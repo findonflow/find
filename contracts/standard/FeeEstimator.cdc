@@ -12,9 +12,9 @@ import FlowToken from "./FlowToken.cdc"
     Consumers of this contract would then need to pop the resource out of the DepositEstimate resource to get it back
  */
 pub contract FeeEstimator {
-    pub resource DepositEstimate {
-        pub var item: @AnyResource?
-        pub var storageFee: UFix64
+    access(all) resource DepositEstimate {
+        access(all) var item: @AnyResource?
+        access(all) var storageFee: UFix64
 
         init(item: @AnyResource, storageFee: UFix64) {
             self.item <- item

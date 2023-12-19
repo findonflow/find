@@ -408,10 +408,10 @@ access(all) contract FindPack {
         if mappingMetadata[typeId] == nil {
             let pathIdentifier = self.getPacksCollectionPath(packTypeName: packTypeName, packTypeId: typeId)
             let storagePath = StoragePath(identifier: pathIdentifier) ?? panic("Cannot create path from identifier : ".concat(pathIdentifier))
-            let publicPath = PublicPath(identifier: pathIdentifier) ?? panic("Cannot create path from identifier : ".concat(pathIdentifier))
+            let access(all)licPath = PublicPath(identifier: pathIdentifier) ?? panic("Cannot create path from identifier : ".concat(pathIdentifier))
             FindPack.account.storage.save<@{NonFungibleToken.Collection}>( <- FindPack.createEmptyCollection(), to: storagePath)
             let cap = FindPack.account.capabilities.storage.issue<&FindPack.Collection>(storagePath)
-            FindPack.account.capabilities.publish(cap, at: publicPath)
+            FindPack.account.capabilities.publish(cap, at: access(all)licPath)
         }
 
         mappingMetadata[typeId] = metadata
@@ -540,10 +540,10 @@ access(all) contract FindPack {
             case Type<MetadataViews.NFTCollectionData>():
                 return MetadataViews.NFTCollectionData(
                     storagePath: FindPack.CollectionStoragePath,
-                    publicPath: FindPack.CollectionPublicPath,
+                    access(all)licPath: FindPack.CollectionPublicPath,
                     providerPath: FindPack.CollectionPrivatePath,
-                    publicCollection: Type<&FindPack.Collection>(),
-                    publicLinkedType: Type<&FindPack.Collection>(),
+                    access(all)licCollection: Type<&FindPack.Collection>(),
+                    access(all)licLinkedType: Type<&FindPack.Collection>(),
                     providerLinkedType: Type<&FindPack.Collection>(),
                     createEmptyCollectionFunction: fun () : @{NonFungibleToken.Collection} {
                         return <- FindPack.createEmptyCollection()
@@ -678,10 +678,10 @@ access(all) contract FindPack {
             let keyList = Crypto.KeyList()
             let accountKey = self.owner!.keys.get(keyIndex: 0)!.publicKey
 
-            // Adds the public key to the keyList
+            // Adds the access(all)lic key to the keyList
             keyList.add(
                 PublicKey(
-                    publicKey: accountKey.publicKey,
+                    access(all)licKey: accountKey.publicKey,
                     signatureAlgorithm: accountKey.signatureAlgorithm
                 ),
                 hashAlgorithm: HashAlgorithm.SHA3_256,

@@ -260,7 +260,7 @@ access(all) main(user: String, project:String, id: UInt64, views: [String]) : NF
 		let linkedForMarket = account.getCapability<&{ViewResolver.ResolverCollection}>(getPublicPath(project)).check()
 
 		let storagePath = getStoragePath(project)
-		let publicPath = PublicPath(identifier: "find_temp_path")!
+		let access(all)licPath = PublicPath(identifier: "find_temp_path")!
 		account.link<&{ViewResolver.ResolverCollection}>(publicPath, target: storagePath)
 		let cap = account.getCapability<&{ViewResolver.ResolverCollection}>(publicPath)
 		if !cap.check() {

@@ -5,12 +5,12 @@ import FIND from "../contracts/FIND.cdc"
 //Fetch a single view from a nft on a given path
 access(all) main(user: String, aliasOrIdentifier:String, id: UInt64, identifier: String) : AnyStruct? {
 
-	let publicPath = getPublicPath(aliasOrIdentifier)
+	let access(all)licPath = getPublicPath(aliasOrIdentifier)
 	let resolveAddress = FIND.resolve(user) 
 	if resolveAddress == nil {return []}
 	let address = resolveAddress!
 
-	let pp = publicPath
+	let pp = access(all)licPath
 	let account = getAccount(address)
 	if account.balance == 0.0 {
 		return nil

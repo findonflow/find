@@ -333,7 +333,7 @@ pub contract Bl0xPack: NonFungibleToken {
 			let keyList = Crypto.KeyList()
 			let accountKey = self.owner!.keys.get(keyIndex: 0)!.publicKey
 
-			// Adds the public key to the keyList
+			// Adds the access(all)lic key to the keyList
 			keyList.add(
 				PublicKey(
 					publicKey: accountKey.publicKey,

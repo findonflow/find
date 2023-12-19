@@ -106,10 +106,10 @@ access(all) contract NameVoucher {
 
             case Type<MetadataViews.NFTCollectionData>():
                 return MetadataViews.NFTCollectionData(storagePath: NameVoucher.CollectionStoragePath,
-                publicPath: NameVoucher.CollectionPublicPath,
+                access(all)licPath: NameVoucher.CollectionPublicPath,
                 providerPath: NameVoucher.CollectionPrivatePath,
-                publicCollection: Type<&Collection>(),
-                publicLinkedType: Type<&Collection>(),
+                access(all)licCollection: Type<&Collection>(),
+                access(all)licLinkedType: Type<&Collection>(),
                 providerLinkedType: Type<&Collection>(),
                 createEmptyCollectionFunction: fun(): @{NonFungibleToken.Collection} {return <- NameVoucher.createEmptyCollection()})
 
@@ -295,7 +295,7 @@ access(all) contract NameVoucher {
             return ids
         }
 
-        // public function that anyone can call to create a new empty collection
+        // access(all)lic function that anyone can call to create a new empty collection
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
             return <- NameVoucher.createEmptyCollection()
         }
@@ -327,7 +327,7 @@ access(all) contract NameVoucher {
         NameVoucher.royalties = cutInfo
     }
 
-    // public function that anyone can call to create a new empty collection
+    // access(all)lic function that anyone can call to create a new empty collection
     access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
         return <- create Collection()
     }
@@ -348,14 +348,14 @@ access(all) contract NameVoucher {
             self.account.capabilities.unpublish(FungibleTokenSwitchboard.ReceiverPublicPath)
             self.account.capabilities.unpublish(FungibleTokenSwitchboard.PublicPath)
 
-            // Create a public capability to the Switchboard exposing the deposit
+            // Create a access(all)lic capability to the Switchboard exposing the deposit
             // function through the {FungibleToken.Receiver} interface
             let receiverCap = self.account.capabilities.storage.issue<&{FungibleToken.Receiver}>(
                 FungibleTokenSwitchboard.StoragePath
             )
             self.account.capabilities.publish(receiverCap, at: FungibleTokenSwitchboard.ReceiverPublicPath)
 
-            // Create a public capability to the Switchboard exposing both the
+            // Create a access(all)lic capability to the Switchboard exposing both the
             // {FungibleTokenSwitchboard.SwitchboardPublic} and the 
             // {FungibleToken.Receiver} interfaces
             let switchboardPublicCap = self.account.capabilities.storage.issue<&{FungibleTokenSwitchboard.SwitchboardPublic, FungibleToken.Receiver}>(

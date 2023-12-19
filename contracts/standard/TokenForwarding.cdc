@@ -5,7 +5,7 @@
 This contract shows how an account could set up a custom FungibleToken Receiver
 to allow them to forward tokens to a different account whenever they receive tokens.
 
-They can publish this Forwarder resource as a Receiver capability just like a Vault,
+They can access(all)lish this Forwarder resource as a Receiver capability just like a Vault,
 and the sender doesn't even need to know it is different.
 
 When an account wants to create a Forwarder, they call the createNewForwarder
@@ -21,7 +21,7 @@ access(all) contract TokenForwarding {
     // Event that is emitted when tokens are deposited to the target receiver
     access(all) event ForwardedDeposit(amount: UFix64, from: Address?)
 
-    pub resource interface ForwarderPublic {
+    access(all) resource interface ForwarderPublic {
 
         /// Helper function to check whether set `recipient` capability
         /// is not latent or the capability tied to a type is valid.
@@ -36,7 +36,7 @@ access(all) contract TokenForwarding {
         access(all) safeBorrow(): &{FungibleToken.Receiver}?
     }
 
-    pub resource Forwarder: FungibleToken.Receiver, ForwarderPublic {
+    access(all) resource Forwarder: FungibleToken.Receiver, ForwarderPublic {
 
         // This is where the deposited tokens will be sent.
         // The type indicates that it is a reference to a receiver

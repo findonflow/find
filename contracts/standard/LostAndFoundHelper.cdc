@@ -2,21 +2,21 @@ import LostAndFound from "./LostAndFound.cdc"
 
 pub contract LostAndFoundHelper {
 
-    pub struct Ticket {
+    access(all) struct Ticket {
 
         // An optional message to attach to this item.
-        pub let memo: String?
+        access(all) let memo: String?
         // The address that it allowed to withdraw the item fromt this ticket
-        pub let redeemer: Address
+        access(all) let redeemer: Address
         //The type of the resource (non-optional) so that bins can represent the true type of an item
-        pub let type: Type
-        pub let typeIdentifier: String
+        access(all) let type: Type
+        access(all) let typeIdentifier: String
         // State maintained by LostAndFound
-        pub let redeemed: Bool
-        pub let name : String?
-        pub let description : String?
-        pub let thumbnail : String?
-        pub let ticketID : UInt64?
+        access(all) let redeemed: Bool
+        access(all) let name : String?
+        access(all) let description : String?
+        access(all) let thumbnail : String?
+        access(all) let ticketID : UInt64?
 
         init(_ ticket: &LostAndFound.Ticket, id: UInt64?) {
             self.memo = ticket.memo 

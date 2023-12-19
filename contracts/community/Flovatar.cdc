@@ -23,9 +23,9 @@ This contract contains also the Admin resource that can be used to manage and ge
 
 pub contract Flovatar: NonFungibleToken {
 
-    pub let CollectionStoragePath: StoragePath
-    pub let CollectionPublicPath: PublicPath
-    pub let AdminStoragePath: StoragePath
+    access(all) let CollectionStoragePath: StoragePath
+    access(all) let CollectionPublicPath: PublicPath
+    access(all) let AdminStoragePath: StoragePath
 
     // These will be used in the Marketplace to pay out
     // royalties to the creator and to the marketplace
@@ -34,7 +34,7 @@ pub contract Flovatar: NonFungibleToken {
 
     // Here we keep track of all the Flovatar unique combinations and names
     // that people will generate to make sure that there are no duplicates
-    pub var totalSupply: UInt64
+    access(all) var totalSupply: UInt64
     access(contract) let mintedCombinations: {String: Bool}
     access(contract) let mintedNames: {String: Bool}
 
@@ -46,24 +46,24 @@ pub contract Flovatar: NonFungibleToken {
     access(all) event NameSet(id: UInt64, name: String)
 
 
-    pub struct Royalties{
-        pub let royalty: [Royalty]
+    access(all) struct Royalties{
+        access(all) let royalty: [Royalty]
         init(royalty: [Royalty]) {
             self.royalty=royalty
         }
     }
 
-    pub enum RoyaltyType: UInt8{
-        pub case fixed
-        pub case percentage
+    access(all) enum RoyaltyType: UInt8{
+        access(all) case fixed
+        access(all) case percentage
     }
 
-    pub struct Royalty{
-        pub let wallet:Capability<&{FungibleToken.Receiver}>
-        pub let cut: UFix64
+    access(all) struct Royalty{
+        access(all) let wallet:Capability<&{FungibleToken.Receiver}>
+        access(all) let cut: UFix64
 
         //can be percentage
-        pub let type: RoyaltyType
+        access(all) let type: RoyaltyType
 
         init(wallet:Capability<&{FungibleToken.Receiver}>, cut: UFix64, type: RoyaltyType ){
             self.wallet=wallet
@@ -74,16 +74,16 @@ pub contract Flovatar: NonFungibleToken {
 
 
     // This Metadata struct contains all the most important informations about the Flovatar
-    pub struct Metadata {
-        pub let mint: UInt64
-        pub let series: UInt32
-        pub let svg: String
-        pub let combination: String
-        pub let creatorAddress: Address
+    access(all) struct Metadata {
+        access(all) let mint: UInt64
+        access(all) let series: UInt32
+        access(all) let svg: String
+        access(all) let combination: String
+        access(all) let creatorAddress: Address
         access(self) let components: {String: UInt64}
-        pub let rareCount: UInt8
-        pub let epicCount: UInt8
-        pub let legendaryCount: UInt8
+        access(all) let rareCount: UInt8
+        access(all) let epicCount: UInt8
+        access(all) let legendaryCount: UInt8
 
 
         init(
@@ -112,18 +112,18 @@ pub contract Flovatar: NonFungibleToken {
         }
     }
 
-    // The public interface can show metadata and the content for the Flovatar.
+    // The access(all)lic interface can show metadata and the content for the Flovatar.
     // In addition to it, it provides methods to access the additional optional
     // components (accessory, hat, eyeglasses, background) for everyone.
-    pub resource interface Public {
-        pub let id: UInt64
+    access(all) resource interface Public {
+        access(all) let id: UInt64
         access(contract) let metadata: Metadata
         access(contract) let royalties: Royalties
 
         // these three are added because I think they will be in the standard. At least Dieter thinks it will be needed
         access(contract) var name: String
-        pub let description: String
-        pub let schema: String?
+        access(all) let description: String
+        access(all) let schema: String?
 
         access(all) getName(): String
         access(all) getAccessory(): UInt64?
@@ -140,7 +140,7 @@ pub contract Flovatar: NonFungibleToken {
 
     //The private interface can update the Accessory, Hat, Eyeglasses and Background
     //for the Flovatar and is accessible only to the owner of the NFT
-    pub resource interface Private {
+    access(all) resource interface Private {
         access(all) setName(name: String): String
         access(all) setAccessory(component: @FlovatarComponent.NFT): @FlovatarComponent.NFT?
         access(all) setHat(component: @FlovatarComponent.NFT): @FlovatarComponent.NFT?
@@ -153,8 +153,8 @@ pub contract Flovatar: NonFungibleToken {
     }
 
     //The NFT resource that implements both Private and Public interfaces
-    pub resource NFT: NonFungibleToken.INFT, Public, Private, ViewResolver.Resolver {
-        pub let id: UInt64
+    access(all) resource NFT: NonFungibleToken.INFT, Public, Private, ViewResolver.Resolver {
+        access(all) let id: UInt64
         access(contract) let metadata: Metadata
         access(contract) let royalties: Royalties
         access(contract) var accessory: @FlovatarComponent.NFT?
@@ -163,8 +163,8 @@ pub contract Flovatar: NonFungibleToken {
         access(contract) var background: @FlovatarComponent.NFT?
 
         access(contract) var name: String
-        pub let description: String
-        pub let schema: String?
+        access(all) let description: String
+        access(all) let schema: String?
         access(self) let bio: {String: String}
 
         init(metadata: Metadata,
@@ -529,10 +529,10 @@ pub contract Flovatar: NonFungibleToken {
             if type == Type<MetadataViews.NFTCollectionData>() {
                 return MetadataViews.NFTCollectionData(
                 storagePath: Flovatar.CollectionStoragePath,
-                publicPath: Flovatar.CollectionPublicPath,
+                access(all)licPath: Flovatar.CollectionPublicPath,
                 providerPath: /private/FlovatarCollection,
-                publicCollection: Type<&Flovatar.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
-                publicLinkedType: Type<&Flovatar.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
+                access(all)licCollection: Type<&Flovatar.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
+                access(all)licLinkedType: Type<&Flovatar.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
                 providerLinkedType: Type<&Flovatar.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Flovatar.CollectionPublic}>(),
                 createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Flovatar.createEmptyCollection()}
                 )
@@ -543,7 +543,7 @@ pub contract Flovatar: NonFungibleToken {
 
 
     // Standard NFT collectionPublic interface that can also borrowFlovatar as the correct type
-    pub resource interface CollectionPublic {
+    access(all) resource interface CollectionPublic {
         access(all) deposit(token: @NonFungibleToken.NFT)
         access(all) getIDs(): [UInt64]
         access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT
@@ -558,10 +558,10 @@ pub contract Flovatar: NonFungibleToken {
     }
 
     // Main Collection to manage all the Flovatar NFT
-    pub resource Collection: CollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
+    access(all) resource Collection: CollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
-        pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+        access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
         init () {
             self.ownedNFTs <- {}
@@ -639,22 +639,22 @@ pub contract Flovatar: NonFungibleToken {
         }
     }
 
-    // public function that anyone can call to create a new empty collection
+    // access(all)lic function that anyone can call to create a new empty collection
     access(all) createEmptyCollection(): @NonFungibleToken.Collection {
         return <- create Collection()
     }
 
     // This struct is used to send a data representation of the Flovatars
     // when retrieved using the contract helper methods outside the collection.
-    pub struct FlovatarData {
-        pub let id: UInt64
-        pub let name: String
-        pub let metadata: Flovatar.Metadata
-        pub let accessoryId: UInt64?
-        pub let hatId: UInt64?
-        pub let eyeglassesId: UInt64?
-        pub let backgroundId: UInt64?
-        pub let bio: {String: String}
+    access(all) struct FlovatarData {
+        access(all) let id: UInt64
+        access(all) let name: String
+        access(all) let metadata: Flovatar.Metadata
+        access(all) let accessoryId: UInt64?
+        access(all) let hatId: UInt64?
+        access(all) let eyeglassesId: UInt64?
+        access(all) let backgroundId: UInt64?
+        access(all) let bio: {String: String}
         init(
             id: UInt64,
             name: String,
@@ -812,7 +812,7 @@ pub contract Flovatar: NonFungibleToken {
     }
 
 
-    // This is a public function that anyone can call to generate a new Flovatar
+    // This is a access(all)lic function that anyone can call to generate a new Flovatar
     // A list of components resources needs to be passed to executed.
     // It will check first for uniqueness of the combination + name and will then
     // generate the Flovatar and burn all the passed components.
@@ -1130,7 +1130,7 @@ pub contract Flovatar: NonFungibleToken {
 
     // This is the main Admin resource that will allow the owner
     // to generate new Templates, Components and Packs
-    pub resource Admin {
+    access(all) resource Admin {
 
         //This will create a new FlovatarComponentTemplate that
         // contains all the SVG and basic informations to represent

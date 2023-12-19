@@ -10,7 +10,7 @@ pub contract FindMetadataFactory {
 		pub let name: String
 		pub let image: String
 		pub let collection: String
-		// pub let source: String //which alchemy shard or our own Factory
+		// access(all) let source: String //which alchemy shard or our own Factory
 
 		pub let rarity:String
 		pub let subCollection: String? // <- This will be Alias unless they want something else

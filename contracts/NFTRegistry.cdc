@@ -25,8 +25,8 @@ pub contract NFTRegistry {
 		pub let providerPath : PrivatePath
 		pub let providerPathIdentifier : String
 		// Must implement {ViewResolver.ResolverCollection}
-		pub let publicPath : PublicPath
-		pub let publicPathIdentifier : String
+		pub let access(all)licPath : PublicPath
+		pub let access(all)licPathIdentifier : String
 		pub let storagePath : StoragePath
 		pub let storagePathIdentifier : String
 		// Pass in arrays of allowed Token Vault, nil => support  all types of FTs
@@ -35,15 +35,15 @@ pub contract NFTRegistry {
 		pub let address : Address
 		pub let externalFixedUrl : String
 
-		init(alias: String, type: Type, typeIdentifier: String, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address, externalFixedUrl: String) {
+		init(alias: String, type: Type, typeIdentifier: String, icon: String?, providerPath: PrivatePath, access(all)licPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address, externalFixedUrl: String) {
 			self.alias = alias
 			self.type = type
 			self.typeIdentifier = typeIdentifier
 			self.icon = icon
 			self.providerPath = providerPath
 			self.providerPathIdentifier = providerPath.toString().slice(from: "/private/".length, upTo: providerPath.toString().length)
-			self.publicPath = publicPath
-			self.publicPathIdentifier = publicPath.toString().slice(from: "/public/".length, upTo: publicPath.toString().length)
+			self.publicPath = access(all)licPath
+			self.publicPathIdentifier = access(all)licPath.toString().slice(from: "/public/".length, upTo: access(all)licPath.toString().length)
 			self.storagePath = storagePath
 			self.storagePathIdentifier = storagePath.toString().slice(from: "/storage/".length, upTo: storagePath.toString().length)
 			self.allowedFTTypes = allowedFTTypes
@@ -91,7 +91,7 @@ pub contract NFTRegistry {
 	}
 
 	/* setters */
-	access(account) fun setNFTInfo(alias: String, type: Type, icon: String?, providerPath: PrivatePath, publicPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address, externalFixedUrl: String ) {
+	access(account) fun setNFTInfo(alias: String, type: Type, icon: String?, providerPath: PrivatePath, access(all)licPath: PublicPath, storagePath: StoragePath, allowedFTTypes: [Type]?, address: Address, externalFixedUrl: String ) {
         if NFTRegistry.nonFungibleTokenList.containsKey(type.identifier) {
             panic("This NonFungibleToken Register already exist")
         }
@@ -101,7 +101,7 @@ pub contract NFTRegistry {
 		typeIdentifier: typeIdentifier,
 		icon: icon,
 		providerPath: providerPath,
-		publicPath: publicPath,
+		publicPath: access(all)licPath,
 		storagePath: storagePath,
 		allowedFTTypes: allowedFTTypes,
 		address: address,

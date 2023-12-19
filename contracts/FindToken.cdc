@@ -12,21 +12,21 @@ pub contract FindToken : FungibleToken {
     access(all) event TokensBurned(amount: UFix64)
     access(all) event TokenRewardMultiplier(multiplier: UFix64)
 
-    pub let tokenAlias: String
-    pub var totalSupply: UFix64
-    pub let initialSupply: UFix64 
+    access(all) let tokenAlias: String
+    access(all) var totalSupply: UFix64
+    access(all) let initialSupply: UFix64 
 
     
-    pub let vaultStoragePath: StoragePath 
-    pub let receiverPublicPath: PublicPath 
-    pub let balancePublicPath: PublicPath 
-    pub let providerPath: PrivatePath 
-    pub let minterPath: StoragePath 
-    pub let findRewardPath: PrivatePath 
+    access(all) let vaultStoragePath: StoragePath 
+    access(all) let receiverPublicPath: PublicPath 
+    access(all) let balancePublicPath: PublicPath 
+    access(all) let providerPath: PrivatePath 
+    access(all) let minterPath: StoragePath 
+    access(all) let findRewardPath: PrivatePath 
 
-    pub resource Vault : FungibleToken.Provider, FungibleToken.Receiver, FungibleToken.Balance, FindViews.VaultViews {
+    access(all) resource Vault : FungibleToken.Provider, FungibleToken.Receiver, FungibleToken.Balance, FindViews.VaultViews {
 
-        pub var balance: UFix64 
+        access(all) var balance: UFix64 
         
         init(balance: UFix64) {
             self.balance=balance
@@ -99,7 +99,7 @@ pub contract FindToken : FungibleToken {
         }
     }
 
-    pub resource Minter {
+    access(all) resource Minter {
         access(all) mintTokens(_ amount: UFix64) : @FungibleToken.Vault {
             if amount == 0.0 {
                 panic("Amount minted must be greater than zero")

@@ -10,10 +10,10 @@ transaction(
     contractAddress: Address,
     nftTypeIdentifer: String,
     storagePathIdentifier: String,
-    publicPathIdentifier: String,
+    access(all)licPathIdentifier: String,
     privatePathIdentifier: String,
-    publicLinkedTypeIdentifier : String,
-    publicLinkedTypeRestrictions : [String],
+    access(all)licLinkedTypeIdentifier : String,
+    access(all)licLinkedTypeRestrictions : [String],
     privateLinkedTypeIdentifier : String,
     privateLinkedTypeRestrictions : [String],
     collectionName : String,
@@ -35,9 +35,9 @@ transaction(
     execute {
         let collectionData = NFTCatalog.NFTCollectionData(
             storagePath: StoragePath(identifier: storagePathIdentifier)!,
-            publicPath: PublicPath(identifier : publicPathIdentifier)!,
+            access(all)licPath: PublicPath(identifier : access(all)licPathIdentifier)!,
             privatePath: PrivatePath(identifier: privatePathIdentifier)!,
-            publicLinkedType : RestrictedType(identifier : publicLinkedTypeIdentifier, restrictions: publicLinkedTypeRestrictions)!,
+            access(all)licLinkedType : RestrictedType(identifier : access(all)licLinkedTypeIdentifier, restrictions: access(all)licLinkedTypeRestrictions)!,
             privateLinkedType : RestrictedType(identifier : privateLinkedTypeIdentifier, restrictions: privateLinkedTypeRestrictions)!
         )
 

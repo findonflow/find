@@ -24,15 +24,15 @@ pub contract CoatCheck {
     // A CoatCheck has been initialized. This resource can now be watched for deposited items that accounts can redeem
     access(all) event CoatCheckInitialized(resourceID: UInt64)
 
-    pub resource interface TicketPublic {
+    access(all) resource interface TicketPublic {
         access(all) redeem(fungibleTokenReceiver: &{FungibleToken.Receiver}?, nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?)
         access(all) getDetails(): CoatCheck.TicketDetails
     }
 
-    pub struct TicketDetails {
-        pub let nftTypes: [Type]
-        pub let vaultTypes: [Type]
-        pub let redeemer: Address
+    access(all) struct TicketDetails {
+        access(all) let nftTypes: [Type]
+        access(all) let vaultTypes: [Type]
+        access(all) let redeemer: Address
 
         init(
             redeemer: Address,
@@ -48,12 +48,12 @@ pub contract CoatCheck {
     // Tickets are used to fungible tokens, non-fungible tokens, or both.
     // A ticket can be created by the CoatCheck valet, and can be redeemed only by
     // capabilities owned by the designated redeemer of a ticket
-    pub resource Ticket: TicketPublic {
+    access(all) resource Ticket: TicketPublic {
         // a ticket can have Fungible Tokens AND NonFungibleTokens
         access(self) var fungibleTokenVaults: @[FungibleToken.Vault]?
         access(self) var nonFungibleTokens: @[NonFungibleToken.NFT]?
         
-        pub let details: TicketDetails
+        access(all) let details: TicketDetails
 
         // The following variables are maintained by the CoatCheck contract
         access(self) var redeemed: Bool // a ticket can only be redeemed once. It also cannot be destroyed unless redeemed is set to true
@@ -171,7 +171,7 @@ pub contract CoatCheck {
 
     // ValetPublic contains our main entry-point methods that
     // anyone can use to make/redeem tickets.
-    pub resource interface ValetPublic {
+    access(all) resource interface ValetPublic {
         // redeem a ticket, supplying an optional receiver to use for depositing
         // any fts or nfts in the ticket
         access(all) redeemTicket(
@@ -183,7 +183,7 @@ pub contract CoatCheck {
         
     }
 
-    pub resource Valet: ValetPublic {
+    access(all) resource Valet: ValetPublic {
         access(self) var tickets: @{UInt64: Ticket}
 
         // we store the fees taken when a ticket is made so that the exact amount is withdrawn

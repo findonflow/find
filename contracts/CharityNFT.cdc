@@ -137,7 +137,7 @@ pub contract CharityNFT: NonFungibleToken {
 
 	}
 
-	//The public interface can show metadata and the content for the Art piece
+	//The access(all)lic interface can show metadata and the content for the Art piece
 	pub resource interface Public {
 		pub let id: UInt64
 		access(all) getMetadata() : {String : String}
@@ -221,7 +221,7 @@ pub contract CharityNFT: NonFungibleToken {
 		}
 	}
 
-	// public function that anyone can call to create a new empty collection
+	// access(all)lic function that anyone can call to create a new empty collection
 	access(all) createEmptyCollection(): @NonFungibleToken.Collection {
 		return <- create Collection()
 	}
@@ -235,7 +235,7 @@ pub contract CharityNFT: NonFungibleToken {
 		var newNFT <- create NFT(initID: CharityNFT.totalSupply, metadata:metadata)
 
 		// deposit it in the recipient's account using their reference
-		let collectionRef = recipient.borrow() ?? panic("Cannot borrow reference to collection public. ")
+		let collectionRef = recipient.borrow() ?? panic("Cannot borrow reference to collection access(all)lic. ")
 		collectionRef.deposit(token: <-newNFT)
 		emit Minted(id: CharityNFT.totalSupply, metadata:metadata, to: recipient.address)
 

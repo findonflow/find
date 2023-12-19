@@ -232,7 +232,7 @@ func SetupFIND(o *OverflowState) error {
 					WithArg("contractAddress", "find"),
 					WithArg("addressWithNFT", "find"),
 					WithArg("nftID", packId),
-					WithArg("publicPathIdentifier", publicPathIdentifier),
+					WithArg("publicPathIdentifier", access(all)licPathIdentifier),
 				)
 	*/
 

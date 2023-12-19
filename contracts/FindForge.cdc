@@ -15,7 +15,7 @@ access(all) contract FindForge {
     access(contract) let verifier : @Verifier
 
     access(contract) let forgeTypes : @{Type : {Forge}}
-    access(contract) let publicForges : [Type]
+    access(contract) let access(all)licForges : [Type]
     access(contract) var platformCut: UFix64 
 
     access(all) struct MinterPlatform {
@@ -120,7 +120,7 @@ access(all) contract FindForge {
         let name = lease.getName() 
         if FindForge.minterPlatforms[forgeType]![name] == nil {
             if !FindForge.publicForges.contains(forgeType) {
-                panic("This forge is not supported publicly. Forge Type : ".concat(forgeType.identifier))
+                panic("This forge is not supported access(all)licly. Forge Type : ".concat(forgeType.identifier))
             }
         }
 
@@ -349,7 +349,7 @@ access(all) contract FindForge {
             panic("This type is not registered to the registry. Type : ".concat(forgeType.identifier))
         }
         if FindForge.publicForges.contains(forgeType) {
-            panic("This type is already registered as public forge. Type : ".concat(forgeType.identifier))
+            panic("This type is already registered as access(all)lic forge. Type : ".concat(forgeType.identifier))
         }
         FindForge.publicForges.append(forgeType)
         if !FindForge.minterPlatforms.containsKey(forgeType) {

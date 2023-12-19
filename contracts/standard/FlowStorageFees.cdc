@@ -29,14 +29,14 @@ pub contract FlowStorageFees {
     // definition is written per unit of flow instead of the inverse, 
     // so there is no loss of precision calculating storage from flow, 
     // but there is loss of precision when calculating flow per storage.
-    pub var storageMegaBytesPerReservedFLOW: UFix64
+    access(all) var storageMegaBytesPerReservedFLOW: UFix64
 
     // Defines the minimum amount of Flow tokens that every account needs to have reserved for storage capacity.
     // If an account has less then this amount reserved by the end of any transaction it participated in, the transaction will fail.
-    pub var minimumStorageReservation: UFix64
+    access(all) var minimumStorageReservation: UFix64
 
     // An administrator resource that can change the parameters of the FlowStorageFees smart contract.
-    pub resource Administrator {
+    access(all) resource Administrator {
 
         // Changes the amount of storage capacity an account has per accounts' reserved storage FLOW.
         access(all) setStorageMegaBytesPerReservedFLOW(_ storageMegaBytesPerReservedFLOW: UFix64) {

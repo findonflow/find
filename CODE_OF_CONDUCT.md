@@ -51,7 +51,7 @@ decisions when appropriate.
 ## Scope
 
 This Code of Conduct applies within all community spaces, and also applies when
-an individual is officially representing the community in public spaces.
+an individual is officially representing the community in access(all)lic spaces.
 Examples of representing our community include using an official e-mail address,
 posting via an official social media account, or acting as an appointed
 representative at an online or offline event.
@@ -78,7 +78,7 @@ unprofessional or unwelcome in the community.
 
 **Consequence**: A private, written warning from community leaders, providing
 clarity around the nature of the violation and an explanation of why the
-behavior was inappropriate. A public apology may be requested.
+behavior was inappropriate. A access(all)lic apology may be requested.
 
 ### 2. Warning
 
@@ -97,8 +97,8 @@ permanent ban.
 **Community Impact**: A serious violation of community standards, including
 sustained inappropriate behavior.
 
-**Consequence**: A temporary ban from any sort of interaction or public
-communication with the community for a specified period of time. No public or
+**Consequence**: A temporary ban from any sort of interaction or access(all)lic
+communication with the community for a specified period of time. No access(all)lic or
 private interaction with the people involved, including unsolicited interaction
 with those enforcing the Code of Conduct, is allowed during this period.
 Violating these terms may lead to a permanent ban.
@@ -109,7 +109,7 @@ Violating these terms may lead to a permanent ban.
 standards, including sustained inappropriate behavior,  harassment of an
 individual, or aggression toward or disparagement of classes of individuals.
 
-**Consequence**: A permanent ban from any sort of public interaction within
+**Consequence**: A permanent ban from any sort of access(all)lic interaction within
 the community.
 
 ## Attribution

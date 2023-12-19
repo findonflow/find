@@ -7,8 +7,8 @@ import ProfileCache from "../contracts/ProfileCache.cdc"
 import FindUtils from "../contracts/FindUtils.cdc"
 
 access(all) contract Profile {
-	access(all) let publicPath: PublicPath
-	access(all) let publicReceiverPath: PublicPath
+	access(all) let access(all)licPath: PublicPath
+	access(all) let access(all)licReceiverPath: PublicPath
 	access(all) let storagePath: StoragePath
 
 	//and event emitted when somebody follows another user

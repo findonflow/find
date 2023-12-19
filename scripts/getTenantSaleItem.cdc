@@ -11,9 +11,9 @@ access(all) main(tenant: Address) : TenantSaleItems {
 }
 
 pub struct TenantSaleItems {
-    pub let findSaleItems : {String : FindMarket.TenantSaleItem}
-    pub let tenantSaleItems : {String : FindMarket.TenantSaleItem}
-    pub let findCuts : {String : FindMarket.TenantSaleItem} 
+    access(all) let findSaleItems : {String : FindMarket.TenantSaleItem}
+    access(all) let tenantSaleItems : {String : FindMarket.TenantSaleItem}
+    access(all) let findCuts : {String : FindMarket.TenantSaleItem} 
 
     init(findSaleItems : {String : FindMarket.TenantSaleItem}, 
          tenantSaleItems : {String : FindMarket.TenantSaleItem},

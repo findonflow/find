@@ -19,26 +19,26 @@ pub contract FiatToken: FungibleToken {
     access(all) event TokensMinted(amount: UFix64)
 
     // The storage path for the admin resource
-    pub let AdminStoragePath: StoragePath
+    access(all) let AdminStoragePath: StoragePath
 
     // The storage Path for minters' MinterProxy
-    pub let MinterProxyStoragePath: StoragePath
+    access(all) let MinterProxyStoragePath: StoragePath
 
-    // The public path for minters' MinterProxy capability
-    pub let MinterProxyPublicPath: PublicPath
+    // The access(all)lic path for minters' MinterProxy capability
+    access(all) let MinterProxyPublicPath: PublicPath
 
     // Event that is emitted when a new minter resource is created
     access(all) event MinterCreated()
 
     // Total supply of fusd in existence
-    pub var totalSupply: UFix64
+    access(all) var totalSupply: UFix64
 
 
 		//paths copied from Fiattoken https://github.com/flow-usdc/flow-usdc/blob/main/contracts/FiatToken.cdc
-	  pub let VaultStoragePath: StoragePath
-    pub let VaultBalancePubPath: PublicPath
-    pub let VaultUUIDPubPath: PublicPath
-    pub let VaultReceiverPubPath: PublicPath
+	  access(all) let VaultStoragePath: StoragePath
+    access(all) let VaultBalancePubPath: PublicPath
+    access(all) let VaultUUIDPubPath: PublicPath
+    access(all) let VaultReceiverPubPath: PublicPath
 
     // Vault
     //
@@ -57,10 +57,10 @@ pub contract FiatToken: FungibleToken {
         access(all) UUID(): UInt64
     }
 
-    pub resource Vault: ResourceId, FungibleToken.Provider, FungibleToken.Receiver, FungibleToken.Balance {
+    access(all) resource Vault: ResourceId, FungibleToken.Provider, FungibleToken.Receiver, FungibleToken.Balance {
 
         // holds the balance of a users tokens
-        pub var balance: UFix64
+        access(all) var balance: UFix64
 
         // initialize the balance at resource creation time
         init(balance: UFix64) {
@@ -121,7 +121,7 @@ pub contract FiatToken: FungibleToken {
     // Resource object that can mint new tokens.
     // The admin stores this and passes it to the minter account as a capability wrapper resource.
     //
-    pub resource Minter {
+    access(all) resource Minter {
 
         // mintTokens
         //
@@ -139,7 +139,7 @@ pub contract FiatToken: FungibleToken {
 
     }
 
-    pub resource interface MinterProxyPublic {
+    access(all) resource interface MinterProxyPublic {
         access(all) setMinterCapability(cap: Capability<&Minter>)
     }
 
@@ -149,7 +149,7 @@ pub contract FiatToken: FungibleToken {
     // The resource that this capability represents can be deleted by the admin
     // in order to unilaterally revoke minting capability if needed.
 
-    pub resource MinterProxy: MinterProxyPublic {
+    access(all) resource MinterProxy: MinterProxyPublic {
 
         // access(self) so nobody else can copy the capability and use it.
         access(self) var minterCapability: Capability<&Minter>?
@@ -191,7 +191,7 @@ pub contract FiatToken: FungibleToken {
     // Ideally we would create this structure in a single function, generate the paths from the address
     // and cache all of this information to enable easy revocation but String/Path comversion isn't yet supported.
     //
-    pub resource Administrator {
+    access(all) resource Administrator {
         access(all) createNewMinter(): @Minter {
             emit MinterCreated()
             return <- create Minter()

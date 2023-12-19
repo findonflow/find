@@ -131,7 +131,7 @@ func TestFindForge(t *testing.T) {
 			WithArg("collectionExternalURL", "Example NFT external url"),
 			WithArg("collectionSquareImage", "Example NFT square image"),
 			WithArg("collectionBannerImage", "Example NFT banner image"),
-		).AssertFailure(t, fmt.Sprintf("This forge is not supported publicly. Forge Type : %s", exampleNFTForge))
+		).AssertFailure(t, fmt.Sprintf("This forge is not supported access(all)licly. Forge Type : %s", exampleNFTForge))
 
 		otu.O.Tx("adminAddForge",
 			WithSigner("find-admin"),

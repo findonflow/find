@@ -17,10 +17,10 @@ access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [
     return fetchAlchemyCollectionShard4(user: user, collectionIDs: collectionIDs)
 }
 
-    pub struct CollectionReport {
-        pub let items : {String : [MetadataCollectionItem]}
-        pub let collections : {String : Int} // mapping of collection to no. of ids
-        pub let extraIDs : {String : [UInt64]}
+    access(all) struct CollectionReport {
+        access(all) let items : {String : [MetadataCollectionItem]}
+        access(all) let collections : {String : Int} // mapping of collection to no. of ids
+        access(all) let extraIDs : {String : [UInt64]}
 
         init(items: {String : [MetadataCollectionItem]},  collections : {String : Int}, extraIDs : {String : [UInt64]} ) {
             self.items=items
@@ -29,16 +29,16 @@ access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [
         }
     }
 
-    pub struct MetadataCollectionItem {
-        pub let id:UInt64
-        pub let uuid:UInt64?
-        pub let name: String
-        pub let collection: String // <- This will be Alias unless they want something else
-        pub let project: String
+    access(all) struct MetadataCollectionItem {
+        access(all) let id:UInt64
+        access(all) let uuid:UInt64?
+        access(all) let name: String
+        access(all) let collection: String // <- This will be Alias unless they want something else
+        access(all) let project: String
 
-        pub let media  : String
-        pub let mediaType : String
-        pub let source : String
+        access(all) let media  : String
+        access(all) let mediaType : String
+        access(all) let source : String
 
         init(id:UInt64, uuid: UInt64?, name: String, collection: String, media  : String, mediaType : String, source : String, project: String) {
             self.id=id

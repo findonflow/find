@@ -67,7 +67,7 @@ pub contract FindMarket {
 		let pathPrefix=self.pathMap[type.identifier]!
 		let path=pathPrefix.concat("_").concat(name)
 
-		return PublicPath(identifier: path) ?? panic("Cannot find public path for type ".concat(type.identifier))
+		return PublicPath(identifier: path) ?? panic("Cannot find access(all)lic path for type ".concat(type.identifier))
 	}
 
 	access(all) getStoragePath(_ type: Type, name:String) : StoragePath {
@@ -75,7 +75,7 @@ pub contract FindMarket {
 		let pathPrefix=self.pathMap[type.identifier]!
 		let path=pathPrefix.concat("_").concat(name)
 
-		return StoragePath(identifier: path) ?? panic("Cannot find public path for type ".concat(type.identifier))
+		return StoragePath(identifier: path) ?? panic("Cannot find access(all)lic path for type ".concat(type.identifier))
 	}
 	access(all) getFindTenantAddress() : Address {
 		return FindMarket.account.address
@@ -1247,7 +1247,7 @@ pub contract FindMarket {
 			let tenantPath=self.getTenantPathForName(name)
 			let sp=StoragePath(identifier: tenantPath)!
 			let pp=PrivatePath(identifier: tenantPath)!
-			let pubp=PublicPath(identifier:tenantPath)!
+			let access(all)p=PublicPath(identifier:tenantPath)!
 			destroy account.load<@Tenant>(from: sp)
 			account.unlink(pp)
 			account.unlink(pubp)
@@ -1278,7 +1278,7 @@ pub contract FindMarket {
 		let tenantPath=self.getTenantPathForName(name)
 		let sp=StoragePath(identifier: tenantPath)!
 		let pp=PrivatePath(identifier: tenantPath)!
-		let pubp=PublicPath(identifier:tenantPath)!
+		let access(all)p=PublicPath(identifier:tenantPath)!
 
 		account.storage.save(<- tenant, to: sp)
 		account.link<&Tenant>(pp, target:sp)

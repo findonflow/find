@@ -139,7 +139,7 @@ access(all) main(user: String) : MetadataCollections? {
 		}
 	}
 
-	let publicPath=/public/FindCuratedCollections
+	let access(all)licPath=/public/FindCuratedCollections
 	let link = account.getCapability<&{String: [String]}>(publicPath)
 	var curatedCollections : {String: [String]} = {}
 	if link.check() {

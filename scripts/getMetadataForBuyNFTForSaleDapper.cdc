@@ -27,7 +27,7 @@ pub struct PurchaseData {
 	pub let amount: UFix64
 	pub let description: String
 	pub let imageURL: String
-  pub let paymentVaultTypeID: Type
+  access(all) let paymentVaultTypeID: Type
 
 	init(id: UInt64, name: String, amount: UFix64, description: String, imageURL: String, paymentVaultTypeID: Type) {
 		self.id = id

@@ -54,7 +54,7 @@ addons - .find leases can support add ons to the name itself.
 	// lookupAddress look up the address of a find name, and return the owner if there is one (and if the lease is still valid / active)
 	access(all) lookupAddress(_ name:String): Address?
 
-	// lookup looks up the find name owner's profile public interface if there is one
+	// lookup looks up the find name owner's profile access(all)lic interface if there is one
 	access(all) lookup(_ input:String): &{Profile.Public}?
 
 	// reverse lookup looks up the address for the user's find name
@@ -64,9 +64,9 @@ addons - .find leases can support add ons to the name itself.
 
 	// status returns the status of a find name
 	// For find lease we have 3 states
-	// pub case FREE - It is not owned and free to take
-	// pub case TAKEN - It is already taken and in use by someone
-	// pub case LOCKED - The lease is expired now, but the lease will be locked only to the previous owner who has 3-month-time to renew it
+	// access(all) case FREE - It is not owned and free to take
+	// access(all) case TAKEN - It is already taken and in use by someone
+	// access(all) case LOCKED - The lease is expired now, but the lease will be locked only to the previous owner who has 3-month-time to renew it
 	//
 	access(all) status(_ name: String): NameStatus
 
@@ -559,7 +559,7 @@ The configuration enables us to add as many more as we want on top
 		access(all) getFindTenantAddress() : Address
 
 
-		// public function to get tenant referece with public interface
+		// access(all)lic function to get tenant referece with access(all)lic interface
 		// the tenant reference and address are vital to do market operations on that particular tenant
 		access(all) getTenant(_ tenant: Address) : &FindMarket.Tenant{FindMarket.TenantPublic}
 	}
@@ -593,7 +593,7 @@ pub contract FindMarketSale {
 		access(contract) let totalRoyalties: UFix64
 	}
 
-	// This is a public interface that expose needed information and required function to execute market interaction.
+	// This is a access(all)lic interface that expose needed information and required function to execute market interaction.
 	pub resource interface SaleItemCollectionPublic {
 		// fetch all the tokens in the collection
 		access(all) getIds(): [UInt64]
@@ -930,7 +930,7 @@ transaction(
 
 You can post thought (what we call Think like Tweet as to Twitter), share medias, reThink (quote and post on top), edit, delete, hide and react to thoughts.
 
-Thoughts are still in alpha stage, we are still forging the ability to share and point to NFTs / any onchain assets, adding reply function, publish with tag and get fetched / categorized by the tags, etc.
+Thoughts are still in alpha stage, we are still forging the ability to share and point to NFTs / any onchain assets, adding reply function, access(all)lish with tag and get fetched / categorized by the tags, etc.
 
 This will be very important part of social mapping
 
@@ -963,7 +963,7 @@ pub contract FindThoughts {
 		access(all) getHide() : Bool
 	}
 
-	// CollectionPublic interface exposes below functions to the public
+	// CollectionPublic interface exposes below functions to the access(all)lic
 	pub resource interface CollectionPublic {
 		access(all) contains(_ id: UInt64) : Bool
 		access(all) getIDs() : [UInt64]
@@ -973,7 +973,7 @@ pub contract FindThoughts {
 	// Collection
 	pub resource Collection : CollectionPublic, ViewResolver.ResolverCollection {
 		// Publish a thought with optional media, NFTPointer or quotes
-		access(all) publish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?)
+		access(all) access(all)lish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?)
 		access(all) delete(_ id: UInt64)
 		access(all) hide(id: UInt64, hide: Bool)
 

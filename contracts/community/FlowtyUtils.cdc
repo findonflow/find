@@ -6,9 +6,9 @@ import CoatCheck from "./CoatCheck.cdc"
 pub contract FlowtyUtils {
     access(contract) var Attributes: {String: AnyStruct}
 
-    pub let FlowtyUtilsStoragePath: StoragePath
+    access(all) let FlowtyUtilsStoragePath: StoragePath
 
-    pub resource FlowtyUtilsAdmin {
+    access(all) resource FlowtyUtilsAdmin {
         // addSupportedTokenType
         // add a supported token type that can be used in Flowty loans
         access(all) addSupportedTokenType(type: Type) {

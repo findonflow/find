@@ -16,8 +16,8 @@ pub contract EmeraldIdentityLilico {
     //
     // Paths
     //
-    pub let AdministratorStoragePath: StoragePath
-    pub let AdministratorPrivatePath: PrivatePath
+    access(all) let AdministratorStoragePath: StoragePath
+    access(all) let AdministratorPrivatePath: PrivatePath
 
     //
     // Events
@@ -28,7 +28,7 @@ pub contract EmeraldIdentityLilico {
     //
     // Administrator
     //
-    pub resource Administrator {
+    access(all) resource Administrator {
         // 1-to-1
         access(account) var accountToDiscord: {Address: String}
         // 1-to-1

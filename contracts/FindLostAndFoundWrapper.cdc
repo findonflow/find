@@ -25,7 +25,7 @@ pub contract FindLostAndFoundWrapper {
     // Mapping of vault uuid to vault.  
     // A method to get around passing the "Vault" reference to Lost and Found to ensure it cannot be hacked. 
     // All vaults should be destroyed after deposit function
-    pub let storagePaymentVaults : @{UInt64 : FungibleToken.Vault}
+    access(all) let storagePaymentVaults : @{UInt64 : FungibleToken.Vault}
 
     // Deposit 
     access(all) depositNFT(

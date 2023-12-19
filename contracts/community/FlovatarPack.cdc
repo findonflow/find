@@ -23,11 +23,11 @@ import FlowUtilityToken from "../standard/FlowUtilityToken.cdc"
 
 pub contract FlovatarPack {
 
-    pub let CollectionStoragePath: StoragePath
-    pub let CollectionPublicPath: PublicPath
+    access(all) let CollectionStoragePath: StoragePath
+    access(all) let CollectionPublicPath: PublicPath
 
     // Counter for all the Packs ever minted
-    pub var totalSupply: UInt64
+    access(all) var totalSupply: UInt64
 
     // Standard events that will be emitted
     access(all) event ContractInitialized()
@@ -37,23 +37,23 @@ pub contract FlovatarPack {
     access(all) event Opened(id: UInt64)
     access(all) event Purchased(id: UInt64)
 
-    // The public interface contains only the ID and the price of the Pack
-    pub resource interface Public {
-        pub let id: UInt64
-        pub let price: UFix64
-        pub let sparkCount: UInt32
-        pub let series: UInt32
-        pub let name: String
+    // The access(all)lic interface contains only the ID and the price of the Pack
+    access(all) resource interface Public {
+        access(all) let id: UInt64
+        access(all) let price: UFix64
+        access(all) let sparkCount: UInt32
+        access(all) let series: UInt32
+        access(all) let name: String
     }
 
     // The Pack resource that implements the Public interface and that contains
     // different Components in a Dictionary
-    pub resource Pack: Public {
-        pub let id: UInt64
-        pub let price: UFix64
-        pub let sparkCount: UInt32
-        pub let series: UInt32
-        pub let name: String
+    access(all) resource Pack: Public {
+        access(all) let id: UInt64
+        access(all) let price: UFix64
+        access(all) let sparkCount: UInt32
+        access(all) let series: UInt32
+        access(all) let name: String
         access(account) let components: @[FlovatarComponent.NFT]
         access(account) var randomString: String
 
@@ -132,7 +132,7 @@ pub contract FlovatarPack {
     }
 
     //Pack CollectionPublic interface that allows users to purchase a Pack
-    pub resource interface CollectionPublic {
+    access(all) resource interface CollectionPublic {
         access(all) getIDs(): [UInt64]
         access(all) deposit(token: @FlovatarPack.Pack)
         access(all) purchase(tokenId: UInt64, recipientCap: Capability<&{FlovatarPack.CollectionPublic}>, buyTokens: @FungibleToken.Vault, signature: String)
@@ -141,7 +141,7 @@ pub contract FlovatarPack {
 
     // Main Collection that implements the Public interface and that
     // will handle the purchase transactions
-    pub resource Collection: CollectionPublic {
+    access(all) resource Collection: CollectionPublic {
         // Dictionary of all the Packs owned
         access(account) let ownedPacks: @{UInt64: FlovatarPack.Pack}
         // Capability to send the FLOW tokens to the owner's account
@@ -242,14 +242,14 @@ pub contract FlovatarPack {
                 buyTokens.isInstance(Type<@FlowToken.Vault>()) : "Vault not of the right Token Type"
             }
 
-            // Gets the Crypto.KeyList and the public key of the collection's owner
+            // Gets the Crypto.KeyList and the access(all)lic key of the collection's owner
             let keyList = Crypto.KeyList()
             let accountKey = self.owner!.keys.get(keyIndex: 0)!.publicKey
 
-            // Adds the public key to the keyList
+            // Adds the access(all)lic key to the keyList
             keyList.add(
                 PublicKey(
-                    publicKey: accountKey.publicKey,
+                    access(all)licKey: accountKey.publicKey,
                     signatureAlgorithm: accountKey.signatureAlgorithm
                 ),
                 hashAlgorithm: HashAlgorithm.SHA3_256,
@@ -306,14 +306,14 @@ pub contract FlovatarPack {
                 buyTokens.isInstance(Type<@FlowUtilityToken.Vault>()) : "Vault not of the right Token Type"
             }
 
-            // Gets the Crypto.KeyList and the public key of the collection's owner
+            // Gets the Crypto.KeyList and the access(all)lic key of the collection's owner
             let keyList = Crypto.KeyList()
             let accountKey = self.owner!.keys.get(keyIndex: 0)!.publicKey
 
-            // Adds the public key to the keyList
+            // Adds the access(all)lic key to the keyList
             keyList.add(
                 PublicKey(
-                    publicKey: accountKey.publicKey,
+                    access(all)licKey: accountKey.publicKey,
                     signatureAlgorithm: accountKey.signatureAlgorithm
                 ),
                 hashAlgorithm: HashAlgorithm.SHA3_256,
@@ -367,7 +367,7 @@ pub contract FlovatarPack {
 
 
 
-    // public function that anyone can call to create a new empty collection
+    // access(all)lic function that anyone can call to create a new empty collection
     access(all) createEmptyCollection(ownerVault: Capability<&{FungibleToken.Receiver}>): @FlovatarPack.Collection {
         return <- create Collection(ownerVault: ownerVault)
     }

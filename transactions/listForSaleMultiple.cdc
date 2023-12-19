@@ -28,7 +28,7 @@ transaction(nftAliasOrIdentifiers: [String], ids: [AnyStruct], ftAliasOrIdentifi
 		self.finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath) ?? panic("Cannot borrow reference to find lease collection")
 
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
-		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
+		let access(all)licPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
 		let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
 
 		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath)

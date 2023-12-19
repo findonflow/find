@@ -65,7 +65,7 @@ func TestFindAirdropper(t *testing.T) {
 
 	})
 
-	ot.Run(t, "Should be able to send Airdrop with only collection public linked", func(t *testing.T) {
+	ot.Run(t, "Should be able to send Airdrop with only collection access(all)lic linked", func(t *testing.T) {
 
 		otu.O.Tx("devUnlinkDandyReceiver",
 			WithSigner("user2"),

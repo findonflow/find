@@ -90,7 +90,7 @@ access(all) contract FungibleToken {
         /// withdraw subtracts tokens from the owner's Vault
         /// and returns a Vault with the removed tokens.
         ///
-        /// The function's access level is public, but this is not a problem
+        /// The function's access level is access(all)lic, but this is not a problem
         /// because only the owner storing the resource in their account
         /// can initially call this function.
         ///
@@ -98,7 +98,7 @@ access(all) contract FungibleToken {
         /// capability that allows specific other users to access
         /// the provider resource through a reference.
         ///
-        /// The owner may also grant all accounts access by creating a public
+        /// The owner may also grant all accounts access by creating a access(all)lic
         /// capability that allows all users to access the provider
         /// resource through a reference.
         ///
@@ -182,12 +182,12 @@ access(all) contract FungibleToken {
             return nil
         }
 
-        /// Returns the public path where this vault should have a public capability
+        /// Returns the access(all)lic path where this vault should have a access(all)lic capability
         access(all) view fun getDefaultPublicPath(): PublicPath? {
             return nil
         }
 
-        /// Returns the public path where this vault's Receiver should have a public capability
+        /// Returns the access(all)lic path where this vault's Receiver should have a access(all)lic capability
         /// Publishing a Receiver Capability at a different path enables alternate Receiver implementations to be used
         /// in the same canonical namespace as the underlying Vault.
         access(all) view fun getDefaultReceiverPath(): PublicPath? {

@@ -57,7 +57,7 @@ access(all) contract FUSD: ViewResolver {
         access(all) var balance: UFix64
 
         access(self) var storagePath: StoragePath
-        access(self) var publicPath: PublicPath
+        access(self) var access(all)licPath: PublicPath
         access(self) var receiverPath: PublicPath
 
         /// Returns the storage path where the vault should typically be stored
@@ -65,12 +65,12 @@ access(all) contract FUSD: ViewResolver {
             return self.storagePath
         }
 
-        /// Returns the public path where this vault should have a public capability
+        /// Returns the access(all)lic path where this vault should have a access(all)lic capability
         access(all) view fun getDefaultPublicPath(): PublicPath? {
             return self.publicPath
         }
 
-        /// Returns the public path where this vault's Receiver should have a public capability
+        /// Returns the access(all)lic path where this vault's Receiver should have a access(all)lic capability
         access(all) view fun getDefaultReceiverPath(): PublicPath? {
             return self.receiverPath
         }
@@ -274,7 +274,7 @@ access(all) contract FUSD: ViewResolver {
 
         self.account.storage.save(<-vault, to: self.VaultStoragePath)
 
-        // Create a public capability to the stored Vault that exposes
+        // Create a access(all)lic capability to the stored Vault that exposes
         // the `deposit` method and getAcceptedTypes method through the `Receiver` interface
         // and the `getBalance()` method through the `Balance` interface
         //

@@ -31,11 +31,11 @@ pub contract FLOATVerifiers {
     //
     // Specifies a time range in which the 
     // FLOAT from an event can be claimed
-    pub struct Timelock: FLOAT.IVerifier {
+    access(all) struct Timelock: FLOAT.IVerifier {
         // An automatic switch handled by the contract
         // to stop people from claiming after a certain time.
-        pub let dateStart: UFix64
-        pub let dateEnding: UFix64
+        access(all) let dateStart: UFix64
+        access(all) let dateEnding: UFix64
 
         access(all) verify(_ params: {String: AnyStruct}) {
             assert(
@@ -59,7 +59,7 @@ pub contract FLOATVerifiers {
     //
     // Specifies a secret code in order
     // to claim a FLOAT (not very secure, but cool feature)
-    pub struct Secret: FLOAT.IVerifier {
+    access(all) struct Secret: FLOAT.IVerifier {
         // The secret code, set by the owner of this event.
         access(self) let secretPhrase: String
 
@@ -83,8 +83,8 @@ pub contract FLOATVerifiers {
     // who can CLAIM. Not to be confused with how many currently
     // hold a FLOAT from this event, since users can
     // delete their FLOATs.
-    pub struct Limited: FLOAT.IVerifier {
-        pub var capacity: UInt64
+    access(all) struct Limited: FLOAT.IVerifier {
+        access(all) var capacity: UInt64
 
         access(all) verify(_ params: {String: AnyStruct}) {
             let event = params["event"]! as! &FLOAT.FLOATEvent{FLOAT.FLOATEventPublic}
@@ -106,7 +106,7 @@ pub contract FLOATVerifiers {
     // Allows for Multiple Secret codes
     // Everytime a secret gets used, it gets removed
     // from the list.
-    pub struct MultipleSecret: FLOAT.IVerifier {
+    access(all) struct MultipleSecret: FLOAT.IVerifier {
         access(self) let secrets: {String: Bool}
 
         access(all) verify(_ params: {String: AnyStruct}) {

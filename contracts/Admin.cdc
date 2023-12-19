@@ -34,7 +34,7 @@ access(all) contract Admin {
     //interface to use for capability receiver pattern
     access(all) resource interface AdminProxyClient {
         //TODO: all methods but this in here needs to be behind and entitlement
-        //the rule is, any method that is publicly linked that was previously _not_ in the linked interface needs an entitlement
+        //the rule is, any method that is access(all)licly linked that was previously _not_ in the linked interface needs an entitlement
         access(all) fun addCapability(_ cap: Capability<&FIND.Network>)
     }
 
@@ -125,7 +125,7 @@ access(all) contract Admin {
             walletRef.setWallet(wallet)
         }
 
-        /// Enable or disable public registration
+        /// Enable or disable access(all)lic registration
         access(all) fun setPublicEnabled(_ enabled: Bool) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"

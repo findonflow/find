@@ -1,7 +1,7 @@
 pub contract FindRelatedAccounts {
 
 	pub let storagePath: StoragePath
-	pub let publicPath: PublicPath
+	pub let access(all)licPath: PublicPath
 
 	pub event RelatedAccount(user: Address, walletId: String, walletName: String, address: String, network: String, action: String)
 

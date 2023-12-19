@@ -148,87 +148,87 @@ pub contract FlowtyRentals {
         deposit: UFix64
     )
 
-    pub let FlowtyRentalsStorefrontStoragePath: StoragePath
-    pub let FlowtyRentalsMarketplaceStoragePath: StoragePath
-    pub let FlowtyRentalsStorefrontPublicPath: PublicPath
-    pub let FlowtyRentalsMarketplacePublicPath: PublicPath
-    pub let FlowtyRentalsAdminStoragePath: StoragePath
+    access(all) let FlowtyRentalsStorefrontStoragePath: StoragePath
+    access(all) let FlowtyRentalsMarketplaceStoragePath: StoragePath
+    access(all) let FlowtyRentalsStorefrontPublicPath: PublicPath
+    access(all) let FlowtyRentalsMarketplacePublicPath: PublicPath
+    access(all) let FlowtyRentalsAdminStoragePath: StoragePath
 
     // SuspendedFundingPeriod
     // A period of time in seconds before which
     // a listing cannot be rented.
-    pub var SuspendedFundingPeriod: UFix64
+    access(all) var SuspendedFundingPeriod: UFix64
 
     // Fee
     // Fee taken as a percentage of the initial rental fee.
     // For instance, if a rental has a fee of 10, Flowty will take a fee
     // of 10 * Fee where Fee is less than 1.
-    pub var Fee: UFix64
+    access(all) var Fee: UFix64
 
     // ListingDetails
     // Non-resource data about a listing.
     //
-    pub struct ListingDetails {
+    access(all) struct ListingDetails {
         // The ID of the storefront that this listing was made on.
         // Note that this listing cannot be transferred to another address
-        pub var flowtyStorefrontID: UInt64
+        access(all) var flowtyStorefrontID: UInt64
 
         // Signal indicating whether the listing has been rented or not.
         // It can only be rented once.
-        pub var rented: Bool
+        access(all) var rented: Bool
 
         // The type of the nft being rented. When attempting to rent an nft,
         // a listing will check that the type of the nft being rented
         // matches nftType
         //
-        pub let nftType: Type
+        access(all) let nftType: Type
 
         // The ID of the nft being rented. When attempting to rent an nft,
         // a listing will check that the ID of the nft being rented
         // matched nftID
-        pub let nftID: UInt64
+        access(all) let nftID: UInt64
 
         // The flat fee amount collected. This amount is split when a listing is
         // rented to the owner of the listing, flowty, and royalty owners
         //
-        pub let amount: UFix64
+        access(all) let amount: UFix64
 
         // The deposit fee collected. This amount is returned to a renter
         // if they return the nft they rented. However, if they do not,
         // the deposit will be transferred to the original owner of the nft
         // and to the royalty recipient of the nft collection
         //
-        pub let deposit: UFix64
+        access(all) let deposit: UFix64
 
         // The number of seconds that a rental is valid for when it is rented
         // After the term has elapsed, a rental can be settled.
-        pub var term: UFix64
+        access(all) var term: UFix64
 
         // The type of FungibleToken to be accepted as payment.
-        pub let paymentVaultType: Type
+        access(all) let paymentVaultType: Type
 
         // A flag to reenable the listing once it has been returned
         // This allows a user to keep a listing open in perpetuity
         // should they desire to leave it open.
-        pub var reenableOnReturn: Bool
+        access(all) var reenableOnReturn: Bool
 
         // Contains information about how to pay owner of this listing
         access(self) let paymentCut: Flowty.PaymentCut
 
         // The time that this listing was created
-        pub let listedTime: UFix64
+        access(all) let listedTime: UFix64
 
         // The royalty percentage taken at the time of listing.
-        pub var royaltyRate: UFix64
+        access(all) var royaltyRate: UFix64
 
         // The duration that this listing is valid for. If this amount of time
         // has passed, the listing can no-longer be rented.
-        pub var expiresAfter: UFix64
+        access(all) var expiresAfter: UFix64
 
         // An optional parameter that can be used to prevent all addresses
         // except for the specified one to rent this listing.
         // This is how we achieve private listings.
-        pub var renter: Address?
+        access(all) var renter: Address?
 
         access(all) getPaymentCut(): Flowty.PaymentCut {
             return self.paymentCut
@@ -276,9 +276,9 @@ pub contract FlowtyRentals {
     }
 
     // ListingPublic
-    // An inerface providing a useful public interface to a listing
+    // An inerface providing a useful access(all)lic interface to a listing
     //
-    pub resource interface ListingPublic {
+    access(all) resource interface ListingPublic {
         // borrowNFT
         // This will assert in the same way as the NFT standard borrowNFT()
         // if the NFT is absent, for example if it has been sold via another listing.
@@ -318,7 +318,7 @@ pub contract FlowtyRentals {
     // Listing
     // A resource that allows an NFT to be temporarily owned by another account in exchange
     // for a Fee and a Deposit.
-    pub resource Listing: ListingPublic {
+    access(all) resource Listing: ListingPublic {
         // The simple (non-Capability, non-complex) details of the listing
         access(self) let details: ListingDetails
 
@@ -328,7 +328,7 @@ pub contract FlowtyRentals {
         // way that it claims.
         access(contract) let nftProviderCapability: Capability<&AnyResource{NonFungibleToken.Provider, NonFungibleToken.Collection}>
 
-        // A capability allowing this resource to access the owner's NFT public collection
+        // A capability allowing this resource to access the owner's NFT access(all)lic collection
         access(contract) let nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>
 
         // reference to the owner's fungibleTokenReceiver to pay them in the event of a settlement.
@@ -351,7 +351,7 @@ pub contract FlowtyRentals {
 
         // getDetails
         // Get the details of the current state of the Listing as a struct.
-        // This avoids having more public variables and getter methods for them, and plays
+        // This avoids having more access(all)lic variables and getter methods for them, and plays
         // nicely with scripts (which cannot return resources).
         //
         access(all) getDetails(): ListingDetails {
@@ -553,32 +553,32 @@ pub contract FlowtyRentals {
 
     // Rental Details
     // A struct containing a Rental's non-resource data.
-    pub struct RentalDetails {
+    access(all) struct RentalDetails {
         // |-- gathered by an initialized Rental resource --|
         // The storefront which owns this rental.
-        pub var flowtyStorefrontID: UInt64
+        access(all) var flowtyStorefrontID: UInt64
         // The listing being funded
-        pub var listingResourceID: UInt64
+        access(all) var listingResourceID: UInt64
         // They type used for payment to obtain the rental.
         // Tokens taken as a deposit are also made of this type
-        pub var paymentVaultType: Type
+        access(all) var paymentVaultType: Type
 
         // The number of seconds that this rental is good for.
         // If the rental is not returned before this time, the deposit can be revoked
-        pub var term: UFix64
+        access(all) var term: UFix64
 
         // The id of the nft that was rented. This is the same as listingDetails.nftID
-        pub var nftID: UInt64
+        access(all) var nftID: UInt64
 
         // The type of the nft that was rented. This is the same as listingDetails.nftType
-        pub var nftType: Type
+        access(all) var nftType: Type
 
         // |-- The below variables are maintained by our smart contract --|
-        pub var returned: Bool
-        pub var settled: Bool
+        access(all) var returned: Bool
+        access(all) var settled: Bool
 
         // The time this Rental was created
-        pub var startTime: UFix64
+        access(all) var startTime: UFix64
 
         access(contract) fun setToReturned() {
             self.returned = true
@@ -610,9 +610,9 @@ pub contract FlowtyRentals {
     }
 
     // RentalPublic
-    // An interface providing a useful public interface to a Rental.
+    // An interface providing a useful access(all)lic interface to a Rental.
     //
-    pub resource interface RentalPublic {
+    access(all) resource interface RentalPublic {
         // The entry point method to return a rental.
         // The same NFT as the one that was rented must be returned.
         access(all) returnNFT(nft: @NonFungibleToken.NFT)
@@ -633,7 +633,7 @@ pub contract FlowtyRentals {
     // The resource used to represent a Rental.
     // A Rental contains the deposit held in exchange for an NFT
     // If that same NFT is returned, the deposit is released back to the renter.
-    pub resource Rental: RentalPublic {
+    access(all) resource Rental: RentalPublic {
         // The non-resource data of a Rental
         access(self) let details: RentalDetails
 
@@ -859,7 +859,7 @@ pub contract FlowtyRentals {
     // FlowtyRentalsMarketplaceManager
     // An interface for adding and removing rental resources within a FlowtyRentalsMarketplace,
     //
-    pub resource interface FlowtyRentalsMarketplaceManager {
+    access(all) resource interface FlowtyRentalsMarketplaceManager {
         // createFunding
         // Allows the FlowtyRentalsMarketplace owner to create and insert Fundings.
         //
@@ -886,12 +886,12 @@ pub contract FlowtyRentals {
         access(all) borrowPrivateRental(rentalResourceID: UInt64): &Rental?
     }
 
-    pub resource interface FlowtyRentalsMarketplacePublic {
+    access(all) resource interface FlowtyRentalsMarketplacePublic {
         access(all) getRentalIDs(): [UInt64]
         access(all) borrowRental(rentalResourceID: UInt64): &Rental{RentalPublic}?
     }
 
-    pub resource FlowtyRentalsMarketplace: FlowtyRentalsMarketplaceManager, FlowtyRentalsMarketplacePublic { 
+    access(all) resource FlowtyRentalsMarketplace: FlowtyRentalsMarketplaceManager, FlowtyRentalsMarketplacePublic { 
         access(self) var rentals: @{UInt64: Rental}
 
         // create a rental and store it on our contract marketplace
@@ -986,7 +986,7 @@ pub contract FlowtyRentals {
         }
     }
 
-    pub resource interface FlowtyRentalsStorefrontManager {
+    access(all) resource interface FlowtyRentalsStorefrontManager {
         access(all) createListing(
             nftProviderCapability: Capability<&AnyResource{NonFungibleToken.Provider, NonFungibleToken.Collection}>,
             nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>,
@@ -1005,7 +1005,7 @@ pub contract FlowtyRentals {
         access(all) removeListing(listingResourceID: UInt64)
     }
 
-    pub resource interface FlowtyRentalsStorefrontPublic {
+    access(all) resource interface FlowtyRentalsStorefrontPublic {
         access(all) getListingIDs(): [UInt64]
         access(all) borrowListing(listingResourceID: UInt64): &Listing{ListingPublic}?
         access(all) cleanup(listingResourceID: UInt64)
@@ -1013,7 +1013,7 @@ pub contract FlowtyRentals {
 
    // FlowtyRentalsStorefront -  The storefront which stores listing and provides functionality to fill them
    // A listing records the an nftid and type, a fee and deposit, and an optional address.
-   pub resource FlowtyRentalsStorefront : FlowtyRentalsStorefrontManager, FlowtyRentalsStorefrontPublic {
+   access(all) resource FlowtyRentalsStorefront : FlowtyRentalsStorefrontManager, FlowtyRentalsStorefrontPublic {
        access(self) var listings: @{UInt64: Listing}
 
        // create a new listing. Takes in a provider to withdraw the listed nft, and details
@@ -1126,7 +1126,7 @@ pub contract FlowtyRentals {
         }
    }
 
-   pub resource FlowtyAdmin {
+   access(all) resource FlowtyAdmin {
         access(all) setFees(fee: UFix64) {
             pre {
                 fee <= 1.0: "rental is a percentage"
@@ -1144,7 +1144,7 @@ pub contract FlowtyRentals {
         return self.account.storage.borrow<&FlowtyRentals.FlowtyRentalsMarketplace>(from: FlowtyRentals.FlowtyRentalsMarketplaceStoragePath)!
     }
 
-    pub resource FlowtyRentalsAdmin {
+    access(all) resource FlowtyRentalsAdmin {
         access(all) setFees(rentalFee: UFix64) {
             pre {
                 rentalFee <= 1.0: "Funding fee should be a percentage"

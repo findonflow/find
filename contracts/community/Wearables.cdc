@@ -694,7 +694,7 @@ pub contract Wearables: NonFungibleToken {
 		}
 	}
 
-	// public function that anyone can call to create a new empty collection
+	// access(all)lic function that anyone can call to create a new empty collection
 	access(all) createEmptyCollection(): @NonFungibleToken.Collection {
 		return <- create Collection()
 	}
@@ -822,7 +822,7 @@ pub contract Wearables: NonFungibleToken {
 		return &Wearables.templates[id]! as &Wearables.Template
 	}
 
-	//Below here are internal resources that is not really relevant to the public
+	//Below here are internal resources that is not really relevant to the access(all)lic
 
 	//internal struct to use for batch minting that points to a specific wearable
 	pub struct WearableMintData {

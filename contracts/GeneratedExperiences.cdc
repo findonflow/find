@@ -6,7 +6,7 @@ import FindPack from "./FindPack.cdc"
 
 pub contract GeneratedExperiences: NonFungibleToken {
 
-    pub var totalSupply: UInt64
+    access(all) var totalSupply: UInt64
 
     access(all) event ContractInitialized()
     access(all) event Withdraw(id: UInt64, from: Address?)
@@ -14,26 +14,26 @@ pub contract GeneratedExperiences: NonFungibleToken {
     access(all) event Minted(id:UInt64, season: UInt64, name: String, thumbnail: String, fullsize: String, artist: String, rarity: String, edition: UInt64, maxEdition: UInt64)
     access(all) event SeasonAdded(season:UInt64, squareImage: String, bannerImage: String)
 
-    pub let CollectionStoragePath: StoragePath
-    pub let CollectionPrivatePath: PrivatePath
-    pub let CollectionPublicPath: PublicPath
-    pub let MinterStoragePath: StoragePath
+    access(all) let CollectionStoragePath: StoragePath
+    access(all) let CollectionPrivatePath: PrivatePath
+    access(all) let CollectionPublicPath: PublicPath
+    access(all) let MinterStoragePath: StoragePath
 
-    pub let CollectionName : String
+    access(all) let CollectionName : String
 
     // {Season : CollectionInfo}
-    pub let collectionInfo: {UInt64 : CollectionInfo}
+    access(all) let collectionInfo: {UInt64 : CollectionInfo}
 
-    pub struct CollectionInfo {
-        pub let season: UInt64
-        pub var royalties: [MetadataViews.Royalty]
+    access(all) struct CollectionInfo {
+        access(all) let season: UInt64
+        access(all) var royalties: [MetadataViews.Royalty]
         // This is only used internally for fetching royalties in
-        pub let royaltiesInput: [FindPack.Royalty]
-        pub let squareImage: MetadataViews.Media
-        pub let bannerImage: MetadataViews.Media
-        pub let description: String
-        pub let socials: {String : String}
-        pub let extra: {String: AnyStruct}
+        access(all) let royaltiesInput: [FindPack.Royalty]
+        access(all) let squareImage: MetadataViews.Media
+        access(all) let bannerImage: MetadataViews.Media
+        access(all) let description: String
+        access(all) let socials: {String : String}
+        access(all) let extra: {String: AnyStruct}
 
         init(
             season: UInt64,
@@ -60,16 +60,16 @@ pub contract GeneratedExperiences: NonFungibleToken {
         }
     }
 
-    pub struct Info {
-        pub let season: UInt64
-        pub let name: String
-        pub let description: String
-        pub let thumbnail: {MetadataViews.File}
-        pub let fullsize: {MetadataViews.File}
-        pub let edition: UInt64
-        pub let maxEdition: UInt64
-        pub let artist: String
-        pub let rarity: String
+    access(all) struct Info {
+        access(all) let season: UInt64
+        access(all) let name: String
+        access(all) let description: String
+        access(all) let thumbnail: {MetadataViews.File}
+        access(all) let fullsize: {MetadataViews.File}
+        access(all) let edition: UInt64
+        access(all) let maxEdition: UInt64
+        access(all) let artist: String
+        access(all) let rarity: String
         access(self) let extra: {String: AnyStruct}
 
         init(season: UInt64, name: String, description: String, thumbnail: {MetadataViews.File}, edition:UInt64, maxEdition:UInt64, fullsize: {MetadataViews.File}, artist: String, rarity: String) {
@@ -86,9 +86,9 @@ pub contract GeneratedExperiences: NonFungibleToken {
         }
     }
 
-    pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
-        pub let id: UInt64
-        pub let info: Info
+    access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
+        access(all) let id: UInt64
+        access(all) let info: Info
 
         init(
             info: Info
@@ -152,10 +152,10 @@ pub contract GeneratedExperiences: NonFungibleToken {
             case Type<MetadataViews.NFTCollectionData>():
                 return MetadataViews.NFTCollectionData(
                     storagePath: GeneratedExperiences.CollectionStoragePath,
-                    publicPath: GeneratedExperiences.CollectionPublicPath,
+                    access(all)licPath: GeneratedExperiences.CollectionPublicPath,
                     providerPath: GeneratedExperiences.CollectionPrivatePath,
-                    publicCollection: Type<&GeneratedExperiences.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-                    publicLinkedType: Type<&GeneratedExperiences.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+                    access(all)licCollection: Type<&GeneratedExperiences.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+                    access(all)licLinkedType: Type<&GeneratedExperiences.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
                     providerLinkedType: Type<&GeneratedExperiences.Collection{NonFungibleToken.Collection,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
                     createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
                         return <-GeneratedExperiences.createEmptyCollection()
@@ -206,10 +206,10 @@ pub contract GeneratedExperiences: NonFungibleToken {
         }
     }
 
-    pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
+    access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
-        pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+        access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
         init () {
             self.ownedNFTs <- {}
@@ -261,12 +261,12 @@ pub contract GeneratedExperiences: NonFungibleToken {
         }
     }
 
-    // public function that anyone can call to create a new empty collection
+    // access(all)lic function that anyone can call to create a new empty collection
     access(all) createEmptyCollection(): @NonFungibleToken.Collection {
         return <- create Collection()
     }
 
-    pub resource Forge: FindForge.Forge {
+    access(all) resource Forge: FindForge.Forge {
         access(all) mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
             let info = data as? Info ?? panic("The data passed in is not in form as needed. Needed: ".concat(Type<Info>().identifier))
 
@@ -323,7 +323,7 @@ pub contract GeneratedExperiences: NonFungibleToken {
         let collection <- create Collection()
         self.account.storage.save(<-collection, to: self.CollectionStoragePath)
 
-        // create a public capability for the collection
+        // create a access(all)lic capability for the collection
         self.account.link<&GeneratedExperiences.Collection{NonFungibleToken.Collection, ViewResolver.ResolverCollection}>(
             self.CollectionPublicPath,
             target: self.CollectionStoragePath

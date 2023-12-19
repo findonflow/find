@@ -95,13 +95,13 @@ pub contract NFTRetrieval {
     }
 
     //LEGACY - DO NOT USE
-    pub struct BaseNFTViewsV1 {
-        pub let id: UInt64
-        pub let display: MetadataViews.Display?
-        pub let externalURL: MetadataViews.ExternalURL?
-        pub let collectionData: MetadataViews.NFTCollectionData?
-        pub let collectionDisplay: MetadataViews.NFTCollectionDisplay?
-        pub let royalties: MetadataViews.Royalties?
+    access(all) struct BaseNFTViewsV1 {
+        access(all) let id: UInt64
+        access(all) let display: MetadataViews.Display?
+        access(all) let externalURL: MetadataViews.ExternalURL?
+        access(all) let collectionData: MetadataViews.NFTCollectionData?
+        access(all) let collectionDisplay: MetadataViews.NFTCollectionDisplay?
+        access(all) let royalties: MetadataViews.Royalties?
 
         init(
             id : UInt64,

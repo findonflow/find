@@ -147,7 +147,7 @@ func TestGeneratedExperiences(t *testing.T) {
 			let acct = getAccount(user)
 			let collectionRef = acct.getCapability(GeneratedExperiences.CollectionPublicPath)
 				.borrow<&{ViewResolver.ResolverCollection}>()
-				?? panic("Could not borrow capability from public collection")
+				?? panic("Could not borrow capability from access(all)lic collection")
 
 			let resolver = collectionRef.borrowViewResolver(id: collectionRef.getIDs()[0])
 			return resolver.getViews()
@@ -206,7 +206,7 @@ func TestGeneratedExperiences(t *testing.T) {
 		let acct = getAccount(user)
 		let collectionRef = acct.getCapability(GeneratedExperiences.CollectionPublicPath)
 			.borrow<&{ViewResolver.ResolverCollection}>()
-			?? panic("Could not borrow capability from public collection")
+			?? panic("Could not borrow capability from access(all)lic collection")
 
 		let resolver = collectionRef.borrowViewResolver(id: collectionRef.getIDs()[1])
 		return resolver.resolveView(CompositeType(view)!)

@@ -56,13 +56,13 @@ access(all) main(user: String) : Report {
 
 pub struct Report {
 
-    pub let initiableStorage : [String] 
-    pub let relinkableStorage : [String]
-    pub let initiatedStorage : [String] 
-    pub let problematicStorage : [String] 
-    pub let notSupportedType : [String] 
+    access(all) let initiableStorage : [String] 
+    access(all) let relinkableStorage : [String]
+    access(all) let initiatedStorage : [String] 
+    access(all) let problematicStorage : [String] 
+    access(all) let notSupportedType : [String] 
 
-    pub let err : String? 
+    access(all) let err : String? 
 
     init(initiableStorage : [String] , relinkableStorage : [String] , initiatedStorage : [String], problematicStorage : [String] , notSupportedType : [String] , err : String? ) {
         self.initiableStorage = initiableStorage

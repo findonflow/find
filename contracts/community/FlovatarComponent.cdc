@@ -14,11 +14,11 @@ import MetadataViews from "../standard/MetadataViews.cdc"
 
 pub contract FlovatarComponent: NonFungibleToken {
 
-    pub let CollectionStoragePath: StoragePath
-    pub let CollectionPublicPath: PublicPath
+    access(all) let CollectionStoragePath: StoragePath
+    access(all) let CollectionPublicPath: PublicPath
 
     // Counter for all the Components ever minted
-    pub var totalSupply: UInt64
+    access(all) var totalSupply: UInt64
 
     // Standard events that will be emitted
     access(all) event ContractInitialized()
@@ -27,12 +27,12 @@ pub contract FlovatarComponent: NonFungibleToken {
     access(all) event Created(id: UInt64, templateId: UInt64, mint: UInt64)
     access(all) event Destroyed(id: UInt64, templateId: UInt64)
 
-    // The public interface provides all the basic informations about
+    // The access(all)lic interface provides all the basic informations about
     // the Component and also the Template ID associated with it.
-    pub resource interface Public {
-        pub let id: UInt64
-        pub let templateId: UInt64
-        pub let mint: UInt64
+    access(all) resource interface Public {
+        access(all) let id: UInt64
+        access(all) let templateId: UInt64
+        access(all) let mint: UInt64
         access(all) getTemplate(): FlovatarComponentTemplate.ComponentTemplateData
         access(all) getSvg(): String
         access(all) getCategory(): String
@@ -42,20 +42,20 @@ pub contract FlovatarComponent: NonFungibleToken {
         access(all) checkCategorySeries(category: String, series: UInt32): Bool
 
         //these three are added because I think they will be in the standard. At least Dieter thinks it will be needed
-        pub let name: String
-        pub let description: String
-        pub let schema: String?
+        access(all) let name: String
+        access(all) let description: String
+        access(all) let schema: String?
     }
 
 
     // The NFT resource that implements the Public interface as well
-    pub resource NFT: NonFungibleToken.INFT, Public, ViewResolver.Resolver {
-        pub let id: UInt64
-        pub let templateId: UInt64
-        pub let mint: UInt64
-        pub let name: String
-        pub let description: String
-        pub let schema: String?
+    access(all) resource NFT: NonFungibleToken.INFT, Public, ViewResolver.Resolver {
+        access(all) let id: UInt64
+        access(all) let templateId: UInt64
+        access(all) let mint: UInt64
+        access(all) let name: String
+        access(all) let description: String
+        access(all) let schema: String?
 
         // Initiates the NFT from a Template ID.
         init(templateId: UInt64) {
@@ -222,10 +222,10 @@ pub contract FlovatarComponent: NonFungibleToken {
             if type == Type<MetadataViews.NFTCollectionData>() {
                 return MetadataViews.NFTCollectionData(
                 storagePath: FlovatarComponent.CollectionStoragePath,
-                publicPath: FlovatarComponent.CollectionPublicPath,
+                access(all)licPath: FlovatarComponent.CollectionPublicPath,
                 providerPath: /private/FlovatarComponentCollection,
-                publicCollection: Type<&FlovatarComponent.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
-                publicLinkedType: Type<&FlovatarComponent.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
+                access(all)licCollection: Type<&FlovatarComponent.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
+                access(all)licLinkedType: Type<&FlovatarComponent.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
                 providerLinkedType: Type<&FlovatarComponent.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, FlovatarComponent.CollectionPublic}>(),
                 createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- FlovatarComponent.createEmptyCollection()}
                 )
@@ -235,7 +235,7 @@ pub contract FlovatarComponent: NonFungibleToken {
     }
 
     // Standard NFT collectionPublic interface that can also borrowComponent as the correct type
-    pub resource interface CollectionPublic {
+    access(all) resource interface CollectionPublic {
 
         access(all) deposit(token: @NonFungibleToken.NFT)
         access(all) getIDs(): [UInt64]
@@ -251,10 +251,10 @@ pub contract FlovatarComponent: NonFungibleToken {
     }
 
     // Main Collection to manage all the Components NFT
-    pub resource Collection: CollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
+    access(all) resource Collection: CollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
-        pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+        access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
         init () {
             self.ownedNFTs <- {}
@@ -320,22 +320,22 @@ pub contract FlovatarComponent: NonFungibleToken {
         }
     }
 
-    // public function that anyone can call to create a new empty collection
+    // access(all)lic function that anyone can call to create a new empty collection
     access(all) createEmptyCollection(): @NonFungibleToken.Collection {
         return <- create Collection()
     }
 
     // This struct is used to send a data representation of the Components
     // when retrieved using the contract helper methods outside the collection.
-    pub struct ComponentData {
-        pub let id: UInt64
-        pub let templateId: UInt64
-        pub let mint: UInt64
-        pub let name: String
-        pub let description: String
-        pub let category: String
-        pub let rarity: String
-        pub let color: String
+    access(all) struct ComponentData {
+        access(all) let id: UInt64
+        access(all) let templateId: UInt64
+        access(all) let mint: UInt64
+        access(all) let name: String
+        access(all) let description: String
+        access(all) let category: String
+        access(all) let rarity: String
+        access(all) let color: String
 
         init(id: UInt64, templateId: UInt64, mint: UInt64) {
             self.id = id

@@ -21,8 +21,8 @@ access(all) typeToStringArray(_ array: [Type]) : [String] {
 }
 
 pub struct Report {
-    pub let nftTypes : [String]
-    pub let err : String? 
+    access(all) let nftTypes : [String]
+    access(all) let err : String? 
 
     init(nftTypes : [String] , err : String? ) {
         self.nftTypes = nftTypes

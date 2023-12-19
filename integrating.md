@@ -13,7 +13,7 @@ In order to integrate with .find you have a couple of options.
  
 ### The web2 serverless api
 
-This api is published at  https://lookup.find.xyz/api/lookup
+This api is access(all)lished at  https://lookup.find.xyz/api/lookup
 
 It can be called either with a name or an address
 

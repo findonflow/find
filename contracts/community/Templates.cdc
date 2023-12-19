@@ -111,14 +111,14 @@ pub contract Templates {
 		pub let address: Address
 		pub let cut: UFix64
 		pub let description: String
-		pub let publicPath: String
+		pub let access(all)licPath: String
 
-		init(name : String , address: Address , cut: UFix64 , description: String , publicPath: String) {
+		init(name : String , address: Address , cut: UFix64 , description: String , access(all)licPath: String) {
 			self.name = name
 			self.address = address
 			self.cut = cut
 			self.description = description
-			self.publicPath = publicPath
+			self.publicPath = access(all)licPath
 		}
 
 		access(all) getPublicPath() : PublicPath {

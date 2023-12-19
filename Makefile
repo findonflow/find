@@ -25,7 +25,7 @@ gen-client:
 	go run tasks/client/main.go > lib/find.json
 
 publish:
-	cd lib && npm publish --access public && cd ..
+	cd lib && npm access(all)lish --access access(all)lic && cd ..
 
 patch:
 	json-bump lib/package.json --patch

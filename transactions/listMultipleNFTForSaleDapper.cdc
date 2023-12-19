@@ -29,7 +29,7 @@ transaction(nftAliasOrIdentifiers: [String], ids: [UInt64], ftAliasOrIdentifiers
 		self.vaultTypes= []
 
 		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
-		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
+		let access(all)licPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
 		let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
 
 		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath)

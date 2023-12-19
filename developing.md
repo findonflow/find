@@ -123,13 +123,13 @@ go run tasks/demo/main.go
 ```
 
 ## Integrating between frontend and backend
-.find uses a feature in [overflow](https://github.com/bjartek/overflow) to convert the transactions/scripts in this repo into a json file that is then published to npm.
+.find uses a feature in [overflow](https://github.com/bjartek/overflow) to convert the transactions/scripts in this repo into a json file that is then access(all)lished to npm.
 
 This flow will be integrated into CI but right now it works like this
 
  - `make client` will run the logic to generate the file lib/find.json
  - `make minor|patch|major` will bump the semantic version of the lib/package.json file
- - `make publish` will publish this file to NPM
+ - `make access(all)lish` will access(all)lish this file to NPM
 
 In the frontend code this module is then used as an [NPM import](https://github.com/findonflow/find-web/blob/master/src/functions/txfunctions.js#L3) and used with FCL in a transaction [like this](https://github.com/findonflow/find-web/blob/master/src/functions/txfunctions.js#L13)
 

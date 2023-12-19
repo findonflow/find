@@ -5,7 +5,7 @@ import FlowToken from "./FlowToken.cdc"
 /// Provide a means for accounts storage TopUps. To be used during transaction execution.
 pub contract DapperStorageRent {
 
-  pub let DapperStorageRentAdminStoragePath: StoragePath
+  access(all) let DapperStorageRentAdminStoragePath: StoragePath
 
   /// Threshold of storage required to trigger a refill
   access(contract) var StorageRentRefillThreshold: UInt64
@@ -186,7 +186,7 @@ pub contract DapperStorageRent {
   }
 
   /// cleanExpiredRefilledAccounts
-  /// public method to clean up expired accounts based on current block height
+  /// access(all)lic method to clean up expired accounts based on current block height
   ///
   /// @param batchSize: Int to set the batch size of the cleanup
   access(all) cleanExpiredRefilledAccounts(_ batchSize: Int) {
@@ -205,9 +205,9 @@ pub contract DapperStorageRent {
 
   /// RefilledAccountInfo struct
   /// Holds the block number it was refilled at
-  pub struct RefilledAccountInfo {
-    pub let atBlock: UInt64
-    pub let index: Int
+  access(all) struct RefilledAccountInfo {
+    access(all) let atBlock: UInt64
+    access(all) let index: Int
 
     init(_ index: Int, _ atBlock: UInt64) {
       self.index = index
@@ -217,7 +217,7 @@ pub contract DapperStorageRent {
 
   /// Admin resource
   /// Used to set different configuration levers such as StorageRentRefillThreshold, RefillRequiredBlocks, and BlockedAccounts
-  pub resource Admin {
+  access(all) resource Admin {
     access(all) setStorageRentRefillThreshold(_ threshold: UInt64) {
       DapperStorageRent.StorageRentRefillThreshold = threshold
     }

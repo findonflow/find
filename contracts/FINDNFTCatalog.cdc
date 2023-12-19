@@ -6,7 +6,7 @@ import MetadataViews from "./standard/MetadataViews.cdc"
 // A general purpose NFT registry for Flow NonFungibleTokens.
 //
 // Each catalog entry stores data about the NFT including
-// its collection identifier, nft type, storage and public paths, etc.
+// its collection identifier, nft type, storage and access(all)lic paths, etc.
 //
 // To make an addition to the catalog you can propose an NFT and provide its metadata.
 // An Admin can approve a proposal which would add the NFT to the catalog
@@ -20,9 +20,9 @@ access(all) contract FINDNFTCatalog {
         contractAddress : Address,
         nftType : Type,
         storagePath: StoragePath,
-        publicPath: PublicPath,
+        access(all)licPath: PublicPath,
         privatePath: PrivatePath,
-        publicLinkedType : Type,
+        access(all)licLinkedType : Type,
         privateLinkedType : Type,
         displayName : String,
         description: String,
@@ -37,9 +37,9 @@ access(all) contract FINDNFTCatalog {
         contractAddress : Address,
         nftType : Type,
         storagePath: StoragePath,
-        publicPath: PublicPath,
+        access(all)licPath: PublicPath,
         privatePath: PrivatePath,
-        publicLinkedType : Type,
+        access(all)licLinkedType : Type,
         privateLinkedType : Type,
         displayName : String,
         description: String,
@@ -223,9 +223,9 @@ access(all) contract FINDNFTCatalog {
             contractAddress : metadata.contractAddress,
             nftType: metadata.nftType,
             storagePath: metadata.collectionData.storagePath,
-            publicPath: metadata.collectionData.publicPath,
+            access(all)licPath: metadata.collectionData.publicPath,
             privatePath: metadata.collectionData.privatePath,
-            publicLinkedType : metadata.collectionData.publicLinkedType,
+            access(all)licLinkedType : metadata.collectionData.publicLinkedType,
             privateLinkedType : metadata.collectionData.privateLinkedType,
             displayName : metadata.collectionDisplay.name,
             description: metadata.collectionDisplay.description,
@@ -252,9 +252,9 @@ access(all) contract FINDNFTCatalog {
             contractAddress : metadata.contractAddress,
             nftType: metadata.nftType,
             storagePath: metadata.collectionData.storagePath,
-            publicPath: metadata.collectionData.publicPath,
+            access(all)licPath: metadata.collectionData.publicPath,
             privatePath: metadata.collectionData.privatePath,
-            publicLinkedType : metadata.collectionData.publicLinkedType,
+            access(all)licLinkedType : metadata.collectionData.publicLinkedType,
             privateLinkedType : metadata.collectionData.privateLinkedType,
             displayName : metadata.collectionDisplay.name,
             description: metadata.collectionDisplay.description,

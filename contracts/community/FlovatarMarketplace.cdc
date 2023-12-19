@@ -14,11 +14,11 @@ import FlovatarComponent from "./FlovatarComponent.cdc"
 
 pub contract FlovatarMarketplace {
 
-    pub let CollectionPublicPath: PublicPath
-    pub let CollectionStoragePath: StoragePath
+    access(all) let CollectionPublicPath: PublicPath
+    access(all) let CollectionStoragePath: StoragePath
 
     // The Vault of the Marketplace where it will receive the cuts on each sale
-    pub let marketplaceWallet: Capability<&FlowToken.Vault{FungibleToken.Receiver}>
+    access(all) let marketplaceWallet: Capability<&FlowToken.Vault{FungibleToken.Receiver}>
 
     // Event that is emitted when a new NFT is put up for sale
     access(all) event FlovatarForSale(id: UInt64, price: UFix64, address: Address)
@@ -39,9 +39,9 @@ pub contract FlovatarMarketplace {
     access(all) event FlovatarSaleWithdrawn(tokenId: UInt64, address: Address)
     access(all) event FlovatarComponentSaleWithdrawn(tokenId: UInt64, address: Address)
 
-    // Interface that users will publish for their Sale collection
-    // that only exposes the methods that are supposed to be public
-    pub resource interface SalePublic {
+    // Interface that users will access(all)lish for their Sale collection
+    // that only exposes the methods that are supposed to be access(all)lic
+    access(all) resource interface SalePublic {
         access(all) purchaseFlovatar(tokenId: UInt64, recipientCap: Capability<&{Flovatar.CollectionPublic}>, buyTokens: @FungibleToken.Vault)
         access(all) purchaseFlovatarComponent(tokenId: UInt64, recipientCap: Capability<&{FlovatarComponent.CollectionPublic}>, buyTokens: @FungibleToken.Vault)
         access(all) getFlovatarPrice(tokenId: UInt64): UFix64?
@@ -54,7 +54,7 @@ pub contract FlovatarMarketplace {
 
     // NFT Collection object that allows a user to put their NFT up for sale
     // where others can send fungible tokens to purchase it
-    pub resource SaleCollection: SalePublic {
+    access(all) resource SaleCollection: SalePublic {
 
         // Dictionary of the NFTs that the user is putting up for sale
         access(contract) let flovatarForSale: @{UInt64: Flovatar.NFT}
@@ -276,14 +276,14 @@ pub contract FlovatarMarketplace {
 
     // This struct is used to send a data representation of the Flovatar Sales
     // when retrieved using the contract helper methods outside the collection.
-    pub struct FlovatarSaleData {
-        pub let id: UInt64
-        pub let price: UFix64
-        pub let metadata: Flovatar.Metadata
-        pub let accessoryId: UInt64?
-        pub let hatId: UInt64?
-        pub let eyeglassesId: UInt64?
-        pub let backgroundId: UInt64?
+    access(all) struct FlovatarSaleData {
+        access(all) let id: UInt64
+        access(all) let price: UFix64
+        access(all) let metadata: Flovatar.Metadata
+        access(all) let accessoryId: UInt64?
+        access(all) let hatId: UInt64?
+        access(all) let eyeglassesId: UInt64?
+        access(all) let backgroundId: UInt64?
 
         init(
             id: UInt64,
@@ -307,10 +307,10 @@ pub contract FlovatarMarketplace {
 
     // This struct is used to send a data representation of the Component Sales 
     // when retrieved using the contract helper methods outside the collection.
-    pub struct FlovatarComponentSaleData {
-        pub let id: UInt64
-        pub let price: UFix64
-        pub let metadata: FlovatarComponent.ComponentData
+    access(all) struct FlovatarComponentSaleData {
+        access(all) let id: UInt64
+        access(all) let price: UFix64
+        access(all) let metadata: FlovatarComponent.ComponentData
 
         init(
             id: UInt64,
@@ -419,7 +419,7 @@ pub contract FlovatarMarketplace {
         return <- create SaleCollection(vault: ownerVault)
     }
 
-    pub init() {
+    access(all) init() {
         self.CollectionPublicPath= /public/FlovatarMarketplace
         self.CollectionStoragePath= /storage/FlovatarMarketplace
 

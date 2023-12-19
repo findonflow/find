@@ -120,7 +120,7 @@ access(all) contract FLOAT {
 
         // A capability that points to the FLOATEvents this FLOAT is from.
         // There is a chance the event host unlinks their event from
-        // the public, in which case it's impossible to know details
+        // the access(all)lic, in which case it's impossible to know details
         // about the event. Which is fine, since we store the
         // crucial data to know about the FLOAT in the FLOAT itself.
         access(all) let eventsCap: Capability<&FLOATEvents>
@@ -190,7 +190,7 @@ access(all) contract FLOAT {
         }
 
         destroy() {
-            // If the FLOATEvent owner decided to unlink their public reference
+            // If the FLOATEvent owner decided to unlink their access(all)lic reference
             // for some reason (heavily recommend against it), their records
             // of who owns the FLOAT is going to be messed up. But that is their
             // fault. We shouldn't let that prevent the user from deleting the FLOAT.
@@ -206,7 +206,7 @@ access(all) contract FLOAT {
         }
     }
 
-    // A public interface for people to call into our Collection
+    // A access(all)lic interface for people to call into our Collection
     access(all) resource interface CollectionPublic {
         access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}
         access(all) fun borrowFLOAT(id: UInt64): &NFT?
@@ -243,7 +243,7 @@ access(all) contract FLOAT {
             }
 
             // Try to update the FLOATEvent's current holders. This will
-            // not work if they unlinked their FLOATEvent to the public,
+            // not work if they unlinked their FLOATEvent to the access(all)lic,
             // and the data will go out of sync. But that is their fault.
             if let floatEvent: &FLOATEvent = nft.getEventMetadata() {
                 floatEvent.updateFLOATHome(id: id, serial: nft.serial, owner: self.owner!.address)
@@ -304,7 +304,7 @@ access(all) contract FLOAT {
             self.events[nft.eventId]!.remove(key: id)
 
             // Try to update the FLOATEvent's current holders. This will
-            // not work if they unlinked their FLOATEvent to the public,
+            // not work if they unlinked their FLOATEvent to the access(all)lic,
             // and the data will go out of sync. But that is their fault.
             //
             // Additionally, this checks if the FLOATEvent host wanted this
@@ -355,7 +355,7 @@ access(all) contract FLOAT {
             return ids
         }
 
-        // public function that anyone can call to create a new empty collection
+        // access(all)lic function that anyone can call to create a new empty collection
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
             return <- FLOAT.createEmptyCollection()
         }
@@ -442,7 +442,7 @@ access(all) contract FLOAT {
         access(account) fun verify(_ params: {String: AnyStruct})
     }
 
-    // A public interface to read the FLOATEvent
+    // A access(all)lic interface to read the FLOATEvent
     access(all) resource interface FLOATEventPublic {
         access(all) var claimable: Bool
         access(all) let dateCreated: UFix64
@@ -561,7 +561,7 @@ access(all) contract FLOAT {
             self.groups.remove(key: groupName)
         }
 
-        /***************** Getters (all exposed to the public) *****************/
+        /***************** Getters (all exposed to the access(all)lic) *****************/
 
         // Returns info about the FLOAT that this account claimed
         // (if any)
@@ -593,7 +593,7 @@ access(all) contract FLOAT {
 
         // This dictionary may be slightly off if for some
         // reason the FLOATEvents owner ever unlinked their
-        // resource from the public.  
+        // resource from the access(all)lic.  
         // Use `getCurrentHolder(serial: UInt64)` to truly
         // verify if someone holds that serial.
         access(all) fun getCurrentHolders(): {UInt64: TokenIdentifier} {
@@ -734,7 +734,7 @@ access(all) contract FLOAT {
             return id
         }
 
-        // For the public to claim FLOATs. Must be claimable to do so.
+        // For the access(all)lic to claim FLOATs. Must be claimable to do so.
         // You can pass in `params` that will be forwarded to the
         // customized `verify` function of the verifier.  
         //
@@ -1013,7 +1013,7 @@ access(all) contract FLOAT {
                 message: "This account owner does not share their account with you."
             )
             let otherFLOATEvents = getAccount(fromHost).capabilities.get<&FLOATEvents>(FLOAT.FLOATEventsPublicPath)!.borrow()
-            ?? panic("Could not borrow the public FLOATEvents.")
+            ?? panic("Could not borrow the access(all)lic FLOATEvents.")
             return otherFLOATEvents.borrowEventsRef()
         }
 
@@ -1031,7 +1031,7 @@ access(all) contract FLOAT {
 
         /************* Getters (for anyone) *************/
 
-        // Get a public reference to the FLOATEvent
+        // Get a access(all)lic reference to the FLOATEvent
         // so you can call some helpful getters
         access(all) fun borrowPublicEventRef(eventId: UInt64): &FLOATEvent? {
             if self.events[eventId] != nil {

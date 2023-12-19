@@ -212,7 +212,7 @@ pub contract FindFooDIM: NonFungibleToken {
 		}
 	}
 
-	// public function that anyone can call to create a new empty collection
+	// access(all)lic function that anyone can call to create a new empty collection
 	access(all) createEmptyCollection(): @NonFungibleToken.Collection {
 		return <- create Collection()
 	}
@@ -264,7 +264,7 @@ pub contract FindFooDIM: NonFungibleToken {
 		let collection <- create Collection()
 		self.account.storage.save(<-collection, to: self.CollectionStoragePath)
 
-		// create a public capability for the collection
+		// create a access(all)lic capability for the collection
 		self.account.link<&FindFooDIM.Collection{NonFungibleToken.Collection, ViewResolver.ResolverCollection}>(
 			self.CollectionPublicPath,
 			target: self.CollectionStoragePath

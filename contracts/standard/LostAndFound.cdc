@@ -29,10 +29,10 @@ import FeeEstimator from "./FeeEstimator.cdc"
 pub contract LostAndFound {
     access(contract) let storageFees: {UInt64: UFix64}
 
-    pub let LostAndFoundPublicPath: PublicPath
-    pub let LostAndFoundStoragePath: StoragePath
-    pub let DepositorPublicPath: PublicPath
-    pub let DepositorStoragePath: StoragePath
+    access(all) let LostAndFoundPublicPath: PublicPath
+    access(all) let LostAndFoundStoragePath: StoragePath
+    access(all) let DepositorPublicPath: PublicPath
+    access(all) let DepositorStoragePath: StoragePath
 
     access(all) event TicketDeposited(redeemer: Address, ticketID: UInt64, type: Type, memo: String?, name: String?, description: String?, thumbnail: String?)
     access(all) event TicketRedeemed(redeemer: Address, ticketID: UInt64, type: Type)
@@ -45,13 +45,13 @@ pub contract LostAndFound {
     access(all) event DepositorTokensWithdrawn(uuid: UInt64, tokens: UFix64, balance: UFix64)
 
     // Placeholder receiver so that any resource can be supported, not just FT and NFT Receivers
-    pub resource interface AnyResourceReceiver {
+    access(all) resource interface AnyResourceReceiver {
         access(all) deposit(resource: @AnyResource)
     }
 
-    pub resource DepositEstimate {
-        pub var item: @AnyResource?
-        pub let storageFee: UFix64
+    access(all) resource DepositEstimate {
+        access(all) var item: @AnyResource?
+        access(all) let storageFee: UFix64
 
         init(item: @AnyResource, storageFee: UFix64) {
             self.item <- item
@@ -77,19 +77,19 @@ pub contract LostAndFound {
     // - memo: An optional message to attach to this ticket
     // - redeemer: The address which is allowed to withdraw the item from this ticket
     // - redeemed: Whether the ticket has been redeemed. This can only be set by the LostAndFound contract
-    pub resource Ticket {
+    access(all) resource Ticket {
         // The item to be redeemed
         access(contract) var item: @AnyResource?
         // An optional message to attach to this item.
-        pub let memo: String?
+        access(all) let memo: String?
         // an optional Display view so that frontend's that borrow this ticket know how to show it
-        pub let display: MetadataViews.Display?
+        access(all) let display: MetadataViews.Display?
         // The address that it allowed to withdraw the item fromt this ticket
-        pub let redeemer: Address
+        access(all) let redeemer: Address
         //The type of the resource (non-optional) so that bins can represent the true type of an item
-        pub let type: Type
+        access(all) let type: Type
         // State maintained by LostAndFound
-        pub var redeemed: Bool
+        access(all) var redeemed: Bool
 
         // flow token amount used to store this ticket is returned when the ticket is redeemed
         access(contract) let flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>?
@@ -196,11 +196,11 @@ pub contract LostAndFound {
     // A Bin is a resource that gathers tickets whos item have the same type.
     // For instance, if two TopShot Moments are deposited to the same redeemer, only one bin
     // will be made which will contain both tickets to redeem each individual moment.
-    pub resource Bin {
+    access(all) resource Bin {
         access(contract) let tickets: @{UInt64:Ticket}
         access(contract) let type: Type
 
-        pub let flowTokenRepayment: Capability<&{FungibleToken.Receiver}>?
+        access(all) let flowTokenRepayment: Capability<&{FungibleToken.Receiver}>?
 
         init (type: Type, flowTokenRepayment: Capability<&{FungibleToken.Receiver}>?) {
             self.tickets <- {}
@@ -223,7 +223,7 @@ pub contract LostAndFound {
         }
 
         // deposit a ticket to this bin. The item type must match this bin's item type.
-        // this function is not public because if it were there would be a way to get around
+        // this function is not access(all)lic because if it were there would be a way to get around
         // deposit fees
         access(contract) fun deposit(ticket: @LostAndFound.Ticket) {
             pre {
@@ -261,7 +261,7 @@ pub contract LostAndFound {
     // A shelf is our top-level organization resource.
     // It groups bins by type to help make discovery of the assets that a
     // redeeming address can claim.
-    pub resource Shelf {
+    access(all) resource Shelf {
         access(self) let bins: @{String: Bin}
         access(self) let identifierToType: {String: Type}
         access(self) let redeemer: Address
@@ -389,7 +389,7 @@ pub contract LostAndFound {
     }
 
     // ShelfManager is a light-weight wrapper to get our shelves into storage.
-    pub resource ShelfManager {
+    access(all) resource ShelfManager {
         access(self) let shelves: @{Address: Shelf}
 
         init() {
@@ -483,14 +483,14 @@ pub contract LostAndFound {
         }
     }
 
-    pub resource interface DepositorPublic {
+    access(all) resource interface DepositorPublic {
         access(all) balance(): UFix64
         access(all) addFlowTokens(vault: @FlowToken.Vault)
     }
 
-    pub resource Depositor: DepositorPublic {
+    access(all) resource Depositor: DepositorPublic {
         access(self) let flowTokenVault: @FlowToken.Vault
-        pub let flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>
+        access(all) let flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}>
         access(self) var lowBalanceThreshold: UFix64?
 
         access(self) fun checkForLowBalance(): Bool {

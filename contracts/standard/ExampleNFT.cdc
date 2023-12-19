@@ -337,10 +337,10 @@ access(all) contract ExampleNFT: NonFungibleToken, ViewResolver {
             case Type<MetadataViews.NFTCollectionData>():
                 return MetadataViews.NFTCollectionData(
                     storagePath: ExampleNFT.CollectionStoragePath,
-                    publicPath: ExampleNFT.CollectionPublicPath,
+                    access(all)licPath: ExampleNFT.CollectionPublicPath,
                     providerPath: /private/exampleNFTCollection,
-                    publicCollection: Type<&ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic}>(),
-                    publicLinkedType: Type<&ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic,NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+                    access(all)licCollection: Type<&ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic}>(),
+                    access(all)licLinkedType: Type<&ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic,NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
                     providerLinkedType: Type<&ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic,NonFungibleToken.Collection,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
                     createEmptyCollectionFunction: (fun(): @NonFungibleToken.Collection {
                         return <-ExampleNFT.createEmptyCollection()
@@ -392,7 +392,7 @@ access(all) contract ExampleNFT: NonFungibleToken, ViewResolver {
         let collection <- create Collection()
         self.account.storage.save(<-collection, to: self.CollectionStoragePath)
 
-        // create a public capability for the collection
+        // create a access(all)lic capability for the collection
         self.account.link<&ExampleNFT.Collection{NonFungibleToken.Collection, ExampleNFT.ExampleNFTCollectionPublic, ViewResolver.ResolverCollection}>(
             self.CollectionPublicPath,
             target: self.CollectionStoragePath

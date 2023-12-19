@@ -5,29 +5,29 @@ import FindForge from "./FindForge.cdc"
 
 pub contract NFGv3: NonFungibleToken {
 
-    pub var totalSupply: UInt64
+    access(all) var totalSupply: UInt64
 
     access(all) event ContractInitialized()
     access(all) event Withdraw(id: UInt64, from: Address?)
     access(all) event Deposit(id: UInt64, to: Address?)
 
-    pub let CollectionStoragePath: StoragePath
-    pub let CollectionPrivatePath: PrivatePath
-    pub let CollectionPublicPath: PublicPath
-    pub let MinterStoragePath: StoragePath
+    access(all) let CollectionStoragePath: StoragePath
+    access(all) let CollectionPrivatePath: PrivatePath
+    access(all) let CollectionPublicPath: PublicPath
+    access(all) let MinterStoragePath: StoragePath
 
-    pub struct Info {
-        pub let name: String
-        pub let description: String
-        pub let thumbnailHash: String
-        pub let externalURL: String
-        pub let edition: UInt64
-        pub let maxEdition: UInt64
-        pub let levels: {String: UFix64}
-        pub let scalars: {String: UFix64}
-        pub let traits: {String: String}
-        pub let birthday: UFix64
-        pub let medias: {String: String}
+    access(all) struct Info {
+        access(all) let name: String
+        access(all) let description: String
+        access(all) let thumbnailHash: String
+        access(all) let externalURL: String
+        access(all) let edition: UInt64
+        access(all) let maxEdition: UInt64
+        access(all) let levels: {String: UFix64}
+        access(all) let scalars: {String: UFix64}
+        access(all) let traits: {String: String}
+        access(all) let birthday: UFix64
+        access(all) let medias: {String: String}
 
         init(name: String, description: String, thumbnailHash: String, edition:UInt64, maxEdition:UInt64, externalURL:String, traits: {String: String}, levels: {String: UFix64}, scalars: {String:UFix64}, birthday: UFix64, medias: {String: String}) {
             self.name=name 
@@ -44,10 +44,10 @@ pub contract NFGv3: NonFungibleToken {
         }
     }
 
-    pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
-        pub let id: UInt64
+    access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
+        access(all) let id: UInt64
 
-        pub let info: Info
+        access(all) let info: Info
         access(self) let royalties: MetadataViews.Royalties
 
         init(
@@ -123,10 +123,10 @@ pub contract NFGv3: NonFungibleToken {
             case Type<MetadataViews.NFTCollectionData>():
                 return MetadataViews.NFTCollectionData(
                     storagePath: NFGv3.CollectionStoragePath,
-                    publicPath: NFGv3.CollectionPublicPath,
+                    access(all)licPath: NFGv3.CollectionPublicPath,
                     providerPath: NFGv3.CollectionPrivatePath,
-                    publicCollection: Type<&NFGv3.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-                    publicLinkedType: Type<&NFGv3.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+                    access(all)licCollection: Type<&NFGv3.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+                    access(all)licLinkedType: Type<&NFGv3.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
                     providerLinkedType: Type<&NFGv3.Collection{NonFungibleToken.Collection,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
                     createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
                         return <-NFGv3.createEmptyCollection()
@@ -165,10 +165,10 @@ pub contract NFGv3: NonFungibleToken {
         }
     }
 
-    pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
+    access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
-        pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+        access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
         init () {
             self.ownedNFTs <- {}
@@ -220,12 +220,12 @@ pub contract NFGv3: NonFungibleToken {
         }
     }
 
-    // public function that anyone can call to create a new empty collection
+    // access(all)lic function that anyone can call to create a new empty collection
     access(all) createEmptyCollection(): @NonFungibleToken.Collection {
         return <- create Collection()
     }
 
-    pub resource Forge: FindForge.Forge {
+    access(all) resource Forge: FindForge.Forge {
         access(all) mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
             let info = data as? Info ?? panic("The data passed in is not in form of NFGv3Info.")
             let royalties : [MetadataViews.Royalty] = []
@@ -269,7 +269,7 @@ pub contract NFGv3: NonFungibleToken {
         let collection <- create Collection()
         self.account.storage.save(<-collection, to: self.CollectionStoragePath)
 
-        // create a public capability for the collection
+        // create a access(all)lic capability for the collection
         self.account.link<&NFGv3.Collection{NonFungibleToken.Collection, ViewResolver.ResolverCollection}>(
             self.CollectionPublicPath,
             target: self.CollectionStoragePath

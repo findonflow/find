@@ -77,28 +77,28 @@ pub contract NFTStorefront {
 
     // StorefrontStoragePath
     // The location in storage that a Storefront resource should be located.
-    pub let StorefrontStoragePath: StoragePath
+    access(all) let StorefrontStoragePath: StoragePath
 
     // StorefrontPublicPath
-    // The public location for a Storefront link.
-    pub let StorefrontPublicPath: PublicPath
+    // The access(all)lic location for a Storefront link.
+    access(all) let StorefrontPublicPath: PublicPath
 
 
     // SaleCut
     // A struct representing a recipient that must be sent a certain amount
     // of the payment when a token is sold.
     //
-    pub struct SaleCut {
+    access(all) struct SaleCut {
         // The receiver for the payment.
         // Note that we do not store an address to find the Vault that this represents,
         // as the link or resource that we fetch in this way may be manipulated,
         // so to find the address that a cut goes to you must get this struct and then
         // call receiver.borrow()!.owner.address on it.
         // This can be done efficiently in a script.
-        pub let receiver: Capability<&{FungibleToken.Receiver}>
+        access(all) let receiver: Capability<&{FungibleToken.Receiver}>
 
         // The amount of the payment FungibleToken that will be paid to the receiver.
-        pub let amount: UFix64
+        access(all) let amount: UFix64
 
         // initializer
         //
@@ -112,24 +112,24 @@ pub contract NFTStorefront {
     // ListingDetails
     // A struct containing a Listing's data.
     //
-    pub struct ListingDetails {
+    access(all) struct ListingDetails {
         // The Storefront that the Listing is stored in.
         // Note that this resource cannot be moved to a different Storefront,
         // so this is OK. If we ever make it so that it *can* be moved,
         // this should be revisited.
-        pub var storefrontID: UInt64
+        access(all) var storefrontID: UInt64
         // Whether this listing has been purchased or not.
-        pub var purchased: Bool
+        access(all) var purchased: Bool
         // The Type of the NonFungibleToken.NFT that is being listed.
-        pub let nftType: Type
+        access(all) let nftType: Type
         // The ID of the NFT within that type.
-        pub let nftID: UInt64
+        access(all) let nftID: UInt64
         // The Type of the FungibleToken that payments must be made in.
-        pub let salePaymentVaultType: Type
+        access(all) let salePaymentVaultType: Type
         // The amount that must be paid in the specified FungibleToken.
-        pub let salePrice: UFix64
+        access(all) let salePrice: UFix64
         // This specifies the division of payment between recipients.
-        pub let saleCuts: [SaleCut]
+        access(all) let saleCuts: [SaleCut]
 
         // setToPurchased
         // Irreversibly set this listing as purchased.
@@ -176,9 +176,9 @@ pub contract NFTStorefront {
 
 
     // ListingPublic
-    // An interface providing a useful public interface to a Listing.
+    // An interface providing a useful access(all)lic interface to a Listing.
     //
-    pub resource interface ListingPublic {
+    access(all) resource interface ListingPublic {
         // borrowNFT
         // This will assert in the same way as the NFT standard borrowNFT()
         // if the NFT is absent, for example if it has been sold via another listing.
@@ -202,7 +202,7 @@ pub contract NFTStorefront {
     // A resource that allows an NFT to be sold for an amount of a given FungibleToken,
     // and for the proceeds of that sale to be split between several recipients.
     // 
-    pub resource Listing: ListingPublic {
+    access(all) resource Listing: ListingPublic {
         // The simple (non-Capability, non-complex) details of the sale
         access(self) let details: ListingDetails
 
@@ -227,7 +227,7 @@ pub contract NFTStorefront {
 
         // getDetails
         // Get the details of the current state of the Listing as a struct.
-        // This avoids having more public variables and getter methods for them, and plays
+        // This avoids having more access(all)lic variables and getter methods for them, and plays
         // nicely with scripts (which cannot return resources). 
         //
         access(all) getDetails(): ListingDetails {
@@ -354,7 +354,7 @@ pub contract NFTStorefront {
     // An interface for adding and removing Listings within a Storefront,
     // intended for use by the Storefront's own
     //
-    pub resource interface StorefrontManager {
+    access(all) resource interface StorefrontManager {
         // createListing
         // Allows the Storefront owner to create and insert Listings.
         //
@@ -375,7 +375,7 @@ pub contract NFTStorefront {
     // An interface to allow listing and borrowing Listings, and purchasing items via Listings
     // in a Storefront.
     //
-    pub resource interface StorefrontPublic {
+    access(all) resource interface StorefrontPublic {
         access(all) getListingIDs(): [UInt64]
         access(all) borrowListing(listingResourceID: UInt64): &Listing{ListingPublic}?
         access(all) cleanup(listingResourceID: UInt64)
@@ -385,12 +385,12 @@ pub contract NFTStorefront {
     // A resource that allows its owner to manage a list of Listings, and anyone to interact with them
     // in order to query their details and purchase the NFTs that they represent.
     //
-    pub resource Storefront : StorefrontManager, StorefrontPublic {
+    access(all) resource Storefront : StorefrontManager, StorefrontPublic {
         // The dictionary of Listing uuids to Listing resources.
         access(self) var listings: @{UInt64: Listing}
 
         // insert
-        // Create and publish a Listing for an NFT.
+        // Create and access(all)lish a Listing for an NFT.
         //
          access(all) createListing(
             nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.Collection}>,
@@ -494,7 +494,7 @@ pub contract NFTStorefront {
     }
 
     // createStorefront
-    // Make creating a Storefront publicly accessible.
+    // Make creating a Storefront access(all)licly accessible.
     //
     access(all) createStorefront(): @Storefront {
         return <-create Storefront()

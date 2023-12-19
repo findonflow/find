@@ -18,12 +18,12 @@
 
 pub contract FlovatarComponentTemplate {
 
-    pub let CollectionStoragePath: StoragePath
-    pub let CollectionPublicPath: PublicPath
+    access(all) let CollectionStoragePath: StoragePath
+    access(all) let CollectionPublicPath: PublicPath
 
 
     // Counter for all the Templates ever minted
-    pub var totalSupply: UInt64
+    access(all) var totalSupply: UInt64
     //These counters will keep track of how many Components were minted for each Template
     access(contract) let totalMintedComponents: { UInt64: UInt64 }
     access(contract) let lastComponentMintedAt: { UInt64: UFix64 }
@@ -32,32 +32,32 @@ pub contract FlovatarComponentTemplate {
     access(all) event ContractInitialized()
     access(all) event Created(id: UInt64, name: String, category: String, color: String, maxMintableComponents: UInt64)
 
-    // The public interface providing the SVG and all the other 
+    // The access(all)lic interface providing the SVG and all the other 
     // metadata like name, category, color, series, description and 
     // the maximum mintable Components
-    pub resource interface Public {
-        pub let id: UInt64
-        pub let name: String
-        pub let category: String
-        pub let color: String
-        pub let description: String
-        pub let svg: String
-        pub let series: UInt32
-        pub let maxMintableComponents: UInt64
-        pub let rarity: String
+    access(all) resource interface Public {
+        access(all) let id: UInt64
+        access(all) let name: String
+        access(all) let category: String
+        access(all) let color: String
+        access(all) let description: String
+        access(all) let svg: String
+        access(all) let series: UInt32
+        access(all) let maxMintableComponents: UInt64
+        access(all) let rarity: String
     }
 
-    // The Component resource implementing the public interface as well
-    pub resource ComponentTemplate: Public {
-        pub let id: UInt64
-        pub let name: String
-        pub let category: String
-        pub let color: String
-        pub let description: String
-        pub let svg: String
-        pub let series: UInt32
-        pub let maxMintableComponents: UInt64
-        pub let rarity: String
+    // The Component resource implementing the access(all)lic interface as well
+    access(all) resource ComponentTemplate: Public {
+        access(all) let id: UInt64
+        access(all) let name: String
+        access(all) let category: String
+        access(all) let color: String
+        access(all) let description: String
+        access(all) let svg: String
+        access(all) let series: UInt32
+        access(all) let maxMintableComponents: UInt64
+        access(all) let rarity: String
 
         // Initialize a Template with all the necessary data
         init(
@@ -85,15 +85,15 @@ pub contract FlovatarComponentTemplate {
     }
 
     // Standard CollectionPublic interface that can also borrow Component Templates
-    pub resource interface CollectionPublic {
+    access(all) resource interface CollectionPublic {
         access(all) getIDs(): [UInt64]
         access(all) borrowComponentTemplate(id: UInt64): &{FlovatarComponentTemplate.Public}?
     }
 
     // The main Collection that manages the Templates and that implements also the Public interface
-    pub resource Collection: CollectionPublic {
+    access(all) resource Collection: CollectionPublic {
         // Dictionary of Component Templates
-        pub var ownedComponentTemplates: @{UInt64: FlovatarComponentTemplate.ComponentTemplate}
+        access(all) var ownedComponentTemplates: @{UInt64: FlovatarComponentTemplate.ComponentTemplate}
 
         init () {
             self.ownedComponentTemplates <- {}
@@ -142,18 +142,18 @@ pub contract FlovatarComponentTemplate {
 
     // This struct is used to send a data representation of the Templates 
     // when retrieved using the contract helper methods outside the collection.
-    pub struct ComponentTemplateData {
-        pub let id: UInt64
-        pub let name: String
-        pub let category: String
-        pub let color: String
-        pub let description: String
-        pub let svg: String?
-        pub let series: UInt32
-        pub let maxMintableComponents: UInt64
-        pub let totalMintedComponents: UInt64
-        pub let lastComponentMintedAt: UFix64
-        pub let rarity: String
+    access(all) struct ComponentTemplateData {
+        access(all) let id: UInt64
+        access(all) let name: String
+        access(all) let category: String
+        access(all) let color: String
+        access(all) let description: String
+        access(all) let svg: String?
+        access(all) let series: UInt32
+        access(all) let maxMintableComponents: UInt64
+        access(all) let totalMintedComponents: UInt64
+        access(all) let lastComponentMintedAt: UFix64
+        access(all) let rarity: String
 
         init(
             id: UInt64,

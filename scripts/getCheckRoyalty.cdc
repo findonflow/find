@@ -6,7 +6,7 @@ access(all) main(name: String, id: UInt64, nftAliasOrIdentifier: String, viewIde
 
 	let address =FIND.resolve(name)!
 
-	// Get collection public path from NFT Registry
+	// Get collection access(all)lic path from NFT Registry
 	let collectionPublicPath = getPublicPath(nftAliasOrIdentifier)
 	let collection= getAuthAccount(address).borrow<&{ViewResolver.ResolverCollection}>(from: collectionPublicPath)!
 

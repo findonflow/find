@@ -259,7 +259,7 @@ pub contract FindThoughts {
 
 		// TODO : Restructure this to take structs , and declare the structs in Trxn.  And identify IPFS and url
 		// So take pointer, thought pointer and media
-		access(all) publish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?) {
+		access(all) access(all)lish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?) {
 			let medias : [MetadataViews.Media] = []
 			let m : [String] = []
 			if media != nil {

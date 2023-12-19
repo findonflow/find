@@ -20,14 +20,14 @@ import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
         return fetchAlchemyShard1(user: user, targetCollections:collections)
     }
 
-    pub let NFTCatalogContracts : [String] = getNFTCatalogContracts()
+    access(all) let NFTCatalogContracts : [String] = getNFTCatalogContracts()
 
-    pub struct ItemReport {
-        pub let length : Int // mapping of collection to no. of ids 
-        pub let extraIDs : [UInt64]
-        pub let shard : String 
-        pub let extraIDsIdentifier : String 
-	    pub let collectionName: String
+    access(all) struct ItemReport {
+        access(all) let length : Int // mapping of collection to no. of ids 
+        access(all) let extraIDs : [UInt64]
+        access(all) let shard : String 
+        access(all) let extraIDsIdentifier : String 
+	    access(all) let collectionName: String
 
         init(length : Int, extraIDs :[UInt64] , shard: String, extraIDsIdentifier: String, collectionName: String) {
             self.length=length 

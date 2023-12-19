@@ -7,8 +7,8 @@ access(all) main(user: Address, addresses: [Address]) : Result {
 }
 
 pub struct Result{
-    pub let result : Bool 
-    pub let description : String 
+    access(all) let result : Bool 
+    access(all) let description : String 
 
     init(_ v : {FindVerifier.Verifier}, input: {String : AnyStruct}) {
         self.result=v.verify(input)

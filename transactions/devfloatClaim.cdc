@@ -36,7 +36,7 @@
       
           let FLOATEvents = getAccount(host).getCapability(FLOAT.FLOATEventsPublicPath)
                               .borrow<&FLOAT.FLOATEvents{FLOAT.FLOATEventsPublic}>()
-                              ?? panic("Could not borrow the public FLOATEvents from the host.")
+                              ?? panic("Could not borrow the access(all)lic FLOATEvents from the host.")
           self.FLOATEvent = FLOATEvents.borrowPublicEventRef(eventId: eventId) ?? panic("This event does not exist.")
       
           self.Collection = acct.borrow<&FLOAT.Collection>(from: FLOAT.FLOATCollectionStoragePath)
