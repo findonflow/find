@@ -551,8 +551,8 @@ func TestFIND(t *testing.T) {
 		 			import FIND from "../contracts/FIND.cdc"
 
 		 			access(all) fun main(user: Address) : [FIND.LeaseInformation] {
-		 			let finLeases= getAuthAccount(user).borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
-		 			return finLeases.getLeaseInformation()
+            let finLeases= getAccount(user).capabilities.borrow<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
+            return finLeases.getLeaseInformation()
 		 			}
 		 		`,
 			WithArg("user", "user1"),
@@ -567,8 +567,8 @@ func TestFIND(t *testing.T) {
 		 			import FIND from "../contracts/FIND.cdc"
 
 		 			access(all) fun main(user: Address) : [String] {
-		 			let finLeases= getAuthAccount(user).borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
-		 			return finLeases.getLeases()
+            let finLeases= getAccount(user).capabilities.borrow<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
+            return finLeases.getLeases()
 		 			}
 		 		`,
 			WithArg("user", "user1"),
@@ -585,8 +585,8 @@ func TestFIND(t *testing.T) {
 		 			import FIND from "../contracts/FIND.cdc"
 
 		 			access(all) fun main(user: Address) : [String] {
-		 			let finLeases= getAuthAccount(user).borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
-		 			return finLeases.getInvalidatedLeases()
+            let finLeases= getAccount(user).capabilities.borrow<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
+            return finLeases.getInvalidatedLeases()
 		 			}
 		 		`,
 			WithArg("user", "user1"),
