@@ -27,7 +27,7 @@ access(all) contract RelatedAccounts {
 		}
 	}
 
-	pub resource interface Public{
+	access(all) resource interface Public{
 		access(all) getFlowAccounts() : {String: Address} 
 		access(all) getRelatedAccounts(_ network: String) : {String : String} 
 		access(all) getAllRelatedAccounts() : {String : {String : String}}
@@ -35,7 +35,7 @@ access(all) contract RelatedAccounts {
 	}
 
 	/// This is just an empty resource we create in storage, you can safely send a reference to it to obtain msg.sender
-	pub resource Accounts: Public {
+	access(all) resource Accounts: Public {
 
 		access(self) let accounts: { String: AccountInformation}
 

@@ -115,7 +115,7 @@ access(all) contract Bl0xPack: NonFungibleToken {
 		return self.packMetadata[typeId]
 	}
 
-	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
+	access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 		// The token's ID
 		access(all) let id: UInt64
 
@@ -233,7 +233,7 @@ access(all) contract Bl0xPack: NonFungibleToken {
 
 	}
 
-	pub resource interface CollectionPublic {
+	access(all) resource interface CollectionPublic {
 		access(all) deposit(token: @NonFungibleToken.NFT)
 		access(all) getIDs(): [UInt64]
 		access(all) getPacksLeftForType(_ type:UInt64) : UInt64
@@ -246,7 +246,7 @@ access(all) contract Bl0xPack: NonFungibleToken {
 	// Collection
 	// A collection of Bl0xPack NFTs owned by an account
 	//
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, CollectionPublic, ViewResolver.ResolverCollection {
+	access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, CollectionPublic, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		//

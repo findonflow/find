@@ -137,7 +137,7 @@ We have a primary social tools which users can follow / unfollow / setPrivate or
 		// User resource is the Profile that we are referring to.
 		// Notice that User resource implments "FungibleToken.Receiver"
 		// Which means that it can be passed elsewhere as a FungibleToken Switchboard
-		pub resource User: Public, Owner, FungibleToken.Receiver {
+		access(all) resource User: Public, Owner, FungibleToken.Receiver {
 			// In deposit function,
 			// The profile is smart enough to identify the vault type and deposit to corresponding FT vault.
 			// Even if the wallet is not set to link with profile, we still tries to borrow vaults from standard path and deposit it.
@@ -946,7 +946,7 @@ access(all) contract FindThoughts {
 
 	// One thing to mention is that Thought supports NFT views.
 	// We implemented FindViews.ViewReadPointer in thoughts, therefore it can be used to point to NFTs (and fetch NFT information)
-	pub resource interface ThoughtPublic {
+	access(all) resource interface ThoughtPublic {
 		access(all) let id: UInt64
 		access(all) let creator: Address
 		access(all) var header: String
@@ -965,14 +965,14 @@ access(all) contract FindThoughts {
 	}
 
 	// CollectionPublic interface exposes below functions to the public
-	pub resource interface CollectionPublic {
+	access(all) resource interface CollectionPublic {
 		access(all) contains(_ id: UInt64) : Bool
 		access(all) getIDs() : [UInt64]
 		access(all) borrowThoughtPublic(_ id: UInt64) : &FindThoughts.Thought{FindThoughts.ThoughtPublic}
 	}
 
 	// Collection
-	pub resource Collection : CollectionPublic, ViewResolver.ResolverCollection {
+	access(all) resource Collection : CollectionPublic, ViewResolver.ResolverCollection {
 		// Publish a thought with optional media, NFTPointer or quotes
 		access(all) access(all)lish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?)
 		access(all) delete(_ id: UInt64)

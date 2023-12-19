@@ -322,7 +322,7 @@ access(all) contract Wearables: NonFungibleToken {
 
 	// A resource on flow https://developers.flow.com/cadence/language/resources is kind of like a struct just with way stronger semantics and rules around security
 
-	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
+	access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 
 		//the unique id of a NFT, Wearables uses UUID so this id is unique across _all_ resources on flow
 		access(all) let id:UInt64
@@ -631,7 +631,7 @@ access(all) contract Wearables: NonFungibleToken {
 
 
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection  {
+	access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection  {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}

@@ -16,7 +16,7 @@ access(all) contract FindMarketSale {
 	pub event Sale(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo?, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt:UFix64?)
 
 	//A sale item for a direct sale
-	pub resource SaleItem : FindMarket.SaleItem{
+	access(all) resource SaleItem : FindMarket.SaleItem{
 
 		//this is set when bought so that pay will work
 		access(self) var buyer: Address?
@@ -145,7 +145,7 @@ access(all) contract FindMarketSale {
 		}
 	}
 
-	pub resource interface SaleItemCollectionPublic {
+	access(all) resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		access(all) getIds(): [UInt64]
 		access(all) borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem} //TODO: look if this is safe
@@ -153,7 +153,7 @@ access(all) contract FindMarketSale {
 		access(all) buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>)
 	}
 
-	pub resource SaleItemCollection: SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic {
+	access(all) resource SaleItemCollection: SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic {
 		//is this the best approach now or just put the NFT inside the saleItem?
 		access(contract) var items: @{UInt64: SaleItem}
 

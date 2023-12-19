@@ -53,7 +53,7 @@ access(all) contract FiatToken: FungibleToken {
     // new tokens.
     //
 
-		pub resource interface ResourceId {
+		access(all) resource interface ResourceId {
         access(all) UUID(): UInt64
     }
 

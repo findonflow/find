@@ -500,7 +500,7 @@ access(all) contract FindLeaseMarket {
 
 	}
 
-	pub resource interface SaleItem {
+	access(all) resource interface SaleItem {
 		//this is the type of sale this is, active, cancelled etc
 		access(all) getSaleType(): String
 		access(all) getSeller(): Address
@@ -528,7 +528,7 @@ access(all) contract FindLeaseMarket {
 		access(all) getId() : UInt64
 	}
 
-	pub resource interface Bid {
+	access(all) resource interface Bid {
 		access(all) getBalance() : UFix64
 		access(all) getSellerAddress() : Address
 		access(all) getBidExtraField() : {String : AnyStruct}
@@ -622,14 +622,14 @@ access(all) contract FindLeaseMarket {
 		}
 	}
 
-	pub resource interface SaleItemCollectionPublic {
+	access(all) resource interface SaleItemCollectionPublic {
 		access(all) getNameSales(): [String]
 		access(all) containsNameSale(_ name: String): Bool
 		access(account) fun borrowSaleItem(_ name: String) : &{SaleItem}
 		access(all) getListingType() : Type
 	}
 
-	pub resource interface MarketBidCollectionPublic {
+	access(all) resource interface MarketBidCollectionPublic {
 		access(all) getNameBids() : [String]
 		access(all) containsNameBid(_ name: String): Bool
 		access(all) getBidType() : Type

@@ -49,7 +49,7 @@ access(all) contract Dandy: NonFungibleToken {
 			self.externalUrlPrefix=externalUrlPrefix 
 		}
 	}
-	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
+	access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 		access(all) let id: UInt64
 		access(self) var nounce: UInt64
 
@@ -214,12 +214,12 @@ access(all) contract Dandy: NonFungibleToken {
 	}
 
 
-	pub resource interface CollectionPublic {
+	access(all) resource interface CollectionPublic {
 		access(all) getIDsFor(minter: String): [UInt64] 
 		access(all) getMinters(): [String] 
 	}
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection, CollectionPublic {
+	access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection, CollectionPublic {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -346,7 +346,7 @@ access(all) contract Dandy: NonFungibleToken {
 	*/
 
 	//TODO: do we want to store minter 
-	pub resource Forge: FindForge.Forge {
+	access(all) resource Forge: FindForge.Forge {
 		access(all) mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
 			let info = data as? DandyInfo ?? panic("The data passed in is not in form of DandyInfo.")
 			return <- Dandy.mintNFT(name: info.name, description: info.description, thumbnail: info.thumbnail, platform: platform, schemas: info.schemas, externalUrlPrefix:info.externalUrlPrefix)

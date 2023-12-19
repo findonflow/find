@@ -23,7 +23,7 @@ access(all) contract FindFooDIM: NonFungibleToken {
 	access(all) let CollectionPublicPath: PublicPath
 	access(all) let MinterStoragePath: StoragePath
 
-	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
+	access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 		access(all) let id: UInt64
 
 		access(all) let info: FindForgeStruct.FindDIM
@@ -157,7 +157,7 @@ access(all) contract FindFooDIM: NonFungibleToken {
 		}
 	}
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
+	access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -217,7 +217,7 @@ access(all) contract FindFooDIM: NonFungibleToken {
 		return <- create Collection()
 	}
 
-	pub resource Forge: FindForge.Forge {
+	access(all) resource Forge: FindForge.Forge {
 		access(all) mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
 			let info = data as? FindForgeStruct.FindDIM ?? panic("The data passed in is not in form of Generic Info Struct.")
 			let royalties : [MetadataViews.Royalty] = []

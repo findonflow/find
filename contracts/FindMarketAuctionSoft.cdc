@@ -12,7 +12,7 @@ access(all) contract FindMarketAuctionSoft {
 
 	pub event EnglishAuction(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, nft:FindMarket.NFTInfo?, buyer:Address?, buyerName:String?, buyerAvatar:String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
 
-	pub resource SaleItem : FindMarket.SaleItem {
+	access(all) resource SaleItem : FindMarket.SaleItem {
 		access(contract) var pointer: FindViews.AuthNFTPointer
 		access(contract) var vaultType: Type
 		access(contract) var auctionStartPrice: UFix64
@@ -237,7 +237,7 @@ access(all) contract FindMarketAuctionSoft {
 		}
 	}
 
-	pub resource interface SaleItemCollectionPublic {
+	access(all) resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		access(all) getIds(): [UInt64]
 		access(all) containsId(_ id: UInt64): Bool
@@ -250,7 +250,7 @@ access(all) contract FindMarketAuctionSoft {
 		access(contract) fun fulfillAuction(id: UInt64, vault: @FungibleToken.Vault)
 	}
 
-	pub resource SaleItemCollection: SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic  {
+	access(all) resource SaleItemCollection: SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic  {
 		//is this the best approach now or just put the NFT inside the saleItem?
 		access(contract) var items: @{UInt64: SaleItem}
 
@@ -646,7 +646,7 @@ access(all) contract FindMarketAuctionSoft {
 		}
 	}
 
-	pub resource Bid : FindMarket.Bid {
+	access(all) resource Bid : FindMarket.Bid {
 		access(contract) let from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>
 		access(contract) let nftCap: Capability<&{NonFungibleToken.Receiver}>
 		access(contract) let itemUUID: UInt64
@@ -687,7 +687,7 @@ access(all) contract FindMarketAuctionSoft {
 		}
 	}
 
-	pub resource interface MarketBidCollectionPublic {
+	access(all) resource interface MarketBidCollectionPublic {
 		access(all) getBalance(_ id: UInt64) : UFix64
 		access(all) containsId(_ id: UInt64): Bool
 		access(contract) fun accept(_ nft: @NonFungibleToken.NFT)
@@ -695,7 +695,7 @@ access(all) contract FindMarketAuctionSoft {
 	}
 
 	//A collection stored for bidders/buyers
-	pub resource MarketBidCollection: MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic {
+	access(all) resource MarketBidCollection: MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic {
 
 		access(contract) var bids : @{UInt64: Bid}
 		access(contract) let receiver: Capability<&{FungibleToken.Receiver}>

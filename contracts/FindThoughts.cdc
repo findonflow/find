@@ -51,7 +51,7 @@ access(all) contract FindThoughts {
 		}
 	}
 
-	pub resource interface ThoughtPublic {
+	access(all) resource interface ThoughtPublic {
 		access(all) let id: UInt64 
 		access(all) let creator: Address 
 		access(all) var header: String 
@@ -69,7 +69,7 @@ access(all) contract FindThoughts {
 		access(all) getHide() : Bool
 	}
 
-	pub resource Thought : ThoughtPublic , ViewResolver.Resolver {
+	access(all) resource Thought : ThoughtPublic , ViewResolver.Resolver {
 		access(all) let id: UInt64 
 		access(all) let creator: Address 
 		access(all) var header: String 
@@ -208,13 +208,13 @@ access(all) contract FindThoughts {
 		}
 	}
 
-	pub resource interface CollectionPublic {
+	access(all) resource interface CollectionPublic {
 		access(all) contains(_ id: UInt64) : Bool 
 		access(all) getIDs() : [UInt64]
 		access(all) borrowThoughtPublic(_ id: UInt64) : &FindThoughts.Thought{FindThoughts.ThoughtPublic} 
 	}
 
-	pub resource Collection : CollectionPublic, ViewResolver.ResolverCollection {
+	access(all) resource Collection : CollectionPublic, ViewResolver.ResolverCollection {
 		access(self) let ownedThoughts : @{UInt64 : FindThoughts.Thought}
 
 		access(self) let sequence : [UInt64] 

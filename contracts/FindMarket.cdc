@@ -640,7 +640,7 @@ access(all) contract FindMarket {
 		}
 	}
 
-	pub resource interface TenantPublic {
+	access(all) resource interface TenantPublic {
 		access(all) getStoragePath(_ type: Type) : StoragePath
 		access(all) getPublicPath(_ type: Type) : PublicPath
 		access(all) allowedAction(listingType: Type, nftType:Type, ftType:Type, action: MarketAction, seller: Address? , buyer: Address?) : FindRulesCache.ActionResult
@@ -651,7 +651,7 @@ access(all) contract FindMarket {
 	}
 
 	//this needs to be a resource so that nobody else can make it.
-	pub resource Tenant : TenantPublic{
+	access(all) resource Tenant : TenantPublic{
 
 		access(self) let findSaleItems : {String : TenantSaleItem}
 		access(self) let tenantSaleItems : {String : TenantSaleItem}
@@ -1164,7 +1164,7 @@ access(all) contract FindMarket {
 
 
 	//interface to use for capability receiver pattern
-	pub resource interface TenantClientPublic  {
+	access(all) resource interface TenantClientPublic  {
 		access(all) addCapability(_ cap: Capability<&Tenant>)
 	}
 
@@ -1175,7 +1175,7 @@ access(all) contract FindMarket {
 
 	*/
 	//admin proxy with capability receiver
-	pub resource TenantClient: TenantClientPublic {
+	access(all) resource TenantClient: TenantClientPublic {
 
 		access(self) var capability: Capability<&Tenant>?
 
@@ -1633,7 +1633,7 @@ access(all) contract FindMarket {
 		}
 	}
 
-	pub resource interface SaleItemCollectionPublic {
+	access(all) resource interface SaleItemCollectionPublic {
 		access(all) getIds(): [UInt64]
 		access(all) getRoyaltyChangedIds(): [UInt64]
 		access(all) containsId(_ id: UInt64): Bool
@@ -1651,7 +1651,7 @@ access(all) contract FindMarket {
 		}
 	}
 
-	pub resource interface MarketBidCollectionPublic {
+	access(all) resource interface MarketBidCollectionPublic {
 		access(all) getIds() : [UInt64]
 		access(all) containsId(_ id: UInt64): Bool
 		access(all) getBidType() : Type
@@ -1668,13 +1668,13 @@ access(all) contract FindMarket {
 		}
 	}
 
-	pub resource interface Bid {
+	access(all) resource interface Bid {
 		access(all) getBalance() : UFix64
 		access(all) getSellerAddress() : Address
 		access(all) getBidExtraField() : {String : AnyStruct}
 	}
 
-	pub resource interface SaleItem {
+	access(all) resource interface SaleItem {
 
 		//this is the type of sale this is, auction, direct offer etc
 		access(all) getSaleType(): String

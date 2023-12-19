@@ -14,7 +14,7 @@ access(all) contract CharityNFT: NonFungibleToken {
 	pub event Deposit(id: UInt64, to: Address?)
 	pub event Minted(id: UInt64, metadata: {String:String}, to:Address)
 
-	pub resource NFT: NonFungibleToken.INFT, Public, ViewResolver.Resolver {
+	access(all) resource NFT: NonFungibleToken.INFT, Public, ViewResolver.Resolver {
 		access(all) let id: UInt64
 
 		access(self) let metadata: {String: String}
@@ -138,13 +138,13 @@ access(all) contract CharityNFT: NonFungibleToken {
 	}
 
 	//The public interface can show metadata and the content for the Art piece
-	pub resource interface Public {
+	access(all) resource interface Public {
 		access(all) let id: UInt64
 		access(all) getMetadata() : {String : String}
 	}
 
 	//Standard NFT collectionPublic interface that can also borrowArt as the correct type
-	pub resource interface CollectionPublic {
+	access(all) resource interface CollectionPublic {
 
 		access(all) deposit(token: @NonFungibleToken.NFT)
 		access(all) getIDs(): [UInt64]
@@ -152,7 +152,7 @@ access(all) contract CharityNFT: NonFungibleToken {
 		access(all) borrowCharity(id: UInt64): &{Public}?
 	}
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, CollectionPublic , ViewResolver.ResolverCollection{
+	access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, CollectionPublic , ViewResolver.ResolverCollection{
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}

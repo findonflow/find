@@ -47,7 +47,7 @@ access(all) contract Flomies: NonFungibleToken {
 		}
 	}
 
-	pub resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
+	access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 
 		access(all) let id:UInt64
 		access(all) let serial:UInt64
@@ -195,7 +195,7 @@ access(all) contract Flomies: NonFungibleToken {
 		}
 	}
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
+	access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
 		access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
@@ -316,7 +316,7 @@ access(all) contract Flomies: NonFungibleToken {
 		self.royalties.appendAll(cutInfo)
 	}
 
-	pub resource Forge: FindForge.Forge {
+	access(all) resource Forge: FindForge.Forge {
 		access(all) mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
 			let info = data as? {String : AnyStruct} ?? panic("The data passed in is not in form of {String : AnyStruct}")
 

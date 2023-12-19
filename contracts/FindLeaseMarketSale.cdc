@@ -14,7 +14,7 @@ access(all) contract FindLeaseMarketSale {
 	pub event Sale(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, leaseInfo: FindLeaseMarket.LeaseInfo?, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt:UFix64?)
 
 	//A sale item for a direct sale
-	pub resource SaleItem : FindLeaseMarket.SaleItem{
+	access(all) resource SaleItem : FindLeaseMarket.SaleItem{
 
 		//this is set when bought so that pay will work
 		access(self) var buyer: Address?
@@ -118,7 +118,7 @@ access(all) contract FindLeaseMarketSale {
 
 	}
 
-	pub resource interface SaleItemCollectionPublic {
+	access(all) resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		access(all) getNameSales(): [String]
 		access(all) containsNameSale(_ name: String): Bool
@@ -126,7 +126,7 @@ access(all) contract FindLeaseMarketSale {
 		access(all) buy(name: String, vault: @FungibleToken.Vault, to: Address)
 	}
 
-	pub resource SaleItemCollection: SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic {
+	access(all) resource SaleItemCollection: SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic {
 		//is this the best approach now or just put the NFT inside the saleItem?
 		access(contract) var items: @{String: SaleItem}
 

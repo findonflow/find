@@ -12,7 +12,7 @@ access(all) contract FindLeaseMarketAuctionSoft {
 
 	pub event EnglishAuction(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, leaseInfo:FindLeaseMarket.LeaseInfo?, buyer:Address?, buyerName:String?, buyerAvatar:String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
 
-	pub resource SaleItem : FindLeaseMarket.SaleItem {
+	access(all) resource SaleItem : FindLeaseMarket.SaleItem {
 		access(contract) var pointer: FindLeaseMarket.AuthLeasePointer
 		access(contract) var vaultType: Type
 		access(contract) var auctionStartPrice: UFix64
@@ -210,7 +210,7 @@ access(all) contract FindLeaseMarketAuctionSoft {
 
 	}
 
-	pub resource interface SaleItemCollectionPublic {
+	access(all) resource interface SaleItemCollectionPublic {
 		//fetch all the tokens in the collection
 		access(all) getNameSales(): [String]
 		access(all) containsNameSale(_ name: String): Bool
@@ -223,7 +223,7 @@ access(all) contract FindLeaseMarketAuctionSoft {
 		access(contract) fun fulfillAuction(name: String, vault: @FungibleToken.Vault)
 	}
 
-	pub resource SaleItemCollection: SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic  {
+	access(all) resource SaleItemCollection: SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic  {
 		//is this the best approach now or just put the NFT inside the saleItem?
 		access(contract) var items: @{String: SaleItem}
 
@@ -521,7 +521,7 @@ access(all) contract FindLeaseMarketAuctionSoft {
 		}
 	}
 
-	pub resource Bid : FindLeaseMarket.Bid {
+	access(all) resource Bid : FindLeaseMarket.Bid {
 		access(contract) let from: Capability<&SaleItemCollection{SaleItemCollectionPublic}>
 		access(contract) let leaseName: String
 
@@ -560,7 +560,7 @@ access(all) contract FindLeaseMarketAuctionSoft {
 		}
 	}
 
-	pub resource interface MarketBidCollectionPublic {
+	access(all) resource interface MarketBidCollectionPublic {
 		access(all) getBalance(_ name: String) : UFix64
 		access(all) containsNameBid(_ name: String): Bool
 		access(contract) fun accept(_ name: String)
@@ -568,7 +568,7 @@ access(all) contract FindLeaseMarketAuctionSoft {
 	}
 
 	//A collection stored for bidders/buyers
-	pub resource MarketBidCollection: MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic {
+	access(all) resource MarketBidCollection: MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic {
 
 		access(contract) var bids : @{String: Bid}
 		access(contract) let receiver: Capability<&{FungibleToken.Receiver}>

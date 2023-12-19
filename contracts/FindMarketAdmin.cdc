@@ -20,12 +20,12 @@ access(all) contract FindMarketAdmin {
 	}
 
 	//interface to use for capability receiver pattern
-	pub resource interface AdminProxyClient {
+	access(all) resource interface AdminProxyClient {
 		access(all) addCapability(_ cap: Capability<&FIND.Network>)
 	}
 
 	//admin proxy with capability receiver
-	pub resource AdminProxy: AdminProxyClient {
+	access(all) resource AdminProxy: AdminProxyClient {
 
 		access(self) var capability: Capability<&FIND.Network>?
 
