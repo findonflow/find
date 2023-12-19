@@ -41,7 +41,7 @@ Collection to complete the transfer.
 
 */
 
-import ViewResolver from 0xf8d6e0586b0a20c7
+import ViewResolver from "./ViewResolver.cdc"
 
 /// The main NFT contract interface. Other NFT contracts will
 /// import and implement this interface
