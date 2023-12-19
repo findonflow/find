@@ -7,7 +7,7 @@ import FindViews from "./FindViews.cdc"
 import FindLostAndFoundWrapper from "./FindLostAndFoundWrapper.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 
-pub contract FindAirdropper {
+access(all) contract FindAirdropper {
 
     access(all) event Airdropped(from: Address ,fromName: String?, to: Address, toName: String?,uuid: UInt64, nftInfo: FindMarket.NFTInfo, context: {String : String}, remark: String?)
     access(all) event AirdroppedToLostAndFound(from: Address, fromName: String? , to: Address, toName: String?, uuid: UInt64, nftInfo: FindMarket.NFTInfo, context: {String : String}, remark: String?, ticketID: UInt64)

@@ -220,7 +220,6 @@
         "FlowUtilityToken"
       ],
       "emulator-find": [
-        "ExampleNFT",
         "FIND",
         "Clock",
         "Profile",

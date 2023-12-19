@@ -3,7 +3,7 @@ import NonFungibleToken from "../standard/NonFungibleToken.cdc"
 import FungibleToken from "../standard/FungibleToken.cdc"  
 import CoatCheck from "./CoatCheck.cdc"  
 
-pub contract FlowtyUtils {
+access(all) contract FlowtyUtils {
     access(contract) var Attributes: {String: AnyStruct}
 
     access(all) let FlowtyUtilsStoragePath: StoragePath

@@ -1,6 +1,6 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
-pub contract FindRulesCache {
+access(all) contract FindRulesCache {
 
 	access(contract) let tenantFindRules : {String : {String : ActionResult}}
 	access(contract) let tenantTenantRules : {String : {String : ActionResult}}

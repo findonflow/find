@@ -3,7 +3,7 @@ import FindMarket from "./FindMarket.cdc"
 import FindViews from "./FindViews.cdc"
 import FIND from "./FIND.cdc"
 
-pub contract FindFurnace {
+access(all) contract FindFurnace {
 
 	pub event Burned(from: Address, fromName: String?, uuid: UInt64, nftInfo: FindMarket.NFTInfo, context: {String : String})
 

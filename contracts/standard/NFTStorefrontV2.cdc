@@ -26,7 +26,7 @@ import NonFungibleToken from "./NonFungibleToken.cdc"
 /// Marketplaces and other aggregators can watch for Listing events
 /// and list items of interest.
 ///
-pub contract NFTStorefrontV2 {
+access(all) contract NFTStorefrontV2 {
 
     /// StorefrontInitialized
     /// A Storefront resource has been created.

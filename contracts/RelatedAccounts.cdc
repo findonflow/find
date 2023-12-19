@@ -1,4 +1,4 @@
-pub contract RelatedAccounts {
+access(all) contract RelatedAccounts {
 
 	// The entire contract is deprecated
 

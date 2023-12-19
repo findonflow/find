@@ -7,7 +7,7 @@ import FindForgeStruct from "./FindForgeStruct.cdc"
 import FindUtils from "./FindUtils.cdc"
 
 // DIM stands for Direct Immuatble Minting, cannot mutate minted NFT states. So all nfts has to be minted in one go. 
-pub contract FindFooDIM: NonFungibleToken {
+access(all) contract FindFooDIM: NonFungibleToken {
 
 	pub var totalSupply: UInt64
 	pub let nftCollectionDisplay: MetadataViews.NFTCollectionDisplay

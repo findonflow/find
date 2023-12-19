@@ -1,6 +1,6 @@
 import FindMarketCutStruct from "../contracts/FindMarketCutStruct.cdc"
 
-pub contract interface FindMarketCutInterface {
+access(all) contract interface FindMarketCutInterface {
 
 	pub let contractName: String
 	pub let category: String

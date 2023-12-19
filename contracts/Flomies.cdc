@@ -5,7 +5,7 @@ import FindForge from "./FindForge.cdc"
 import FindPack from "./FindPack.cdc"
 
 
-pub contract Flomies: NonFungibleToken {
+access(all) contract Flomies: NonFungibleToken {
 
 	pub var totalSupply: UInt64
 

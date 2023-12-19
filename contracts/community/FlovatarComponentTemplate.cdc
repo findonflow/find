@@ -16,7 +16,7 @@
 
  */
 
-pub contract FlovatarComponentTemplate {
+access(all) contract FlovatarComponentTemplate {
 
     access(all) let CollectionStoragePath: StoragePath
     access(all) let CollectionPublicPath: PublicPath

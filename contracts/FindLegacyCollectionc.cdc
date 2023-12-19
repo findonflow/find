@@ -61,7 +61,7 @@ import Momentables from 0x9d21537544d9123d
 import ZeedzINO from 0x62b3063fbe672fc8
 import PartyMansionDrinksContract from 0x34f2bf4a80bb0f69
 
-pub contract FindLegacyCollectionc {
+access(all) contract FindLegacyCollectionc {
 
 	pub struct MetadataCollections {
 

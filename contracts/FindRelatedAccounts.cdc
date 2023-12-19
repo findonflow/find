@@ -1,4 +1,4 @@
-pub contract FindRelatedAccounts {
+access(all) contract FindRelatedAccounts {
 
 	pub let storagePath: StoragePath
 	pub let publicPath: PublicPath

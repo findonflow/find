@@ -10,7 +10,7 @@ import FindUtils from "../contracts/FindUtils.cdc"
 import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
 import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 
-pub contract FindMarket {
+access(all) contract FindMarket {
 	access(account) let  pathMap : {String: String}
 	access(account) let  listingName : {String: String}
 	access(contract) let  saleItemTypes : [Type]

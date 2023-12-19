@@ -9,7 +9,7 @@ import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
 import Profile from "./Profile.cdc"
 
-pub contract FindMarketDirectOfferSoft {
+access(all) contract FindMarketDirectOfferSoft {
 
 	pub event DirectOffer(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo?, buyer:Address?, buyerName:String?, buyerAvatar:String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
 

@@ -6,7 +6,7 @@ import NFTCatalog from "./NFTCatalog.cdc"
 // A helper contract to get NFT's in a users account
 // leveraging the NFTCatalog Smart Contract
 
-pub contract NFTRetrieval {
+access(all) contract NFTRetrieval {
     
     access(all) getRecommendedViewsTypes(version: String) : [Type] {
         switch version {

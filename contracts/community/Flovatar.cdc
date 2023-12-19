@@ -21,7 +21,7 @@ This contract contains also the Admin resource that can be used to manage and ge
 
  */
 
-pub contract Flovatar: NonFungibleToken {
+access(all) contract Flovatar: NonFungibleToken {
 
     access(all) let CollectionStoragePath: StoragePath
     access(all) let CollectionPublicPath: PublicPath

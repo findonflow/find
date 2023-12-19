@@ -25,7 +25,7 @@ import CoatCheck from "./CoatCheck.cdc"
 // Lenders can watch for Listing events and check the NFT type and
 // ID to see if they wish to fund the listed loan.
 //
-pub contract Flowty {
+access(all) contract Flowty {
     // FlowtyInitialized
     // This contract has been deployed.
     // Event consumers can now expect events from this contract.

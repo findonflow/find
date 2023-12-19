@@ -22,7 +22,7 @@
 
 import FLOAT from "./FLOAT.cdc"
 
-pub contract FLOATVerifiers {
+access(all) contract FLOATVerifiers {
 
     // The "verifiers" to be used
     

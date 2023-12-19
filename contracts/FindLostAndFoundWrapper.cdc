@@ -9,7 +9,7 @@ import FIND from "./FIND.cdc"
 import FindViews from "./FindViews.cdc"
 
 
-pub contract FindLostAndFoundWrapper {
+access(all) contract FindLostAndFoundWrapper {
 
     access(all) event NFTDeposited(receiver: Address, receiverName: String?, sender: Address?, senderName: String?, type: String, id: UInt64?, uuid: UInt64?, memo: String?, name: String?, description: String?, thumbnail: String?, collectionName: String?, collectionImage: String?)
     access(all) event UserStorageSubsidized(receiver: Address, receiverName: String?, sender: Address, senderName: String?, forUUID: UInt64, storageFee: UFix64)

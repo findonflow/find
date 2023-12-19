@@ -1,6 +1,6 @@
 import MetadataViews from "./standard/MetadataViews.cdc"
 
-pub contract FindForgeStruct {
+access(all) contract FindForgeStruct {
 
 	pub event ContractInitialized()
 

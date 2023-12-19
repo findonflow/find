@@ -9,7 +9,7 @@ import FindMarket from "./FindMarket.cdc"
 
 A Find Market for direct sales
 */
-pub contract FindLeaseMarketSale {
+access(all) contract FindLeaseMarketSale {
 
 	pub event Sale(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, leaseInfo: FindLeaseMarket.LeaseInfo?, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt:UFix64?)
 

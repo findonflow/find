@@ -8,7 +8,7 @@ import FindMarket from "./FindMarket.cdc"
 import FindLeaseMarket from "./FindLeaseMarket.cdc"
 
 // An auction saleItem contract that escrows the FT, does _not_ escrow the NFT
-pub contract FindLeaseMarketAuctionSoft {
+access(all) contract FindLeaseMarketAuctionSoft {
 
 	pub event EnglishAuction(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, leaseInfo:FindLeaseMarket.LeaseInfo?, buyer:Address?, buyerName:String?, buyerAvatar:String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
 

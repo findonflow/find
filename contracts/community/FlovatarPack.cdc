@@ -21,7 +21,7 @@ import FlowUtilityToken from "../standard/FlowUtilityToken.cdc"
 
  */
 
-pub contract FlovatarPack {
+access(all) contract FlovatarPack {
 
     access(all) let CollectionStoragePath: StoragePath
     access(all) let CollectionPublicPath: PublicPath

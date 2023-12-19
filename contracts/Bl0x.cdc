@@ -2,7 +2,7 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 //import FindViews from "./FindViews.cdc"
 
-pub contract Bl0x: NonFungibleToken {
+access(all) contract Bl0x: NonFungibleToken {
 
 	pub var totalSupply: UInt64
 

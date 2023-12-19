@@ -12,7 +12,7 @@ import FlovatarComponent from "./FlovatarComponent.cdc"
 
 */
 
-pub contract FlovatarMarketplace {
+access(all) contract FlovatarMarketplace {
 
     access(all) let CollectionPublicPath: PublicPath
     access(all) let CollectionStoragePath: StoragePath

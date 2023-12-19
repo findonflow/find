@@ -4,7 +4,7 @@ import NonFungibleToken from "../standard/NonFungibleToken.cdc"
 import MetadataViews from "../standard/MetadataViews.cdc"
 import Wearables from "./Wearables.cdc"
 
-pub contract WearablesDev {
+access(all) contract WearablesDev {
 
 	pub var initiated: Bool
 

@@ -9,7 +9,7 @@ import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FindLeaseMarket from "./FindLeaseMarket.cdc"
 
-pub contract FindLeaseMarketDirectOfferSoft {
+access(all) contract FindLeaseMarketDirectOfferSoft {
 
 	pub event DirectOffer(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, leaseInfo: FindLeaseMarket.LeaseInfo?, buyer:Address?, buyerName:String?, buyerAvatar:String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
 

@@ -4,7 +4,7 @@ import FungibleToken from "./FungibleToken.cdc"
 // THis is a local mocked version of USDC FiatToken that is basically a clone of FUSD just to make it easier to test with
 //the paths are copied from the testnet version 
 
-pub contract FiatToken: FungibleToken {
+access(all) contract FiatToken: FungibleToken {
 
     // Event that is emitted when the contract is created
     access(all) event TokensInitialized(initialSupply: UFix64)

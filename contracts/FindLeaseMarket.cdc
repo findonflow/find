@@ -10,7 +10,7 @@ import FindRulesCache from "../contracts/FindRulesCache.cdc"
 import FindMarketCutStruct from "../contracts/FindMarketCutStruct.cdc"
 import FindUtils from "../contracts/FindUtils.cdc"
 
-pub contract FindLeaseMarket {
+access(all) contract FindLeaseMarket {
 
 	access(contract) let  saleItemTypes : [Type]
 	access(contract) let  saleItemCollectionTypes : [Type]

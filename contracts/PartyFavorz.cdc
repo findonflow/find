@@ -5,7 +5,7 @@ import FindForge from "./FindForge.cdc"
 import FindPack from "./FindPack.cdc"
 import PartyFavorzExtraData from "./PartyFavorzExtraData.cdc"
 
-pub contract PartyFavorz: NonFungibleToken {
+access(all) contract PartyFavorz: NonFungibleToken {
 
 	pub var totalSupply: UInt64
 

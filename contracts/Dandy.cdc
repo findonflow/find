@@ -4,7 +4,7 @@ import MetadataViews from "./standard/MetadataViews.cdc"
 import FindViews from "./FindViews.cdc"
 import FindForge from "./FindForge.cdc"
 
-pub contract Dandy: NonFungibleToken {
+access(all) contract Dandy: NonFungibleToken {
 
 	pub let CollectionStoragePath: StoragePath
 	pub let CollectionPrivatePath: PrivatePath

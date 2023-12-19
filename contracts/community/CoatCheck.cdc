@@ -8,7 +8,7 @@ import NonFungibleToken from "../standard/NonFungibleToken.cdc"
 // this contract is essentially an escrow that no one holds the keys to. It will support holding any Fungible and NonFungible Tokens
 // with a specified address that is allowed to claim them. In this way, dapps which need to ensure that accounts are able to "Receive" assets
 // have a way of putting them into a holding resource that the intended receiver can redeem.
-pub contract CoatCheck {
+access(all) contract CoatCheck {
 
     // | ---------------- Events ----------------- |
     access(all) event Initialized()

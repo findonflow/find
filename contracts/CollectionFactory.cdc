@@ -18,7 +18,7 @@ import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-pub contract CollectionFactory {
+access(all) contract CollectionFactory {
 
     access(all) let FlowverseSocksIds : [UInt64]
 

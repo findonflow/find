@@ -2,7 +2,7 @@ import FindMarketCutInterface from "../contracts/FindMarketCutInterface.cdc"
 import FindMarketCutStruct from "../contracts/FindMarketCutStruct.cdc"
 import FindMarketCut from "../contracts/FindMarketCut.cdc"
 
-pub contract FindMarketInfrastructureCut : FindMarketCutInterface {
+access(all) contract FindMarketInfrastructureCut : FindMarketCutInterface {
 
 	pub let contractName: String
 	pub let category: String

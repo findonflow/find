@@ -1,5 +1,5 @@
 
-pub contract PartyFavorzExtraData {
+access(all) contract PartyFavorzExtraData {
 	pub let extraData : {UInt64 : {String : AnyStruct}}
 
 	access(account) fun setData(id: UInt64, field: String, value: AnyStruct) {

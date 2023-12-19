@@ -4,7 +4,7 @@ import FungibleToken from "../standard/FungibleToken.cdc"
 
 // This contracts stores all the defined interfaces and structs.
 // Interfaces can span on both Characters and Wearables therefore it is better to have them in a central contract
-pub contract Templates {
+access(all) contract Templates {
 
 	access(contract) let counters : {String : UInt64}
 	access(contract) let features : {String : Bool}

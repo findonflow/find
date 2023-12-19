@@ -3,7 +3,7 @@ import FungibleToken from "./standard/FungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 import FindForge from "./FindForge.cdc"
 
-pub contract NFGv3: NonFungibleToken {
+access(all) contract NFGv3: NonFungibleToken {
 
     access(all) var totalSupply: UInt64
 

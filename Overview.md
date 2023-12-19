@@ -940,7 +940,7 @@ This will be very important part of social mapping
 ```cadence
 // ** Thoughts are NOT NFTs as they are not meant to be.
 // They should not be freely moved or regarded as NFT assets
-pub contract FindThoughts {
+access(all) contract FindThoughts {
 
 	// These are the fields in the Thought and exposed through ThoughtPublic interface to enable the above mentinoned functions
 

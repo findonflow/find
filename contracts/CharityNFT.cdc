@@ -2,7 +2,7 @@
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 
-pub contract CharityNFT: NonFungibleToken {
+access(all) contract CharityNFT: NonFungibleToken {
 
 	pub var totalSupply: UInt64
 

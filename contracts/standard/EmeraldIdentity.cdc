@@ -11,7 +11,7 @@
 // multiple addresses to your DiscordID, and you cannot configure
 // multiple DiscordIDs to your address. 1-1.
 
-pub contract EmeraldIdentity {
+access(all) contract EmeraldIdentity {
 
     //
     // Paths

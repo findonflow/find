@@ -7,7 +7,7 @@ import Debug from "./Debug.cdc"
 import FLOAT from "../contracts/standard/FLOAT.cdc"
 import Bl0x from "../contracts/Bl0x.cdc"
 
-pub contract Bl0xPack: NonFungibleToken {
+access(all) contract Bl0xPack: NonFungibleToken {
 	// Events
 	pub event ContractInitialized()
 	pub event Withdraw(id: UInt64, from: Address?)

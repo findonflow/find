@@ -1,5 +1,5 @@
 //This contract is temporary until dapper finishes their initiative
-pub contract NFTRegistry {
+access(all) contract NFTRegistry {
 
 	/* Event */
 	pub event ContractInitialized()

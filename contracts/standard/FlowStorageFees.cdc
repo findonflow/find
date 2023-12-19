@@ -17,7 +17,7 @@
 import FungibleToken from "./FungibleToken.cdc"
 import FlowToken from "./FlowToken.cdc"
 
-pub contract FlowStorageFees {
+access(all) contract FlowStorageFees {
 
     // Emitted when the amount of storage capacity an account has per reserved Flow token changes
     access(all) event StorageMegaBytesPerReservedFLOWChanged(_ storageMegaBytesPerReservedFLOW: UFix64)

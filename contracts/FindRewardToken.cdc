@@ -1,6 +1,6 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
-pub contract FindRewardToken {
+access(all) contract FindRewardToken {
 
     // Map tenantToken to custom task rewards 
     access(contract) let defaultTaskRewards:  {String : UFix64}

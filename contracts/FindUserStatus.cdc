@@ -8,7 +8,7 @@ import FlovatarMarketplace from "../contracts/community/FlovatarMarketplace.cdc"
 import Flovatar from "../contracts/community/Flovatar.cdc"
 import FlovatarComponent from "../contracts/community/FlovatarComponent.cdc"
 
-pub contract FindUserStatus {
+access(all) contract FindUserStatus {
 
 	pub struct StoreFrontCut {
 		pub let amount:UFix64

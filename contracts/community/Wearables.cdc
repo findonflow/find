@@ -12,7 +12,7 @@ import MetadataViews from "../standard/MetadataViews.cdc"
 import Templates from "./Templates.cdc"
 import FindUtils from "../FindUtils.cdc"
 
-pub contract Wearables: NonFungibleToken {
+access(all) contract Wearables: NonFungibleToken {
 
 	//Holds the total supply of wearables ever minted
 	pub var totalSupply: UInt64

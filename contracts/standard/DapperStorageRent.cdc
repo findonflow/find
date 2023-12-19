@@ -3,7 +3,7 @@ import FlowToken from "./FlowToken.cdc"
 
 /// DapperStorageRent
 /// Provide a means for accounts storage TopUps. To be used during transaction execution.
-pub contract DapperStorageRent {
+access(all) contract DapperStorageRent {
 
   access(all) let DapperStorageRentAdminStoragePath: StoragePath
 

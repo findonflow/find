@@ -5,7 +5,7 @@ import FINDNFTCatalog from "./FINDNFTCatalog.cdc"
 import FIND from "./FIND.cdc"
 import Clock from "./Clock.cdc"
 
-pub contract FindThoughts {
+access(all) contract FindThoughts {
 
 	pub event Published(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], nfts:[FindMarket.NFTInfo], tags: [String], quoteOwner: Address?, quoteId: UInt64?)
 	pub event Edited(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], hide: Bool, tags: [String])

@@ -4,7 +4,7 @@ import MetadataViews from "./standard/MetadataViews.cdc"
 import FindForge from "./FindForge.cdc"
 import FindPack from "./FindPack.cdc"
 
-pub contract GeneratedExperiences: NonFungibleToken {
+access(all) contract GeneratedExperiences: NonFungibleToken {
 
     access(all) var totalSupply: UInt64
 

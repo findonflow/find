@@ -3,7 +3,7 @@
 import NonFungibleToken from "../standard/NonFungibleToken.cdc"
 import MetadataViews from "../standard/MetadataViews.cdc"
 
-pub contract TopShot: NonFungibleToken {
+access(all) contract TopShot: NonFungibleToken {
 
     // Emitted when the TopShot contract is created
     access(all) event ContractInitialized()

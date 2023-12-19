@@ -2,7 +2,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 
-pub contract FindMetadataFactory {
+access(all) contract FindMetadataFactory {
 
 	pub struct MetadataCollectionItem {
 		pub let id:UInt64

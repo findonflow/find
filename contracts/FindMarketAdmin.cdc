@@ -4,7 +4,7 @@ import FIND from "./FIND.cdc"
 import FindMarket from "./FindMarket.cdc"
 import FindMarketCutStruct from "./FindMarketCutStruct.cdc"
 
-pub contract FindMarketAdmin {
+access(all) contract FindMarketAdmin {
 
 	//store the proxy for the admin
 	pub let AdminProxyPublicPath: PublicPath

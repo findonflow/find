@@ -12,7 +12,7 @@ import MetadataViews from "../standard/MetadataViews.cdc"
 
  */
 
-pub contract FlovatarComponent: NonFungibleToken {
+access(all) contract FlovatarComponent: NonFungibleToken {
 
     access(all) let CollectionStoragePath: StoragePath
     access(all) let CollectionPublicPath: PublicPath

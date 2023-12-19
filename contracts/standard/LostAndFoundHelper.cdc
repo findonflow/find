@@ -1,6 +1,6 @@
 import LostAndFound from "./LostAndFound.cdc"
 
-pub contract LostAndFoundHelper {
+access(all) contract LostAndFoundHelper {
 
     access(all) struct Ticket {
 

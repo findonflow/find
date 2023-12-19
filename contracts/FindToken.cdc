@@ -2,7 +2,7 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import Clock from "../contracts/Clock.cdc"
 
-pub contract FindToken : FungibleToken {
+access(all) contract FindToken : FungibleToken {
 
     access(all) event TokensInitialized(initialSupply: UFix64)
     access(all) event TokensWithdrawn(amount: UFix64, from: Address?)

@@ -26,7 +26,7 @@ import FeeEstimator from "./FeeEstimator.cdc"
 // - NonFunigibleToken.Receiver
 // - FungibleToken.Receiver
 // - LostAndFound.ResourceReceiver (This is a placeholder so that non NFT and FT resources can be utilized here)
-pub contract LostAndFound {
+access(all) contract LostAndFound {
     access(contract) let storageFees: {UInt64: UFix64}
 
     access(all) let LostAndFoundPublicPath: PublicPath

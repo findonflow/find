@@ -1,7 +1,7 @@
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
-pub contract FindMarketCutStruct {
+access(all) contract FindMarketCutStruct {
 
 	pub struct Cuts {
 		pub let cuts : [{Cut}]

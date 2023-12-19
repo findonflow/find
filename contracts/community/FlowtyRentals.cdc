@@ -22,7 +22,7 @@ import CoatCheck from "./CoatCheck.cdc"
 //
 // Lenders can watch for Listing events and check the NFT type and
 // ID to see if they wish to rent the listing on a storefront.
-pub contract FlowtyRentals {
+access(all) contract FlowtyRentals {
 
     // FlowtyRentalsInitialized
     // This contract has been deployed
