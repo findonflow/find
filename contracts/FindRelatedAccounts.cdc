@@ -5,7 +5,7 @@ access(all) contract FindRelatedAccounts {
 
 	pub event RelatedAccount(user: Address, walletId: String, walletName: String, address: String, network: String, action: String)
 
-	pub struct AccountInformation{
+	access(all) struct AccountInformation{
 		pub let name:String
 		pub let address:Address?
 		pub let network:String //do not use enum because of contract upgrade

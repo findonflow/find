@@ -59,7 +59,7 @@ access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [
 	return report
 }
 
-pub struct MetadataCollectionItem {
+access(all) struct MetadataCollectionItem {
 	pub let id:UInt64
 	pub let uuid:UInt64
 	pub let name: String

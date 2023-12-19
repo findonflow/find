@@ -14,7 +14,7 @@ access(all) main(packTypeName: String) : {UInt64 : Report} {
 	return packData
 }
 
-pub struct Report {
+access(all) struct Report {
 		pub let name: String
 		pub let description: String
 
@@ -71,7 +71,7 @@ pub struct Report {
 		}
 }
 
-pub struct SaleInfo {
+access(all) struct SaleInfo {
 		pub let name : String
 		pub let startTime : UFix64 
 		pub let endTime : UFix64?

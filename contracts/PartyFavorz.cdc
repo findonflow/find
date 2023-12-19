@@ -21,7 +21,7 @@ access(all) contract PartyFavorz: NonFungibleToken {
 
 	pub let royalties: [MetadataViews.Royalty]
 
-	pub struct Info {
+	access(all) struct Info {
 		pub let name: String
 		pub let description: String
 		pub let thumbnailHash: String

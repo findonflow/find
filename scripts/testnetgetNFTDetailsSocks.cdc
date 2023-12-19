@@ -5,7 +5,7 @@ access(all) main(user: String , project: String, id: UInt64, views: [String]) : 
 	return nil
 }
 
-pub struct NFTData {
+access(all) struct NFTData {
 	pub let contract: NFTContractData
 	pub let id: UInt64
 	pub let uuid: UInt64?
@@ -39,7 +39,7 @@ pub struct NFTData {
 	}
 }
 
-pub struct NFTContractData {
+access(all) struct NFTContractData {
 	pub let name: String
 	pub let address: Address
 	pub let storage_path: String
@@ -64,7 +64,7 @@ pub struct NFTContractData {
 	}
 }
 
-pub struct NFTMedia {
+access(all) struct NFTMedia {
 	pub let uri: String?
 	pub let mimetype: String?
 

@@ -29,7 +29,7 @@ access(all) main(name: String) : NameReport? {
 
 }
 
-pub struct NameReport {
+access(all) struct NameReport {
 	pub let status: String
 	pub let cost: UFix64
 	pub let owner: Address?

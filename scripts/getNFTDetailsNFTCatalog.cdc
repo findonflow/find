@@ -6,7 +6,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
-pub struct NFTDetailReport {
+access(all) struct NFTDetailReport {
 	pub let findMarket: {String : FindMarket.SaleItemInformation}
 	pub let nftDetail: NFTDetail?
 	pub let allowedListingActions: {String : ListingTypeReport}
@@ -27,7 +27,7 @@ pub struct NFTDetailReport {
 	}
 }
 
-pub struct ListingTypeReport {
+access(all) struct ListingTypeReport {
 	pub let ftAlias: [String]
 	pub let ftIdentifiers: [String]
 	pub let listingType: String
@@ -43,7 +43,7 @@ pub struct ListingTypeReport {
 	}
 }
 
-pub struct NFTDetail {
+access(all) struct NFTDetail {
 	pub let id: UInt64
 	pub let uuid: UInt64
 	pub let name:String
@@ -178,7 +178,7 @@ pub struct NFTDetail {
 	}
 }
 
-pub struct ListingRoyalties {
+access(all) struct ListingRoyalties {
 
 	pub let ftAlias: String?
 	pub let ftIdentifier: String
@@ -191,7 +191,7 @@ pub struct ListingRoyalties {
 	}
 }
 
-pub struct Royalties {
+access(all) struct Royalties {
 
 	pub let royaltyName: String
 	pub let address: Address
@@ -206,7 +206,7 @@ pub struct Royalties {
 	}
 }
 
-pub struct NFTCollectionDisplay {
+access(all) struct NFTCollectionDisplay {
 	// Name that should be used when displaying this NFT collection.
 	pub let name: String
 

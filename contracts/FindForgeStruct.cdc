@@ -10,7 +10,7 @@ access(all) contract FindForgeStruct {
 		if descriptions are added, we put that in description with prefix of the map variable, e.g. : scalar_key
 	*/
 	
-	pub struct FindDIM {
+	access(all) struct FindDIM {
 		pub let name: String
 		pub let description: String
 		pub let thumbnailHash: String

@@ -6,7 +6,7 @@ access(all) main(user: String, collections: [String]) : {String : ItemReport} {
 	return fetchNFTCatalog(user: user, targetCollections:collections)
 }
 
-pub struct ItemReport {
+access(all) struct ItemReport {
 	pub let length : Int // mapping of collection to no. of ids 
 	pub let extraIDs : [UInt64]
 	pub let shard : String 
@@ -22,7 +22,7 @@ pub struct ItemReport {
 	}
 }
 
-pub struct NFTView {
+access(all) struct NFTView {
 	pub let id: UInt64
 	pub let display: MetadataViews.Display?
 	pub let editions: MetadataViews.Editions?
@@ -44,7 +44,7 @@ pub struct NFTView {
 	}
 }
 
-pub struct NFTIDs {
+access(all) struct NFTIDs {
 	pub let ids: [UInt64]
 	pub let collectionName: String 
 

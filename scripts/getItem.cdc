@@ -2,7 +2,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 
-pub struct MetadataCollectionItem {
+access(all) struct MetadataCollectionItem {
 	pub let id:UInt64
 	pub let uuid:UInt64
 	pub let name: String

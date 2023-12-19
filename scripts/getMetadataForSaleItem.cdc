@@ -1,7 +1,7 @@
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 
-pub struct PurchaseData {
+access(all) struct PurchaseData {
 	pub let id: UInt64
 	pub let name: String
 	pub let amount: UFix64

@@ -4,7 +4,7 @@ import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import Clock from "../contracts/Clock.cdc"
 
-pub struct FINDReport{
+access(all) struct FINDReport{
 
 	pub let leasesForSale: {String : SaleItemCollectionReport}
 	pub let leasesBids: {String : BidItemCollectionReport}
@@ -46,7 +46,7 @@ access(all) main(user: String) : FINDReport? {
 }
 
 // These are for consolidating FIND Lease Sales
-pub struct SaleItemCollectionReport {
+access(all) struct SaleItemCollectionReport {
 	pub let items : [SaleItemInformation]
 	pub let ghosts: [FindLeaseMarket.GhostListing]
 
@@ -64,7 +64,7 @@ pub struct SaleItemCollectionReport {
 	}
 }
 
-pub struct SaleItemInformation {
+access(all) struct SaleItemInformation {
 	pub var leaseIdentifier: String
 	pub var leaseName: String
 	pub var seller: Address?
@@ -127,7 +127,7 @@ pub struct SaleItemInformation {
 	}
 }
 
-pub struct LeaseInfo {
+access(all) struct LeaseInfo {
 	pub let name: String
 	pub let address: Address
 	pub let cost: UFix64
@@ -358,7 +358,7 @@ access(all) addLeasesSale(_ leases: [FIND.LeaseInformation], _ sales : {String :
 	return s
 }
 
-pub struct BidInfo{
+access(all) struct BidInfo{
 	pub let name: String
 	pub let bidAmount: UFix64
 	pub let bidTypeIdentifier: String
@@ -395,7 +395,7 @@ access(all) BidInfoFromFindLeaseMarket(_ b: FindLeaseMarket.BidInfo) : BidInfo {
 	)
 }
 
-pub struct BidItemCollectionReport {
+access(all) struct BidItemCollectionReport {
 	pub let items : [BidInfo]
 	pub let ghosts: [FindLeaseMarket.GhostListing]
 

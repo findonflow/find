@@ -44,7 +44,7 @@ access(all) contract Wearables: NonFungibleToken {
 	pub let sets: {UInt64 : Set}
 
 	//the definition of a set, a data structure that is Retriable and Editionable
-	pub struct Set : Templates.Retirable, Templates.Editionable, Templates.RoyaltyHolder {
+	access(all) struct Set : Templates.Retirable, Templates.Editionable, Templates.RoyaltyHolder {
 		pub let id:UInt64
 		pub let name: String
 		pub var active:Bool
@@ -104,7 +104,7 @@ access(all) contract Wearables: NonFungibleToken {
 	pub let positions: {UInt64 : Position}
 
 	//the definition of a position, a data structure that is Retriable and Editionable
-	pub struct Position : Templates.Retirable, Templates.Editionable{
+	access(all) struct Position : Templates.Retirable, Templates.Editionable{
 		pub let id:UInt64
 		pub let name: String
 		pub let classifiers: [String]
@@ -176,7 +176,7 @@ access(all) contract Wearables: NonFungibleToken {
 	pub let templates: {UInt64 : Template}
 
 	//the definition of a template, a data structure that is Retriable and Editionable
-	pub struct Template : Templates.Retirable, Templates.Editionable {
+	access(all) struct Template : Templates.Retirable, Templates.Editionable {
 		pub let id:UInt64
 		pub let name: String
 		pub let set: UInt64
@@ -272,7 +272,7 @@ access(all) contract Wearables: NonFungibleToken {
 	}
 
 	//A tag is a label for a Wearable, they can have many tags associated with them
-	pub struct Tag : Templates.Editionable {
+	access(all) struct Tag : Templates.Editionable {
 		pub let value : String
 		access(self) let extra: {String : AnyStruct}
 
@@ -596,7 +596,7 @@ access(all) contract Wearables: NonFungibleToken {
 	}
 
 	//A metadata for technical information that is not useful as traits
-	pub struct Metadata {
+	access(all) struct Metadata {
 		pub let templateId:UInt64
 		pub let setId:UInt64
 		pub let positionId:UInt64
@@ -611,7 +611,7 @@ access(all) contract Wearables: NonFungibleToken {
 	// POINTER
 
 	// a struct to store who has interacted with a wearable
-	pub struct Pointer {
+	access(all) struct Pointer {
 		pub let id: UInt64
 		pub let characterId: UInt64
 		pub let address: Address
@@ -825,7 +825,7 @@ access(all) contract Wearables: NonFungibleToken {
 	//Below here are internal resources that is not really relevant to the public
 
 	//internal struct to use for batch minting that points to a specific wearable
-	pub struct WearableMintData {
+	access(all) struct WearableMintData {
 		pub let template: UInt64
 		pub let setEdition: UInt64
 		pub let positionEdition: UInt64
@@ -854,7 +854,7 @@ access(all) contract Wearables: NonFungibleToken {
 
 	// This is not in use anymore. Use WearableMintData
 	//cadence does not allow us to remove this
-	pub struct MintData {
+	access(all) struct MintData {
 		pub let template: UInt64
 		pub let setEdition: UInt64
 		pub let positionEdition: UInt64

@@ -2,7 +2,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 
-pub struct Report{
+access(all) struct Report{
 	pub let alias:String
 	pub let ids:[UInt64]
 	pub let key:String

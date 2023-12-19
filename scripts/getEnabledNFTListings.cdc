@@ -99,7 +99,7 @@ access(all) main(page: Int, detail: Bool) : AnyStruct {
 	return Report(nonDapper: nonDapper, dapper: Dapper)
 }
 
-pub struct Report {
+access(all) struct Report {
 	pub let nonDapper : [AnyStruct]
 	pub let dapper : [AnyStruct]
 
@@ -113,7 +113,7 @@ pub struct Report {
 
 }
 
-pub struct Item {
+access(all) struct Item {
 	pub let type: String
 	pub let listingType: String
 	pub let ftType: [Type]

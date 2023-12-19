@@ -6,7 +6,7 @@ access(all) contract FindRulesCache {
 	access(contract) let tenantTenantRules : {String : {String : ActionResult}}
 	access(contract) let tenantCuts : {String : {String : TenantCuts}}
 
-	pub struct ActionResult {
+	access(all) struct ActionResult {
 		pub let allowed:Bool
 		pub let message:String
 		pub let name:String
@@ -18,7 +18,7 @@ access(all) contract FindRulesCache {
 		}
 	}
 
-	pub struct TenantCuts {
+	access(all) struct TenantCuts {
 		pub let findCut:MetadataViews.Royalty?
 		pub let tenantCut:MetadataViews.Royalty?
 

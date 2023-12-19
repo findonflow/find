@@ -16,7 +16,7 @@ access(all) contract NFTRegistry {
 	//TODO: name of init transactions
 	//TODO: name of check storage slot script
 	/* Struct */
-	pub struct NFTInfo {
+	access(all) struct NFTInfo {
 		pub let alias : String
 		// Pass in @NFT type
 		pub let type : Type              

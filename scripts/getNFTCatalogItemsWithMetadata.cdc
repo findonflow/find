@@ -8,7 +8,7 @@ access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [
 	return fetchNFTCatalog(user: user, collectionIDs: collectionIDs)
 }
 
-pub struct NFTView {
+access(all) struct NFTView {
 	pub let id: UInt64
 	pub let display: MetadataViews.Display?
 	pub let collectionDisplay: MetadataViews.NFTCollectionDisplay?
@@ -130,7 +130,7 @@ access(all) getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [NFTView]
 	return results
 }
 
-pub struct CollectionReport {
+access(all) struct CollectionReport {
 	pub let items : {String : [MetadataCollectionItem]} 
 	pub let collections : {String : Int} // mapping of collection to no. of ids 
 	pub let extraIDs : {String : [UInt64]} 
@@ -142,7 +142,7 @@ pub struct CollectionReport {
 	}
 }
 
-pub struct MetadataCollectionItem {
+access(all) struct MetadataCollectionItem {
 	pub let id:UInt64
 	pub let name: String
 	pub let collection: String // <- This will be Alias unless they want something else

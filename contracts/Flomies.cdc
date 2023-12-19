@@ -29,7 +29,7 @@ access(all) contract Flomies: NonFungibleToken {
 	Common
 	*/
 
-	pub struct Metadata {
+	access(all) struct Metadata {
 		pub let nftId: UInt64
 		pub let name: String
 		pub let serial:UInt64

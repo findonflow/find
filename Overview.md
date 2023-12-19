@@ -1098,7 +1098,7 @@ access(all) main(
 returning object
 
 ```cadence
-pub struct Thought {
+access(all) struct Thought {
 	pub let id: UInt64
 	pub let creator: Address
 	pub let creatorName: String?

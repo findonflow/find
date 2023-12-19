@@ -24,7 +24,7 @@ access(all) contract Dandy: NonFungibleToken {
 	pub event Deposit(id: UInt64, to: Address?)
 	pub event Minted(id:UInt64, minter:String, name:String, description:String)
 
-	pub struct ViewInfo {
+	access(all) struct ViewInfo {
 		access(contract) let typ: Type
 		access(contract) let result: AnyStruct
 
@@ -34,7 +34,7 @@ access(all) contract Dandy: NonFungibleToken {
 		}
 	}
 
-	pub struct DandyInfo {
+	access(all) struct DandyInfo {
 		pub let name: String
 		pub let description: String
 		pub let thumbnail: MetadataViews.Media
@@ -374,7 +374,7 @@ access(all) contract Dandy: NonFungibleToken {
 
 	/// This struct interface is used on a contract level to convert from one View to another. 
 	/// See Dandy nft for an example on how to convert one type to another
-	pub struct interface ViewConverter {
+	access(all) struct interface ViewConverter {
 		pub let to: Type
 		pub let from: Type
 

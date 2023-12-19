@@ -4,7 +4,7 @@ import FindViews from "../contracts/FindViews.cdc"
 
 access(all) contract FindMetadataFactory {
 
-	pub struct MetadataCollectionItem {
+	access(all) struct MetadataCollectionItem {
 		pub let id:UInt64
 		pub let uuid: UInt64 
 		pub let name: String

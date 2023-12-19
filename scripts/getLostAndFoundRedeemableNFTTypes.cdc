@@ -20,7 +20,7 @@ access(all) typeToStringArray(_ array: [Type]) : [String] {
     return res
 }
 
-pub struct Report {
+access(all) struct Report {
     access(all) let nftTypes : [String]
     access(all) let err : String? 
 

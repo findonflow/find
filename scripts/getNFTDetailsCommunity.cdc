@@ -4,7 +4,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FindUserStatus from "../contracts/FindUserStatus.cdc"
 
-pub struct NFTDetailReport {
+access(all) struct NFTDetailReport {
 	pub let storefront: FindUserStatus.StorefrontListing?
 	pub let storefrontV2: FindUserStatus.StorefrontListing?
 	pub let flowty: FindUserStatus.FlowtyListing?

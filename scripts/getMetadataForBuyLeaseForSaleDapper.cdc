@@ -26,7 +26,7 @@ access(all) main(sellerAccount: Address, leaseName: String, amount: UFix64) :Pur
 			)
 }
 
-pub struct PurchaseData {
+access(all) struct PurchaseData {
 	pub let id: UInt64
 	pub let name: String
 	pub let amount: UFix64

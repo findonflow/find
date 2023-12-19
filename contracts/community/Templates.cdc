@@ -27,7 +27,7 @@ access(all) contract Templates {
 		return EditionInfo(counter: counter, name:name, number:max)
 	}
 
-	pub struct interface Editionable {
+	access(all) struct interface Editionable {
 
 		access(all) getCounterSuffix() : String
 		// e.g. set , position
@@ -49,7 +49,7 @@ access(all) contract Templates {
 
 	}
 
-	pub struct interface Retirable{
+	access(all) struct interface Retirable{
 
 		pub var active:Bool
 
@@ -65,7 +65,7 @@ access(all) contract Templates {
 		}
 	}
 
-	pub struct interface RoyaltyHolder {
+	access(all) struct interface RoyaltyHolder {
 		pub let royalties: [Templates.Royalty]
 
 		access(all) getRoyalties() : [MetadataViews.Royalty] {
@@ -77,7 +77,7 @@ access(all) contract Templates {
 		}
 	}
 
-	pub struct EditionInfo {
+	access(all) struct EditionInfo {
 		pub let counter :String
 		pub let name : String
 		pub let number:UInt64
@@ -106,7 +106,7 @@ access(all) contract Templates {
 
 	}
 
-	pub struct Royalty {
+	access(all) struct Royalty {
 		pub let name : String
 		pub let address: Address
 		pub let cut: UFix64

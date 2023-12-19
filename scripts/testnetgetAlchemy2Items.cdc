@@ -29,7 +29,7 @@ access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [
         }
     }
 
-	pub struct MetadataCollectionItem {
+	access(all) struct MetadataCollectionItem {
         access(all) let id:UInt64
         access(all) let uuid:UInt64?
         access(all) let name: String

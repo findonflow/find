@@ -27,7 +27,7 @@ access(all) contract Bl0x: NonFungibleToken {
 	Common
 	*/
 
-	pub struct Metadata {
+	access(all) struct Metadata {
 		pub let nftId: UInt64
 		pub let name: String
 		pub let serial:UInt64
@@ -48,7 +48,7 @@ access(all) contract Bl0x: NonFungibleToken {
 	}
 
 	//TODO: This can be removed before mainnet
-	pub struct Data {
+	access(all) struct Data {
 		pub let nftId: UInt64
 		pub let name: String
 		pub let serial:UInt64
@@ -367,7 +367,7 @@ access(all) contract Bl0x: NonFungibleToken {
 		}
 
 		/// A trait contains information about a trait
-		pub struct Trait {
+		access(all) struct Trait {
 			pub let id:UInt64
 			pub let metadata : {String:String}
 

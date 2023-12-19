@@ -42,7 +42,7 @@ access(all) main(user: String) : Report {
 }
 
 
-pub struct Report {
+access(all) struct Report {
 
 	pub let nftCatalogTicketInfo : {String : [LostAndFoundHelper.Ticket]}
 	pub let ticketInfo : {String : [LostAndFoundHelper.Ticket]}

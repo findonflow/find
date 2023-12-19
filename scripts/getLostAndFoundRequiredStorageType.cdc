@@ -54,7 +54,7 @@ access(all) main(user: String) : Report {
 
 }
 
-pub struct Report {
+access(all) struct Report {
 
     access(all) let initiableStorage : [String] 
     access(all) let relinkableStorage : [String]

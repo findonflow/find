@@ -319,7 +319,7 @@ access(all) contract FindLeaseMarket {
 
 	/////// Pointer Section
 
-	pub struct interface LeasePointer {
+	access(all) struct interface LeasePointer {
 		pub let name: String
 		pub let uuid: UInt64
 
@@ -330,7 +330,7 @@ access(all) contract FindLeaseMarket {
 		access(contract) fun borrow() : &FIND.LeaseCollection{FIND.LeaseCollectionPublic}
 	}
 
-	pub struct ReadLeasePointer : LeasePointer {
+	access(all) struct ReadLeasePointer : LeasePointer {
 		access(self) let cap: Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>
 		pub let name: String
 		pub let uuid: UInt64
@@ -379,7 +379,7 @@ access(all) contract FindLeaseMarket {
 		}
 	}
 
-	pub struct AuthLeasePointer : LeasePointer {
+	access(all) struct AuthLeasePointer : LeasePointer {
 		access(self) let cap: Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>
 		pub let name: String
 		pub let uuid: UInt64
@@ -465,7 +465,7 @@ access(all) contract FindLeaseMarket {
 	}
 
 	//struct to expose information about leases
-	pub struct LeaseInfo {
+	access(all) struct LeaseInfo {
 		pub let name: String
 		pub let address: Address
 		pub let cost: UFix64
@@ -534,7 +534,7 @@ access(all) contract FindLeaseMarket {
 		access(all) getBidExtraField() : {String : AnyStruct}
 	}
 
-	pub struct SaleItemInformation {
+	access(all) struct SaleItemInformation {
 		pub let leaseIdentifier: String
 		pub let leaseName: String
 		pub let seller: Address
@@ -584,7 +584,7 @@ access(all) contract FindLeaseMarket {
 		}
 	}
 
-	pub struct BidInfo{
+	access(all) struct BidInfo{
 		pub let name: String
 		pub let bidAmount: UFix64
 		pub let bidTypeIdentifier: String
@@ -600,7 +600,7 @@ access(all) contract FindLeaseMarket {
 		}
 	}
 
-	pub struct AuctionItem {
+	access(all) struct AuctionItem {
 		//end time
 		//current time
 		pub let startPrice: UFix64
@@ -636,7 +636,7 @@ access(all) contract FindLeaseMarket {
 		access(account) fun borrowBidItem(_ name: String) : &{Bid}
 	}
 
-	pub struct GhostListing{
+	access(all) struct GhostListing{
 		//		pub let listingType: Type
 		pub let listingTypeIdentifier: String
 		pub let name: String
@@ -649,7 +649,7 @@ access(all) contract FindLeaseMarket {
 		}
 	}
 
-	pub struct SaleItemCollectionReport {
+	access(all) struct SaleItemCollectionReport {
 		pub let items : [FindLeaseMarket.SaleItemInformation]
 		pub let ghosts: [FindLeaseMarket.GhostListing]
 
@@ -659,7 +659,7 @@ access(all) contract FindLeaseMarket {
 		}
 	}
 
-	pub struct BidItemCollectionReport {
+	access(all) struct BidItemCollectionReport {
 		pub let items : [FindLeaseMarket.BidInfo]
 		pub let ghosts: [FindLeaseMarket.GhostListing]
 

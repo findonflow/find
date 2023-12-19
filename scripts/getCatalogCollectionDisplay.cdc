@@ -38,7 +38,7 @@ access(all) main(collectionIdentifier : String, type: String?) : NFTCatalogMetad
 	return nil
 }
 
-pub struct NFTCatalogMetadata {
+access(all) struct NFTCatalogMetadata {
 	pub let contractName : String
 	pub let contractAddress : Address
 	pub let nftType: String

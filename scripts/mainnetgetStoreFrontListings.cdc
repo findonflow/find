@@ -9,7 +9,7 @@ import FlovatarMarketplace from  0x921ea449dffec68a
 
 // This script returns the details for a listing within a storefront
 
-pub struct Listing {
+access(all) struct Listing {
 	pub let marketplace : String
 	pub let ftVault: Type
 	pub let price:UFix64

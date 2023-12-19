@@ -12,7 +12,7 @@ access(all) contract RelatedAccounts {
 	pub event RelatedAccountAdded(name: String, address: Address, related: String, network: String)
 	pub event RelatedAccountRemoved(name: String, address: Address, related: String, network: String)
 
-	pub struct AccountInformation{
+	access(all) struct AccountInformation{
 		// unique alias for each wallet
 		pub let name:String
 		pub let address:Address?

@@ -18,7 +18,7 @@ access(all) main(user: Address, path: String, rarityA: Bool, rarityB: Bool) : Re
     return Result(verifier, input: input)
 }
 
-pub struct Result{
+access(all) struct Result{
     access(all) let result : Bool 
     access(all) let description : String 
 

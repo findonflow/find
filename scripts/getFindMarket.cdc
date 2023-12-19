@@ -3,7 +3,7 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import Clock from "../contracts/Clock.cdc"
 
-pub struct FINDReport{
+access(all) struct FINDReport{
 
 	pub let leases: [FIND.LeaseInformation]
 	pub let leasesBids: [FIND.BidInfo]

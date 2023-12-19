@@ -119,7 +119,7 @@ access(all) main(sender: Address, nftIdentifiers: [String],  allReceivers:[Strin
 }
 
 
-pub struct Report {
+access(all) struct Report {
 	pub let receiver: String
 	pub let address: Address?
 	pub let inputName: String?
@@ -162,7 +162,7 @@ pub struct Report {
 	}
 }
 
-pub struct Royalties {
+access(all) struct Royalties {
 	pub let totalRoyalty: UFix64
 	pub let royalties: [Royalty]
 
@@ -178,7 +178,7 @@ pub struct Royalties {
 	}
 }
 
-pub struct Royalty {
+access(all) struct Royalty {
 	pub let name: String?
 	pub let address: Address
 	pub let cut: UFix64

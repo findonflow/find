@@ -7,7 +7,7 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
-pub struct FINDReport {
+access(all) struct FINDReport {
 	pub let profile:Profile.UserReport?
 	pub let bids: [FIND.BidInfo]
 	pub let relatedAccounts: { String: [Address]}
@@ -30,7 +30,7 @@ pub struct FINDReport {
 	}
 }
 
-pub struct NameReport {
+access(all) struct NameReport {
 	pub let status: String
 	pub let cost: UFix64
 	pub let leaseStatus: LeaseInformation?
@@ -149,7 +149,7 @@ access(all) main(user: String) : NameReport? {
 	return nameReport
 }
 
-	pub struct LeaseInformation {
+	access(all) struct LeaseInformation {
 		pub var name: String
 		pub var address: Address
 		pub var cost: UFix64

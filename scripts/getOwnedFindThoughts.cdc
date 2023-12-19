@@ -23,7 +23,7 @@ access(all) main(address: Address) : [Thought] {
 	return thoughts
 }
 
-pub struct User {
+access(all) struct User {
 	pub var name: String?
 	pub let address: Address 
 	pub let findName: String? 
@@ -45,7 +45,7 @@ pub struct User {
 	}
 }
 
-pub struct Thought {
+access(all) struct Thought {
 	pub let id: UInt64 
 	pub let creator: Address 
 	pub let creatorName: String? 

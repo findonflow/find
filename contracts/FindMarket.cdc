@@ -38,7 +38,7 @@ access(all) contract FindMarket {
 	access(account) let tenantAddressName : {Address:String}
 
 	// Deprecated in testnet
-	pub struct TenantCuts {
+	access(all) struct TenantCuts {
 		pub let findCut:MetadataViews.Royalty?
 		pub let tenantCut:MetadataViews.Royalty?
 
@@ -49,7 +49,7 @@ access(all) contract FindMarket {
 	}
 
 	// Deprecated in testnet
-	pub struct ActionResult {
+	access(all) struct ActionResult {
 		pub let allowed:Bool
 		pub let message:String
 		pub let name:String
@@ -542,7 +542,7 @@ access(all) contract FindMarket {
 	// ========================================
 
 	/// A struct to return what action an NFT can execute
-	pub struct AllowedListing {
+	access(all) struct AllowedListing {
 		pub let listingType: Type
 		pub let ftTypes: [Type]
 		pub let status: String
@@ -555,7 +555,7 @@ access(all) contract FindMarket {
 	}
 
 	/// If this is a listing action it will not be allowed if deprecated
-	pub struct MarketAction{
+	access(all) struct MarketAction{
 		pub let listing:Bool
 		pub let name:String
 
@@ -565,7 +565,7 @@ access(all) contract FindMarket {
 		}
 	}
 
-	pub struct TenantRule{
+	access(all) struct TenantRule{
 		pub let name:String
 		pub let types:[Type]
 		pub let ruleType:String
@@ -597,7 +597,7 @@ access(all) contract FindMarket {
 		}
 	}
 
-	pub struct TenantSaleItem {
+	access(all) struct TenantSaleItem {
 		pub let name:String
 		pub let cut:MetadataViews.Royalty?
 		pub let rules:[TenantRule]
@@ -1453,7 +1453,7 @@ access(all) contract FindMarket {
 		panic(msg)
 	}
 
-	pub struct NFTInfo {
+	access(all) struct NFTInfo {
 		pub let id: UInt64
 		pub let name:String
 		pub let thumbnail:String
@@ -1598,7 +1598,7 @@ access(all) contract FindMarket {
 		}
 	}
 
-	pub struct GhostListing{
+	access(all) struct GhostListing{
 		//		pub let listingType: Type
 		pub let listingTypeIdentifier: String
 		pub let id: UInt64
@@ -1611,7 +1611,7 @@ access(all) contract FindMarket {
 		}
 	}
 
-	pub struct AuctionItem {
+	access(all) struct AuctionItem {
 		//end time
 		//current time
 		pub let startPrice: UFix64
@@ -1641,7 +1641,7 @@ access(all) contract FindMarket {
 		access(all) getListingType() : Type
 	}
 
-	pub struct SaleItemCollectionReport {
+	access(all) struct SaleItemCollectionReport {
 		pub let items : [FindMarket.SaleItemInformation]
 		pub let ghosts: [FindMarket.GhostListing]
 
@@ -1658,7 +1658,7 @@ access(all) contract FindMarket {
 		access(account) fun borrowBidItem(_ id: UInt64) : &{Bid}
 	}
 
-	pub struct BidItemCollectionReport {
+	access(all) struct BidItemCollectionReport {
 		pub let items : [FindMarket.BidInfo]
 		pub let ghosts: [FindMarket.GhostListing]
 
@@ -1712,7 +1712,7 @@ access(all) contract FindMarket {
 		access(all) getNFTCollectionData() : MetadataViews.NFTCollectionData
 	}
 
-	pub struct SaleItemInformation {
+	access(all) struct SaleItemInformation {
 		pub let nftIdentifier: String
 		pub let nftId: UInt64
 		pub let seller: Address
@@ -1762,7 +1762,7 @@ access(all) contract FindMarket {
 		}
 	}
 
-	pub struct BidInfo{
+	access(all) struct BidInfo{
 		pub let id: UInt64
 		pub let bidAmount: UFix64
 		pub let bidTypeIdentifier: String

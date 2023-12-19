@@ -13,7 +13,7 @@ access(all) main(packTypeName: String, packTypeId: UInt64, user: Address) : Repo
 	return nil
 }
 
-pub struct Report {
+access(all) struct Report {
 		pub let name: String
 		pub let description: String
 
@@ -60,7 +60,7 @@ pub struct Report {
 		}
 }
 
-pub struct UserSaleInfo {
+access(all) struct UserSaleInfo {
 		pub let name : String
 		pub let startTime : UFix64 
 		pub let endTime : UFix64?
@@ -128,7 +128,7 @@ access(all) getRequiredFlow(_ requiresReservation: UInt64, user: Address) : UFix
 	return FlowStorageFees.storageCapacityToFlow(FlowStorageFees.convertUInt64StorageBytesToUFix64Megabytes(account.storageUsed + requiresReservation))
 }
 
-pub struct SaleInfo {
+access(all) struct SaleInfo {
 		pub let name : String
 		pub let startTime : UFix64 
 		pub let endTime : UFix64?

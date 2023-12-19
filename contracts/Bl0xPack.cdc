@@ -42,7 +42,7 @@ access(all) contract Bl0xPack: NonFungibleToken {
 
 	access(contract) let packMetadata: {UInt64: Metadata}
 
-	pub struct Metadata {
+	access(all) struct Metadata {
 		pub let name: String
 		pub let description: String
 

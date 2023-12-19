@@ -10,7 +10,7 @@ import FlovatarComponent from "../contracts/community/FlovatarComponent.cdc"
 
 access(all) contract FindUserStatus {
 
-	pub struct StoreFrontCut {
+	access(all) struct StoreFrontCut {
 		pub let amount:UFix64
 		pub let address: Address
 		pub let findName:String?
@@ -29,7 +29,7 @@ access(all) contract FindUserStatus {
 	}
 
 
-	pub struct StorefrontListing {
+	access(all) struct StorefrontListing {
 		pub var listingId: UInt64
 		// if purchased is true -> don't show it
 		//pub var purchased: Bool
@@ -61,7 +61,7 @@ access(all) contract FindUserStatus {
 		}
 	}
 
-	pub struct FlowtyListing {
+	access(all) struct FlowtyListing {
 		pub var listingId: UInt64
 		pub var funded: Bool
 		pub let nftIdentifier: String
@@ -101,7 +101,7 @@ access(all) contract FindUserStatus {
 		}
 	}
 
-	pub struct FlowtyRental {
+	access(all) struct FlowtyRental {
 		pub var listingId: UInt64
 		pub var rented: Bool
 		pub let nftIdentifier: String
@@ -150,7 +150,7 @@ access(all) contract FindUserStatus {
 		}
 	}
 
-	pub struct FlovatarListing {
+	access(all) struct FlovatarListing {
 		pub var listingId: UInt64
 		pub let nftIdentifier: String
 		pub let nftId: UInt64
@@ -198,7 +198,7 @@ access(all) contract FindUserStatus {
 		}
 	}
 
-	pub struct FlovatarComponentListing {
+	access(all) struct FlovatarComponentListing {
 		pub var listingId: UInt64
 		pub let nftIdentifier: String
 		pub let nftId: UInt64

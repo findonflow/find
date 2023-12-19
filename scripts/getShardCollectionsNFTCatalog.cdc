@@ -13,7 +13,7 @@ access(all) main(user: String) : {String : CollectionLength} {
 
 }
 
-pub struct CollectionLength {
+access(all) struct CollectionLength {
 	pub let shard : String 
 	pub let length : Int 
 	init(shard : String, length : Int ) {

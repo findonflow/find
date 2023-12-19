@@ -10,7 +10,7 @@ access(all) main(tenant: Address) : TenantSaleItems {
 
 }
 
-pub struct TenantSaleItems {
+access(all) struct TenantSaleItems {
     access(all) let findSaleItems : {String : FindMarket.TenantSaleItem}
     access(all) let tenantSaleItems : {String : FindMarket.TenantSaleItem}
     access(all) let findCuts : {String : FindMarket.TenantSaleItem} 

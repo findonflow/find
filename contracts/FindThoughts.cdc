@@ -16,7 +16,7 @@ access(all) contract FindThoughts {
 	pub let CollectionPublicPath : PublicPath 
 	pub let CollectionPrivatePath : PrivatePath 
 
-	pub struct ThoughtPointer {
+	access(all) struct ThoughtPointer {
 		pub let cap: Capability<&FindThoughts.Collection{FindThoughts.CollectionPublic}>
 		pub let id: UInt64 
 

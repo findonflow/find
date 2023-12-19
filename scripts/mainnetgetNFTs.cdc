@@ -73,7 +73,7 @@ import MintStoreItem from 0x20187093790b9aef
 
 
 
-pub struct MetadataCollectionItem {
+access(all) struct MetadataCollectionItem {
 	pub let id:UInt64
 	pub let name: String
 	pub let image: String

@@ -3,7 +3,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 access(all) contract FindMarketCutStruct {
 
-	pub struct Cuts {
+	access(all) struct Cuts {
 		pub let cuts : [{Cut}]
 		access(contract) let extra: {String : AnyStruct}
 
@@ -21,7 +21,7 @@ access(all) contract FindMarketCutStruct {
 		}
 	}
 
-	pub struct EventSafeCut {
+	access(all) struct EventSafeCut {
 		pub let name: String
 		pub let description: String
 		pub let cut: UFix64
@@ -37,7 +37,7 @@ access(all) contract FindMarketCutStruct {
 		}
 	}
 
-	pub struct interface Cut {
+	access(all) struct interface Cut {
 		access(all) getName() : String
 		access(all) getReceiverCap() : Capability<&{FungibleToken.Receiver}>
 		access(all) getCut() : UFix64
@@ -69,7 +69,7 @@ access(all) contract FindMarketCutStruct {
 		}
 	}
 
-	pub struct GeneralCut : Cut {
+	access(all) struct GeneralCut : Cut {
 		// This is the description of the royalty struct
 		pub let name : String
 		pub let cap: Capability<&{FungibleToken.Receiver}>
@@ -112,7 +112,7 @@ access(all) contract FindMarketCutStruct {
 		}
 	}
 
-	pub struct ThresholdCut : Cut {
+	access(all) struct ThresholdCut : Cut {
 		// This is the description of the royalty struct
 		pub let name : String
 		pub let address: Address

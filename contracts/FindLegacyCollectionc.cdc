@@ -63,7 +63,7 @@ import PartyMansionDrinksContract from 0x34f2bf4a80bb0f69
 
 access(all) contract FindLegacyCollectionc {
 
-	pub struct MetadataCollections {
+	access(all) struct MetadataCollections {
 
 		pub let items: {String : MetadataCollectionItem}
 		pub let collections: {String : [String]}
@@ -77,7 +77,7 @@ access(all) contract FindLegacyCollectionc {
 	}
 
 
-	pub struct MetadataCollection{
+	access(all) struct MetadataCollection{
 		pub let type: String
 		pub let items: [MetadataCollectionItem]
 
@@ -88,7 +88,7 @@ access(all) contract FindLegacyCollectionc {
 	}
 
 
-	pub struct MetadataCollectionItem {
+	access(all) struct MetadataCollectionItem {
 		pub let id:UInt64
 		pub let name: String
 		pub let image: String

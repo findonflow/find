@@ -50,7 +50,7 @@ access(all) getNFTs(ownerAddress: Address, ids: [UInt64]) : [MetadataViews.NFTVi
 	return results
 }
 
-pub struct CollectionReport {
+access(all) struct CollectionReport {
 	pub let items : {String : [MetadataCollectionItem]}
 	pub let collections : {String : Int} // mapping of collection to no. of ids
 	pub let extraIDs : {String : [UInt64]}
@@ -62,7 +62,7 @@ pub struct CollectionReport {
 	}
 }
 
-pub struct MetadataCollectionItem {
+access(all) struct MetadataCollectionItem {
 	pub let id:UInt64
 	pub let uuid:UInt64?
 	pub let name: String

@@ -3,7 +3,7 @@ import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-pub struct MetadataCollections {
+access(all) struct MetadataCollections {
 
 	pub let items: {String : MetadataCollectionItem}
 	pub let collections: {String : [String]}
@@ -18,7 +18,7 @@ pub struct MetadataCollections {
 }
 
 
-pub struct MetadataCollection{
+access(all) struct MetadataCollection{
 	pub let type: String
 	pub let items: [MetadataCollectionItem]
 
@@ -30,7 +30,7 @@ pub struct MetadataCollection{
 
 // Collection Index.cdc Address : [{Path, ID}]
 /* 
-	pub struct CollectionItemPointer {
+	access(all) struct CollectionItemPointer {
 		pub let path 
 		pub let id 
 	}
@@ -44,7 +44,7 @@ pub struct MetadataCollection{
 // [id1 , id2, id3]
 // Another list -> take these path, id, collection and return the specific collection information (similar in collections)
 
-pub struct MetadataCollectionItem {
+access(all) struct MetadataCollectionItem {
 	pub let id:UInt64
 	pub let typeIdentifier: String
 	pub let uuid: UInt64 
