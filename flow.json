@@ -6,6 +6,13 @@
     }
   },
   "contracts": {
+    "EmeraldIdentity": {
+      "source": "./contracts/standard/EmeraldIdentity.cdc",
+      "aliases": {
+        "mainnet": "0x39e42c67cc851cfb",
+        "testnet": "0xfe433270356d985c"
+      }
+    },
     "NonFungibleToken": {
       "source": "./contracts/standard/NonFungibleToken.cdc",
       "aliases": {
@@ -226,6 +233,7 @@
         "TokenForwarding",
         "FLOAT",
         "GrantedAccountAccess",
+        "EmeraldIdentity",
         "DapperStorageRent",
         "NFTCatalog",
         "NFTCatalogAdmin"

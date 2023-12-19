@@ -4,14 +4,15 @@ import FindRelatedAccounts from "../contracts/FindRelatedAccounts.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import EmeraldIdentity from "../contracts/standard/EmeraldIdentity.cdc"
-import EmeraldIdentityDapper from "../contracts/standard/EmeraldIdentityDapper.cdc"
-import EmeraldIdentityLilico from "../contracts/standard/EmeraldIdentityLilico.cdc"
+//TODO:Fix
+//import EmeraldIdentityDapper from "../contracts/standard/EmeraldIdentityDapper.cdc"
+//import EmeraldIdentityLilico from "../contracts/standard/EmeraldIdentityLilico.cdc"
 import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import Wearables from "../contracts/community/Wearables.cdc"
+//import Wearables from "../contracts/community/Wearables.cdc"
 import FindUtils from "../contracts/FindUtils.cdc"
 import Clock from "../contracts/Clock.cdc"
-import LostAndFound from "../contracts/standard/LostAndFound.cdc"
+//import LostAndFound from "../contracts/standard/LostAndFound.cdc"
 
 access(all) 
 struct FINDReport{
@@ -43,8 +44,7 @@ struct FINDReport{
 }
 }
 
-access(all) 
-struct AccountInformation {
+access(all) struct AccountInformation {
     access(all) let name: String
     access(all) let address: String
     access(all) let network: String
@@ -71,7 +71,8 @@ fun main(user: String) : FINDReport? {
 
     let address=maybeAddress!
 
-    let account=getAuthAccount(address)
+    //why not auth account here?
+    let account=getAccount(address)
     if account.balance == 0.0 {
         return nil
     }
@@ -108,15 +109,15 @@ fun main(user: String) : FINDReport? {
         )
     }
 
-    let discordID = EmeraldIdentity.getDiscordFromAccount(account: address)
-    ?? EmeraldIdentityDapper.getDiscordFromAccount(account: address)
-    ?? EmeraldIdentityLilico.getDiscordFromAccount(account: address)
-    ?? ""
+    let discordID = EmeraldIdentity.getDiscordFromAccount(account: address) ?? ""
+    //?? EmeraldIdentityDapper.getDiscordFromAccount(account: address)
+    //?? EmeraldIdentityLilico.getDiscordFromAccount(account: address)
+    //    ?? ""
 
     let emeraldIDAccounts : {String : Address} = {}
     emeraldIDAccounts["blocto"] = EmeraldIdentity.getAccountFromDiscord(discordID: discordID)
-    emeraldIDAccounts["lilico"] = EmeraldIdentityLilico.getAccountFromDiscord(discordID: discordID)
-    emeraldIDAccounts["dapper"] = EmeraldIdentityDapper.getAccountFromDiscord(discordID: discordID)
+    //   emeraldIDAccounts["lilico"] = EmeraldIdentityLilico.getAccountFromDiscord(discordID: discordID)
+    //   emeraldIDAccounts["dapper"] = EmeraldIdentityDapper.getAccountFromDiscord(discordID: discordID)
 
     let accounts : [AccountInformation] = []
     for wallet in ["blocto", "lilico", "dapper"] {
@@ -136,8 +137,7 @@ fun main(user: String) : FINDReport? {
             }
         }
 
-        let allAcctsCap = FindRelatedAccounts.getCapability(address)
-        if allAcctsCap.check() {
+        if let allAcctsCap = FindRelatedAccounts.getCapability(address) {
             let allAcctsRef = allAcctsCap.borrow()!
             let allAccts = allAcctsRef.getAllRelatedAccountInfo()
             for acct in allAccts.values {
@@ -159,7 +159,9 @@ fun main(user: String) : FINDReport? {
             }
         }
 
-        var readyForWearables = true
+        var readyForWearables = false
+        var hasLostAndFoundItem : Bool = false
+        /*
         let wearablesRef= account.storage.borrow<&Wearables.Collection>(from: Wearables.CollectionStoragePath)
         if wearablesRef == nil {
             readyForWearables = false
@@ -175,13 +177,13 @@ fun main(user: String) : FINDReport? {
             readyForWearables = false
         }
 
-        var hasLostAndFoundItem : Bool = false
         for t in LostAndFound.getRedeemableTypes(address) {
             if t.isSubtype(of: Type<@NonFungibleToken.NFT>()) {
                 hasLostAndFoundItem = true
                 break
             }
         }
+        */
 
         return FINDReport(
             profile: profileReport,

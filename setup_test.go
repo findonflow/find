@@ -50,8 +50,6 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("dapperAddress", "dapper"),
 	)
 
-	createUser(stx, 100.0, "find")
-
 	// link in the server in the versus client
 	res := stx("setup_find_market_2",
 		findAdminSigner,
@@ -91,6 +89,7 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("address", "residual"),
 	)
 
+	createUser(stx, 100.0, "find")
 	stx(
 		"initSwitchboard",
 		WithSigner("residual"),

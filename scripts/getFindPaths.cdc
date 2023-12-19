@@ -4,14 +4,14 @@ import FindRelatedAccounts from "../contracts/FindRelatedAccounts.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import EmeraldIdentity from "../contracts/standard/EmeraldIdentity.cdc"
-import EmeraldIdentityDapper from "../contracts/standard/EmeraldIdentityDapper.cdc"
-import EmeraldIdentityLilico from "../contracts/standard/EmeraldIdentityLilico.cdc"
+//import EmeraldIdentityDapper from "../contracts/standard/EmeraldIdentityDapper.cdc"
+//import EmeraldIdentityLilico from "../contracts/standard/EmeraldIdentityLilico.cdc"
 import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import Wearables from "../contracts/community/Wearables.cdc"
+//import Wearables from "../contracts/community/Wearables.cdc"
 import FindUtils from "../contracts/FindUtils.cdc"
 import Clock from "../contracts/Clock.cdc"
-import LostAndFound from "../contracts/standard/LostAndFound.cdc"
+//import LostAndFound from "../contracts/standard/LostAndFound.cdc"
 
 access(all)
 fun main(user: String) : Report? {
@@ -23,12 +23,13 @@ fun main(user: String) : Report? {
 
     let address=maybeAddress!
 
-    let account=getAuthAccount(address)
+    //TODO: getAuthAccount
+    let account=getAccount(address)
     if account.balance == 0.0 {
         return nil
     }
 
-    let allPaths = account.storagePaths
+    let allPaths = account.storage.storagePaths
 
     let banned : {StoragePath : Bool} = {
         /storage/FantastecNFTCollection: true,

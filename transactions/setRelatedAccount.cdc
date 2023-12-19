@@ -6,7 +6,7 @@ transaction(name: String, target: String) {
     var relatedAccounts : &FindRelatedAccounts.Accounts?
     let address : Address?
 
-    prepare(account: auth(SaveValue) &Account) {
+    prepare(account: auth(SaveValue, BorrowValue, PublishCapability, UnpublishCapability,IssueStorageCapabilityController) &Account) {
 
 
         self.address = FIND.resolve(target)
@@ -23,7 +23,7 @@ transaction(name: String, target: String) {
 
         let cap = account.capabilities.get<&{FindRelatedAccounts.Public}>(FindRelatedAccounts.publicPath)
         if cap == nil {
-            account.unlink(FindRelatedAccounts.publicPath)
+            account.capabilities.unpublish(FindRelatedAccounts.publicPath)
             let cap = account.capabilities.storage.issue<&{FindRelatedAccounts.Public}>(FindRelatedAccounts.storagePath)
             account.capabilities.publish(cap, at: FindRelatedAccounts.publicPath)
         }

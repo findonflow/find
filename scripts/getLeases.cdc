@@ -1,6 +1,6 @@
-import "FIND"
+import FIND from "../contracts/FIND.cdc"
 
 access(all)
-fun main() : [FIND.NetworkLease] {
+fun main() : &[FIND.NetworkLease] {
     return FIND.getLeases()
 }
