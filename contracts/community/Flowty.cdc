@@ -30,7 +30,7 @@ pub contract Flowty {
     // This contract has been deployed.
     // Event consumers can now expect events from this contract.
     //
-    pub event FlowtyInitialized()
+    access(all) event FlowtyInitialized()
 
     // FlowtyStorefrontInitialized
     // A FlowtyStorefront resource has been created.
@@ -44,7 +44,7 @@ pub contract Flowty {
     // If the seller moves the FlowtyStorefront while the listing is valid, 
     // that is on them.
     //
-    pub event FlowtyStorefrontInitialized(flowtyStorefrontResourceID: UInt64)
+    access(all) event FlowtyStorefrontInitialized(flowtyStorefrontResourceID: UInt64)
 
     // FlowtyMarketplaceInitialized
     // A FlowtyMarketplace resource has been created.
@@ -58,21 +58,21 @@ pub contract Flowty {
     // If the seller moves the FlowtyStorefront while the listing is valid, 
     // that is on them.
     //
-    pub event FlowtyMarketplaceInitialized(flowtyMarketplaceResourceID: UInt64)
+    access(all) event FlowtyMarketplaceInitialized(flowtyMarketplaceResourceID: UInt64)
 
     // FlowtyStorefrontDestroyed
     // A FlowtyStorefront has been destroyed.
     // Event consumers can now stop processing events from this FlowtyStorefront.
     // Note that we do not specify an address.
     //
-    pub event FlowtyStorefrontDestroyed(flowtyStorefrontResourceID: UInt64)
+    access(all) event FlowtyStorefrontDestroyed(flowtyStorefrontResourceID: UInt64)
 
     // FlowtyMarketplaceDestroyed
     // A FlowtyMarketplace has been destroyed.
     // Event consumers can now stop processing events from this FlowtyMarketplace.
     // Note that we do not specify an address.
     //
-    pub event FlowtyMarketplaceDestroyed(flowtyStorefrontResourceID: UInt64)
+    access(all) event FlowtyMarketplaceDestroyed(flowtyStorefrontResourceID: UInt64)
 
     // ListingAvailable
     // A listing has been created and added to a FlowtyStorefront resource.
@@ -80,7 +80,7 @@ pub contract Flowty {
     // the state of the accounts they refer to may be changed outside of the
     // FlowtyMarketplace workflow, so be careful to check when using them.
     //
-    pub event ListingAvailable(
+    access(all) event ListingAvailable(
         flowtyStorefrontAddress: Address,
         flowtyStorefrontID: UInt64, 
         listingResourceID: UInt64,
@@ -98,7 +98,7 @@ pub contract Flowty {
     // ListingCompleted
     // The listing has been resolved. It has either been funded, or removed and destroyed.
     //
-    pub event ListingCompleted(
+    access(all) event ListingCompleted(
         listingResourceID: UInt64, 
         flowtyStorefrontID: UInt64, 
         funded: Bool,
@@ -113,7 +113,7 @@ pub contract Flowty {
     // the state of the accounts they refer to may be changed outside of the
     // FlowtyMarketplace workflow, so be careful to check when using them.
     //
-    pub event FundingAvailable(
+    access(all) event FundingAvailable(
         fundingResourceID: UInt64,
         listingResourceID: UInt64,
         borrower: Address,
@@ -127,7 +127,7 @@ pub contract Flowty {
     // FundingRepaid
     // A funding has been repaid.
     //
-    pub event FundingRepaid(
+    access(all) event FundingRepaid(
         fundingResourceID: UInt64,
         listingResourceID: UInt64,
         borrower: Address,
@@ -140,7 +140,7 @@ pub contract Flowty {
     // FundingSettled
     // A funding has been settled.
     //
-    pub event FundingSettled(
+    access(all) event FundingSettled(
         fundingResourceID: UInt64,
         listingResourceID: UInt64,
         borrower: Address,
@@ -150,17 +150,17 @@ pub contract Flowty {
         repaymentAmount: UFix64
     )
 
-    pub event CollectionSupportChanged(
+    access(all) event CollectionSupportChanged(
         collectionIdentifier: String,
         state: Bool
     )
 
-    pub event RoyaltyAdded(
+    access(all) event RoyaltyAdded(
         collectionIdentifier: String,
         rate: UFix64
     )
 
-    pub event RoyaltyEscrow(
+    access(all) event RoyaltyEscrow(
         fundingResourceID: UInt64,
         listingResourceID: UInt64,
         lender: Address,

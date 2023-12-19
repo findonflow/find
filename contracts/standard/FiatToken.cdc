@@ -7,16 +7,16 @@ import FungibleToken from "./FungibleToken.cdc"
 pub contract FiatToken: FungibleToken {
 
     // Event that is emitted when the contract is created
-    pub event TokensInitialized(initialSupply: UFix64)
+    access(all) event TokensInitialized(initialSupply: UFix64)
 
     // Event that is emitted when tokens are withdrawn from a Vault
-    pub event TokensWithdrawn(amount: UFix64, from: Address?)
+    access(all) event TokensWithdrawn(amount: UFix64, from: Address?)
 
     // Event that is emitted when tokens are deposited to a Vault
-    pub event TokensDeposited(amount: UFix64, to: Address?)
+    access(all) event TokensDeposited(amount: UFix64, to: Address?)
 
     // Event that is emitted when new tokens are minted
-    pub event TokensMinted(amount: UFix64)
+    access(all) event TokensMinted(amount: UFix64)
 
     // The storage path for the admin resource
     pub let AdminStoragePath: StoragePath
@@ -28,7 +28,7 @@ pub contract FiatToken: FungibleToken {
     pub let MinterProxyPublicPath: PublicPath
 
     // Event that is emitted when a new minter resource is created
-    pub event MinterCreated()
+    access(all) event MinterCreated()
 
     // Total supply of fusd in existence
     pub var totalSupply: UFix64

@@ -26,7 +26,7 @@ pub contract NFTStorefront {
     // This contract has been deployed.
     // Event consumers can now expect events from this contract.
     //
-    pub event NFTStorefrontInitialized()
+    access(all) event NFTStorefrontInitialized()
 
     // StorefrontInitialized
     // A Storefront resource has been created.
@@ -40,14 +40,14 @@ pub contract NFTStorefront {
     // If the seller moves the Storefront while the listing is valid, 
     // that is on them.
     //
-    pub event StorefrontInitialized(storefrontResourceID: UInt64)
+    access(all) event StorefrontInitialized(storefrontResourceID: UInt64)
 
     // StorefrontDestroyed
     // A Storefront has been destroyed.
     // Event consumers can now stop processing events from this Storefront.
     // Note that we do not specify an address.
     //
-    pub event StorefrontDestroyed(storefrontResourceID: UInt64)
+    access(all) event StorefrontDestroyed(storefrontResourceID: UInt64)
 
     // ListingAvailable
     // A listing has been created and added to a Storefront resource.
@@ -55,7 +55,7 @@ pub contract NFTStorefront {
     // the state of the accounts they refer to may be changed outside of the
     // NFTStorefront workflow, so be careful to check when using them.
     //
-    pub event ListingAvailable(
+    access(all) event ListingAvailable(
         storefrontAddress: Address,
         listingResourceID: UInt64,
         nftType: Type,
@@ -67,7 +67,7 @@ pub contract NFTStorefront {
     // ListingCompleted
     // The listing has been resolved. It has either been purchased, or removed and destroyed.
     //
-    pub event ListingCompleted(
+    access(all) event ListingCompleted(
         listingResourceID: UInt64, 
         storefrontResourceID: UInt64, 
         purchased: Bool,

@@ -29,8 +29,8 @@ pub contract FlovatarComponentTemplate {
     access(contract) let lastComponentMintedAt: { UInt64: UFix64 }
 
     // Event to notify about the Template creation
-    pub event ContractInitialized()
-    pub event Created(id: UInt64, name: String, category: String, color: String, maxMintableComponents: UInt64)
+    access(all) event ContractInitialized()
+    access(all) event Created(id: UInt64, name: String, category: String, color: String, maxMintableComponents: UInt64)
 
     // The public interface providing the SVG and all the other 
     // metadata like name, category, color, series, description and 

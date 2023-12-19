@@ -30,12 +30,12 @@ pub contract FlovatarPack {
     pub var totalSupply: UInt64
 
     // Standard events that will be emitted
-    pub event ContractInitialized()
-    pub event Withdraw(id: UInt64, from: Address?)
-    pub event Deposit(id: UInt64, to: Address?)
-    pub event Created(id: UInt64, prefix: String)
-    pub event Opened(id: UInt64)
-    pub event Purchased(id: UInt64)
+    access(all) event ContractInitialized()
+    access(all) event Withdraw(id: UInt64, from: Address?)
+    access(all) event Deposit(id: UInt64, to: Address?)
+    access(all) event Created(id: UInt64, prefix: String)
+    access(all) event Opened(id: UInt64)
+    access(all) event Purchased(id: UInt64)
 
     // The public interface contains only the ID and the price of the Pack
     pub resource interface Public {

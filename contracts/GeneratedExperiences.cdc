@@ -8,11 +8,11 @@ pub contract GeneratedExperiences: NonFungibleToken {
 
     pub var totalSupply: UInt64
 
-    pub event ContractInitialized()
-    pub event Withdraw(id: UInt64, from: Address?)
-    pub event Deposit(id: UInt64, to: Address?)
-    pub event Minted(id:UInt64, season: UInt64, name: String, thumbnail: String, fullsize: String, artist: String, rarity: String, edition: UInt64, maxEdition: UInt64)
-    pub event SeasonAdded(season:UInt64, squareImage: String, bannerImage: String)
+    access(all) event ContractInitialized()
+    access(all) event Withdraw(id: UInt64, from: Address?)
+    access(all) event Deposit(id: UInt64, to: Address?)
+    access(all) event Minted(id:UInt64, season: UInt64, name: String, thumbnail: String, fullsize: String, artist: String, rarity: String, edition: UInt64, maxEdition: UInt64)
+    access(all) event SeasonAdded(season:UInt64, squareImage: String, bannerImage: String)
 
     pub let CollectionStoragePath: StoragePath
     pub let CollectionPrivatePath: PrivatePath

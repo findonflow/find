@@ -6,12 +6,12 @@ import MetadataViews from "../standard/MetadataViews.cdc"
 pub contract TopShot: NonFungibleToken {
 
     // Emitted when the TopShot contract is created
-    pub event ContractInitialized()
+    access(all) event ContractInitialized()
     //
     // Emitted when a moment is withdrawn from a Collection
-    pub event Withdraw(id: UInt64, from: Address?)
+    access(all) event Withdraw(id: UInt64, from: Address?)
     // Emitted when a moment is deposited into a Collection
-    pub event Deposit(id: UInt64, to: Address?)
+    access(all) event Deposit(id: UInt64, to: Address?)
     pub var totalSupply: UInt64
 
     // The resource that represents the Moment NFTs

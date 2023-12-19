@@ -21,23 +21,23 @@ pub contract FlovatarMarketplace {
     pub let marketplaceWallet: Capability<&FlowToken.Vault{FungibleToken.Receiver}>
 
     // Event that is emitted when a new NFT is put up for sale
-    pub event FlovatarForSale(id: UInt64, price: UFix64, address: Address)
-    pub event FlovatarComponentForSale(id: UInt64, price: UFix64, address: Address)
+    access(all) event FlovatarForSale(id: UInt64, price: UFix64, address: Address)
+    access(all) event FlovatarComponentForSale(id: UInt64, price: UFix64, address: Address)
 
     // Event that is emitted when the price of an NFT changes
-    pub event FlovatarPriceChanged(id: UInt64, newPrice: UFix64, address: Address)
-    pub event FlovatarComponentPriceChanged(id: UInt64, newPrice: UFix64, address: Address)
+    access(all) event FlovatarPriceChanged(id: UInt64, newPrice: UFix64, address: Address)
+    access(all) event FlovatarComponentPriceChanged(id: UInt64, newPrice: UFix64, address: Address)
 
     // Event that is emitted when a token is purchased
-    pub event FlovatarPurchased(id: UInt64, price: UFix64, from: Address, to: Address)
-    pub event FlovatarComponentPurchased(id: UInt64, price: UFix64, from: Address, to: Address)
+    access(all) event FlovatarPurchased(id: UInt64, price: UFix64, from: Address, to: Address)
+    access(all) event FlovatarComponentPurchased(id: UInt64, price: UFix64, from: Address, to: Address)
 
     // Event that is emitted when a royalty has been paid
-    pub event RoyaltyPaid(id: UInt64, amount: UFix64, to: Address, name: String)
+    access(all) event RoyaltyPaid(id: UInt64, amount: UFix64, to: Address, name: String)
 
     // Event that is emitted when a seller withdraws their NFT from the sale
-    pub event FlovatarSaleWithdrawn(tokenId: UInt64, address: Address)
-    pub event FlovatarComponentSaleWithdrawn(tokenId: UInt64, address: Address)
+    access(all) event FlovatarSaleWithdrawn(tokenId: UInt64, address: Address)
+    access(all) event FlovatarComponentSaleWithdrawn(tokenId: UInt64, address: Address)
 
     // Interface that users will publish for their Sale collection
     // that only exposes the methods that are supposed to be public

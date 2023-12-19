@@ -7,9 +7,9 @@ pub contract NFGv3: NonFungibleToken {
 
     pub var totalSupply: UInt64
 
-    pub event ContractInitialized()
-    pub event Withdraw(id: UInt64, from: Address?)
-    pub event Deposit(id: UInt64, to: Address?)
+    access(all) event ContractInitialized()
+    access(all) event Withdraw(id: UInt64, from: Address?)
+    access(all) event Deposit(id: UInt64, to: Address?)
 
     pub let CollectionStoragePath: StoragePath
     pub let CollectionPrivatePath: PrivatePath

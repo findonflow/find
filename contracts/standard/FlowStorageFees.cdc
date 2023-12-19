@@ -20,10 +20,10 @@ import FlowToken from "./FlowToken.cdc"
 pub contract FlowStorageFees {
 
     // Emitted when the amount of storage capacity an account has per reserved Flow token changes
-    pub event StorageMegaBytesPerReservedFLOWChanged(_ storageMegaBytesPerReservedFLOW: UFix64)
+    access(all) event StorageMegaBytesPerReservedFLOWChanged(_ storageMegaBytesPerReservedFLOW: UFix64)
 
     // Emitted when the minimum amount of Flow tokens that an account needs to have reserved for storage capacity changes.
-    pub event MinimumStorageReservationChanged(_ minimumStorageReservation: UFix64)
+    access(all) event MinimumStorageReservationChanged(_ minimumStorageReservation: UFix64)
 
     // Defines how much storage capacity every account has per reserved Flow token.
     // definition is written per unit of flow instead of the inverse, 

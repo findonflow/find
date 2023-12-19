@@ -19,11 +19,11 @@ pub contract DapperStorageRent {
   access(contract) var RefillRequiredBlocks: UInt64
 
   /// Event emitted when an Admin blocks an address
-  pub event BlockedAddress(_ address: [Address])
+  access(all) event BlockedAddress(_ address: [Address])
   /// Event emitted when a Refill is successful
-  pub event Refuelled(_ address: Address)
+  access(all) event Refuelled(_ address: Address)
   /// Event emitted when a Refill is not successful
-  pub event RefilledFailed(address: Address, reason: String)
+  access(all) event RefilledFailed(address: Address, reason: String)
 
   /// getStorageRentRefillThreshold
   /// Get the current StorageRentRefillThreshold

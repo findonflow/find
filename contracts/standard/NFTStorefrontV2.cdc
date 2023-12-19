@@ -40,14 +40,14 @@ pub contract NFTStorefrontV2 {
     /// If the seller moves the Storefront while the listing is valid, 
     /// that is on them.
     ///
-    pub event StorefrontInitialized(storefrontResourceID: UInt64)
+    access(all) event StorefrontInitialized(storefrontResourceID: UInt64)
 
     /// StorefrontDestroyed
     /// A Storefront has been destroyed.
     /// Event consumers can now stop processing events from this Storefront.
     /// Note that we do not specify an address.
     ///
-    pub event StorefrontDestroyed(storefrontResourceID: UInt64)
+    access(all) event StorefrontDestroyed(storefrontResourceID: UInt64)
 
     /// ListingAvailable
     /// A listing has been created and added to a Storefront resource.
@@ -55,7 +55,7 @@ pub contract NFTStorefrontV2 {
     /// the state of the accounts they refer to may change outside of the
     /// NFTStorefrontV2 workflow, so be careful to check when using them.
     ///
-    pub event ListingAvailable(
+    access(all) event ListingAvailable(
         storefrontAddress: Address,
         listingResourceID: UInt64,
         nftType: Type,
@@ -72,7 +72,7 @@ pub contract NFTStorefrontV2 {
     /// ListingCompleted
     /// The listing has been resolved. It has either been purchased, removed or destroyed.
     ///
-    pub event ListingCompleted(
+    access(all) event ListingCompleted(
         listingResourceID: UInt64, 
         storefrontResourceID: UInt64, 
         purchased: Bool,
@@ -90,7 +90,7 @@ pub contract NFTStorefrontV2 {
     /// UnpaidReceiver
     /// A entitled receiver has not been paid during the sale of the NFT.
     ///
-    pub event UnpaidReceiver(receiver: Address, entitledSaleCut: UFix64)
+    access(all) event UnpaidReceiver(receiver: Address, entitledSaleCut: UFix64)
 
     /// StorefrontStoragePath
     /// The location in storage that a Storefront resource should be located.

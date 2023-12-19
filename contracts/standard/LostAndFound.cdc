@@ -34,15 +34,15 @@ pub contract LostAndFound {
     pub let DepositorPublicPath: PublicPath
     pub let DepositorStoragePath: StoragePath
 
-    pub event TicketDeposited(redeemer: Address, ticketID: UInt64, type: Type, memo: String?, name: String?, description: String?, thumbnail: String?)
-    pub event TicketRedeemed(redeemer: Address, ticketID: UInt64, type: Type)
-    pub event BinDestroyed(redeemer: Address, type: Type)
-    pub event ShelfDestroyed(redeemer: Address)
+    access(all) event TicketDeposited(redeemer: Address, ticketID: UInt64, type: Type, memo: String?, name: String?, description: String?, thumbnail: String?)
+    access(all) event TicketRedeemed(redeemer: Address, ticketID: UInt64, type: Type)
+    access(all) event BinDestroyed(redeemer: Address, type: Type)
+    access(all) event ShelfDestroyed(redeemer: Address)
 
-    pub event DepositorCreated(uuid: UInt64)
-    pub event DepositorBalanceLow(uuid: UInt64, threshold: UFix64, balance: UFix64)
-    pub event DepositorTokensAdded(uuid: UInt64, tokens: UFix64, balance: UFix64)
-    pub event DepositorTokensWithdrawn(uuid: UInt64, tokens: UFix64, balance: UFix64)
+    access(all) event DepositorCreated(uuid: UInt64)
+    access(all) event DepositorBalanceLow(uuid: UInt64, threshold: UFix64, balance: UFix64)
+    access(all) event DepositorTokensAdded(uuid: UInt64, tokens: UFix64, balance: UFix64)
+    access(all) event DepositorTokensWithdrawn(uuid: UInt64, tokens: UFix64, balance: UFix64)
 
     // Placeholder receiver so that any resource can be supported, not just FT and NFT Receivers
     pub resource interface AnyResourceReceiver {

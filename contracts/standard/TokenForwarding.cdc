@@ -16,10 +16,10 @@ their tokens to.
 
 import FungibleToken from "FungibleToken.cdc"
 
-pub contract TokenForwarding {
+access(all) contract TokenForwarding {
 
     // Event that is emitted when tokens are deposited to the target receiver
-    pub event ForwardedDeposit(amount: UFix64, from: Address?)
+    access(all) event ForwardedDeposit(amount: UFix64, from: Address?)
 
     pub resource interface ForwarderPublic {
 

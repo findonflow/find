@@ -26,7 +26,7 @@ pub contract FlowtyRentals {
 
     // FlowtyRentalsInitialized
     // This contract has been deployed
-    pub event FlowtyRentalsInitialized()
+    access(all) event FlowtyRentalsInitialized()
 
     // FlowtyRentalsStorefrontInitialized
     // A FlowtyRentalsStorefront resource has been created.
@@ -40,14 +40,14 @@ pub contract FlowtyRentals {
     // If the seller moves the FlowtyRentalsStorefront while the listing is valid,
     // that is on them.
     //
-    pub event FlowtyRentalsStorefrontInitialized(flowtyRentalsStorefrontResourceID: UInt64)
+    access(all) event FlowtyRentalsStorefrontInitialized(flowtyRentalsStorefrontResourceID: UInt64)
 
     // FlowtyRentalsStorefrontfrontDestroyed
     // A FlowtyRentalsStorefront has been destroyed.
     // Event consumers can now stop processing events from this FlowtyRentalsStorefront.
     // Note that we do not specify an address.
     //
-    pub event FlowtyRentalsStorefrontDestroyed(flowtyRentalsStorefrontResourceID: UInt64)
+    access(all) event FlowtyRentalsStorefrontDestroyed(flowtyRentalsStorefrontResourceID: UInt64)
 
     // FlowtyRentalsMarketplaceInitialized
     // A FlowtyRentalsMarketplace resource has been created.
@@ -59,14 +59,14 @@ pub contract FlowtyRentals {
     // by default, access the one stored in this contract address's account. Any listing that is
     // funded will get routed to and stored there.
     //
-    pub event FlowtyRentalsMarketplaceInitialized(flowtyRentalsMarketplaceResourceID: UInt64)
+    access(all) event FlowtyRentalsMarketplaceInitialized(flowtyRentalsMarketplaceResourceID: UInt64)
 
     // FlowtyRentalsMarketplaceDestroyed
     // A FlowtyRentalsMarketplace has been destroyed.
     // Event consumers can now stop processing events from this FlowtyRentalsMarketplace.
     // Note that we do not specify an address.
     //
-    pub event FlowtyRentalsMarketplaceDestroyed(flowtyRentalsMarketplaceResourceID: UInt64)
+    access(all) event FlowtyRentalsMarketplaceDestroyed(flowtyRentalsMarketplaceResourceID: UInt64)
 
     // ListingAvailable
     // A listing has been created and added to a FlowtyRentalsStorefront resource.
@@ -74,7 +74,7 @@ pub contract FlowtyRentals {
     // the state of the accounts they refer to may be changed outside of the
     // FlowtyRentalsStorefront workflow, so be careful to check before using them.
     //
-    pub event ListingAvailable(
+    access(all) event ListingAvailable(
         flowtyStorefrontAddress: Address,
         flowtyStorefrontID: UInt64,
         listingResourceID: UInt64,
@@ -95,7 +95,7 @@ pub contract FlowtyRentals {
     // of the accounts they refer to may be changed outside of the
     // FlowtyRentalsMarketplace workflow, so be careful to check when using them.
     //
-    pub event ListingRented(
+    access(all) event ListingRented(
         flowtyStorefrontAddress: Address,
         flowtyStorefrontID: UInt64,
         renterAddress: Address,
@@ -111,7 +111,7 @@ pub contract FlowtyRentals {
     // RentalReturned
     // A rental has been returned, releasing the deposit back to its renter
     //
-    pub event RentalReturned(
+    access(all) event RentalReturned(
         flowtyStorefrontAddress: Address,
         flowtyStorefrontID: UInt64,
         renterAddress: Address,
@@ -125,7 +125,7 @@ pub contract FlowtyRentals {
     // Listing has been destroyed and has been removed from
     // the owning account's FlowtyRentalsStorefront
     //
-    pub event ListingDestroyed(
+    access(all) event ListingDestroyed(
         flowtyStorefrontAddress: Address,
         flowtyStorefrontID: UInt64,
         listingResourceID: UInt64,
@@ -138,7 +138,7 @@ pub contract FlowtyRentals {
         // to the original owner of the rented asset and to the assets'
         // royalty beneficiaries
         //
-    pub event RentalSettled(
+    access(all) event RentalSettled(
         rentalResourceID: UInt64, 
         listingResourceID: UInt64,
         renter: Address,

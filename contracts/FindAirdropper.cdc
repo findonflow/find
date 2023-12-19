@@ -9,9 +9,9 @@ import MetadataViews from "./standard/MetadataViews.cdc"
 
 pub contract FindAirdropper {
 
-    pub event Airdropped(from: Address ,fromName: String?, to: Address, toName: String?,uuid: UInt64, nftInfo: FindMarket.NFTInfo, context: {String : String}, remark: String?)
-    pub event AirdroppedToLostAndFound(from: Address, fromName: String? , to: Address, toName: String?, uuid: UInt64, nftInfo: FindMarket.NFTInfo, context: {String : String}, remark: String?, ticketID: UInt64)
-    pub event AirdropFailed(from: Address, fromName: String? , to: Address, toName: String?, uuid: UInt64, id: UInt64, type: String, context: {String : String}, reason: String)
+    access(all) event Airdropped(from: Address ,fromName: String?, to: Address, toName: String?,uuid: UInt64, nftInfo: FindMarket.NFTInfo, context: {String : String}, remark: String?)
+    access(all) event AirdroppedToLostAndFound(from: Address, fromName: String? , to: Address, toName: String?, uuid: UInt64, nftInfo: FindMarket.NFTInfo, context: {String : String}, remark: String?, ticketID: UInt64)
+    access(all) event AirdropFailed(from: Address, fromName: String? , to: Address, toName: String?, uuid: UInt64, id: UInt64, type: String, context: {String : String}, reason: String)
 
     // The normal way of airdrop. If the user didn't init account, they cannot receive it
     access(all) safeAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, deepValidation: Bool) {

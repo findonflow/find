@@ -22,8 +22,8 @@ pub contract EmeraldIdentity {
     //
     // Events
     //
-    pub event EmeraldIDCreated(account: Address, discordID: String)
-    pub event EmeraldIDRemoved(account: Address, discordID: String)
+    access(all) event EmeraldIDCreated(account: Address, discordID: String)
+    access(all) event EmeraldIDRemoved(account: Address, discordID: String)
     
     //
     // Administrator

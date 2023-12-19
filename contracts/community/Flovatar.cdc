@@ -38,12 +38,12 @@ pub contract Flovatar: NonFungibleToken {
     access(contract) let mintedCombinations: {String: Bool}
     access(contract) let mintedNames: {String: Bool}
 
-    pub event ContractInitialized()
-    pub event Withdraw(id: UInt64, from: Address?)
-    pub event Deposit(id: UInt64, to: Address?)
-    pub event Created(id: UInt64, metadata: Metadata)
-    pub event Updated(id: UInt64)
-    pub event NameSet(id: UInt64, name: String)
+    access(all) event ContractInitialized()
+    access(all) event Withdraw(id: UInt64, from: Address?)
+    access(all) event Deposit(id: UInt64, to: Address?)
+    access(all) event Created(id: UInt64, metadata: Metadata)
+    access(all) event Updated(id: UInt64)
+    access(all) event NameSet(id: UInt64, name: String)
 
 
     pub struct Royalties{

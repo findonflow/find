@@ -11,18 +11,18 @@ import NonFungibleToken from "../standard/NonFungibleToken.cdc"
 pub contract CoatCheck {
 
     // | ---------------- Events ----------------- |
-    pub event Initialized()
+    access(all) event Initialized()
 
-    pub event TicketCreated(ticketResourceID: UInt64, redeemer: Address, fungibleTokenTypes: [Type], nonFungibleTokenTypes: [Type])
+    access(all) event TicketCreated(ticketResourceID: UInt64, redeemer: Address, fungibleTokenTypes: [Type], nonFungibleTokenTypes: [Type])
 
-    pub event TicketRedeemed(ticketResourceID: UInt64, redeemer: Address)
+    access(all) event TicketRedeemed(ticketResourceID: UInt64, redeemer: Address)
 
-    pub event ValetDestroyed(resourceID: UInt64)
+    access(all) event ValetDestroyed(resourceID: UInt64)
 
     access(account) let valet: @CoatCheck.Valet
 
     // A CoatCheck has been initialized. This resource can now be watched for deposited items that accounts can redeem
-    pub event CoatCheckInitialized(resourceID: UInt64)
+    access(all) event CoatCheckInitialized(resourceID: UInt64)
 
     pub resource interface TicketPublic {
         access(all) redeem(fungibleTokenReceiver: &{FungibleToken.Receiver}?, nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?)

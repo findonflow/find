@@ -21,11 +21,11 @@ pub contract FlovatarComponent: NonFungibleToken {
     pub var totalSupply: UInt64
 
     // Standard events that will be emitted
-    pub event ContractInitialized()
-    pub event Withdraw(id: UInt64, from: Address?)
-    pub event Deposit(id: UInt64, to: Address?)
-    pub event Created(id: UInt64, templateId: UInt64, mint: UInt64)
-    pub event Destroyed(id: UInt64, templateId: UInt64)
+    access(all) event ContractInitialized()
+    access(all) event Withdraw(id: UInt64, from: Address?)
+    access(all) event Deposit(id: UInt64, to: Address?)
+    access(all) event Created(id: UInt64, templateId: UInt64, mint: UInt64)
+    access(all) event Destroyed(id: UInt64, templateId: UInt64)
 
     // The public interface provides all the basic informations about
     // the Component and also the Template ID associated with it.

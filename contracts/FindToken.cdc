@@ -4,13 +4,13 @@ import Clock from "../contracts/Clock.cdc"
 
 pub contract FindToken : FungibleToken {
 
-    pub event TokensInitialized(initialSupply: UFix64)
-    pub event TokensWithdrawn(amount: UFix64, from: Address?)
-    pub event TokensDeposited(amount: UFix64, to: Address?)
+    access(all) event TokensInitialized(initialSupply: UFix64)
+    access(all) event TokensWithdrawn(amount: UFix64, from: Address?)
+    access(all) event TokensDeposited(amount: UFix64, to: Address?)
 
-    pub event TokensMinted(amount: UFix64)
-    pub event TokensBurned(amount: UFix64)
-    pub event TokenRewardMultiplier(multiplier: UFix64)
+    access(all) event TokensMinted(amount: UFix64)
+    access(all) event TokensBurned(amount: UFix64)
+    access(all) event TokenRewardMultiplier(multiplier: UFix64)
 
     pub let tokenAlias: String
     pub var totalSupply: UFix64
