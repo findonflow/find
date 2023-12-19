@@ -30,7 +30,7 @@ access(all) contract FindMarketInfrastructureCut : FindMarketCutInterface {
             }
         }
         if cuts.length > 0 {
-            returningCut = FindMarketCutStruct.Cuts(cuts)
+            returningCut = FindMarketCutStruct.Cuts(cuts:cuts)
 
             // set cache if not already
             // we do not need to check if cache exist here, because if it is, it will be returned earlier

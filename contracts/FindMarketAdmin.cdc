@@ -21,7 +21,7 @@ access(all) contract FindMarketAdmin {
 
     //interface to use for capability receiver pattern
     access(all) resource interface AdminProxyClient {
-        access(all) addCapability(_ cap: Capability<&FIND.Network>)
+        access(all) fun addCapability(_ cap: Capability<&FIND.Network>)
     }
 
     //admin proxy with capability receiver
@@ -129,7 +129,7 @@ access(all) contract FindMarketAdmin {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
             let string = FindMarket.getTenantPathForAddress(tenant)
-            let pp = PrivatePath(identifier: string) ?? panic("Cannot generate storage path from string : ".concat(string))
+            let pp = PublicPath(identifier: string) ?? panic("Cannot generate storage path from string : ".concat(string))
             let cap = FindMarketAdmin.account.capabilities.get<&FindMarket.Tenant>(pp)!
             return cap.borrow() ?? panic("Cannot borrow tenant reference from path. Path : ".concat(pp.toString()) )
         }

@@ -84,7 +84,6 @@
     "FungibleTokenMetadataViews": {
       "source": "./contracts/standard/FungibleTokenMetadataViews.cdc",
       "aliases": {
-        "emulator": "0xf8d6e0586b0a20c7",
         "mainnet": "0xf233dcee88fe0abe",
         "testnet": "0x9a0766d93b6608b7"
       }
@@ -222,6 +221,7 @@
     "emulator": {
       "emulator-account": [
         "FungibleTokenSwitchboard",
+        "FungibleTokenMetadataViews",
         "FUSD",
         "TokenForwarding",
         "FLOAT",

@@ -41,6 +41,10 @@ access(all) contract FindMarketSale {
             self.totalRoyalties=self.pointer.getTotalRoyaltiesCut()
         }
 
+        access(all) fun getPointer() : FindViews.AuthNFTPointer {
+            return self.pointer
+        }
+
         access(all) fun getSaleType() : String {
             return "active_listed"
         }
@@ -150,7 +154,7 @@ access(all) contract FindMarketSale {
         access(all) fun getIds(): [UInt64]
         access(all) fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem} //TODO: look if this is safe
         access(all) fun containsId(_ id: UInt64): Bool
-        access(all) fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>)
+        access(all) fun buy(id: UInt64, vault: @{FungibleToken.Vault}, nftCap: Capability<&{NonFungibleToken.Receiver}>)
     }
 
     access(all) resource SaleItemCollection: SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic {
@@ -176,7 +180,7 @@ access(all) contract FindMarketSale {
             return Type<@SaleItem>()
         }
 
-        access(all) fun buy(id: UInt64, vault: @FungibleToken.Vault, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
+        access(all) fun buy(id: UInt64, vault: @{FungibleToken.Vault}, nftCap: Capability<&{NonFungibleToken.Receiver}>) {
             if !self.items.containsKey(id) {
                 panic("Invalid id=".concat(id.toString()))
             }
@@ -187,8 +191,8 @@ access(all) contract FindMarketSale {
 
             let saleItem=self.borrow(id)
 
-            if saleItem.salePrice != vault.balance {
-                panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(vault.balance.toString()))
+            if saleItem.salePrice != vault.getBalance() {
+                panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(vault.getBalance().toString()))
             }
 
             if saleItem.validUntil != nil && saleItem.validUntil! < Clock.time() {
@@ -230,11 +234,11 @@ access(all) contract FindMarketSale {
 
 
             if !nftCap.check() {
-                let cpCap =getAccount(nftCap.address).getCapability<&{NonFungibleToken.Collection}>(saleItem.getNFTCollectionData().publicPath)
-                if !cpCap.check() {
+                let cp =getAccount(nftCap.address).capabilities.borrow<&{NonFungibleToken.Collection}>(saleItem.getNFTCollectionData().publicPath)
+                if cp == nil {
                     panic("The nft receiver capability passed in is invalid.")
                 } else {
-                    cpCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())
+                    cp!.deposit(token: <- saleItem.pointer.withdraw())
                 }
             } else {
                 nftCap.borrow()!.deposit(token: <- saleItem.pointer.withdraw())
@@ -291,7 +295,7 @@ access(all) contract FindMarketSale {
 
         }
 
-        access(all) delist(_ id: UInt64) {
+        access(all) fun delist(_ id: UInt64) {
             if !self.items.containsKey(id) {
                 panic("Unknown item with id=".concat(id.toString()))
             }
@@ -311,17 +315,17 @@ access(all) contract FindMarketSale {
             destroy saleItem
         }
 
-        access(all) relist(_ id: UInt64) {
+        access(all) fun relist(_ id: UInt64) {
             let saleItem = self.borrow(id)
 
-            let pointer = saleItem.pointer
+            let pointer = saleItem.getPointer()
             let vaultType= saleItem.vaultType
             let directSellPrice=saleItem.salePrice
             var validUntil= saleItem.validUntil
             if validUntil != nil && saleItem.validUntil! <= Clock.time() {
                 validUntil = nil
             }
-            let extraField= saleItem.saleItemExtraField
+            let extraField= saleItem.getSaleItemExtraField()
 
             self.delist(id)
             self.listForSale(pointer: pointer, vaultType: vaultType, directSellPrice:directSellPrice, validUntil: validUntil, extraField: extraField)

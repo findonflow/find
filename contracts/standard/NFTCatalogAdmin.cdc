@@ -8,7 +8,6 @@ import NFTCatalog from "./NFTCatalog.cdc"
 
 access(all) contract NFTCatalogAdmin {
 
-    access(all) let AdminPrivatePath: PrivatePath
     access(all) let AdminStoragePath: StoragePath
 
     access(all) let AdminProxyPublicPath: PublicPath
@@ -76,7 +75,7 @@ access(all) contract NFTCatalogAdmin {
     }
 
     access(all) resource AdminProxy : IAdminProxy {
-        
+
         access(self) var capability : Capability<&Admin>?
 
         access(all) fun addCapability(capability : Capability<&Admin>) {
@@ -98,7 +97,7 @@ access(all) contract NFTCatalogAdmin {
         init() {
             self.capability = nil
         }
-        
+
     }
 
     access(all) fun createAdminProxy() : @AdminProxy {
@@ -108,12 +107,11 @@ access(all) contract NFTCatalogAdmin {
     init () {
         self.AdminProxyPublicPath = /public/nftCatalogAdminProxy
         self.AdminProxyStoragePath = /storage/nftCatalogAdminProxy
-        
+
         self.AdminStoragePath = /storage/nftCatalogAdmin
 
         let admin    <- create Admin()
 
         self.account.storage.save(<-admin, to: self.AdminStoragePath)
-        let adminCap = self.account.capabilities.storage.issue<&Admin>(AdminStoragePath)
     }
 }

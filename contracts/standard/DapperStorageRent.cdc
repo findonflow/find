@@ -66,7 +66,7 @@ access(all) contract DapperStorageRent {
     }
 
 
-    access(all) fun fundedRefill(address: Address, tokens: @FungibleToken.Vault) {
+    access(all) fun fundedRefill(address: Address, tokens: @{FungibleToken.Vault}) {
         destroy tokens
 
         /*
@@ -160,8 +160,8 @@ access(all) contract DapperStorageRent {
             return false
         }
         let acct = getAccount(address)
-        var high: UInt64 = acct.storageCapacity
-        var low: UInt64 = acct.storageUsed
+        var high: UInt64 = acct.storage.capacity
+        var low: UInt64 = acct.storage.used
         if high < low {
             high <-> low
         }

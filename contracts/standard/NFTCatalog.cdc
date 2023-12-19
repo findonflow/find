@@ -79,19 +79,19 @@ access(all) contract NFTCatalog {
         access(all) fun getCurrentProposalEntry(): String?
     }
     access(all) resource NFTCatalogProposalManager : NFTCatalogProposalManagerPublic {
-            access(self) var currentProposalEntry: String?
+        access(self) var currentProposalEntry: String?
 
-            access(all) fun getCurrentProposalEntry(): String? {
-                return self.currentProposalEntry
-            }
+        access(all) fun getCurrentProposalEntry(): String? {
+            return self.currentProposalEntry
+        }
 
-            access(all) fun setCurrentProposalEntry(identifier: String?) {
-                self.currentProposalEntry = identifier
-            }
+        access(all) fun setCurrentProposalEntry(identifier: String?) {
+            self.currentProposalEntry = identifier
+        }
 
-            init () {
-                self.currentProposalEntry = nil
-            }
+        init () {
+            self.currentProposalEntry = nil
+        }
     }
 
     // NFTCollectionData
@@ -222,7 +222,7 @@ access(all) contract NFTCatalog {
         return self.catalogProposals
     }
 
-    access(all) fun getCatalogProposalEntry(proposalID : UInt64) : NFTCatalogProposal? {
+    access(all) view fun getCatalogProposalEntry(proposalID : UInt64) : NFTCatalogProposal? {
         return self.catalogProposals[proposalID]
     }
 
