@@ -17,3 +17,8 @@ if you only want to borrow you can do capabilities.borrow and you do not need to
 
 ## resource types for interfaces
 @FungibleToken.Vault -> @{FungibleToken.Vault}
+
+
+- getAuthAccount in script does not work, need types
+- FT does not emit events yet
+- account.storage.storagePaths return &[StoragePath] and not [StoragePath]

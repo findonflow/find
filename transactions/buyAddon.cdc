@@ -1,6 +1,6 @@
-import "FUSD"
-import "FIND"
-import "FungibleToken"
+import FUSD from "../contracts/standard/FUSD.cdc"
+import FIND from "../contracts/FIND.cdc"
+import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
 
 transaction(name: String, addon:String, amount:UFix64) {
@@ -22,7 +22,6 @@ transaction(name: String, addon:String, amount:UFix64) {
 
     execute {
         let vault <- self.vaultRef!.withdraw(amount: amount)
-        //TODO: entitlements
         self.leases!.buyAddon(name: name, addon: addon, vault: <- vault)
     }
 }

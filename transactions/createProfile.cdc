@@ -55,7 +55,6 @@ transaction(name: String) {
 
         let bidCollection = account.capabilities.get<&FIND.BidCollection>(FIND.BidPublicPath)
         if bidCollection == nil {
-
             let fr = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver) ?? panic("could not find balance") 
             let lc = account.capabilities.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)
             account.storage.save(<- FIND.createEmptyBidCollection(receiver: fr!, leases: lc!), to: FIND.BidStoragePath)
