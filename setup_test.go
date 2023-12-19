@@ -96,16 +96,14 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("dapperAddress", "dapper"),
 	)
 
-	/*
-		// setup find forge
-		stx("setup_find_forge_1", WithSigner("find-forge"))
+	// setup find forge
+	stx("setup_find_forge_1", WithSigner("find-forge"))
 
-		// link in the server in the versus client
-		stx("setup_find_forge_2",
-			findSigner,
-			WithArg("ownerAddress", "find-forge"),
-		)
-	*/
+	// link in the server in the versus client
+	stx("setup_find_forge_2",
+		findSigner,
+		WithArg("ownerAddress", "find-forge"),
+	)
 
 	stx("devClock",
 		findAdminSigner,
