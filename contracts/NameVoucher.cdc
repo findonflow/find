@@ -43,10 +43,7 @@ access(all) contract NameVoucher {
             self.id=self.uuid
         }
 
-        destroy() {
-            emit Destroyed(id: self.id, address: self.owner?.address, minCharLength: self.minCharLength)
-        }
-
+        //TODO: emit destory event
         access(all) view fun getViews(): [Type] {
             return  [
             Type<MetadataViews.Display>(),
@@ -56,6 +53,10 @@ access(all) contract NameVoucher {
             Type<MetadataViews.NFTCollectionDisplay>(),
             Type<MetadataViews.Traits>()
             ]
+        }
+
+        access(all) view fun getID() : UInt64 {
+            return self.id
         }
 
         access(all) fun resolveView(_ view: Type): AnyStruct? {
@@ -150,46 +151,6 @@ access(all) contract NameVoucher {
             return <-token
         }
 
-        //TODO: this will be removed
-        /// withdrawWithUUID removes an NFT from the collection, using its UUID, and moves it to the caller
-        access(NonFungibleToken.Withdrawable) fun withdrawWithUUID(_ uuid: UInt64): @{NonFungibleToken.NFT} {
-            let token <- self.ownedNFTs.remove(key: uuid) ?? panic("Could not withdraw nft")
-
-            let nft <- token as! @NFT
-
-            emit Withdraw(id: nft.id, from: self.owner?.address)
-
-            return <-nft
-
-        }
-
-        /// withdrawWithType removes an NFT from the collection, using its Type and ID and moves it to the caller
-        /// This would be used by a collection that can store multiple NFT types
-        access(NonFungibleToken.Withdrawable) fun withdrawWithType(type: Type, withdrawID: UInt64): @{NonFungibleToken.NFT} {
-            let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("Could not withdraw nft")
-
-            let nft <- token as! @NFT
-
-            emit Withdraw(id: nft.id, from: self.owner?.address)
-
-            return <-nft
-
-        }
-
-        /// withdrawWithTypeAndUUID removes an NFT from the collection using its type and uuid and moves it to the caller
-        /// This would be used by a collection that can store multiple NFT types
-        access(NonFungibleToken.Withdrawable) fun withdrawWithTypeAndUUID(type: Type, uuid: UInt64): @{NonFungibleToken.NFT} {
-            let token <- self.ownedNFTs.remove(key: uuid) ?? panic("Could not withdraw nft")
-
-            let nft <- token as! @NFT
-
-            emit Withdraw(id: nft.id, from: self.owner?.address)
-
-            return <-nft
-        }
-
-
-
         // deposit takes a NFT and adds it to the collections dictionary
         // and adds the ID to the id array
         access(all) fun deposit(token: @{NonFungibleToken.NFT}) {
@@ -207,14 +168,6 @@ access(all) contract NameVoucher {
 
             destroy oldToken
         }
-
-        access(NonFungibleToken.Withdrawable) fun transfer(id: UInt64, receiver: Capability<&{NonFungibleToken.Receiver}>): Bool {
-            let token <- self.ownedNFTs.remove(key: id) ?? panic("missing NFT")
-            let receiver = receiver as! &{NonFungibleToken.Receiver}
-            receiver.deposit(token: <-token)
-            return true
-        }
-
         // getIDs returns an array of the IDs that are in the collection
         access(all) view fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
@@ -226,14 +179,14 @@ access(all) contract NameVoucher {
 
         // borrowNFT gets a reference to an NFT in the collection
         // so that the caller can read its metadata and call its methods
-        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT} {
-            return (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
+            return &self.ownedNFTs[id] 
         }
 
         access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
             let nft = &self.ownedNFTs[id] as &{NonFungibleToken.NFT}?
             let vr = nft as! &NFT
-            return vr as &{ViewResolver.Resolver}
+            return vr 
         }
 
         access(all) fun redeem(id: UInt64, name: String) {
@@ -269,10 +222,6 @@ access(all) contract NameVoucher {
             panic("Name is already taken by others ".concat(status.owner!.toString()))
         }
 
-        destroy() {
-            destroy self.ownedNFTs
-        }
-
         access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
             let supportedTypes: {Type: Bool} = {}
             return supportedTypes
@@ -299,6 +248,15 @@ access(all) contract NameVoucher {
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
             return <- NameVoucher.createEmptyCollection()
         }
+
+        access(all) view fun getDefaultStoragePath() : StoragePath {
+            return NameVoucher.CollectionStoragePath
+        }
+
+        access(all) view fun getDefaultPublicPath() : PublicPath {
+            return NameVoucher.CollectionPublicPath
+        }
+
     }
 
     // Internal mint NFT is used inside the contract as a helper function

@@ -106,7 +106,7 @@ access(all) contract FungibleToken {
             post {
                 // `result` refers to the return value
                 result.getBalance() == amount:
-                    "Withdrawal amount must be the same as the balance of the withdrawn Vault"
+                "Withdrawal amount must be the same as the balance of the withdrawn Vault"
                 //FungibleToken.emitWithdrawEvent(amount: amount, from: self.owner?.address, type: self.getType().identifier)
             }
         }
@@ -140,7 +140,7 @@ access(all) contract FungibleToken {
         }
     }
 
-       access(all) resource interface Transferor {
+    access(all) resource interface Transferor {
         /// Function for a direct transfer instead of having to do a deposit and withdrawal
         ///
         access(Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
@@ -200,14 +200,14 @@ access(all) contract FungibleToken {
         access(Withdrawable) fun withdraw(amount: UFix64): @{Vault} {
             pre {
                 self.getBalance() >= amount:
-                    "Amount withdrawn must be less than or equal than the balance of the Vault"
+                "Amount withdrawn must be less than or equal than the balance of the Vault"
             }
             post {
                 // use the special function `before` to get the value of the `balance` field
                 // at the beginning of the function execution
                 //
                 self.getBalance() == before(self.getBalance()) - amount:
-                    "New Vault balance must be the difference of the previous balance and the withdrawn Vault balance"
+                "New Vault balance must be the difference of the previous balance and the withdrawn Vault balance"
             }
         }
 
@@ -218,12 +218,12 @@ access(all) contract FungibleToken {
             // as the vault that is accepting the deposit
             pre {
                 from.isInstance(self.getType()): 
-                    "Cannot deposit an incompatible token type"
+                "Cannot deposit an incompatible token type"
                 //FungibleToken.emitDepositEvent(amount: from.getBalance(), to: self.owner?.address, type: from.getType().identifier)
             }
             post {
                 self.getBalance() == before(self.getBalance()) + before(from.getBalance()):
-                    "New Vault balance must be the sum of the previous balance and the deposited Vault"
+                "New Vault balance must be the sum of the previous balance and the deposited Vault"
             }
         }
 
@@ -232,7 +232,7 @@ access(all) contract FungibleToken {
         access(Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
             post {
                 self.getBalance() == before(self.getBalance()) - amount:
-                    "New Vault balance from the sender must be the difference of the previous balance and the withdrawn Vault balance"
+                "New Vault balance from the sender must be the difference of the previous balance and the withdrawn Vault balance"
                 //FungibleToken.emitTransferEvent(amount: amount, from: self.owner?.address, to: receiver.borrow()?.owner?.address, type: self.getType().identifier)
             }
         }
@@ -242,12 +242,6 @@ access(all) contract FungibleToken {
         access(all) fun createEmptyVault(): @{Vault} {
             post {
                 result.getBalance() == 0.0: "The newly created Vault must have zero balance"
-            }
-        }
-
-        destroy() {
-            pre {
-                //FungibleToken.emitBurnEvent(amount: self.getBalance(), type: self.getType().identifier)
             }
         }
     }

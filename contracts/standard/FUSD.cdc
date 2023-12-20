@@ -211,14 +211,6 @@ access(all) contract FUSD: ViewResolver {
         access(all) fun createEmptyVault(): @FUSD.Vault {
             return <-create Vault(balance: 0.0)
         }
-
-        // TODO: Revisit if removal of custom destructors passes
-        // See https://github.com/onflow/flips/pull/131
-        destroy() {
-            if self.balance > 0.0 {
-                FUSD.totalSupply = FUSD.totalSupply - self.balance
-            }
-        }
     }
 
     /// Minter

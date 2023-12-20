@@ -1366,11 +1366,6 @@ access(all) contract FIND {
             }
             destroy <- self.leases.remove(key: name)!
         }
-
-        destroy() {
-            destroy self.leases
-            destroy self.auctions
-        }
     }
 
     //Create an empty lease collection that store your leases to a name
@@ -1785,10 +1780,6 @@ access(all) contract FIND {
             self.bidAt=time
         }
 
-        destroy() {
-            //This is kinda bad. find FUSD vault of owner and deploy to that?
-            destroy self.vault
-        }
     }
 
     access(all) resource interface BidCollectionPublic {
@@ -1925,10 +1916,6 @@ access(all) contract FIND {
         access(all) fun getBalance(_ name: String) : UFix64 {
             let bid= self.borrowBid(name)
             return bid.vault.balance
-        }
-
-        destroy() {
-            destroy self.bids
         }
     }
 

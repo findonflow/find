@@ -79,57 +79,57 @@ access(all) contract DapperUtilityCoin: ViewResolver  {
 
         access(all) view fun getViews(): [Type] {
             return [
-                Type<FungibleTokenMetadataViews.FTView>(),
-                Type<FungibleTokenMetadataViews.FTDisplay>(),
-                Type<FungibleTokenMetadataViews.FTVaultData>(),
-                Type<FungibleTokenMetadataViews.TotalSupply>()
+            Type<FungibleTokenMetadataViews.FTView>(),
+            Type<FungibleTokenMetadataViews.FTDisplay>(),
+            Type<FungibleTokenMetadataViews.FTVaultData>(),
+            Type<FungibleTokenMetadataViews.TotalSupply>()
             ]
         }
 
         access(all) fun resolveView(_ view: Type): AnyStruct? {
             switch view {
-                case Type<FungibleTokenMetadataViews.FTView>():
-                    return FungibleTokenMetadataViews.FTView(
-                        ftDisplay: self.resolveView(Type<FungibleTokenMetadataViews.FTDisplay>()) as! FungibleTokenMetadataViews.FTDisplay?,
-                        ftVaultData: self.resolveView(Type<FungibleTokenMetadataViews.FTVaultData>()) as! FungibleTokenMetadataViews.FTVaultData?
-                    )
-                case Type<FungibleTokenMetadataViews.FTDisplay>():
-                    let media = MetadataViews.Media(
-                            file: MetadataViews.HTTPFile(
-                            url: "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg"
-                        ),
-                        mediaType: "image/svg+xml"
-                    )
-                    let medias = MetadataViews.Medias([media])
-                    return FungibleTokenMetadataViews.FTDisplay(
-                        name: "Example Fungible Token",
-                        symbol: "EFT",
-                        description: "This fungible token is used as an example to help you develop your next FT #onFlow.",
-                        externalURL: MetadataViews.ExternalURL("https://example-ft.onflow.org"),
-                        logos: medias,
-                        socials: {
-                            "twitter": MetadataViews.ExternalURL("https://twitter.com/flow_blockchain")
-                        }
-                    )
-                case Type<FungibleTokenMetadataViews.FTVaultData>():
-                    let vaultRef = DapperUtilityCoin.account.storage.borrow<&DapperUtilityCoin.Vault>(from: self.storagePath)
-                        ?? panic("Could not borrow a reference to the stored vault")
-                    return FungibleTokenMetadataViews.FTVaultData(
-                        storagePath: self.storagePath,
-                        receiverPath: self.receiverPath,
-                        metadataPath: self.publicPath,
-                        providerPath: /private/exampleTokenVault,
-                        receiverLinkedType: Type<&{FungibleToken.Receiver}>(),
-                        metadataLinkedType: Type<&DapperUtilityCoin.Vault>(),
-                        providerLinkedType: Type<&DapperUtilityCoin.Vault>(),
-                        createEmptyVaultFunction: (fun(): @{FungibleToken.Vault} {
-                            return <-vaultRef.createEmptyVault()
-                        })
-                    )
-                case Type<FungibleTokenMetadataViews.TotalSupply>():
-                    return FungibleTokenMetadataViews.TotalSupply(
-                        totalSupply: DapperUtilityCoin.totalSupply
-                    )
+            case Type<FungibleTokenMetadataViews.FTView>():
+                return FungibleTokenMetadataViews.FTView(
+                    ftDisplay: self.resolveView(Type<FungibleTokenMetadataViews.FTDisplay>()) as! FungibleTokenMetadataViews.FTDisplay?,
+                    ftVaultData: self.resolveView(Type<FungibleTokenMetadataViews.FTVaultData>()) as! FungibleTokenMetadataViews.FTVaultData?
+                )
+            case Type<FungibleTokenMetadataViews.FTDisplay>():
+                let media = MetadataViews.Media(
+                    file: MetadataViews.HTTPFile(
+                        url: "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg"
+                    ),
+                    mediaType: "image/svg+xml"
+                )
+                let medias = MetadataViews.Medias([media])
+                return FungibleTokenMetadataViews.FTDisplay(
+                    name: "Example Fungible Token",
+                    symbol: "EFT",
+                    description: "This fungible token is used as an example to help you develop your next FT #onFlow.",
+                    externalURL: MetadataViews.ExternalURL("https://example-ft.onflow.org"),
+                    logos: medias,
+                    socials: {
+                        "twitter": MetadataViews.ExternalURL("https://twitter.com/flow_blockchain")
+                    }
+                )
+            case Type<FungibleTokenMetadataViews.FTVaultData>():
+                let vaultRef = DapperUtilityCoin.account.storage.borrow<&DapperUtilityCoin.Vault>(from: self.storagePath)
+                ?? panic("Could not borrow a reference to the stored vault")
+                return FungibleTokenMetadataViews.FTVaultData(
+                    storagePath: self.storagePath,
+                    receiverPath: self.receiverPath,
+                    metadataPath: self.publicPath,
+                    providerPath: /private/exampleTokenVault,
+                    receiverLinkedType: Type<&{FungibleToken.Receiver}>(),
+                    metadataLinkedType: Type<&DapperUtilityCoin.Vault>(),
+                    providerLinkedType: Type<&DapperUtilityCoin.Vault>(),
+                    createEmptyVaultFunction: (fun(): @{FungibleToken.Vault} {
+                        return <-vaultRef.createEmptyVault()
+                    })
+                )
+            case Type<FungibleTokenMetadataViews.TotalSupply>():
+                return FungibleTokenMetadataViews.TotalSupply(
+                    totalSupply: DapperUtilityCoin.totalSupply
+                )
             }
             return nil
         }
@@ -196,7 +196,7 @@ access(all) contract DapperUtilityCoin: ViewResolver  {
 
             // Get a reference to the recipient's Receiver
             let receiverRef = receiver.borrow()
-                ?? panic("Could not borrow receiver reference to the recipient's Vault")
+            ?? panic("Could not borrow receiver reference to the recipient's Vault")
 
             // Deposit the withdrawn tokens in the recipient's receiver
             receiverRef.deposit(from: <-transferVault)
@@ -212,14 +212,6 @@ access(all) contract DapperUtilityCoin: ViewResolver  {
         ///
         access(all) fun createEmptyVault(): @DapperUtilityCoin.Vault {
             return <-create Vault(balance: 0.0)
-        }
-
-        // TODO: Revisit if removal of custom destructors passes
-        // See https://github.com/onflow/flips/pull/131
-        destroy() {
-            if self.balance > 0.0 {
-                DapperUtilityCoin.totalSupply = DapperUtilityCoin.totalSupply - self.balance
-            }
         }
     }
 
@@ -325,8 +317,8 @@ access(all) contract DapperUtilityCoin: ViewResolver  {
         let vaultCap = self.account.capabilities.storage.issue<&Vault>(/storage/dapperUtilityCoinVault)
         self.account.capabilities.publish(vaultCap, at: /public/dapperUtilityCoinVault)
 
-       
-     
+
+
 
         // Create a public capability to the stored Vault that only exposes
         // the `deposit` method through the `Receiver` interface

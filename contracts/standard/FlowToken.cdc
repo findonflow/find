@@ -109,16 +109,10 @@ access(all) contract FlowToken: ViewResolver {
 
             // Get a reference to the recipient's Receiver
             let receiverRef = receiver.borrow()
-                ?? panic("Could not borrow receiver reference to the recipient's Vault")
+            ?? panic("Could not borrow receiver reference to the recipient's Vault")
 
             // Deposit the withdrawn tokens in the recipient's receiver
             receiverRef.deposit(from: <-transferVault)
-        }
-
-        destroy() {
-            if self.balance > 0.0 {
-                FlowToken.totalSupply = FlowToken.totalSupply - self.balance
-            }
         }
 
         /// Get all the Metadata Views implemented by FlowToken
@@ -157,9 +151,9 @@ access(all) contract FlowToken: ViewResolver {
 
     access(all) view fun getViews(): [Type] {
         return [Type<FungibleTokenMetadataViews.FTView>(),
-                Type<FungibleTokenMetadataViews.FTDisplay>(),
-                Type<FungibleTokenMetadataViews.FTVaultData>(),
-                Type<FungibleTokenMetadataViews.TotalSupply>()]
+        Type<FungibleTokenMetadataViews.FTDisplay>(),
+        Type<FungibleTokenMetadataViews.FTVaultData>(),
+        Type<FungibleTokenMetadataViews.TotalSupply>()]
     }
 
     /// Get a Metadata View from FlowToken
@@ -169,44 +163,44 @@ access(all) contract FlowToken: ViewResolver {
     ///
     access(all) fun resolveView(_ view: Type): AnyStruct? {
         switch view {
-            case Type<FungibleTokenMetadataViews.FTView>():
-                return FungibleTokenMetadataViews.FTView(
-                    ftDisplay: self.resolveView(Type<FungibleTokenMetadataViews.FTDisplay>()) as! FungibleTokenMetadataViews.FTDisplay?,
-                    ftVaultData: self.resolveView(Type<FungibleTokenMetadataViews.FTVaultData>()) as! FungibleTokenMetadataViews.FTVaultData?
-                )
-            case Type<FungibleTokenMetadataViews.FTDisplay>():
-                let media = MetadataViews.Media(
-                        file: MetadataViews.HTTPFile(
-                        url: FlowToken.getLogoURI()
-                    ),
-                    mediaType: "image/svg+xml"
-                )
-                let medias = MetadataViews.Medias([media])
-                return FungibleTokenMetadataViews.FTDisplay(
-                    name: "FLOW Network Token",
-                    symbol: "FLOW",
-                    description: "FLOW is the native token for the Flow blockchain. It is required for securing the network, transaction fees, storage fees, staking, FLIP voting and may be used by applications built on the Flow Blockchain",
-                    externalURL: MetadataViews.ExternalURL("https://flow.com"),
-                    logos: medias,
-                    socials: {
-                        "twitter": MetadataViews.ExternalURL("https://twitter.com/flow_blockchain")
-                    }
-                )
-            case Type<FungibleTokenMetadataViews.FTVaultData>():
-                return FungibleTokenMetadataViews.FTVaultData(
-                    storagePath: /storage/flowTokenVault,
-                    receiverPath: /public/flowTokenReceiver,
-                    metadataPath: /public/flowTokenBalance,
-                    providerPath: /private/flowTokenVault,
-                    receiverLinkedType: Type<&FlowToken.Vault>(),
-                    metadataLinkedType: Type<&FlowToken.Vault>(),
-                    providerLinkedType: Type<&FlowToken.Vault>(),
-                    createEmptyVaultFunction: (fun (): @{FungibleToken.Vault} {
-                        return <-FlowToken.createEmptyVault()
-                    })
-                )
-            case Type<FungibleTokenMetadataViews.TotalSupply>():
-                return FungibleTokenMetadataViews.TotalSupply(totalSupply: FlowToken.totalSupply)
+        case Type<FungibleTokenMetadataViews.FTView>():
+            return FungibleTokenMetadataViews.FTView(
+                ftDisplay: self.resolveView(Type<FungibleTokenMetadataViews.FTDisplay>()) as! FungibleTokenMetadataViews.FTDisplay?,
+                ftVaultData: self.resolveView(Type<FungibleTokenMetadataViews.FTVaultData>()) as! FungibleTokenMetadataViews.FTVaultData?
+            )
+        case Type<FungibleTokenMetadataViews.FTDisplay>():
+            let media = MetadataViews.Media(
+                file: MetadataViews.HTTPFile(
+                    url: FlowToken.getLogoURI()
+                ),
+                mediaType: "image/svg+xml"
+            )
+            let medias = MetadataViews.Medias([media])
+            return FungibleTokenMetadataViews.FTDisplay(
+                name: "FLOW Network Token",
+                symbol: "FLOW",
+                description: "FLOW is the native token for the Flow blockchain. It is required for securing the network, transaction fees, storage fees, staking, FLIP voting and may be used by applications built on the Flow Blockchain",
+                externalURL: MetadataViews.ExternalURL("https://flow.com"),
+                logos: medias,
+                socials: {
+                    "twitter": MetadataViews.ExternalURL("https://twitter.com/flow_blockchain")
+                }
+            )
+        case Type<FungibleTokenMetadataViews.FTVaultData>():
+            return FungibleTokenMetadataViews.FTVaultData(
+                storagePath: /storage/flowTokenVault,
+                receiverPath: /public/flowTokenReceiver,
+                metadataPath: /public/flowTokenBalance,
+                providerPath: /private/flowTokenVault,
+                receiverLinkedType: Type<&FlowToken.Vault>(),
+                metadataLinkedType: Type<&FlowToken.Vault>(),
+                providerLinkedType: Type<&FlowToken.Vault>(),
+                createEmptyVaultFunction: (fun (): @{FungibleToken.Vault} {
+                    return <-FlowToken.createEmptyVault()
+                })
+            )
+        case Type<FungibleTokenMetadataViews.TotalSupply>():
+            return FungibleTokenMetadataViews.TotalSupply(totalSupply: FlowToken.totalSupply)
         }
         return nil
     }

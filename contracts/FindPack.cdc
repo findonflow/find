@@ -5,7 +5,7 @@ import Crypto
 import Clock from "../contracts/Clock.cdc"
 import Debug from "./Debug.cdc"
 import FindForge from "../contracts/FindForge.cdc"
-import FindVerifier from "../contracts/FindVerifier.cdc"
+import FindVerifier from "./FindVerifier.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import ViewResolver from "../contracts/standard/ViewResolver.cdc"
 
@@ -396,7 +396,7 @@ access(all) contract FindPack {
         }
 
         access(contract) fun borrowSaleInfo(_ i: Int) : &SaleInfo {
-            return &self.saleInfos[i] as &FindPack.SaleInfo
+            return &self.saleInfos[i] 
         }
     }
 
@@ -462,11 +462,15 @@ access(all) contract FindPack {
             self.packTypeName=packTypeName
         }
 
+        access(all) view fun getID() : UInt64 {
+            return self.id
+        }
+
         access(all) fun getOpenedBy() : {Type : Capability<&{NonFungibleToken.Receiver}>} {
             if self.openedBy== nil {
                 panic("Pack is not opened")
             }
-            return self.openedBy!
+            return self.openedBy
         }
 
         access(all) fun getHash() : String{
@@ -481,7 +485,7 @@ access(all) contract FindPack {
             if self.openedBy.length == 0 {
                 panic("Pack is not opened")
             }
-            let cap = self.openedBy!
+            let cap = self.openedBy
 
             self.openedBy={}
             return cap.values[0].address
@@ -580,7 +584,7 @@ access(all) contract FindPack {
         access(all) view fun getIDs(): [UInt64]
         access(all) fun contains(_ id: UInt64): Bool
         access(all) fun getPacksLeft() : Int   // returns the no of a type
-        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT} 
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}?
         access(all) fun borrowFindPack(id: UInt64): &FindPack.NFT?
         access(all) fun buyWithSignature(packId: UInt64, signature:String, vault: @{FungibleToken.Vault}, collectionCapability: Capability<&Collection>)
         access(all) fun buy(packTypeName: String, typeId: UInt64, vault: @{FungibleToken.Vault}, collectionCapability: Capability<&Collection>)
@@ -756,8 +760,8 @@ access(all) contract FindPack {
             for i, info in metadata.saleInfos {
                 // for later implement : if it requires all sale info checks
                 if info.checkBuyable(addr: collectionCapability.address, time:timestamp) {
-                    if lowestPrice == nil || lowestPrice! > info!.price {
-                        lowestPrice = info!.price
+                    if lowestPrice == nil || lowestPrice! > info.price {
+                        lowestPrice = info.price
                         saleInfo = info
                         saleInfoIndex = i
                     }
@@ -875,19 +879,7 @@ access(all) contract FindPack {
         }
 
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-            return <- (create Collection() as @{NonFungibleToken.Collection})
-        }
-
-        access(NonFungibleToken.Withdrawable) fun transfer(id: UInt64, receiver: Capability<&{NonFungibleToken.Receiver}>): Bool {
-            let token <- self.ownedNFTs.remove(key: id) ?? panic("Could not withdraw nft")
-
-            let nft <- token as! @NFT
-
-            emit Withdraw(id: nft.id, from: self.owner?.address)
-
-            receiver.borrow()!.deposit(token: <-nft)
-
-            return true
+            return <- create Collection() 
         }
 
         access(all) view fun getLength() : Int {
@@ -931,8 +923,8 @@ access(all) contract FindPack {
         // borrowNFT
         // Gets a reference to an NFT in the collection
         // so that the caller can read its metadata and call its methods
-        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT} {
-            return (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
+            return &self.ownedNFTs[id]
         }
 
         // borrowFindPack
@@ -955,10 +947,13 @@ access(all) contract FindPack {
             return exampleNFT
         }
 
-        // destructor
-        //
-        destroy() {
-            destroy self.ownedNFTs
+
+        access(all) view fun getDefaultStoragePath() : StoragePath {
+            return FindPack.CollectionStoragePath
+        }
+
+        access(all) view fun getDefaultPublicPath() : PublicPath {
+            return FindPack.CollectionPublicPath
         }
 
         // initializer
@@ -969,7 +964,7 @@ access(all) contract FindPack {
     }
 
     access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-        return <- (create Collection() as @{NonFungibleToken.Collection})
+        return <- create Collection() 
     }
 
     access(account) fun mintNFT(packTypeName: String, typeId: UInt64, hash: String, royalties: [MetadataViews.Royalty]) : @{NonFungibleToken.NFT} {
@@ -978,7 +973,7 @@ access(all) contract FindPack {
         emit Minted(id: nft.id, typeId:typeId)
 
         // deposit it in the recipient's account using their reference
-        return <- (nft as @{NonFungibleToken.NFT})
+        return <- nft
     }
 
     access(account) fun fulfill(packId: UInt64, types:[Type], rewardIds: [UInt64], salt:String) {
@@ -998,7 +993,7 @@ access(all) contract FindPack {
         let rewards=pack.getMetadata().providerCaps
 
         let receiverAccount=getAccount(receivingAddress)
-        var freeStorage=UInt64(0)
+        var freeStorage=0 as UInt64
         // prevent underflow
         if receiverAccount.storage.capacity >= receiverAccount.storage.used {
             freeStorage = receiverAccount.storage.capacity- receiverAccount.storage.used
@@ -1080,7 +1075,7 @@ access(all) contract FindPack {
             )
             target.deposit(token: <-token)
         }
-        emit Fulfilled(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receivingAddress!, packFields:packFields, packNFTTypes:packNFTTypes)
+        emit Fulfilled(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receivingAddress, packFields:packFields, packNFTTypes:packNFTTypes)
 
         destroy pack
     }
@@ -1161,8 +1156,8 @@ access(all) contract FindPack {
         var lowestPrice : UFix64? = nil
         for info in metadata.saleInfos {
             if info.checkBuyable(addr: user, time:timestamp) {
-                if lowestPrice == nil || lowestPrice! > info!.price {
-                    lowestPrice = info!.price
+                if lowestPrice == nil || lowestPrice! > info.price {
+                    lowestPrice = info.price
                 }
             }
         }
@@ -1172,7 +1167,7 @@ access(all) contract FindPack {
 
     access(contract) fun borrowSaleInfo(packTypeName: String, packTypeId: UInt64, index: Int) : &FindPack.SaleInfo {
         let mappingRef = (&FindPack.packMetadata[packTypeName] as &{UInt64: FindPack.Metadata}?)!
-        let ref = (mappingRef[packTypeId] as &FindPack.Metadata?)!
+        let ref = mappingRef[packTypeId]!
         return ref.borrowSaleInfo(index)
     }
 

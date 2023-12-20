@@ -297,8 +297,4 @@ access(all) contract FindVerifier {
         }
 
     }
-
-
-
-
 }

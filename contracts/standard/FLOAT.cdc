@@ -125,6 +125,11 @@ access(all) contract FLOAT {
         // crucial data to know about the FLOAT in the FLOAT itself.
         access(all) let eventsCap: Capability<&FLOATEvents>
 
+
+        access(all) view fun getID() : UInt64 {
+            return self.id
+        }
+
         // Helper function to get the metadata of the event 
         // this FLOAT is from.
         access(all) fun getEventMetadata(): &FLOATEvent? {
@@ -188,27 +193,11 @@ access(all) contract FLOAT {
 
             FLOAT.totalSupply = FLOAT.totalSupply + 1
         }
-
-        destroy() {
-            // If the FLOATEvent owner decided to unlink their public reference
-            // for some reason (heavily recommend against it), their records
-            // of who owns the FLOAT is going to be messed up. But that is their
-            // fault. We shouldn't let that prevent the user from deleting the FLOAT.
-            if let floatEvent: &FLOATEvent = self.getEventMetadata() {
-                floatEvent.updateFLOATHome(id: self.id, serial: self.serial, owner: nil)
-            }
-            emit FLOATDestroyed(
-                id: self.id, 
-                eventHost: self.eventHost, 
-                eventId: self.eventId, 
-                serial: self.serial
-            )
-        }
     }
 
     // A public interface for people to call into our Collection
     access(all) resource interface CollectionPublic {
-        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}?
         access(all) fun borrowFLOAT(id: UInt64): &NFT?
         access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}
         access(all) fun deposit(token: @{NonFungibleToken.NFT})
@@ -402,8 +391,8 @@ access(all) contract FLOAT {
             return answer
         }
 
-        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT} {
-            return (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
+            return &self.ownedNFTs[id] 
         }
 
         access(all) fun borrowFLOAT(id: UInt64): &NFT? {
@@ -417,16 +406,22 @@ access(all) contract FLOAT {
         access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
             let tokenRef = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
             let nftRef = tokenRef as! &NFT
-            return nftRef as &{ViewResolver.Resolver}
+            return nftRef
         }
+
+        access(all) view fun getDefaultStoragePath() : StoragePath {
+            return FLOAT.FLOATCollectionStoragePath
+        }
+
+        access(all) view fun getDefaultPublicPath() : PublicPath {
+            return FLOAT.FLOATCollectionPublicPath
+        }
+
+
 
         init() {
             self.ownedNFTs <- {}
             self.events = {}
-        }
-
-        destroy() {
-            destroy self.ownedNFTs
         }
     }
 
@@ -743,10 +738,8 @@ access(all) contract FLOAT {
         // be passed in the `params`.
         access(all) fun claim(recipient: &Collection, params: {String: AnyStruct}) {
             pre {
-                self.claimed[recipient.owner!.address] == nil:
-                "This person already claimed their FLOAT!"
-                self.claimable: 
-                "This FLOATEvent is not claimable, and thus not currently active."
+                self.claimed[recipient.owner!.address] == nil: "This person already claimed their FLOAT!"
+                self.claimable: "This FLOATEvent is not claimable, and thus not currently active."
             }
 
             if (self.getPrices() != nil) {
@@ -832,9 +825,6 @@ access(all) contract FLOAT {
             emit FLOATEventCreated(eventId: self.eventId, description: self.description, host: self.host, image: self.image, name: self.name, url: self.url)
         }
 
-        destroy() {
-            emit FLOATEventDestroyed(eventId: self.eventId, host: self.host, name: self.name)
-        }
     }
 
     // A container of FLOAT Events (maybe because they're similar to
@@ -1064,10 +1054,6 @@ access(all) contract FLOAT {
             self.groups <- {}
         }
 
-        destroy() {
-            destroy self.events
-            destroy self.groups
-        }
     }
 
     access(all) fun createEmptyCollection(): @Collection {

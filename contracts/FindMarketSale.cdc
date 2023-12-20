@@ -360,10 +360,6 @@ access(all) contract FindMarketSale {
             }
             return (&self.items[id] as &{FindMarket.SaleItem}?)!
         }
-
-        destroy() {
-            destroy self.items
-        }
     }
 
     //Create an empty lease collection that store your leases to a name

@@ -213,14 +213,6 @@ access(all) contract FlowUtilityToken: ViewResolver  {
         access(all) fun createEmptyVault(): @FlowUtilityToken.Vault {
             return <-create Vault(balance: 0.0)
         }
-
-        // TODO: Revisit if removal of custom destructors passes
-        // See https://github.com/onflow/flips/pull/131
-        destroy() {
-            if self.balance > 0.0 {
-                FlowUtilityToken.totalSupply = FlowUtilityToken.totalSupply - self.balance
-            }
-        }
     }
 
 
