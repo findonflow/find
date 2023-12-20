@@ -1,7 +1,7 @@
 import FungibleToken from "./FungibleToken.cdc"
-import ViewResolver from "./ViewResolver.cdc"
 import MetadataViews from "./MetadataViews.cdc"
 import FungibleTokenMetadataViews from "./FungibleTokenMetadataViews.cdc"
+import ViewResolver from "./ViewResolver.cdc"
 
 access(all) contract FlowToken: ViewResolver {
 
@@ -102,17 +102,6 @@ access(all) contract FlowToken: ViewResolver {
             emit TokensDeposited(amount: vault.balance, to: self.owner?.address)
             vault.balance = 0.0
             destroy vault
-        }
-
-        access(FungibleToken.Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
-            let transferVault <- self.withdraw(amount: amount)
-
-            // Get a reference to the recipient's Receiver
-            let receiverRef = receiver.borrow()
-            ?? panic("Could not borrow receiver reference to the recipient's Vault")
-
-            // Deposit the withdrawn tokens in the recipient's receiver
-            receiverRef.deposit(from: <-transferVault)
         }
 
         /// Get all the Metadata Views implemented by FlowToken
@@ -269,9 +258,16 @@ access(all) contract FlowToken: ViewResolver {
         // total supply in the Vault destructor.
         //
         access(all) fun burnTokens(from: @FlowToken.Vault) {
-            let vault <- from as! @FlowToken.Vault
-            let amount = vault.balance
-            destroy vault
+            FlowToken.burnTokens(from: <-from)
+        }
+    }
+
+    access(all) fun burnTokens(from: @FlowToken.Vault) {
+        let vault <- from as! @FlowToken.Vault
+        let amount = vault.balance
+        destroy vault
+        if amount > 0.0 {
+            FlowToken.totalSupply = FlowToken.totalSupply - amount
             emit TokensBurned(amount: amount)
         }
     }
@@ -294,13 +290,13 @@ access(all) contract FlowToken: ViewResolver {
         adminAccount.storage.save(<-vault, to: /storage/flowTokenVault)
 
         // Create a public capability to the stored Vault that only exposes
-        // the  method through the  interface
+        // the `deposit` method through the `Receiver` interface
         //
         let receiverCapability = adminAccount.capabilities.storage.issue<&FlowToken.Vault>(/storage/flowTokenVault)
         adminAccount.capabilities.publish(receiverCapability, at: /public/flowTokenReceiver)
 
         // Create a public capability to the stored Vault that only exposes
-        // the  field through the  interface
+        // the `balance` field through the `Balance` interface
         //
         let balanceCapability = adminAccount.capabilities.storage.issue<&FlowToken.Vault>(/storage/flowTokenVault)
         adminAccount.capabilities.publish(balanceCapability, at: /public/flowTokenBalance)
@@ -313,3 +309,4 @@ access(all) contract FlowToken: ViewResolver {
 
     }
 }
+
