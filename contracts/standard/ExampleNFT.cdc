@@ -71,14 +71,14 @@ access(all) contract ExampleNFT: NonFungibleToken, ViewResolver {
         ///
         access(all) view fun getViews(): [Type] {
             return [
-                Type<MetadataViews.Display>(),
-                Type<MetadataViews.Royalties>(),
-                Type<MetadataViews.Editions>(),
-                Type<MetadataViews.ExternalURL>(),
-                Type<MetadataViews.NFTCollectionData>(),
-                Type<MetadataViews.NFTCollectionDisplay>(),
-                Type<MetadataViews.Serial>(),
-                Type<MetadataViews.Traits>()
+            Type<MetadataViews.Display>(),
+            Type<MetadataViews.Royalties>(),
+            Type<MetadataViews.Editions>(),
+            Type<MetadataViews.ExternalURL>(),
+            Type<MetadataViews.NFTCollectionData>(),
+            Type<MetadataViews.NFTCollectionDisplay>(),
+            Type<MetadataViews.Serial>(),
+            Type<MetadataViews.Traits>()
             ]
         }
 
@@ -89,66 +89,66 @@ access(all) contract ExampleNFT: NonFungibleToken, ViewResolver {
         ///
         access(all) fun resolveView(_ view: Type): AnyStruct? {
             switch view {
-                case Type<MetadataViews.Display>():
-                    return MetadataViews.Display(
-                        name: self.name,
-                        description: self.description,
-                        thumbnail: MetadataViews.HTTPFile(
-                            url: self.thumbnail
-                        )
+            case Type<MetadataViews.Display>():
+                return MetadataViews.Display(
+                    name: self.name,
+                    description: self.description,
+                    thumbnail: MetadataViews.HTTPFile(
+                        url: self.thumbnail
                     )
-                case Type<MetadataViews.Editions>():
-                    // There is no max number of NFTs that can be minted from this contract
-                    // so the max edition field value is set to nil
-                    let editionInfo = MetadataViews.Edition(name: "Example NFT Edition", number: self.id, max: nil)
-                    let editionList: [MetadataViews.Edition] = [editionInfo]
-                    return MetadataViews.Editions(
-                        editionList
-                    )
-                case Type<MetadataViews.Serial>():
-                    return MetadataViews.Serial(
-                        self.id
-                    )
-                case Type<MetadataViews.Royalties>():
-                    return MetadataViews.Royalties(
-                        self.royalties
-                    )
-                case Type<MetadataViews.ExternalURL>():
-                    return MetadataViews.ExternalURL("https://example-nft.onflow.org/".concat(self.id.toString()))
-                case Type<MetadataViews.NFTCollectionData>():
-                    return ExampleNFT.resolveView(view)
-                case Type<MetadataViews.NFTCollectionDisplay>():
-                    let media = MetadataViews.Media(
-                        file: MetadataViews.HTTPFile(
-                            url: "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg"
-                        ),
-                        mediaType: "image/svg+xml"
-                    )
-                    return MetadataViews.NFTCollectionDisplay(
-                        name: "The Example Collection",
-                        description: "This collection is used as an example to help you develop your next Flow NFT.",
-                        externalURL: MetadataViews.ExternalURL("https://example-nft.onflow.org"),
-                        squareImage: media,
-                        bannerImage: media,
-                        socials: {
-                            "twitter": MetadataViews.ExternalURL("https://twitter.com/flow_blockchain")
-                        }
-                    )
-                case Type<MetadataViews.Traits>():
-                    // exclude mintedTime and foo to show other uses of Traits
-                    let excludedTraits = ["mintedTime", "foo"]
-                    let traitsView = MetadataViews.dictToTraits(dict: self.metadata, excludedNames: excludedTraits)
+                )
+            case Type<MetadataViews.Editions>():
+                // There is no max number of NFTs that can be minted from this contract
+                // so the max edition field value is set to nil
+                let editionInfo = MetadataViews.Edition(name: "Example NFT Edition", number: self.id, max: nil)
+                let editionList: [MetadataViews.Edition] = [editionInfo]
+                return MetadataViews.Editions(
+                    editionList
+                )
+            case Type<MetadataViews.Serial>():
+                return MetadataViews.Serial(
+                    self.id
+                )
+            case Type<MetadataViews.Royalties>():
+                return MetadataViews.Royalties(
+                    self.royalties
+                )
+            case Type<MetadataViews.ExternalURL>():
+                return MetadataViews.ExternalURL("https://example-nft.onflow.org/".concat(self.id.toString()))
+            case Type<MetadataViews.NFTCollectionData>():
+                return ExampleNFT.resolveView(view)
+            case Type<MetadataViews.NFTCollectionDisplay>():
+                let media = MetadataViews.Media(
+                    file: MetadataViews.HTTPFile(
+                        url: "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg"
+                    ),
+                    mediaType: "image/svg+xml"
+                )
+                return MetadataViews.NFTCollectionDisplay(
+                    name: "The Example Collection",
+                    description: "This collection is used as an example to help you develop your next Flow NFT.",
+                    externalURL: MetadataViews.ExternalURL("https://example-nft.onflow.org"),
+                    squareImage: media,
+                    bannerImage: media,
+                    socials: {
+                        "twitter": MetadataViews.ExternalURL("https://twitter.com/flow_blockchain")
+                    }
+                )
+            case Type<MetadataViews.Traits>():
+                // exclude mintedTime and foo to show other uses of Traits
+                let excludedTraits = ["mintedTime", "foo"]
+                let traitsView = MetadataViews.dictToTraits(dict: self.metadata, excludedNames: excludedTraits)
 
-                    // mintedTime is a unix timestamp, we should mark it with a displayType so platforms know how to show it.
-                    let mintedTimeTrait = MetadataViews.Trait(name: "mintedTime", value: self.metadata["mintedTime"]!, displayType: "Date", rarity: nil)
-                    traitsView.addTrait(mintedTimeTrait)
+                // mintedTime is a unix timestamp, we should mark it with a displayType so platforms know how to show it.
+                let mintedTimeTrait = MetadataViews.Trait(name: "mintedTime", value: self.metadata["mintedTime"]!, displayType: "Date", rarity: nil)
+                traitsView.addTrait(mintedTimeTrait)
 
-                    // foo is a trait with its own rarity
-                    let fooTraitRarity = MetadataViews.Rarity(score: 10.0, max: 100.0, description: "Common")
-                    let fooTrait = MetadataViews.Trait(name: "foo", value: self.metadata["foo"], displayType: nil, rarity: fooTraitRarity)
-                    traitsView.addTrait(fooTrait)
+                // foo is a trait with its own rarity
+                let fooTraitRarity = MetadataViews.Rarity(score: 10.0, max: 100.0, description: "Common")
+                let fooTrait = MetadataViews.Trait(name: "foo", value: self.metadata["foo"], displayType: nil, rarity: fooTraitRarity)
+                traitsView.addTrait(fooTrait)
 
-                    return traitsView
+                return traitsView
 
             }
             return nil
@@ -164,7 +164,7 @@ access(all) contract ExampleNFT: NonFungibleToken, ViewResolver {
         access(all) view fun borrowExampleNFT(id: UInt64): &ExampleNFT.NFT? {
             post {
                 (result == nil) || (result?.id == id):
-                    "Cannot borrow ExampleNFT reference: the ID of the returned reference is incorrect"
+                "Cannot borrow ExampleNFT reference: the ID of the returned reference is incorrect"
             }
         }
     }
@@ -238,21 +238,6 @@ access(all) contract ExampleNFT: NonFungibleToken, ViewResolver {
             return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
         }
 
-        /// Gets a reference to an NFT in the collection so that
-        /// the caller can read its metadata and call its methods
-        ///
-        /// @param id: The ID of the wanted NFT
-        /// @return A reference to the wanted NFT resource
-        ///
-        access(all) view fun borrowExampleNFT(id: UInt64): &ExampleNFT.NFT? {
-            if self.ownedNFTs[id] != nil {
-                // Create an authorized reference to allow downcasting
-                let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
-                return ref as! &ExampleNFT.NFT
-            }
-
-            return nil
-        }
 
         /// Gets a reference to the NFT only conforming to the `{ViewResolver.Resolver}`
         /// interface so that the caller can retrieve the views that the NFT
@@ -261,10 +246,11 @@ access(all) contract ExampleNFT: NonFungibleToken, ViewResolver {
         /// @param id: The ID of the wanted NFT
         /// @return The resource reference conforming to the Resolver interface
         ///
-        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
-            let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
-            let exampleNFT = nft as! &ExampleNFT.NFT
-            return exampleNFT as &{ViewResolver.Resolver}
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}? {
+            if let nft = &self.ownedNFTs[id] as &ExampleNFT.NFT? {
+                return nft as &{ViewResolver.Resolver}
+            }
+            return nil
         }
 
         destroy() {
@@ -334,35 +320,35 @@ access(all) contract ExampleNFT: NonFungibleToken, ViewResolver {
     ///
     access(all) fun resolveView(_ view: Type): AnyStruct? {
         switch view {
-            case Type<MetadataViews.NFTCollectionData>():
-                return MetadataViews.NFTCollectionData(
-                    storagePath: ExampleNFT.CollectionStoragePath,
-                    publicPath: ExampleNFT.CollectionPublicPath,
-                    providerPath: /private/exampleNFTCollection,
-                    publicCollection: Type<&ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic}>(),
-                    publicLinkedType: Type<&ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic,NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-                    providerLinkedType: Type<&ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic,NonFungibleToken.Collection,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
-                    createEmptyCollectionFunction: (fun(): @NonFungibleToken.Collection {
-                        return <-ExampleNFT.createEmptyCollection()
-                    })
-                )
-            case Type<MetadataViews.NFTCollectionDisplay>():
-                let media = MetadataViews.Media(
-                    file: MetadataViews.HTTPFile(
-                        url: "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg"
-                    ),
-                    mediaType: "image/svg+xml"
-                )
-                return MetadataViews.NFTCollectionDisplay(
-                    name: "The Example Collection",
-                    description: "This collection is used as an example to help you develop your next Flow NFT.",
-                    externalURL: MetadataViews.ExternalURL("https://example-nft.onflow.org"),
-                    squareImage: media,
-                    bannerImage: media,
-                    socials: {
-                        "twitter": MetadataViews.ExternalURL("https://twitter.com/flow_blockchain")
-                    }
-                )
+        case Type<MetadataViews.NFTCollectionData>():
+            return MetadataViews.NFTCollectionData(
+                storagePath: ExampleNFT.CollectionStoragePath,
+                publicPath: ExampleNFT.CollectionPublicPath,
+                providerPath: /private/exampleNFTCollection,
+                publicCollection: Type<&ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic}>(),
+                publicLinkedType: Type<&ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic,NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
+                providerLinkedType: Type<&ExampleNFT.Collection{ExampleNFT.ExampleNFTCollectionPublic,NonFungibleToken.Collection,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
+                createEmptyCollectionFunction: (fun(): @NonFungibleToken.Collection {
+                    return <-ExampleNFT.createEmptyCollection()
+                })
+            )
+        case Type<MetadataViews.NFTCollectionDisplay>():
+            let media = MetadataViews.Media(
+                file: MetadataViews.HTTPFile(
+                    url: "https://assets.website-files.com/5f6294c0c7a8cdd643b1c820/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.svg"
+                ),
+                mediaType: "image/svg+xml"
+            )
+            return MetadataViews.NFTCollectionDisplay(
+                name: "The Example Collection",
+                description: "This collection is used as an example to help you develop your next Flow NFT.",
+                externalURL: MetadataViews.ExternalURL("https://example-nft.onflow.org"),
+                squareImage: media,
+                bannerImage: media,
+                socials: {
+                    "twitter": MetadataViews.ExternalURL("https://twitter.com/flow_blockchain")
+                }
+            )
         }
         return nil
     }
@@ -374,8 +360,8 @@ access(all) contract ExampleNFT: NonFungibleToken, ViewResolver {
     ///
     access(all) view fun getViews(): [Type] {
         return [
-            Type<MetadataViews.NFTCollectionData>(),
-            Type<MetadataViews.NFTCollectionDisplay>()
+        Type<MetadataViews.NFTCollectionData>(),
+        Type<MetadataViews.NFTCollectionDisplay>()
         ]
     }
 

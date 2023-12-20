@@ -548,7 +548,7 @@ access(all) contract FindPack {
                     providerPath: FindPack.CollectionPrivatePath,
                     publicCollection: Type<&FindPack.Collection>(),
                     publicLinkedType: Type<&FindPack.Collection>(),
-                    providerLinkedType: Type<&FindPack.Collection>(),
+                    providerLinkedType: Type<auth (NonFungibleToken.Withdrawable) &FindPack.Collection>(),
                     createEmptyCollectionFunction: fun () : @{NonFungibleToken.Collection} {
                         return <- FindPack.createEmptyCollection()
                     }
@@ -825,44 +825,6 @@ access(all) contract FindPack {
         }
 
 
-        //TODO: this will be removed
-        /// withdrawWithUUID removes an NFT from the collection, using its UUID, and moves it to the caller
-        access(NonFungibleToken.Withdrawable) fun withdrawWithUUID(_ uuid: UInt64): @{NonFungibleToken.NFT} {
-            let token <- self.ownedNFTs.remove(key: uuid) ?? panic("Could not withdraw nft")
-
-            let nft <- token as! @NFT
-
-            emit Withdraw(id: nft.id, from: self.owner?.address)
-
-            return <-nft
-
-        }
-
-        /// withdrawWithType removes an NFT from the collection, using its Type and ID and moves it to the caller
-        /// This would be used by a collection that can store multiple NFT types
-        access(NonFungibleToken.Withdrawable) fun withdrawWithType(type: Type, withdrawID: UInt64): @{NonFungibleToken.NFT} {
-            let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("Could not withdraw nft")
-
-            let nft <- token as! @NFT
-
-            emit Withdraw(id: nft.id, from: self.owner?.address)
-
-            return <-nft
-
-        }
-
-        /// withdrawWithTypeAndUUID removes an NFT from the collection using its type and uuid and moves it to the caller
-        /// This would be used by a collection that can store multiple NFT types
-        access(NonFungibleToken.Withdrawable) fun withdrawWithTypeAndUUID(type: Type, uuid: UInt64): @{NonFungibleToken.NFT} {
-            let token <- self.ownedNFTs.remove(key: uuid) ?? panic("Could not withdraw nft")
-
-            let nft <- token as! @NFT
-
-            emit Withdraw(id: nft.id, from: self.owner?.address)
-
-            return <-nft
-        }
-
 
 
         access(all) view fun getIDsWithTypes(): {Type: [UInt64]} {
@@ -941,10 +903,12 @@ access(all) contract FindPack {
             }
         }
 
-        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
-            let nft =  (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
-            let exampleNFT = nft as! &NFT
-            return exampleNFT
+
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}? {
+            if let nft = &self.ownedNFTs[id] as &{NonFungibleToken.NFT}? {
+                return nft as &{ViewResolver.Resolver}
+            }
+            return nil
         }
 
 

@@ -9,7 +9,7 @@ import "FindPack"
 import "Profile"
 //import "FindMarket"
 //import "FindMarketDirectOfferEscrow"
-//import "Dandy"
+import "Dandy"
 //import "FindThoughts"
 
 transaction(name: String) {
@@ -62,13 +62,13 @@ transaction(name: String) {
             account.capabilities.publish(cap, at: FIND.BidPublicPath)
         }
 
-        /*
         let dandyCap= account.capabilities.get<&{NonFungibleToken.Collection}>(Dandy.CollectionPublicPath)
-        if !dandyCap.check() {
-            account.storage.save<@NonFungibleToken.Collection>(<- Dandy.createEmptyCollection(), to: Dandy.CollectionStoragePath)
+        if dandyCap == nil {
+            account.storage.save(<- Dandy.createEmptyCollection(), to: Dandy.CollectionStoragePath)
             let cap = account.capabilities.storage.issue<&Dandy.Collection>(Dandy.CollectionStoragePath)
             account.capabilities.publish(cap, at: Dandy.CollectionPublicPath)
         }
+        /*
 
         let thoughtsCap= account.capabilities.get<&{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
         if !thoughtsCap.check() {
