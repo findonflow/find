@@ -139,24 +139,28 @@ func SetupFIND(o *OverflowState) error {
 	tokens := []string{
 		"Flow",
 		"FUSD",
-		//"USDC",
+		"USDC",
 	}
 
 	for _, alias := range tokens {
 		registerFtInFTRegistry(stx, strings.ToLower(alias))
 	}
 
-	// we register example NFT in the catalog
-	exampleNFTIdentifier, _ := o.QualifiedIdentifier("ExampleNFT", "NFT")
-	stx("devaddNFTCatalog",
-		WithSigner("account"),
-		WithArg("collectionIdentifier", exampleNFTIdentifier),
-		WithArg("contractName", exampleNFTIdentifier),
-		WithArg("contractAddress", "find"),
-		WithArg("addressWithNFT", "find"),
-		WithArg("nftID", 0),
-		WithArg("publicPathIdentifier", "exampleNFTCollection"),
-	)
+	/*
+		  //TODO: need to mint an NFT here
+			stx("mintExampleNFT")
+			// we register example NFT in the catalog
+			exampleNFTIdentifier, _ := o.QualifiedIdentifier("ExampleNFT", "NFT")
+			stx("devaddNFTCatalog",
+				WithSigner("account"),
+				WithArg("collectionIdentifier", exampleNFTIdentifier),
+				WithArg("contractName", exampleNFTIdentifier),
+				WithArg("contractAddress", "find"),
+				WithArg("addressWithNFT", "find"),
+				WithArg("nftID", 0),
+				WithArg("publicPathIdentifier", "exampleNFTCollection"),
+			)
+	*/
 
 	// we mint dandy for testing
 	result := stx("mintDandy",
@@ -251,7 +255,7 @@ func createUser(stx OverflowTransactionFunction, fusd float64, name string) {
 
 	for _, mintName := range []string{
 		"devMintFusd",
-		//		"devMintUsdc",
+		"devMintUsdc",
 	} {
 		stx(mintName, WithSigner("account"),
 			WithArg("recipient", name),

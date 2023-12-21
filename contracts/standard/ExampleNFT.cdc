@@ -138,7 +138,7 @@ access(all) contract ExampleNFT: ViewResolver {
 
         init () {
             self.ownedNFTs <- {}
-            let identifier = "cadenceExampleNFTCollection"
+            let identifier = "exampleNFTCollection"
             self.storagePath = StoragePath(identifier: identifier)!
             self.publicPath = PublicPath(identifier: identifier)!
         }
@@ -329,7 +329,7 @@ access(all) contract ExampleNFT: ViewResolver {
     init() {
 
         // Set the named paths
-        self.MinterStoragePath = /storage/cadenceExampleNFTMinter
+        self.MinterStoragePath = /storage/exampleNFTMinter
 
         // Create a Collection resource and save it to storage
         let collection <- create Collection()
