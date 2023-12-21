@@ -2,7 +2,7 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
-//import FiatToken from "../contracts/standard/FiatToken.cdc"
+import FiatToken from "../contracts/standard/FiatToken.cdc"
 import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
 import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
@@ -35,17 +35,16 @@ transaction(dapperAddress: Address) {
         }
 
 
-
-        /*
-        //USDC
-        let usdcCap = acct.getCapability<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
-        if !usdcCap.check() {
-            acct.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
-            acct.link<&{FungibleToken.Receiver}>( FiatToken.VaultReceiverPubPath, target: FiatToken.VaultStoragePath)
-            acct.link<&{FiatToken.ResourceId}>( FiatToken.VaultUUIDPubPath, target: FiatToken.VaultStoragePath)
-            acct.link<&{FungibleToken.Vault}>( FiatToken.VaultBalancePubPath, target:FiatToken.VaultStoragePath)
+        var usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
+        if usdcCap == nil {
+            account.storage.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
+            let cap = account.capabilities.storage.issue<&FiatToken.Vault>(FiatToken.VaultStoragePath)
+            account.capabilities.publish(cap, at: FiatToken.VaultUUIDPubPath)
+            account.capabilities.publish(cap, at: FiatToken.VaultReceiverPubPath)
+            account.capabilities.publish(cap, at: FiatToken.VaultBalancePubPath)
+            usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
         }
-        */
+
 
 
         //Dapper utility token
@@ -88,11 +87,9 @@ transaction(dapperAddress: Address) {
         if !types.contains(Type<@FlowUtilityToken.Vault>()) {
             switchboard.addNewVaultWrapper(capability: dapperFUTReceiver, type: Type<@FlowUtilityToken.Vault>())
         }
-        /*
-        if !types.contains(usdcCap.borrow()!.getType()) {
-            switchboard.addNewVault(capability: usdcCap)
+        if !types.contains(usdcCap!.borrow()!.getType()) {
+            switchboard.addNewVault(capability: usdcCap!)
         }
-        */
         if !types.contains(fusdReceiver!.borrow()!.getType()) {
             switchboard.addNewVault(capability: fusdReceiver!)
         }

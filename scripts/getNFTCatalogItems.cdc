@@ -1,4 +1,5 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import ViewResolver from "../contracts/standard/ViewResolver.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 
@@ -35,7 +36,7 @@ access(all) struct NFTView {
 
 access(all) fun getNFTs(ownerAddress: Address, ids: {String : [UInt64]}) : [NFTView] {
 
-    let account = getAuthAccount(ownerAddress)
+    let account = getAuthAccount<auth(BorrowValue) &Account>(ownerAddress)
 
     if account.balance == 0.0 {
         return []
@@ -121,7 +122,7 @@ access(all) struct MetadataCollectionItem {
 
 // Helper function
 
-access(all) fun resolveAddress(user: String) : PublicAccount? {
+access(all) fun resolveAddress(user: String) : &Account? {
     let address = FIND.resolve(user)
     if address == nil {
         return nil

@@ -33,7 +33,6 @@ transaction() {
         }
         ftCaps.append(fusdReceiver!)
 
-        /*
         let usdcCap = account.getCapability<&FiatToken.Vault{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
         if !usdcCap.check() {
             account.storage.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
@@ -42,7 +41,6 @@ transaction() {
             account.link<&FiatToken.Vault{FungibleToken.Balance}>( FiatToken.VaultBalancePubPath, target:FiatToken.VaultStoragePath)
         }
         ftCaps.append(usdcCap)
-        */
 
         // setup switch board
         var checkSB = account.storage.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)

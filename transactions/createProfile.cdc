@@ -1,15 +1,15 @@
-import "FungibleToken"
-import "NonFungibleToken"
-import "FUSD"
-//import "FiatToken"
-import "FlowToken"
-import "MetadataViews"
-import "FIND"
-import "FindPack"
-import "Profile"
-//import "FindMarket"
+import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import FUSD from "../contracts/standard/FUSD.cdc"
+import FiatToken from "../contracts/standard/FiatToken.cdc"
+import FlowToken from "../contracts/standard/FlowToken.cdc"
+import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import FIND from "../contracts/FIND.cdc"
+import FindPack from "../contracts/FindPack.cdc"
+import Profile from "../contracts/Profile.cdc"
+import FindMarket from "../contracts/FindMarket.cdc"
 //import "FindMarketDirectOfferEscrow"
-import "Dandy"
+import Dandy from "../contracts/Dandy.cdc"
 //import "FindThoughts"
 
 transaction(name: String) {
@@ -26,7 +26,6 @@ transaction(name: String) {
         let fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
         if fusdReceiver == nil {
             let fusd <- FUSD.createEmptyVault()
-
             account.storage.save(<- fusd, to: /storage/fusdVault)
             var cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/fusdVault)
             account.capabilities.publish(cap, at: /public/fusdReceiver)
@@ -34,17 +33,14 @@ transaction(name: String) {
             account.capabilities.publish(capb, at: /public/fusdBalance)
         }
 
-        /*
         let usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
-        if !usdcCap.check() {
+        if usdcCap == nil {
             account.storage.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
-
             let cap = account.capabilities.storage.issue<&FiatToken.Vault>(FiatToken.VaultStoragePath)
             account.capabilities.publish(cap, at: FiatToken.VaultUUIDPubPath)
             account.capabilities.publish(cap, at: FiatToken.VaultReceiverPubPath)
             account.capabilities.publish(cap, at: FiatToken.VaultBalancePubPath)
         }
-        */
 
         let leaseCollection = account.capabilities.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)
         if leaseCollection == nil {
@@ -57,7 +53,7 @@ transaction(name: String) {
         if bidCollection == nil {
             let fr = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver) ?? panic("could not find balance") 
             let lc = account.capabilities.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)
-            account.storage.save(<- FIND.createEmptyBidCollection(receiver: fr!, leases: lc!), to: FIND.BidStoragePath)
+            account.storage.save(<- FIND.createEmptyBidCollection(receiver: fr, leases: lc!), to: FIND.BidStoragePath)
             let cap = account.capabilities.storage.issue<&FIND.BidCollection>(FIND.BidStoragePath)
             account.capabilities.publish(cap, at: FIND.BidPublicPath)
         }

@@ -1,5 +1,6 @@
-import "FungibleToken"
-import "FUSD"
+import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import FUSD from "../contracts/standard/FUSD.cdc"
+
 
 transaction(recipient: Address, amount: UFix64) {
     let tokenAdmin: &FUSD.Minter

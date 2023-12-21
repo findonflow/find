@@ -8,58 +8,68 @@ import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 
 transaction(dapperAddress: Address) {
-    prepare(acct: auth(BorrowValue) &Account) {
+    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
 
         let dapper = getAccount(dapperAddress)
 
-        //FUSD
-        let fusdReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-        if !fusdReceiver.check() {
+
+        var fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
+        if fusdReceiver == nil {
             let fusd <- FUSD.createEmptyVault()
-            acct.save(<- fusd, to: /storage/fusdVault)
-            acct.link<&{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
-            acct.link<&{FungibleToken.Vault}>( /public/fusdBalance, target: /storage/fusdVault)
+            account.storage.save(<- fusd, to: /storage/fusdVault)
+            var cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/fusdVault)
+            account.capabilities.publish(cap, at: /public/fusdReceiver)
+            let capb = account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/fusdVault)
+            account.capabilities.publish(capb, at: /public/fusdBalance)
+            fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
         }
 
-        //USDC
-        let usdcCap = acct.getCapability<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
-        if !usdcCap.check() {
-            acct.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
-            acct.link<&{FungibleToken.Receiver}>( FiatToken.VaultReceiverPubPath, target: FiatToken.VaultStoragePath)
-            acct.link<&{FiatToken.ResourceId}>( FiatToken.VaultUUIDPubPath, target: FiatToken.VaultStoragePath)
-            acct.link<&{FungibleToken.Vault}>( FiatToken.VaultBalancePubPath, target:FiatToken.VaultStoragePath)
+        var usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
+        if usdcCap == nil {
+            account.storage.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
+            let cap = account.capabilities.storage.issue<&FiatToken.Vault>(FiatToken.VaultStoragePath)
+            account.capabilities.publish(cap, at: FiatToken.VaultUUIDPubPath)
+            account.capabilities.publish(cap, at: FiatToken.VaultReceiverPubPath)
+            account.capabilities.publish(cap, at: FiatToken.VaultBalancePubPath)
+            usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
         }
 
 
         //Dapper utility token
-        let dapperDUCReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-        let DUCReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-        if !DUCReceiver.check(){
+        let dapperDUCReceiver = dapper.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)!
+        let DUCReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+        if DUCReceiver == nil{
             let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapperDUCReceiver)
-            acct.save(<-ducForwarder, to: /storage/dapperUtilityCoinReceiver)
-            acct.link<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver, target: /storage/dapperUtilityCoinReceiver)
+            account.storage.save(<-ducForwarder, to: /storage/dapperUtilityCoinReceiver)
+            let cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/dapperUtilityCoinReceiver)
+            account.capabilities.publish(cap, at: /public/dapperUtilityCoinReceiver)
         }
+
 
         //FlowUtility token
-        let dapperFUTReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-        let FUTReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-        if !FUTReceiver.check(){
+        let dapperFUTReceiver = dapper.capabilities.get<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)!
+        let FUTReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+        if FUTReceiver ==nil{
             let futForwarder <- TokenForwarding.createNewForwarder(recipient: dapperFUTReceiver)
-            acct.save(<-futForwarder, to: /storage/flowUtilityTokenReceiver)
-            acct.link<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver, target: /storage/flowUtilityTokenReceiver)
+            account.storage.save(<-futForwarder, to: /storage/flowUtilityTokenVault)
+            let cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/flowUtilityTokenVault)
+            account.capabilities.publish(cap, at: /public/flowUtilityTokenReceiver)
         }
 
-        let switchboardRef = acct.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)
-        if switchboardRef == nil{
+
+        let switchboardRef = account.storage.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)
+        if switchboardRef == nil {
             let sb <- FungibleTokenSwitchboard.createSwitchboard()
-            acct.save(<- sb, to: FungibleTokenSwitchboard.StoragePath)
-            acct.link<&{FungibleToken.Receiver}>( FungibleTokenSwitchboard.ReceiverPublicPath, target: FungibleTokenSwitchboard.StoragePath)
-            acct.link<&{FungibleTokenSwitchboard.SwitchboardPublic, FungibleToken.Receiver}>(
-                FungibleTokenSwitchboard.PublicPath,
-                target: FungibleTokenSwitchboard.StoragePath
-            )
+            account.storage.save(<- sb, to: FungibleTokenSwitchboard.StoragePath)
+
+            let cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.StoragePath)
+            account.capabilities.publish(cap, at: FungibleTokenSwitchboard.ReceiverPublicPath)
+
+            let capb = account.capabilities.storage.issue<&{FungibleTokenSwitchboard.SwitchboardPublic,FungibleToken.Receiver}>(FungibleTokenSwitchboard.StoragePath)
+            account.capabilities.publish(capb, at: FungibleTokenSwitchboard.PublicPath)
         }
-        let switchboard = acct.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)!
+
+        let switchboard = account.storage.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)!
         let types = switchboard.getVaultTypes()
         if !types.contains(Type<@DapperUtilityCoin.Vault>()) {
             switchboard.addNewVaultWrapper(capability: dapperDUCReceiver, type: Type<@DapperUtilityCoin.Vault>())
@@ -67,13 +77,13 @@ transaction(dapperAddress: Address) {
         if !types.contains(Type<@FlowUtilityToken.Vault>()) {
             switchboard.addNewVaultWrapper(capability: dapperFUTReceiver, type: Type<@FlowUtilityToken.Vault>())
         }
-        if !types.contains(usdcCap.borrow()!.getType()) {
-            switchboard.addNewVault(capability: usdcCap)
+        if !types.contains(usdcCap!.borrow()!.getType()) {
+            switchboard.addNewVault(capability: usdcCap!)
         }
-        if !types.contains(fusdReceiver.borrow()!.getType()) {
-            switchboard.addNewVault(capability: fusdReceiver)
+        if !types.contains(fusdReceiver!.borrow()!.getType()) {
+            switchboard.addNewVault(capability: fusdReceiver!)
         }
-        let flowTokenCap = acct.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+        let flowTokenCap = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
         if !types.contains(flowTokenCap.borrow()!.getType()) {
             switchboard.addNewVault(capability: flowTokenCap)
         }
