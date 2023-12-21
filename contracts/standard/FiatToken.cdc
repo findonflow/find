@@ -4,7 +4,7 @@ import FungibleToken from "./FungibleToken.cdc"
 // THis is a local mocked version of USDC FiatToken that is basically a clone of FUSD just to make it easier to test with
 //the paths are copied from the testnet version 
 
-access(all) contract FiatToken: FungibleToken {
+access(all) contract FiatToken {
 
     // Event that is emitted when the contract is created
     access(all) event TokensInitialized(initialSupply: UFix64)
@@ -54,10 +54,10 @@ access(all) contract FiatToken: FungibleToken {
     //
 
     access(all) resource interface ResourceId {
-        access(all) UUID(): UInt64
+        access(all) fun UUID(): UInt64
     }
 
-    access(all) resource Vault: ResourceId, FungibleToken.Provider, FungibleToken.Receiver, FungibleToken.Balance {
+    access(all) resource Vault: FungibleToken.Vault, ResourceId, FungibleToken.Provider, FungibleToken.Receiver{
 
         // holds the balance of a users tokens
         access(all) var balance: UFix64
@@ -67,7 +67,22 @@ access(all) contract FiatToken: FungibleToken {
             self.balance = balance
         }
 
-        access(all) UUID(): UInt64 {
+        access(all) view fun getBalance(): UFix64 {
+            return self.balance
+        }
+
+
+        /// Returns the storage path where the vault should typically be stored
+        access(all) view fun getDefaultStoragePath(): StoragePath? {
+            return FiatToken.VaultStoragePath
+        }
+
+        /// Returns the public path where this vault should have a public capability
+        access(all) view fun getDefaultPublicPath(): PublicPath? {
+            return FiatToken.VaultReceiverPubPath
+        }
+
+        access(all) fun UUID(): UInt64 {
             return self.uuid
         }
         // withdraw
@@ -79,11 +94,12 @@ access(all) contract FiatToken: FungibleToken {
         // created Vault to the context that called so it can be deposited
         // elsewhere.
         //
-        access(all) withdraw(amount: UFix64): @FungibleToken.Vault {
+        access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
             self.balance = self.balance - amount
             emit TokensWithdrawn(amount: amount, from: self.owner?.address)
             return <-create Vault(balance: amount)
         }
+
 
         // deposit
         //
@@ -92,7 +108,7 @@ access(all) contract FiatToken: FungibleToken {
         // It is allowed to destroy the sent Vault because the Vault
         // was a temporary holder of the tokens. The Vault's balance has
         // been consumed and therefore can be destroyed.
-        access(all) deposit(from: @FungibleToken.Vault) {
+        access(all) fun deposit(from: @{FungibleToken.Vault}) {
             let vault <- from as! @FiatToken.Vault
             self.balance = self.balance + vault.balance
             emit TokensDeposited(amount: vault.balance, to: self.owner?.address)
@@ -100,9 +116,10 @@ access(all) contract FiatToken: FungibleToken {
             destroy vault
         }
 
-        destroy() {
-            FiatToken.totalSupply = FiatToken.totalSupply - self.balance
+        access(all) fun createEmptyVault(): @{FungibleToken.Vault} {
+            return <-create Vault(balance: 0.0)
         }
+
     }
 
     // createEmptyVault
@@ -112,7 +129,7 @@ access(all) contract FiatToken: FungibleToken {
     // and store the returned Vault in their storage in order to allow their
     // account to be able to receive deposits of this token type.
     //
-    access(all) createEmptyVault(): @FiatToken.Vault {
+    access(all) fun createEmptyVault(): @FiatToken.Vault {
         return <-create Vault(balance: 0.0)
     }
 
@@ -128,7 +145,7 @@ access(all) contract FiatToken: FungibleToken {
         // Function that mints new tokens, adds them to the total supply,
         // and returns them to the calling context.
         //
-        access(all) mintTokens(amount: UFix64): @Vault {
+        access(all) fun mintTokens(amount: UFix64): @Vault {
             pre {
                 amount > 0.0: "Amount minted must be greater than zero"
             }
@@ -140,7 +157,7 @@ access(all) contract FiatToken: FungibleToken {
     }
 
     access(all) resource interface MinterProxyPublic {
-        access(all) setMinterCapability(cap: Capability<&Minter>)
+        access(all) fun setMinterCapability(cap: Capability<&Minter>)
     }
 
     // MinterProxy
@@ -178,7 +195,7 @@ access(all) contract FiatToken: FungibleToken {
     // Anyone can call this, but the MinterProxy cannot mint without a Minter capability,
     // and only the admin can provide that.
     //
-    access(all) createMinterProxy(): @MinterProxy {
+    access(all) fun createMinterProxy(): @MinterProxy {
         return <- create MinterProxy()
     }
 

@@ -43,6 +43,13 @@
         "mainnet": "0x3c5959b568896393"
       }
     },
+    "FiatToken": {
+      "source": "./contracts/standard/FiatToken.cdc",
+      "aliases": {
+        "testnet": "0xa983fecbed621163",
+        "mainnet": "0xb19436aae4d94622"
+      }
+    },
     "DapperStorageRent": {
       "source": "./contracts/standard/DapperStorageRent.cdc",
       "aliases": {
@@ -231,6 +238,7 @@
         "FungibleTokenSwitchboard",
         "FungibleTokenMetadataViews",
         "FUSD",
+        "FiatToken",
         "TokenForwarding",
         "FLOAT",
         "GrantedAccountAccess",
