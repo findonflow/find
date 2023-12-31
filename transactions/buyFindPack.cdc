@@ -9,19 +9,19 @@ import Profile from "../contracts/Profile.cdc"
 transaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, totalAmount: UFix64) {
     let packs: &FindPack.Collection
 
-    let userPacks: Capability<&{NonFungibleToken.Receiver}>
+    let userPacks: Capability<&FindPack.Collection>
     let salePrice: UFix64
     let packsLeft: UInt64
 
-    let userFlowTokenVault: &FlowToken.Vault
+    let userFlowTokenVault: auth(FungibleToken.Withdrawable) &FlowToken.Vault
 
-    let paymentVault: @FungibleToken.Vault
+    let paymentVault: @{FungibleToken.Vault}
     let balanceBeforeTransfer:UFix64
 
-    prepare(account: auth(BorrowValue) &Account) {
+    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, FungibleToken.Withdrawable) &Account) {
 
 
-        let col = account.storage.borrow<&FindPack.Collection>(from: FindPack.CollectionPublicPath)
+        let col = account.storage.borrow<&FindPack.Collection>(from: FindPack.CollectionStoragePath)
         if col == nil {
             account.storage.save( <- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)
             let cap = account.capabilities.storage.issue<&FindPack.Collection>(FindPack.CollectionStoragePath)
@@ -29,52 +29,54 @@ transaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, total
         }
 
 
-        let profileCap = account.getCapability<&{Profile.Public}>(Profile.publicPath)
+        let profileCap = account.capabilities.get<&{Profile.Public}>(Profile.publicPath)!
         if !profileCap.check() {
             let profile <-Profile.createUser(name:account.address.toString(), createdAt: "find")
 
-            //Add exising FUSD or create a new one and add it
-            let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-            if !fusdReceiver.check() {
+            let fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
+            if fusdReceiver == nil {
                 let fusd <- FUSD.createEmptyVault()
                 account.storage.save(<- fusd, to: /storage/fusdVault)
-                account.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
-                account.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
+                var cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/fusdVault)
+                account.capabilities.publish(cap, at: /public/fusdReceiver)
+                let capb = account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/fusdVault)
+                account.capabilities.publish(capb, at: /public/fusdBalance)
             }
+
 
             let fusdWallet=Profile.Wallet(
                 name:"FUSD", 
-                receiver:account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver),
-                balance:account.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance),
+                receiver:account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)!,
+                balance:account.capabilities.get<&{FungibleToken.Vault}>(/public/fusdBalance)!,
                 accept: Type<@FUSD.Vault>(),
-                names: ["fusd", "stablecoin"]
+                tags: ["fusd", "stablecoin"]
             )
 
             profile.addWallet(fusdWallet)
 
             let flowWallet=Profile.Wallet(
                 name:"Flow", 
-                receiver:account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver),
-                balance:account.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance),
+                receiver:account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!,
+                balance:account.capabilities.get<&{FungibleToken.Vault}>(/public/flowTokenBalance)!,
                 accept: Type<@FlowToken.Vault>(),
-                names: ["flow"]
+                tags: ["flow"]
             )
             profile.addWallet(flowWallet)
             account.storage.save(<-profile, to: Profile.storagePath)
-            account.link<&Profile.User{Profile.Public}>(Profile.publicPath, target: Profile.storagePath)
-            account.link<&{FungibleToken.Receiver}>(Profile.publicReceiverPath, target: Profile.storagePath)
 
-
+            let cap = account.capabilities.storage.issue<&Profile.User>(Profile.storagePath)
+            account.capabilities.publish(cap, at: Profile.publicPath)
+            account.capabilities.publish(cap, at: Profile.publicReceiverPath)
         }
 
-        self.userPacks=account.getCapability<&FindPack.Collection{NonFungibleToken.Receiver}>(FindPack.CollectionPublicPath)
+        self.userPacks=account.capabilities.get<&FindPack.Collection>(FindPack.CollectionPublicPath)!
         self.packs=FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId:packTypeId)
 
         self.salePrice= FindPack.getCurrentPrice(packTypeName: packTypeName, packTypeId:packTypeId, user:account.address) ?? panic ("Cannot buy the pack now") 
         self.packsLeft= UInt64(self.packs.getPacksLeft())
 
 
-        self.userFlowTokenVault = account.storage.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Cannot borrow FlowToken vault from account storage")
+        self.userFlowTokenVault = account.storage.borrow<auth(FungibleToken.Withdrawable) &FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Cannot borrow FlowToken vault from account storage")
         self.balanceBeforeTransfer = self.userFlowTokenVault.balance
 
         if self.balanceBeforeTransfer < totalAmount {
@@ -96,7 +98,7 @@ transaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, total
             self.packs.buy(packTypeName: packTypeName, typeId:packTypeId, vault: <- purchasingVault, collectionCapability: self.userPacks)
             counter = counter - 1
         }
-        if self.paymentVault.balance != 0.0 {
+        if self.paymentVault.getBalance() != 0.0 {
             panic("paymentVault balance is non-zero after paying")
         }
         destroy self.paymentVault

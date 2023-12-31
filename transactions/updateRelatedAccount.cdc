@@ -2,27 +2,25 @@ import FindRelatedAccounts from "../contracts/FindRelatedAccounts.cdc"
 
 transaction(name: String, network: String, oldAddress:String, address: String) {
 
-	var relatedAccounts : &FindRelatedAccounts.Accounts?
+    var relatedAccounts : &FindRelatedAccounts.Accounts?
 
-	prepare(account: auth(BorrowValue) &Account) {
+    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, IssueStorageCapabilityController) &Account) {
 
-		self.relatedAccounts= account.storage.borrow<&FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
-		if self.relatedAccounts == nil {
-			let relatedAccounts <- FindRelatedAccounts.createEmptyAccounts()
-			account.storage.save(<- relatedAccounts, to: FindRelatedAccounts.storagePath)
-			account.link<&FindRelatedAccounts.Accounts{FindRelatedAccounts.Public}>(FindRelatedAccounts.publicPath, target: FindRelatedAccounts.storagePath)
-			self.relatedAccounts = account.storage.borrow<&FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
-		}
+        let relatedAccounts= account.storage.borrow<&FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
+        if relatedAccounts == nil {
+            let relatedAccounts <- FindRelatedAccounts.createEmptyAccounts()
+            account.storage.save(<- relatedAccounts, to: FindRelatedAccounts.storagePath)
+            var cap = account.capabilities.storage.issue<&FindRelatedAccounts.Accounts>(FindRelatedAccounts.storagePath)
+            account.capabilities.publish(cap, at: FindRelatedAccounts.publicPath)
+            self.relatedAccounts = account.storage.borrow<&FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
+        }else {
+            self.relatedAccounts=relatedAccounts
+        }
 
-		let cap = account.getCapability<&FindRelatedAccounts.Accounts{FindRelatedAccounts.Public}>(FindRelatedAccounts.publicPath)
-		if !cap.check() {
-			account.unlink(FindRelatedAccounts.publicPath)
-			account.link<&FindRelatedAccounts.Accounts{FindRelatedAccounts.Public}>(FindRelatedAccounts.publicPath, target: FindRelatedAccounts.storagePath)
-		}
-	}
+    }
 
-	execute {
-		self.relatedAccounts!.updateRelatedAccount(name:name, network:network, oldAddress: oldAddress, address: address)
-	}
+    execute {
+        self.relatedAccounts!.updateRelatedAccount(name:name, network:network, oldAddress: oldAddress, address: address)
+    }
 
 }

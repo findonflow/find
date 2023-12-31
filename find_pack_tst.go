@@ -2,8 +2,6 @@ package test_main
 
 import (
 	"testing"
-
-	. "github.com/bjartek/overflow"
 )
 
 func TestFindPack(t *testing.T) {
@@ -11,7 +9,7 @@ func TestFindPack(t *testing.T) {
 	packTypeId := uint64(1)
 	buyer := "user1"
 
-	ot.Run(t, "Should be able to buy pack", func(t *testing.T) {
+	ot.Run(t, "Should be able to buy pack", func(_ *testing.T) {
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
 	})
 
