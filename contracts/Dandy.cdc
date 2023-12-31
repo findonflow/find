@@ -102,7 +102,7 @@ access(all) contract Dandy :ViewResolver{
 
         access(all) view fun getViews() : [Type] {
 
-            return [
+            let views = [
             Type<FindViews.Nounce>(),
             Type<MetadataViews.NFTCollectionData>(),
             Type<MetadataViews.NFTCollectionDisplay>(),
@@ -111,16 +111,14 @@ access(all) contract Dandy :ViewResolver{
 
 
             //TODO: fix
-            /*
             //if any specific here they will override
             for s in self.schemas.keys {
                 if !views.contains(self.schemas[s]!.typ) {
-                    views.append(self.schemas[s]!.typ)
+                    views.concat([self.schemas[s]!.typ])
                 }
             }
-            */
 
-            //return views
+            return views
         }
 
         access(self) fun resolveRoyalties() : MetadataViews.Royalties {
