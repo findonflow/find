@@ -3171,3 +3171,15 @@ func OptionalString(input string) cadence.Optional {
 	}
 	return cadence.NewOptional(s)
 }
+
+type CollectionData struct {
+	Collection          string `json:"collection"`
+	Media               string `json:"media"`
+	MediaType           string `json:"mediaType"`
+	Name                string `json:"name"`
+	NftDetailIdentifier string `json:"nftDetailIdentifier"`
+	Source              string `json:"source"`
+	SubCollection       string `json:"subCollection"`
+	Edition             int    `json:"edition"`
+	SoulBounded         bool   `json:"soulBounded"`
+}

@@ -56,7 +56,6 @@ access(all) contract ExampleNFT: ViewResolver {
             return [
             Type<MetadataViews.Display>(),
             Type<MetadataViews.Royalties>(),
-            Type<MetadataViews.Editions>(),
             Type<MetadataViews.ExternalURL>(),
             Type<MetadataViews.NFTCollectionData>(),
             Type<MetadataViews.NFTCollectionDisplay>(),
@@ -74,14 +73,6 @@ access(all) contract ExampleNFT: ViewResolver {
                     thumbnail: MetadataViews.HTTPFile(
                         url: self.thumbnail
                     )
-                )
-            case Type<MetadataViews.Editions>():
-                // There is no max number of NFTs that can be minted from this contract
-                // so the max edition field value is set to nil
-                let editionInfo = MetadataViews.Edition(name: "Example NFT Edition", number: self.getID(), max: nil)
-                let editionList: [MetadataViews.Edition] = [editionInfo]
-                return MetadataViews.Editions(
-                    editionList
                 )
             case Type<MetadataViews.Serial>():
                 return MetadataViews.Serial(
