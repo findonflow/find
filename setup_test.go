@@ -17,6 +17,7 @@ var (
 	dandyIds   []uint64 // ids for test dandies minted
 	exampleIds []uint   // ids for test example nfts minted
 	packId     uint64   // the id for the test pack
+	packTypeId uint64
 )
 
 func TestMain(m *testing.M) {
@@ -203,7 +204,7 @@ func SetupFIND(o *OverflowState) error {
 	)
 
 	// set up packs
-	packTypeId := uint64(1)
+	packTypeId = uint64(1)
 	salt := "find"
 	singleType := []string{dandyIdentifier}
 	minter := "user1"

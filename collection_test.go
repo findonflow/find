@@ -13,7 +13,7 @@ import (
 func TestCollectionScripts(t *testing.T) {
 	otu := &OverflowTestUtils{T: t, O: ot.O}
 
-	t.Run("Should be able to get dandies by script", func(t *testing.T) {
+	ot.Run(t, "Should be able to get dandies by script", func(t *testing.T) {
 		var data []CollectionData
 		err := otu.O.Script("getNFTCatalogItems",
 			WithArg("user", "user1"),
@@ -24,7 +24,7 @@ func TestCollectionScripts(t *testing.T) {
 		autogold.Equal(t, data)
 	})
 
-	t.Run("Should be able to get soul bounded items by script", func(t *testing.T) {
+	ot.Run(t, "Should be able to get soul bounded items by script", func(t *testing.T) {
 		exampleNFTIden := exampleNFTType(otu)
 
 		ids, err := otu.O.Script("getNFTCatalogIDs",

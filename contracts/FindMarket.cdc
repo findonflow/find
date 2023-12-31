@@ -1457,13 +1457,12 @@ access(all) struct NFTInfo {
 
     init(_ item: &{ViewResolver.Resolver}, id: UInt64, detail: Bool){
 
-        self.tags = {}
+        self.tags = { "uuid" : item.uuid.toString()}
 
         self.collectionName=nil
         self.collectionDescription=nil
-        self.scalars = {
-            "uuid" : UFix64(item.uuid)
-        }
+        //uuid is not here anymore
+        self.scalars = { }
         self.rarity= nil
         self.editionNumber=nil
         self.totalInEdition=nil
