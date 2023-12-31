@@ -26,7 +26,7 @@ transaction(
         let collectionCap = nftAccount.capabilities.get<&{ViewResolver.ResolverCollection}>(pubPath) ?? panic("MetadataViews Collection is not set up properly, ensure the Capability was created/linked correctly.")
         let collectionRef = collectionCap.borrow()!
         assert(collectionRef.getIDs().length > 0, message: "No NFTs exist in this collection.")
-        let nftResolver = collectionRef.borrowViewResolver(id: nftID)!
+        let nftResolver = collectionRef.borrowViewResolver(id: nftID) ?? panic("could not find item with id")
 
         // return early if already in catalog
         if FINDNFTCatalog.getCollectionDataForType(nftTypeIdentifier: nftResolver.getType().identifier) != nil {

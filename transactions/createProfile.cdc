@@ -64,6 +64,7 @@ transaction(name: String) {
             let cap = account.capabilities.storage.issue<&Dandy.Collection>(Dandy.CollectionStoragePath)
             account.capabilities.publish(cap, at: Dandy.CollectionPublicPath)
         }
+
         /*
 
         let thoughtsCap= account.capabilities.get<&{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)

@@ -12,7 +12,12 @@ import (
 )
 
 // we set the shared overflow test struct that will reset to known setup state after each test
-var ot *OverflowTest
+var (
+	ot         *OverflowTest
+	dandyIds   []uint64 // ids for test dandies minted
+	exampleIds []uint   // ids for test example nfts minted
+	packId     uint64   // the id for the test pack
+)
 
 func TestMain(m *testing.M) {
 	var err error
@@ -146,21 +151,27 @@ func SetupFIND(o *OverflowState) error {
 		registerFtInFTRegistry(stx, strings.ToLower(alias))
 	}
 
-	/*
-		  //TODO: need to mint an NFT here
-			stx("mintExampleNFT")
-			// we register example NFT in the catalog
-			exampleNFTIdentifier, _ := o.QualifiedIdentifier("ExampleNFT", "NFT")
-			stx("devaddNFTCatalog",
-				WithSigner("account"),
-				WithArg("collectionIdentifier", exampleNFTIdentifier),
-				WithArg("contractName", exampleNFTIdentifier),
-				WithArg("contractAddress", "find"),
-				WithArg("addressWithNFT", "find"),
-				WithArg("nftID", 0),
-				WithArg("publicPathIdentifier", "exampleNFTCollection"),
-			)
-	*/
+	er := stx("mintExampleNFT",
+		findSigner,
+		WithArg("address", "find"),
+		WithArg("name", "Example1"),
+		WithArg("description", "An example NFT"),
+		WithArg("thumbnail", "http://foo.bar"),
+	)
+
+	exampleNFTS := er.GetIdsFromEvent("NonFungibleToken.Deposit", "id")
+
+	// we register example NFT in the catalog
+	exampleNFTIdentifier, _ := o.QualifiedIdentifier("ExampleNFT", "NFT")
+	stx("devaddNFTCatalog",
+		WithSigner("account"),
+		WithArg("collectionIdentifier", exampleNFTIdentifier),
+		WithArg("contractName", exampleNFTIdentifier),
+		WithArg("contractAddress", "find"),
+		WithArg("addressWithNFT", "find"),
+		WithArg("nftID", exampleNFTS[0]),
+		WithArg("publicPathIdentifier", "exampleNFTCollection"),
+	)
 
 	// we mint dandy for testing
 	result := stx("mintDandy",
@@ -177,7 +188,8 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("collectionSquareImage", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
 		WithArg("collectionBannerImage", "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1"),
 	)
-	dandyIds := result.GetIdsFromEvent("Dandy.Deposit", "id")
+
+	dandyIds = result.GetIdsFromEvent("Dandy.Deposit", "id")
 
 	dandyIdentifier, _ := o.QualifiedIdentifier("Dandy", "NFT")
 	stx("devaddNFTCatalog",
@@ -196,7 +208,7 @@ func SetupFIND(o *OverflowState) error {
 	singleType := []string{dandyIdentifier}
 	minter := "user1"
 
-	info := generatePackStruct(o, minter, packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find", "account")
+	info := generatePackStruct(o, minter, packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find")
 
 	stx("setupFindPackMinterPlatform",
 		WithSigner("user1"),
@@ -213,14 +225,13 @@ func SetupFIND(o *OverflowState) error {
 
 	packIdentTemplate, _ := o.QualifiedIdentifier("FindPack", "%s")
 
-	packId, _ := stx("adminMintFindPack",
+	packId, _ = stx("adminMintFindPack",
 		WithSigner("find-admin"),
 		WithArg("packTypeName", minter),
 		WithArg("typeId", packTypeId),
 		WithArg("hashes", []string{packHash}),
 	).GetIdFromEvent(fmt.Sprintf(packIdentTemplate, "Deposit"), "id")
 
-	fmt.Println(packId)
 	publicPathIdentifier := "FindPack_" + minter + "_" + fmt.Sprint(packTypeId)
 
 	stx("devaddNFTCatalog",

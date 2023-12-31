@@ -11,7 +11,6 @@ import (
 )
 
 func TestFindPack(t *testing.T) {
-
 	packTypeId := uint64(1)
 	salt := "find-admin"
 	buyer := "user1"
@@ -35,13 +34,11 @@ func TestFindPack(t *testing.T) {
 	})
 
 	t.Run("Should be able to register pack data", func(t *testing.T) {
-
 		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
 		packTypeId++
 	})
 
 	t.Run("Should be able to register pack as a User with struct", func(t *testing.T) {
-
 		otu.O.Tx("registerFindPackMetadata",
 			WithSigner("user1"),
 			WithArg("forge", buyer),
@@ -81,11 +78,10 @@ func TestFindPack(t *testing.T) {
 	})
 
 	t.Run("Should be able to register pack as a User with struct", func(t *testing.T) {
-
 		eventIden, err := otu.O.QualifiedIdentifier("FindPack", "MetadataRegistered")
 		assert.NoError(otu.T, err)
 
-		info := generatePackStruct(otu.O, "user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
+		info := generatePackStruct(otu.O, "user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin")
 
 		otu.O.Tx("registerFindPackMetadataStruct",
 			WithSigner("user1"),
@@ -100,17 +96,14 @@ func TestFindPack(t *testing.T) {
 	})
 
 	t.Run("Should be able to mint pack", func(t *testing.T) {
-
 		id1 := otu.mintExampleNFTs()
 
 		otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find").
 			mintPack("user1", packTypeId, []uint64{id1}, singleType, salt)
 		packTypeId++
-
 	})
 
 	t.Run("Should be able to buy pack", func(t *testing.T) {
-
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
@@ -119,11 +112,9 @@ func TestFindPack(t *testing.T) {
 
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
 		packTypeId++
-
 	})
 
 	t.Run("Should be able to buy pack and open pack", func(t *testing.T) {
-
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
@@ -133,11 +124,9 @@ func TestFindPack(t *testing.T) {
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
 		otu.openPack(buyer, packId)
 		packTypeId++
-
 	})
 
 	t.Run("Should be able to buy and open", func(t *testing.T) {
-
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
@@ -151,7 +140,6 @@ func TestFindPack(t *testing.T) {
 	})
 
 	t.Run("Should be able to buy and open with no collection setup", func(t *testing.T) {
-
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
@@ -165,7 +153,6 @@ func TestFindPack(t *testing.T) {
 	})
 
 	t.Run("Should get transferred to DLQ if try to open with wrong salt", func(t *testing.T) {
-
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
@@ -189,11 +176,9 @@ func TestFindPack(t *testing.T) {
 				"reason":  "The content of the pack was not verified with the hash provided at mint",
 			})
 		packTypeId++
-
 	})
 
 	t.Run("Should not be able to buy pack before drop is open", func(t *testing.T) {
-
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
@@ -209,11 +194,9 @@ func TestFindPack(t *testing.T) {
 		).
 			AssertFailure(t, "Cannot buy the pack now")
 		packTypeId++
-
 	})
 
 	t.Run("Should not be able to open the pack before it is available", func(t *testing.T) {
-
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
@@ -228,11 +211,9 @@ func TestFindPack(t *testing.T) {
 		).
 			AssertFailure(t, "You cannot open the pack yet")
 		packTypeId++
-
 	})
 
 	t.Run("Should get transferred to DLQ if storage full", func(t *testing.T) {
-
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
@@ -267,19 +248,18 @@ func TestFindPack(t *testing.T) {
 			AssertEvent(t, otu.identifier("FindPack", "FulfilledError"), map[string]interface{}{
 				"packId":  packId,
 				"address": otu.O.Address(buyer),
-				"reason":  "Not enough flow to hold the content of the pack. Please top up your account"})
+				"reason":  "Not enough flow to hold the content of the pack. Please top up your account",
+			})
 
 		otu.O.Tx("devRefillStorage",
 			WithSigner(buyer),
 		).
 			AssertSuccess(t)
 		packTypeId++
-
 	})
 
 	//  Tests on Float implementation
 	t.Run("Should be able to buy nft if the user has the float and with a whitelist.", func(t *testing.T) {
-
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
@@ -295,7 +275,6 @@ func TestFindPack(t *testing.T) {
 	})
 
 	t.Run("Should not be able to buy nft if the user doesnt have the float during the whitelist period, but can buy in public sale.", func(t *testing.T) {
-
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
@@ -438,7 +417,6 @@ func TestFindPack(t *testing.T) {
 
 	// Tests on Royalty implementation
 	t.Run("Should have 0.15 cut to find", func(t *testing.T) {
-
 		totalAmount := 4.2
 
 		id1 := otu.mintExampleNFTs()
@@ -465,7 +443,6 @@ func TestFindPack(t *testing.T) {
 	})
 
 	t.Run("Should be able to buy only if fulfills all verifiers specified", func(t *testing.T) {
-
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
@@ -511,11 +488,9 @@ func TestFindPack(t *testing.T) {
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.2)
 
 		packTypeId++
-
 	})
 
 	t.Run("Should be able to buy if fulfills either verifiers specified", func(t *testing.T) {
-
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
@@ -550,11 +525,9 @@ func TestFindPack(t *testing.T) {
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.2)
 
 		packTypeId++
-
 	})
 
 	t.Run("Should be able to buy if fulfills either verifiers specified 2", func(t *testing.T) {
-
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
@@ -590,11 +563,9 @@ func TestFindPack(t *testing.T) {
 		otu.buyPack("user2", buyer, packTypeId, 1, 4.2)
 
 		packTypeId++
-
 	})
 
 	t.Run("Should get the lowest price if several options are enabled at the same time", func(t *testing.T) {
-
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
@@ -630,12 +601,10 @@ func TestFindPack(t *testing.T) {
 		otu.buyPack(buyer, buyer, packTypeId, 1, 1.1)
 
 		packTypeId++
-
 	})
 
 	// buy with Reservation
 	t.Run("Should be able to buy with reservation", func(t *testing.T) {
-
 		id1 := otu.mintExampleNFTs()
 		ids := []uint64{id1}
 
@@ -661,7 +630,6 @@ func TestFindPack(t *testing.T) {
 
 	// Scripts - ways to return useful sales
 	t.Run("should return sale details for user", func(t *testing.T) {
-
 		floatID := otu.createFloatEvent("find")
 
 		// buyer should have find name "user1" or float
@@ -757,7 +725,6 @@ func TestFindPack(t *testing.T) {
 	floatID := otu.createFloatEvent("find")
 
 	t.Run("Should get the running sale for user with the lowest price -> 2.2", func(t *testing.T) {
-
 		otu.claimFloat("find", buyer, floatID)
 
 		// buyer should have find name "user1" or float
@@ -854,7 +821,6 @@ func TestFindPack(t *testing.T) {
 	})
 
 	t.Run("Should get the running sale for user with the lowest price -> 3.3", func(t *testing.T) {
-
 		otu.O.Script("getFindPackSaleDetailsWithUser",
 			WithArg("packTypeName", "user1"),
 			WithArg("packTypeId", packTypeId),
@@ -922,11 +888,9 @@ func TestFindPack(t *testing.T) {
 				},
 				"walletType": "A.0ae53cb6e3f42a79.FlowToken.Vault",
 			}))
-
 	})
 
 	t.Run("Should get all pack sale under a lease name type", func(t *testing.T) {
-
 		otu.O.Script("getAllFindPackSaleDetails",
 			WithArg("packTypeName", "user1"),
 		).
@@ -998,13 +962,11 @@ func TestFindPack(t *testing.T) {
 	otu.createUser(100.0, "find-admin")
 
 	t.Run("Should be able to register pack data with 2 NFT Types", func(t *testing.T) {
-
 		otu.registerPackType("user1", packTypeId, doubleTypes, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
 		packTypeId++
 	})
 
 	t.Run("Should be able to mint pack", func(t *testing.T) {
-
 		example := otu.mintExampleNFTs()
 		dandy := otu.mintThreeExampleDandies()[0]
 		otu.sendDandy(find, "user1", dandy)
@@ -1012,11 +974,9 @@ func TestFindPack(t *testing.T) {
 		otu.registerPackType("user1", packTypeId, doubleTypes, 0.0, 1.0, 1.0, false, 0, "find-admin", "find").
 			mintPack("user1", packTypeId, []uint64{example, dandy}, doubleTypes, salt)
 		packTypeId++
-
 	})
 
 	t.Run("Should be able to buy pack with 2 NFT Types", func(t *testing.T) {
-
 		example := otu.mintExampleNFTs()
 		dandy := otu.mintThreeExampleDandies()[0]
 		otu.sendDandy(find, "user1", dandy)
@@ -1027,11 +987,9 @@ func TestFindPack(t *testing.T) {
 
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
 		packTypeId++
-
 	})
 
 	t.Run("Should be able to buy pack and open pack with 2 NFT Types", func(t *testing.T) {
-
 		example := otu.mintExampleNFTs()
 		dandy := otu.mintThreeExampleDandies()[0]
 		otu.sendDandy(find, "user1", dandy)
@@ -1043,11 +1001,9 @@ func TestFindPack(t *testing.T) {
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
 		otu.openPack(buyer, packId)
 		packTypeId++
-
 	})
 
 	t.Run("Should be able to buy and open with 2 NFT Types", func(t *testing.T) {
-
 		example := otu.mintExampleNFTs()
 		dandy := otu.mintThreeExampleDandies()[0]
 		otu.sendDandy(find, "user1", dandy)

@@ -247,7 +247,7 @@ access(all) contract ExampleNFT: ViewResolver {
         switch nftType {
         case Type<@ExampleNFT.NFT>():
             let collectionRef = self.account.storage.borrow<&ExampleNFT.Collection>(
-                from: /storage/cadenceExampleNFTCollection
+                from: /storage/exampleNFTCollection
             ) ?? panic("Could not borrow a reference to the stored collection")
             let collectionData = MetadataViews.NFTCollectionData(
                 storagePath: collectionRef.getDefaultStoragePath()!,

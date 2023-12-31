@@ -2620,7 +2620,7 @@ func (otu *OverflowTestUtils) mintExampleNFTs() uint64 {
 	return res
 }
 
-func generatePackStruct(o *OverflowState, user string, packTypeId uint64, itemType []string, whitelistTime, buyTime, openTime float64, requiresReservation bool, floatId uint64, clientAddress, marketAddress string) findGo.FindPack_PackRegisterInfo {
+func generatePackStruct(o *OverflowState, user string, packTypeId uint64, itemType []string, whitelistTime float64, buyTime float64, openTime float64, requiresReservation bool, floatId uint64, clientAddress string) findGo.FindPack_PackRegisterInfo {
 	flow, _ := o.QualifiedIdentifier("FlowToken", "Vault")
 
 	saleInfo := []findGo.FindPack_PackRegisterSaleInfo{
@@ -2687,7 +2687,7 @@ func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, i
 	eventIden, err := otu.O.QualifiedIdentifier("FindPack", "MetadataRegistered")
 	assert.NoError(otu.T, err)
 
-	info := generatePackStruct(otu.O, user, packTypeId, itemType, whitelistTime, buyTime, openTime, requiresReservation, floatId, clientAddress, marketAddress)
+	info := generatePackStruct(otu.O, user, packTypeId, itemType, whitelistTime, buyTime, openTime, requiresReservation, floatId, clientAddress)
 
 	o.Tx("setupFindPackMinterPlatform",
 		WithSigner(user),

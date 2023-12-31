@@ -3,7 +3,7 @@ module github.com/findonflow/find
 go 1.20
 
 require (
-	github.com/bjartek/overflow v1.14.1-0.20231220114203-b4d28262f2dc
+	github.com/bjartek/overflow v1.14.1-0.20231231144751-166808112fe3
 	github.com/hexops/autogold v1.3.1
 	github.com/onflow/cadence v1.0.0-preview.1.0.20231213191345-0ff20e15e7e1
 	github.com/recursionpharma/go-csv-map v0.0.0-20160524001940-792523c65ae9
@@ -131,7 +131,7 @@ require (
 	github.com/nightlyone/lockfile v1.0.0 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/onflow/atree v0.6.1-0.20230711151834-86040b30171f // indirect
-	github.com/onflow/flow-cli/flowkit v1.8.1-0.20231219225947-ab1800f005ad // indirect
+	github.com/onflow/flow-cli/flowkit v1.9.3-0.20231220185949-f5ab0f6b8982 // indirect
 	github.com/onflow/flow-core-contracts/lib/go/contracts v0.15.1-0.20231212203043-37cbe453d425 // indirect
 	github.com/onflow/flow-core-contracts/lib/go/templates v0.15.1-0.20231212203043-37cbe453d425 // indirect
 	github.com/onflow/flow-emulator v0.59.1-0.20231218185945-9116c416533f // indirect
