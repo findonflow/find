@@ -207,6 +207,14 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("publicPathIdentifier", "findDandy"),
 	)
 
+	// add that we can sell dandies on the market
+	stx("tenantsetMarketOption",
+		WithSigner("find"),
+		WithArg("nftName", "Dandy"),
+		WithArg("nftTypes", []string{dandyIdentifier}),
+		WithArg("cut", 0.0),
+	)
+
 	// set up packs
 	packTypeId = uint64(1)
 	salt := "find"

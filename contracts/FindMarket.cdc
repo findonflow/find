@@ -1271,7 +1271,8 @@ access(account) fun createFindMarket(name: String, address:Address, findCutSaleI
     let sp=StoragePath(identifier: tenantPath)!
     let pubp=PublicPath(identifier:tenantPath)!
     account.storage.save(<- tenant, to: sp)
-    let cap = account.capabilities.storage.issue<&{TenantPublic}>(sp)
+    //TODO:: What path to store here...
+    let cap = account.capabilities.storage.issue<&Tenant>(sp)
     account.capabilities.publish(cap, at: pubp)
     let tenantCap = account.capabilities.storage.issue<&Tenant>(sp)
     return tenantCap

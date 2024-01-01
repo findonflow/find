@@ -9,29 +9,30 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 transaction(tenant: Address, cut: UFix64){
     prepare(account: auth(BorrowValue) &Account){
+
         let adminRef = account.storage.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
-		let defaultRules : [FindMarket.TenantRule] = [
-			FindMarket.TenantRule(
-				name: "standardFT",
-				types:[Type<@FlowToken.Vault>(), Type<@FUSD.Vault>(), Type<@FiatToken.Vault>(), Type<@DapperUtilityCoin.Vault>(), Type<@FlowUtilityToken.Vault>()],
-				ruleType: "ft",
-				allow:true
-			)
-		]
+        let defaultRules : [FindMarket.TenantRule] = [
+        FindMarket.TenantRule(
+            name: "standardFT",
+            types:[Type<@FlowToken.Vault>(), Type<@FUSD.Vault>(), Type<@FiatToken.Vault>(), Type<@DapperUtilityCoin.Vault>(), Type<@FlowUtilityToken.Vault>()],
+            ruleType: "ft",
+            allow:true
+        )
+        ]
 
-		let royalty = MetadataViews.Royalty(
-			receiver: adminRef.getSwitchboardReceiverPublic(),
-			cut: cut,
-			description: "find"
-		)
+        let royalty = MetadataViews.Royalty(
+            receiver: adminRef.getSwitchboardReceiverPublic(),
+            cut: cut,
+            description: "find"
+        )
 
-		let saleItem = FindMarket.TenantSaleItem(
-			name: "findRoyalty",
-			cut: royalty,
-			rules: defaultRules,
-			status: "active"
-		)
+        let saleItem = FindMarket.TenantSaleItem(
+            name: "findRoyalty",
+            cut: royalty,
+            rules: defaultRules,
+            status: "active"
+        )
 
         adminRef.setFindCut(tenant: tenant, saleItem:saleItem)
     }

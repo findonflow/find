@@ -2,7 +2,7 @@ import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
 import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
-//import FiatToken from "../contracts/standard/FiatToken.cdc"
+import FiatToken from "../contracts/standard/FiatToken.cdc"
 import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
@@ -18,7 +18,7 @@ transaction(tenant: String, tenantAddress: Address, findCut: UFix64) {
         FindMarket.TenantRule( name:"standard ft", types:[
         Type<@FUSD.Vault>(), 
         Type<@FlowToken.Vault>(), 
-        // Type<@FiatToken.Vault>(), 
+        Type<@FiatToken.Vault>(), 
         Type<@DapperUtilityCoin.Vault>() , 
         Type<@FlowUtilityToken.Vault>()], ruleType:"ft", allow:true)
         ]

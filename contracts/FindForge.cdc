@@ -82,7 +82,7 @@ access(all) contract FindForge {
     }
 
     access(contract) fun borrowForge(_ type: Type) : &{Forge}? {
-        return &FindForge.forgeTypes[type] as &{Forge}?
+        return &FindForge.forgeTypes[type] 
     }
 
     access(all) fun getMinterPlatform(name: String, forgeType: Type) : MinterPlatform? {

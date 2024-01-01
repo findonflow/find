@@ -15,7 +15,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
     let saleItemsCap: Capability<&{FindMarketSale.SaleItemCollectionPublic}>
 
 
-    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, FungibleToken.Withdrawable) &Account) {
+    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, UnpublishCapability, FungibleToken.Withdrawable) &Account) {
 
         let marketplace = FindMarket.getFindTenantAddress()
         let tenantCapability= FindMarket.getTenantCapability(marketplace)!
@@ -48,41 +48,37 @@ transaction(user: String, id: UInt64, amount: UFix64) {
         let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
 
         //TODO: maybe just use AnyResource here and cast to what we want?
-        var  targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
-        if targetCapability == nil || !targetCapability!.check() {
+        //
+        let col= account.storage.borrow<&{NonFungibleToken.Collection}>(from: nft.storagePath)
+        if col == nil {
             let cd = item.getNFTCollectionData()
-
-            /*
-            i think we can just delete this
-            // should use account.type here instead
-            if account.type(at: cd.storagePath) != nil {
-                let pathIdentifier = nft.publicPath.toString()
-                let findPath = PublicPath(identifier: pathIdentifier.slice(from: "/public/".length , upTo: pathIdentifier.length).concat("_FIND"))!
-                account.link<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
-                    findPath,
-                    target: nft.storagePath
-                )
-                self.targetCapability = account.getCapability<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(findPath)
-            } else {
-                */
-                account.storage.save(<- cd.createEmptyCollection(), to: cd.storagePath)
+            account.storage.save(<- cd.createEmptyCollection(), to: cd.storagePath)
+            account.capabilities.unpublish(cd.publicPath)
+            let cap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(cd.storagePath)
+            account.capabilities.publish(cap, at: cd.publicPath)
+            self.targetCapability=cap
+        } else {
+            var targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
+            if targetCapability == nil || !targetCapability!.check() {
+                let cd = item.getNFTCollectionData()
                 let cap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(cd.storagePath)
+                account.capabilities.unpublish(cd.publicPath)
                 account.capabilities.publish(cap, at: cd.publicPath)
-
-
                 targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
             }
             self.targetCapability=targetCapability!
 
-            self.walletReference = account.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
         }
 
-        pre {
-            self.walletReference.getBalance() > amount : "Your wallet does not have enough funds to pay for this item"
-        }
-
-        execute {
-            let vault <- self.walletReference.withdraw(amount: amount)
-            self.saleItemsCap.borrow()!.buy(id:id, vault: <- vault, nftCap: self.targetCapability)
-        }
+        self.walletReference = account.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
     }
+
+    pre {
+        self.walletReference.getBalance() > amount : "Your wallet does not have enough funds to pay for this item"
+    }
+
+    execute {
+        let vault <- self.walletReference.withdraw(amount: amount)
+        self.saleItemsCap.borrow()!.buy(id:id, vault: <- vault, nftCap: self.targetCapability)
+    }
+}
