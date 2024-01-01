@@ -12,7 +12,7 @@ import FIND from "../contracts/FIND.cdc"
 // import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
 import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11
 
-    access(all) main(user: String, collections: [String]) : {String : ItemReport} {
+    access(all) fun main(user: String, collections: [String]) : {String : ItemReport} {
         return fetchAlchemyShard3(user: user, targetCollections:collections)
     }
 

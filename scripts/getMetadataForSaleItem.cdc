@@ -16,7 +16,7 @@ access(all) struct PurchaseData {
 		self.imageURL = imageURL
 	}
 }
-access(all) main(merchantAddress: Address,  address: Address, id: UInt64, amount: UFix64) : PurchaseData{
+access(all) fun main(merchantAddress: Address,  address: Address, id: UInt64, amount: UFix64) : PurchaseData{
 	let marketplace = FindMarket.getFindTenantAddress()
 	let saleItemsCap= FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
 	let saleItemCollection = saleItemsCap.borrow()!

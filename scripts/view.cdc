@@ -3,7 +3,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 //Fetch a single view from a nft on a given path
-access(all) main(user: Address, path:PublicPath, id: UInt64, identifier: String) : AnyStruct? {
+access(all) fun main(user: Address, path:PublicPath, id: UInt64, identifier: String) : AnyStruct? {
 
 	let address = user
 	let account=getAccount(address)

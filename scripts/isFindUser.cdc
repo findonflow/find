@@ -1,7 +1,7 @@
 import Profile from "../contracts/Profile.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-access(all) main(user: Address) : Bool {
+access(all) fun main(user: Address) : Bool {
 
 	let account=getAccount(user)
 	if account.balance == 0.0 {

@@ -1176,7 +1176,7 @@ access(all) getItemForMetadataStandard(path: PublicPath, owner:PublicAccount, ex
 }
 
 /*
-access(all) main(user: String) : {String: [UInt64]} {
+access(all) fun main(user: String) : {String: [UInt64]} {
 	let resolvingAddress = FIND.resolve(user)
 	if resolvingAddress == nil {
 		return {}
@@ -1188,7 +1188,7 @@ access(all) main(user: String) : {String: [UInt64]} {
 */
 
 
-access(all) main(address: Address, ids: {String:[UInt64]}): [MetadataCollectionItem] {
+access(all) fun main(address: Address, ids: {String:[UInt64]}): [MetadataCollectionItem] {
 
 	return getNFTs(ownerAddress:address, ids:ids)
 }

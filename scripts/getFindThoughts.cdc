@@ -5,7 +5,7 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-access(all) main(addresses: [Address], ids: [UInt64]) : [Thought] {
+access(all) fun main(addresses: [Address], ids: [UInt64]) : [Thought] {
 	let thoughts : [Thought] = [] 
 
 	for i, address in addresses {

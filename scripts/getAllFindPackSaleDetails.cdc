@@ -2,7 +2,7 @@ import FindPack from "../contracts/FindPack.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
-access(all) main(packTypeName: String) : {UInt64 : Report} {
+access(all) fun main(packTypeName: String) : {UInt64 : Report} {
 	let packs = FindPack.getMetadataByName(packTypeName: packTypeName)
 	let packData : {UInt64 : Report} = {}
 	for packTypeId in packs.keys {

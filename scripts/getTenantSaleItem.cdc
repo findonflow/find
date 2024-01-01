@@ -1,6 +1,6 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 
-access(all) main(tenant: Address) : TenantSaleItems {
+access(all) fun main(tenant: Address) : TenantSaleItems {
     let tenantCap = FindMarket.getTenantCapability(tenant) ?? panic("No tenant capability is set up. Tenant Address : ".concat(tenant.toString()))
     let tenantRef = tenantCap.borrow() ?? panic("Cannot borrow tenant reference. Tenant Address : ".concat(tenant.toString()))
     let saleItems = tenantRef.getSaleItems()

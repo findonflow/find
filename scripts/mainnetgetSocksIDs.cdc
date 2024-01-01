@@ -3,7 +3,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 import RaribleNFT from 0x01ab36aaf654a13e
 
-access(all) main(user: String, collections: [String]) : {String : ItemReport} {
+access(all) fun main(user: String, collections: [String]) : {String : ItemReport} {
 	return fetchRaribleNFT(user: user, targetCollections: collections)
 }
 

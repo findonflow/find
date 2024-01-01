@@ -1,7 +1,7 @@
 import FindVerifier from "../contracts/FindVerifier.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
-access(all) main(user: Address, path: String, rarityA: Bool, rarityB: Bool) : Result {
+access(all) fun main(user: Address, path: String, rarityA: Bool, rarityB: Bool) : Result {
 
     let rarities : [MetadataViews.Rarity] = []
 

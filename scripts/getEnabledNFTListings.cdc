@@ -37,7 +37,7 @@ access(all) let removeElement = fun (_ arr: [Type], _ element: Type): [Type] {
 		}
 
 
-access(all) main(page: Int, detail: Bool) : AnyStruct {
+access(all) fun main(page: Int, detail: Bool) : AnyStruct {
 
 	let tenant = FindMarket.getFindTenantAddress()
 	let tenantRef = FindMarket.getTenant(tenant)

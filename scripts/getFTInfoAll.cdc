@@ -1,6 +1,6 @@
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
-access(all) main() : {String: FTRegistry.FTInfo}{
+access(all) fun main() : {String: FTRegistry.FTInfo}{
 
     return FTRegistry.getFTInfoAll()
 

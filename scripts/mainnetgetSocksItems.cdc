@@ -4,7 +4,7 @@ import FIND from "../contracts/FIND.cdc"
 
 import RaribleNFT from 0x01ab36aaf654a13e
 
-access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+access(all) fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 
 	return fetchRaribleNFTs(user: user, collectionIDs: collectionIDs)
 }

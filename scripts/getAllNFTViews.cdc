@@ -3,7 +3,7 @@ import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 //Fetch a single view from a nft on a given path
-access(all) main(user: String, aliasOrIdentifier:String, id: UInt64) : {String : AnyStruct} {
+access(all) fun main(user: String, aliasOrIdentifier:String, id: UInt64) : {String : AnyStruct} {
 
 	let publicPath = getPublicPath(aliasOrIdentifier)
 	let resolveAddress = FIND.resolve(user) 

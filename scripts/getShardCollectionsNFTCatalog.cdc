@@ -2,7 +2,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 
-access(all) main(user: String) : {String : CollectionLength} {
+access(all) fun main(user: String) : {String : CollectionLength} {
 
 	if let address = FIND.resolve(user) {
 

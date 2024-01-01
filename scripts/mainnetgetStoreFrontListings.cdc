@@ -25,7 +25,7 @@ access(all) struct Listing {
 	}
 }
 
-access(all) main(user: String): {UInt64 :[Listing]} {
+access(all) fun main(user: String): {UInt64 :[Listing]} {
 
 	let resolveAddress = FIND.resolve(user) 
 	if resolveAddress == nil {return {}}

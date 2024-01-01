@@ -3,7 +3,7 @@ import NFTRegistry from "../contracts/NFTRegistry.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 //get all the views for an nft and address/path/id
-access(all) main(user: String) : {String: [UInt64]} {
+access(all) fun main(user: String) : {String: [UInt64]} {
 
 	let resolveAddress=FIND.resolve(user)
 	if resolveAddress == nil {

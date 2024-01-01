@@ -24,7 +24,7 @@ access(all) struct Report{
 	}
 }
 
-access(all) main(address: Address, targetPaths: [String]): {String : Report}{
+access(all) fun main(address: Address, targetPaths: [String]): {String : Report}{
 
 	let resolvers = {
 	"CricketMomentsCollection" : 1,

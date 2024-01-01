@@ -118,7 +118,7 @@ access(all) struct Report {
 	}
 }
 
-access(all) main(user: String) : Report? {
+access(all) fun main(user: String) : Report? {
 
 	var findReport: FINDReport? = nil
 	if let address=FIND.resolve(user) {

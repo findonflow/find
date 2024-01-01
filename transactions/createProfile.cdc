@@ -65,8 +65,8 @@ transaction(name: String) {
             account.capabilities.publish(cap, at: Dandy.CollectionPublicPath)
         }
 
-        /*
 
+        /*
         let thoughtsCap= account.capabilities.get<&{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
         if !thoughtsCap.check() {
             account.storage.save(<- FindThoughts.createEmptyCollection(), to: FindThoughts.CollectionStoragePath)
@@ -111,12 +111,13 @@ transaction(name: String) {
             updated=true
         }
 
-        /*
         if !profile.hasWallet("USDC") {
-            profile.addWallet(Profile.Wallet( name:"USDC", receiver:usdcCap, balance:account.capabilities.get<&{FungibleToken.Balance}>(FiatToken.VaultBalancePubPath), accept: Type<@FiatToken.Vault>(), tags: ["usdc", "stablecoin"]))
+
+            let fr = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath) ?? panic("could not find fiat receiver") 
+            let fb =account.capabilities.get<&{FungibleToken.Vault}>(FiatToken.VaultBalancePubPath) ?? panic("could not find fiat balance") 
+            profile.addWallet(Profile.Wallet( name:"USDC", receiver:fr, balance:fb, accept: Type<@FiatToken.Vault>(), tags: ["usdc", "stablecoin"]))
             updated=true
         }
-        */
 
         //If find name not set and we have a profile set it.
         if profile.getFindName() == "" {

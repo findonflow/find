@@ -458,7 +458,7 @@ access(all) fun main(s: [String], sep: String) : String {
 access(all) fun main(s: [String]) : [Type] {
 	var typ : [Type] = []
 	for t in s {
-		typ.append(CompositeType(t)!)
+		typ.append(CompositeType(t) ?? panic("value ".concat(t).concat(" is not a composite type")))
 	}
 	return FindUtils.deDupTypeArray(typ)
 }
@@ -466,11 +466,11 @@ access(all) fun main(s: [String]) : [Type] {
 	t.Run("deDupTypeArray should dedup duplicated as expected", func(t *testing.T) {
 		flow, err := o.QualifiedIdentifier("FlowToken", "Vault")
 		assert.NoError(t, err)
-		ft, err := o.QualifiedIdentifier("FungibleToken", "Vault")
+		ft, err := o.QualifiedIdentifier("FUSD", "Vault")
 		assert.NoError(t, err)
-		nft, err := o.QualifiedIdentifier("NonFungibleToken", "NFT")
+		nft, err := o.QualifiedIdentifier("ExampleNFT", "NFT")
 		assert.NoError(t, err)
-		collection, err := o.QualifiedIdentifier("NonFungibleToken", "Collection")
+		collection, err := o.QualifiedIdentifier("Dandy", "Collection")
 		assert.NoError(t, err)
 		o.Script(devDeDupTypeArray,
 			WithArg("s", []string{

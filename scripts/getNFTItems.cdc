@@ -4,7 +4,7 @@ import FIND from "../contracts/FIND.cdc"
 import FindViews from "../contracts/FindViews.cdc"
 
 
-access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+access(all) fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 
 	let report : { String: [MetadataCollectionItem]}= { }
 	let address = FIND.resolve(user)

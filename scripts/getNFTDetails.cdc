@@ -246,7 +246,7 @@ access(all) struct NFTCollectionDisplay {
 	}
 }
 
-access(all) main(user: String, project:String, id: UInt64, views: [String]) : NFTDetailReport?{
+access(all) fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDetailReport?{
 	let resolveAddress = FIND.resolve(user)
 	if resolveAddress == nil {
 		return nil

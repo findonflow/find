@@ -44,7 +44,7 @@ access(all) struct NameReport {
 	}
 }
 
-access(all) main(user: String) : NameReport? {
+access(all) fun main(user: String) : NameReport? {
 
 	var findReport: FINDReport? = nil
 	var nameLease: LeaseInformation? = nil

@@ -1,6 +1,6 @@
 import FIND from "../contracts/FIND.cdc"
 
-access(all) main(address: [Address]) : { Address:String}{
+access(all) fun main(address: [Address]) : { Address:String}{
 
 	let items : {Address:String} = {}
 	for a in address {

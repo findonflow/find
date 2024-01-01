@@ -13,7 +13,7 @@ import FIND from "../contracts/FIND.cdc"
 // import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
 import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11
 
-access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+access(all) fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
     return fetchAlchemyCollectionShard3(user: user, collectionIDs: collectionIDs)
 }
 

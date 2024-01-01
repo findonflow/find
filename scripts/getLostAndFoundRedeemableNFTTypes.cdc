@@ -2,7 +2,7 @@ import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-access(all) main(user: String) : Report {
+access(all) fun main(user: String) : Report {
 
     if let address = FIND.resolve(user){
         let type : Type = Type<@NonFungibleToken.NFT>()

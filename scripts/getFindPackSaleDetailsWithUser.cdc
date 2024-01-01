@@ -4,7 +4,7 @@ import FlowStorageFees from "../contracts/standard/FlowStorageFees.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-access(all) main(packTypeName: String, packTypeId: UInt64, user: Address) : Report? {
+access(all) fun main(packTypeName: String, packTypeId: UInt64, user: Address) : Report? {
 	if let metadata = FindPack.getMetadataById(packTypeName: packTypeName, typeId: packTypeId) {
 		let packsLeft = FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId: packTypeId).getPacksLeft()
 		return Report(metadata, user: user, packsLeft:packsLeft)

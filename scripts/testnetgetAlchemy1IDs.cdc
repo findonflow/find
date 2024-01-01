@@ -15,7 +15,7 @@ import AlchemyMetadataWrapperTestnetShard1 from 0x5ff2c7b4c40de11
 
 
 
-    access(all) main(user: String, collections: [String]) : {String : ItemReport}  {
+    access(all) fun main(user: String, collections: [String]) : {String : ItemReport}  {
         return fetchAlchemyShard1(user: user, targetCollections:collections)
     }
 

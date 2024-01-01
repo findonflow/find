@@ -1,7 +1,7 @@
 import FindMarket from "../contracts/FindMarket.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-access(all) main(user: String) : {String : FindMarket.SaleItemCollectionReport} {
+access(all) fun main(user: String) : {String : FindMarket.SaleItemCollectionReport} {
     let resolveAddress = FIND.resolve(user)
 	let marketplace = FindMarket.getFindTenantAddress()
     if resolveAddress == nil { return {}}

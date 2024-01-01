@@ -4,7 +4,7 @@ import FindViews from "../contracts/FindViews.cdc"
 
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 
-access(all) main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
+access(all) fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 	return fetchNFTCatalog(user: user, collectionIDs: collectionIDs)
 }
 

@@ -11,7 +11,7 @@ import FIND from "../contracts/FIND.cdc"
 import FindAirdropper from "../contracts/FindAirdropper.cdc"
 import FindUtils from "../contracts/FindUtils.cdc"
 
-access(all) main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] , ids: [UInt64], memos: [String]) : [Report] {
+access(all) fun main(sender: Address, nftIdentifiers: [String],  allReceivers:[String] , ids: [UInt64], memos: [String]) : [Report] {
 
  	fun logErr(_ i: Int , err: String) : Report {
 		return Report(receiver: allReceivers[i] , address: nil, inputName: nil, findName: nil, avatar: nil, isDapper: nil, type: nftIdentifiers[i], id: ids[i] , message: memos[i] ,receiverLinked: nil , collectionPublicLinked: nil , accountInitialized: nil , nftInPlace: nil, royalties: nil, err: err)

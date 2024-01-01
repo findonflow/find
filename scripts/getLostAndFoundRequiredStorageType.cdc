@@ -4,7 +4,7 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-access(all) main(user: String) : Report {
+access(all) fun main(user: String) : Report {
 
     if let address = FIND.resolve(user){
         let runTimeType : Type = Type<@NonFungibleToken.NFT>()

@@ -16,7 +16,7 @@ import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
 
 
 
-    access(all) main(user: String, collections: [String]) : {String : ItemReport}  {
+    access(all) fun main(user: String, collections: [String]) : {String : ItemReport}  {
         return fetchAlchemyShard1(user: user, targetCollections:collections)
     }
 

@@ -30,7 +30,7 @@ access(all) struct MetadataCollectionItem {
 }
 
 
-access(all) main(user: String, aliasOrIdentifier: String, id:UInt64) : MetadataCollectionItem?{
+access(all) fun main(user: String, aliasOrIdentifier: String, id:UInt64) : MetadataCollectionItem?{
 
 	let publicPath = getPublicPath(aliasOrIdentifier)
 

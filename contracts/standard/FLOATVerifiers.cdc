@@ -25,7 +25,7 @@ import FLOAT from "./FLOAT.cdc"
 access(all) contract FLOATVerifiers {
 
     // The "verifiers" to be used
-    
+
     //
     // Timelock
     //
@@ -37,7 +37,7 @@ access(all) contract FLOATVerifiers {
         access(all) let dateStart: UFix64
         access(all) let dateEnding: UFix64
 
-        access(all) verify(_ params: {String: AnyStruct}) {
+        access(all) fun verify(_ params: {String: AnyStruct}) {
             assert(
                 getCurrentBlock().timestamp >= self.dateStart,
                 message: "This FLOAT Event has not started yet."
@@ -63,7 +63,7 @@ access(all) contract FLOATVerifiers {
         // The secret code, set by the owner of this event.
         access(self) let secretPhrase: String
 
-        access(all) verify(_ params: {String: AnyStruct}) {
+        access(all) fun verify(_ params: {String: AnyStruct}) {
             let secretPhrase = params["secretPhrase"]! as! String
             assert(
                 self.secretPhrase == secretPhrase, 
@@ -86,9 +86,9 @@ access(all) contract FLOATVerifiers {
     access(all) struct Limited: FLOAT.IVerifier {
         access(all) var capacity: UInt64
 
-        access(all) verify(_ params: {String: AnyStruct}) {
-            let event = params["event"]! as! &FLOAT.FLOATEvent{FLOAT.FLOATEventPublic}
-            let currentCapacity = event.totalSupply
+        access(all) fun verify(_ params: {String: AnyStruct}) {
+            let e = params["event"]! as! &FLOAT.FLOATEvent
+            let currentCapacity = e.totalSupply
             assert(
                 currentCapacity < self.capacity,
                 message: "This FLOAT Event is at capacity."
@@ -109,7 +109,7 @@ access(all) contract FLOATVerifiers {
     access(all) struct MultipleSecret: FLOAT.IVerifier {
         access(self) let secrets: {String: Bool}
 
-        access(all) verify(_ params: {String: AnyStruct}) {
+        access(all) fun verify(_ params: {String: AnyStruct}) {
             let secretPhrase = params["secretPhrase"]! as! String
             assert(
                 self.secrets[secretPhrase] != nil, 

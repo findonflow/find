@@ -1,6 +1,6 @@
 import FindMarket from "../contracts/FindMarket.cdc" 
 
-access(all) main() : {String : [String] } {
+access(all) fun main() : {String : [String] } {
 	let mapping : {String : [String] } = {}
 
 	let findAddress=FindMarket.getFindTenantAddress()
