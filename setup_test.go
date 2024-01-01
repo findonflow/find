@@ -152,6 +152,10 @@ func SetupFIND(o *OverflowState) error {
 		registerFtInFTRegistry(stx, strings.ToLower(alias))
 	}
 
+	stx("devsetupRelatedAccount",
+		WithSigner("user1"),
+	)
+
 	er := stx("mintExampleNFT",
 		findSigner,
 		WithArg("address", "find"),

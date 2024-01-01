@@ -35,7 +35,7 @@ access(all) contract FindVerifier {
             }
 
             let user : Address = param["address"]! as! Address 
-            let float = getAccount(user).capabilities.get<&FLOAT.Collection>(FLOAT.FLOATCollectionPublicPath)!.borrow() 
+            let float = getAccount(user).capabilities.borrow<&FLOAT.Collection>(FLOAT.FLOATCollectionPublicPath)
 
             if float == nil {
                 return false
@@ -198,15 +198,12 @@ access(all) contract FindVerifier {
 
             let user : Address = param["address"]! as! Address 
 
-            let cap = getAccount(user).capabilities.get<&{NonFungibleToken.Collection}>(self.path)!
-            if !cap.check() {
-                let mvCap = getAccount(user).capabilities.get<&{ViewResolver.ResolverCollection}>(self.path)!
-                if !mvCap.check() {
-                    return false
-                }
-                return mvCap.borrow()!.getIDs().length >= self.threshold
+            let ref = getAccount(user).capabilities.borrow<&{NonFungibleToken.Collection}>(self.path)
+
+            if ref == nil{
+                return false
             } 
-            return cap.borrow()!.getIDs().length >= self.threshold
+            return ref!.getIDs().length >= self.threshold
         }
     }
 
@@ -279,11 +276,11 @@ access(all) contract FindVerifier {
 
             let user : Address = param["address"]! as! Address 
 
-            let mvCap = getAccount(user).capabilities.get<&{ViewResolver.ResolverCollection}>(self.path)!
-            if !mvCap.check() {
+            let mvCap = getAccount(user).capabilities.borrow<&{ViewResolver.ResolverCollection}>(self.path)
+            if mvCap ==nil{
                 return false
             }
-            let ref = mvCap.borrow()!
+            let ref = mvCap!
 
             for id in ref.getIDs() {
                 let resolver = ref.borrowViewResolver(id: id)!

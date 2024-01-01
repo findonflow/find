@@ -13,7 +13,7 @@ import (
 )
 
 func TestFindUtils(t *testing.T) {
-	otu := NewOverflowTest(t)
+	otu := &OverflowTestUtils{T: t, O: ot.O}
 	o := otu.O
 
 	devCheckContainsChar := `import FindUtils from "../contracts/FindUtils.cdc"
@@ -22,7 +22,7 @@ func TestFindUtils(t *testing.T) {
 		return FindUtils.containsChar(string, char: char)
 	}`
 	// containsChar
-	t.Run("containsChar should return false if string does not contain", func(t *testing.T) {
+	ot.Run(t, "containsChar should return false if string does not contain", func(t *testing.T) {
 		o.Script(devCheckContainsChar,
 			WithArg("string", "bam.find"),
 			WithArg("char", cadence.Character(",")),
@@ -30,7 +30,7 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("false", false))
 	})
 
-	t.Run("containsChar should return true if string contains", func(t *testing.T) {
+	ot.Run(t, "containsChar should return true if string contains", func(t *testing.T) {
 		o.Script(devCheckContainsChar,
 			WithArg("string", "bam.find"),
 			WithArg("char", cadence.Character(".")),
@@ -45,7 +45,7 @@ func TestFindUtils(t *testing.T) {
 	}`
 
 	// contains
-	t.Run("contains should be able to check contains", func(t *testing.T) {
+	ot.Run(t, "contains should be able to check contains", func(t *testing.T) {
 		o.Script(devCheckContains,
 			WithArg("string", "string"),
 			WithArg("element", "string"),
@@ -53,7 +53,7 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("true", true))
 	})
 
-	t.Run("contains should return false if string does not contain", func(t *testing.T) {
+	ot.Run(t, "contains should return false if string does not contain", func(t *testing.T) {
 		o.Script(devCheckContains,
 			WithArg("string", "string"),
 			WithArg("element", "stt"),
@@ -61,7 +61,7 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("false", false))
 	})
 
-	t.Run("contains should return true if string partially contains", func(t *testing.T) {
+	ot.Run(t, "contains should return true if string partially contains", func(t *testing.T) {
 		o.Script(devCheckContains,
 			WithArg("string", "string"),
 			WithArg("element", "ing"),

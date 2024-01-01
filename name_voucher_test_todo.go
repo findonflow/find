@@ -10,10 +10,7 @@ import (
 )
 
 func TestNameVoucher(t *testing.T) {
-
-	otu := NewOverflowTest(t).
-		setupFIND().
-		createUser(10.0, "user1")
+	otu := &OverflowTestUtils{T: t, O: ot.O}
 
 	initUser := func(s string) *OverflowTestUtils {
 		otu.O.Tx(
@@ -30,7 +27,7 @@ func TestNameVoucher(t *testing.T) {
 
 	// User 1 : have collection set up
 	// User 2 : does not have collection
-	t.Run("Should be able to mint NFT to User 1 with collection", func(t *testing.T) {
+	ot.Run(t, "Should be able to mint NFT to User 1 with collection", func(t *testing.T) {
 		initUser("user1")
 
 		minCharLength := 4
@@ -54,7 +51,6 @@ func TestNameVoucher(t *testing.T) {
 	})
 
 	t.Run("Should be able to use the name for register new name", func(t *testing.T) {
-
 		otu.O.Tx(
 			"redeemNameVoucher",
 			WithSigner("user1"),
@@ -74,7 +70,6 @@ func TestNameVoucher(t *testing.T) {
 	otu.createDapperUser("user2")
 	var ticketID uint64
 	t.Run("Should be able to mint NFT to User 1 without collection", func(t *testing.T) {
-
 		minCharLength := 5
 
 		res := otu.O.Tx(
@@ -99,7 +94,6 @@ func TestNameVoucher(t *testing.T) {
 	})
 
 	t.Run("Should be able to use the name for register new name in LostAndFound directly", func(t *testing.T) {
-
 		otu.O.Tx(
 			"redeemNameVoucher",
 			WithSigner("user2"),
@@ -167,7 +161,6 @@ func TestNameVoucher(t *testing.T) {
 				user := "user1"
 
 				t.Run(fmt.Sprintf(msg, s, tf.ExpectedAction, tf.NameVoucherLength, name), func(t *testing.T) {
-
 					// send out the voucher and get prepared
 					id, err := otu.O.Tx(
 						"adminMintAndAirdropNameVoucher",
@@ -203,11 +196,9 @@ func TestNameVoucher(t *testing.T) {
 						return
 					}
 					res.AssertFailure(t, fmt.Sprintf("You are trying to register a %d character name, but the voucher can only support names with minimun character of %d", len(name), tf.NameVoucherLength))
-
 				})
 			}
 		}
-
 	}
 
 	nameVoucherLength := 4
@@ -326,7 +317,6 @@ Upon successful completion, the voucher will be invalidated, and the chosen .fin
 	for _, tc := range viewsTC {
 		for _, p := range tc.cases {
 			t.Run(fmt.Sprintf("should get %s view with %s", tc.view, p.expected.Name()), func(t *testing.T) {
-
 				iden, err := otu.O.QualifiedIdentifier("MetadataViews", tc.view)
 				assert.NoError(t, err)
 
@@ -341,5 +331,4 @@ Upon successful completion, the voucher will be invalidated, and the chosen .fin
 			})
 		}
 	}
-
 }

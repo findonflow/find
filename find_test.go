@@ -480,18 +480,18 @@ func TestFIND(t *testing.T) {
 			AssertWithPointerWant(t, "/accounts",
 				autogold.Want("with accounts", `[]interface {}{
   map[string]interface {}{
-    "address": "0xfd43f9148d4b725d",
-    "name": "notLink",
-    "network": "Flow",
-    "node": "FindRelatedAccounts",
-    "trusted": false,
-  },
-  map[string]interface {}{
     "address": "0x192440c99cb17282",
     "name": "link",
     "network": "Flow",
     "node": "FindRelatedAccounts",
     "trusted": true,
+  },
+  map[string]interface {}{
+    "address": "0xfd43f9148d4b725d",
+    "name": "notLink",
+    "network": "Flow",
+    "node": "FindRelatedAccounts",
+    "trusted": false,
   },
 }`))
 	})

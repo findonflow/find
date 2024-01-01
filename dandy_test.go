@@ -15,7 +15,7 @@ Tests must be in the same folder as flow.json with contracts and transactions/sc
 */
 func TestDandy(t *testing.T) {
 	otu := &OverflowTestUtils{T: t, O: ot.O}
-	t.Run("Should be able to mint 3 dandy nfts and display them", func(t *testing.T) {
+	ot.Run(t, "Should be able to mint 3 dandy nfts and display them", func(t *testing.T) {
 		id := dandyIds[0]
 
 		viewList := []string{
@@ -73,7 +73,7 @@ func TestDandy(t *testing.T) {
 	})
 
 	/* Test on dandy nft indexing {Mapping of minter} */
-	t.Run("Should be able to return the correct minter and dandies list", func(t *testing.T) {
+	ot.Run(t, "Should be able to return the correct minter and dandies list", func(t *testing.T) {
 		result, err := otu.O.Script("getDandiesIDsFor",
 			WithArg("user", "user1"),
 			WithArg("minter", "user1"),

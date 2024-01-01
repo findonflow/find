@@ -8,10 +8,9 @@ import (
 )
 
 func TestFindStruct(t *testing.T) {
+	otu := &OverflowTestUtils{T: t, O: ot.O}
 
-	otu := NewOverflowTest(t)
-
-	t.Run("Should be able to pass in Royalty Struct", func(t *testing.T) {
+	ot.Run(t, "Should be able to pass in Royalty Struct", func(t *testing.T) {
 		otu.O.Tx(
 			`
 				import FindPack from "../contracts/FindPack.cdc"
@@ -29,7 +28,7 @@ func TestFindStruct(t *testing.T) {
 			AssertSuccess(t)
 	})
 
-	t.Run("Should be able to pass in Verifier Struct", func(t *testing.T) {
+	ot.Run(t, "Should be able to pass in Verifier Struct", func(t *testing.T) {
 		otu.O.Tx(
 			`
 			import FindVerifier from "../contracts/FindVerifier.cdc"
@@ -45,7 +44,7 @@ func TestFindStruct(t *testing.T) {
 			AssertSuccess(t)
 	})
 
-	t.Run("Should be able to pass in PackRegisterSaleInfo Struct", func(t *testing.T) {
+	ot.Run(t, "Should be able to pass in PackRegisterSaleInfo Struct", func(t *testing.T) {
 		otu.O.Tx(
 			`
 			import FindPack from "../contracts/FindPack.cdc"
@@ -68,7 +67,7 @@ func TestFindStruct(t *testing.T) {
 			AssertSuccess(t)
 	})
 
-	t.Run("Should be able to pass in PackRegisterInfo Struct", func(t *testing.T) {
+	ot.Run(t, "Should be able to pass in PackRegisterInfo Struct", func(t *testing.T) {
 		otu.O.Tx(
 			`
 			import FindPack from "../contracts/FindPack.cdc"
@@ -82,5 +81,4 @@ func TestFindStruct(t *testing.T) {
 		).
 			AssertSuccess(t)
 	})
-
 }
