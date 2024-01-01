@@ -232,7 +232,7 @@ access(all) contract FindViews {
 
 
     access(all) struct AuthNFTPointer : Pointer, AuthPointer{
-        access(self) let cap: Capability<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection} >
+        access(self) let cap: Capability<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>
         access(all) let id: UInt64
         access(all) let nounce: UInt64
         access(all) let uuid: UInt64
@@ -273,13 +273,17 @@ access(all) contract FindViews {
         }
 
         access(all) fun valid() : Bool {
-            if !self.cap.check() || !self.cap.borrow()!.getIDs().contains(self.id) {
+            if !self.cap.check() {
                 return false
             }
 
-            let viewResolver=self.getViewResolver()
+            let nft= self.cap.borrow()!.borrowNFT(self.id)
 
-            if let nounce = viewResolver.resolveView(Type<FindViews.Nounce>()) {
+            if nft ==nil {
+                return false
+            }
+
+            if let nounce = nft!.resolveView(Type<FindViews.Nounce>()) {
                 if let v = nounce as? FindViews.Nounce {
                     return v.nounce==self.nounce
                 }
