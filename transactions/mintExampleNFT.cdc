@@ -1,14 +1,17 @@
 import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
-transaction(address: Address, name: String, description: String, thumbnail: String) {
+transaction(address: Address, name: String, description: String, thumbnail: String, soulBound: Bool) {
     let cap : Capability<&ExampleNFT.Collection>
-    let minter: &ExampleNFT.NFTMinter
+    let royaltyCap : Capability<&{FungibleToken.Receiver}>
 
-    prepare(account: auth(BorrowValue) &Account) {
-        self.cap = getAccount(address).capabilities.get<&ExampleNFT.Collection>(/public/exampleNFTCollection)!
-        self.minter=account.storage.borrow<&ExampleNFT.NFTMinter>(from: ExampleNFT.MinterStoragePath)!
+    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, UnpublishCapability) &Account) {
+
+        self.cap = getAccount(address).capabilities.get<&ExampleNFT.Collection>(ExampleNFT.CollectionPublicPath)!
+
+        self.royaltyCap =getAccount(address).capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
     }
 
     pre{
@@ -16,7 +19,10 @@ transaction(address: Address, name: String, description: String, thumbnail: Stri
     }
 
     execute{
-        let nft <- self.minter.mintNFT(name: name, description: description, thumbnail: thumbnail, royalties: [])
+
+        let r  = MetadataViews.Royalty(receiver:self.royaltyCap, cut: 0.01, description: "creator")
+        let royalties = MetadataViews.Royalties([r])
+        let nft <- ExampleNFT.mintNFT(name: name, description: description, thumbnail: thumbnail, soulBound:soulBound, traits:[], royalties: royalties)
         self.cap.borrow()!.deposit(token: <- nft)
     }
 }

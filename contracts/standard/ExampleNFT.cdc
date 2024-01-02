@@ -10,58 +10,111 @@
 */
 
 import NonFungibleToken from "./NonFungibleToken.cdc"
+import FungibleToken from "./FungibleToken.cdc"
 import MetadataViews from "./MetadataViews.cdc"
+import FindViews from "../FindViews.cdc"
+import FindForge from "../FindForge.cdc"
+import DapperUtilityCoin from "./DapperUtilityCoin.cdc"
 import ViewResolver from "./ViewResolver.cdc"
+
 
 access(all) contract ExampleNFT: ViewResolver {
 
-    /// Path where the minter should be stored
-    /// The standard paths for the collection are stored in the collection resource type
-    access(all) let MinterStoragePath: StoragePath
+    access(all) var totalSupply: UInt64
 
-    /// We choose the name NFT here, but this type can have any name now
-    /// because the interface does not require it to have a specific name any more
-    access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
+    access(all) event ContractInitialized()
+    access(all) event Withdraw(id: UInt64, from: Address?)
+    access(all) event Deposit(id: UInt64, to: Address?)
 
-        access(all) view fun getID(): UInt64 {
-            return self.uuid
+    access(all) let CollectionStoragePath: StoragePath
+    access(all) let CollectionPublicPath: PublicPath
+
+    access(all) let traits : {UInt64 : MetadataViews.Trait}
+
+    access(all) struct ExampleNFTInfo {
+        access(all) let name: String
+        access(all) let description: String
+        access(all) let soulBound: Bool
+        access(all) let traits : [UInt64]
+        access(all) let thumbnail: String
+
+        init(name: String, description: String, soulBound: Bool, traits : [UInt64], thumbnail: String) {
+            self.name=name
+            self.description=description
+            self.thumbnail=thumbnail
+            self.traits=traits
+            self.soulBound=soulBound
         }
+    }
 
-        /// From the Display metadata view
+
+    access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
+        access(all) let id: UInt64
+
         access(all) let name: String
         access(all) let description: String
         access(all) let thumbnail: String
+        access(all) var soulBound: Bool
+        // For testing
+        access(all) let traits : [UInt64]
+        access(self) let royalties: MetadataViews.Royalties
 
-        /// For the Royalties metadata view
-        access(self) let royalties: [MetadataViews.Royalty]
-
-        /// Generic dictionary of traits the NFT has
-        access(self) let metadata: {String: AnyStruct}
+        access(all) var changedRoyalties: Bool
 
         init(
+            id: UInt64,
             name: String,
             description: String,
             thumbnail: String,
-            royalties: [MetadataViews.Royalty],
-            metadata: {String: AnyStruct},
+            soulBound: Bool,
+            traits : [UInt64],
+            royalties: MetadataViews.Royalties
         ) {
+            self.id = id
             self.name = name
             self.description = description
             self.thumbnail = thumbnail
+            self.soulBound = soulBound
             self.royalties = royalties
-            self.metadata = metadata
+
+            for traitId in traits {
+                if !ExampleNFT.traits.containsKey(traitId) {
+                    panic("This trait does not exist ID :".concat(traitId.toString()))
+                }
+            }
+            self.traits=traits
+            self.changedRoyalties = false
+        }
+
+        access(all) view fun getID(): UInt64 {
+            return self.id
+        }
+
+        access(all) fun toggleSoulBound(_ status: Bool) {
+            self.soulBound = status
+        }
+
+        access(all) fun changeRoyalties(_ bool: Bool) {
+            self.changedRoyalties = bool
         }
 
         access(all) view fun getViews(): [Type] {
-            return [
+            let views = [
             Type<MetadataViews.Display>(),
             Type<MetadataViews.Royalties>(),
+            Type<MetadataViews.Editions>(),
             Type<MetadataViews.ExternalURL>(),
             Type<MetadataViews.NFTCollectionData>(),
             Type<MetadataViews.NFTCollectionDisplay>(),
             Type<MetadataViews.Serial>(),
-            Type<MetadataViews.Traits>()
+            Type<MetadataViews.Rarity>()
             ]
+
+            if self.soulBound {
+                views.concat([Type<FindViews.SoulBound>()])
+            }
+
+            return views
         }
 
         access(all) fun resolveView(_ view: Type): AnyStruct? {
@@ -74,40 +127,47 @@ access(all) contract ExampleNFT: ViewResolver {
                         url: self.thumbnail
                     )
                 )
+            case Type<MetadataViews.Editions>():
+                // There is no max number of NFTs that can be minted from this contract
+                // so the max edition field value is set to nil
+                let editionInfo = MetadataViews.Edition(name: "Example NFT Edition", number: self.id, max: nil)
+                let editionList: [MetadataViews.Edition] = [editionInfo]
+                return MetadataViews.Editions(
+                    editionList
+                )
             case Type<MetadataViews.Serial>():
                 return MetadataViews.Serial(
-                    self.getID()
+                    self.id
                 )
             case Type<MetadataViews.Royalties>():
-                return MetadataViews.Royalties(
-                    self.royalties
-                )
+                if !self.changedRoyalties {
+                    return self.royalties
+                }
+                return MetadataViews.Royalties([
+                MetadataViews.Royalty(receiver:ExampleNFT.account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!, cut: 0.99, description: "cheater")
+                ])
             case Type<MetadataViews.ExternalURL>():
-                return MetadataViews.ExternalURL("https://example-nft.onflow.org/".concat(self.getID().toString()))
+                return MetadataViews.ExternalURL("https://example-nft.onflow.org/".concat(self.id.toString()))
             case Type<MetadataViews.NFTCollectionData>():
                 return ExampleNFT.getCollectionData(nftType: Type<@ExampleNFT.NFT>())
             case Type<MetadataViews.NFTCollectionDisplay>():
                 return ExampleNFT.getCollectionDisplay(nftType: Type<@ExampleNFT.NFT>())
-            case Type<MetadataViews.Traits>():
-                // exclude mintedTime and foo to show other uses of Traits
-                let excludedTraits = ["mintedTime", "foo"]
-                let traitsView = MetadataViews.dictToTraits(dict: self.metadata, excludedNames: excludedTraits)
+            case Type<FindViews.SoulBound>() :
+                if !self.soulBound {
+                    return nil
+                }
+                return FindViews.SoulBound(
+                    "This NFT is soulbound."
+                )
 
-                // mintedTime is a unix timestamp, we should mark it with a displayType so platforms know how to show it.
-                let mintedTimeTrait = MetadataViews.Trait(name: "mintedTime", value: self.metadata["mintedTime"]!, displayType: "Date", rarity: nil)
-                traitsView.addTrait(mintedTimeTrait)
-
-                // foo is a trait with its own rarity
-                let fooTraitRarity = MetadataViews.Rarity(score: 10.0, max: 100.0, description: "Common")
-                let fooTrait = MetadataViews.Trait(name: "foo", value: self.metadata["foo"], displayType: nil, rarity: fooTraitRarity)
-                traitsView.addTrait(fooTrait)
-
-                return traitsView
+            case Type<MetadataViews.Rarity>() :
+                return MetadataViews.Rarity(score: 1.0, max: 2.0, description: "rarity description")
 
             }
             return nil
         }
     }
+
 
     access(all) resource Collection: NonFungibleToken.Collection {
         /// dictionary of NFT conforming tokens
@@ -198,6 +258,8 @@ access(all) contract ExampleNFT: ViewResolver {
         }
     }
 
+
+
     /// public function that anyone can call to create a new empty collection
     /// Since multiple collection types can be defined in a contract,
     /// The caller needs to specify which one they want to create
@@ -205,16 +267,32 @@ access(all) contract ExampleNFT: ViewResolver {
         return <- create Collection()
     }
 
-    /// Function that returns all the Metadata Views implemented by a Non Fungible Token
-    ///
-    /// @return An array of Types defining the implemented views. This value will be used by
-    ///         developers to know which parameter to pass to the resolveView() method.
-    ///
-    access(all) view fun getViews(): [Type] {
-        return [
-        Type<MetadataViews.NFTCollectionData>(),
-        Type<MetadataViews.NFTCollectionDisplay>()
-        ]
+
+    /* Find Forge Specific code  */
+    // mintNFT mints a new NFT with a new ID
+    // and deposit it in the recipients collection using their collection reference
+    access(all) fun mintNFT(
+        name: String,
+        description: String,
+        thumbnail: String,
+        soulBound: Bool ,
+        traits: [UInt64] ,
+        royalties: MetadataViews.Royalties
+    ) : @{NonFungibleToken.NFT} {
+
+        // create a new NFT
+        var newNFT <- create NFT(
+            id: ExampleNFT.totalSupply,
+            name: name,
+            description: description,
+            thumbnail: thumbnail,
+            soulBound: soulBound,
+            traits: traits,
+            royalties: royalties
+        )
+
+        ExampleNFT.totalSupply = ExampleNFT.totalSupply + 1 
+        return <- newNFT
     }
 
     /// Function that resolves a metadata view for this contract.
@@ -282,59 +360,74 @@ access(all) contract ExampleNFT: ViewResolver {
         }
     }
 
-    /// Resource that an admin or something similar would own to be
-    /// able to mint new NFTs
-    ///
-    access(all) resource NFTMinter {
 
-        /// mintNFT mints a new NFT with a new ID
-        /// and returns it to the calling context
-        access(all) fun mintNFT(
-            name: String,
-            description: String,
-            thumbnail: String,
-            royalties: [MetadataViews.Royalty]
-        ): @ExampleNFT.NFT {
 
-            let metadata: {String: AnyStruct} = {}
-            let currentBlock = getCurrentBlock()
-            metadata["mintedBlock"] = currentBlock.height
-            metadata["mintedTime"] = currentBlock.timestamp
+    access(all)resource Forge: FindForge.Forge {
+        access(all) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
+            let info = data as? ExampleNFTInfo ?? panic("The data passed in is not in form of ExampleNFTInfo.")
+            let royalties : [MetadataViews.Royalty] = []
+            if platform.platformPercentCut != 0.0 {
+                royalties.append(MetadataViews.Royalty(receiver:platform.platform, cut: platform.platformPercentCut, description: "find forge"))
+            }
+            if platform.minterCut != nil && platform.minterCut! != 0.0 {
+                royalties.append(MetadataViews.Royalty(receiver:platform.getMinterFTReceiver(), cut: platform.minterCut!, description: "creator"))
+            }
+            return <- ExampleNFT.mintNFT(name: info.name,
+            description: info.description,
+            thumbnail: info.thumbnail,
+            soulBound: info.soulBound,
+            traits: info.traits,
+            royalties: MetadataViews.Royalties(royalties))
+        }
 
-            // this piece of metadata will be used to show embedding rarity into a trait
-            metadata["foo"] = "bar"
+        access(all) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
+            let type = data.getType()
 
-            // create a new NFT
-            var newNFT <- create NFT(
-                name: name,
-                description: description,
-                thumbnail: thumbnail,
-                royalties: royalties,
-                metadata: metadata,
-            )
+            switch type {
+            case Type<{UInt64 : MetadataViews.Trait}>() :
+                // for duplicated indexes, the new one will replace the old one
+                let typedData = data as! {UInt64 : MetadataViews.Trait}
+                for key in typedData.keys {
+                    ExampleNFT.traits[key] = ExampleNFT.traits[key] ?? typedData[key]
+                }
+                return
 
-            return <-newNFT
+            }
         }
     }
 
+    access(account) fun createForge() : @{FindForge.Forge} {
+        return <- create Forge()
+    }
+
+    access(all) fun getForgeType() : Type {
+        return Type<@Forge>()
+    }
+
     init() {
+        // Initialize the total supply
+        self.totalSupply = 0
 
         // Set the named paths
-        self.MinterStoragePath = /storage/exampleNFTMinter
+        self.CollectionStoragePath = /storage/exampleNFTCollection
+        self.CollectionPublicPath = /public/exampleNFTCollection
+
+        self.traits={
+            1 : MetadataViews.Trait(name: "head", value: "hat", displayType: "string", rarity: nil),
+            2 : MetadataViews.Trait(name: "shoulder", value: "shoulder pad", displayType: "string", rarity: MetadataViews.Rarity(score: nil, max: nil, description: "Common")),
+            3 : MetadataViews.Trait(name: "knees", value: "knee pad", displayType: "string", rarity: nil)
+        }
 
         // Create a Collection resource and save it to storage
         let collection <- create Collection()
-        let defaultStoragePath = collection.getDefaultStoragePath()!
-        let defaultPublicPath = collection.getDefaultPublicPath()!
-        self.account.storage.save(<-collection, to: defaultStoragePath)
+        self.account.storage.save(<-collection, to: self.CollectionStoragePath)
 
         // create a public capability for the collection
-        let collectionCap = self.account.capabilities.storage.issue<&ExampleNFT.Collection>(defaultStoragePath)
-        self.account.capabilities.publish(collectionCap, at: defaultPublicPath)
+        let collectionCap = self.account.capabilities.storage.issue<&ExampleNFT.Collection>(self.CollectionStoragePath)
+        self.account.capabilities.publish(collectionCap, at: self.CollectionPublicPath)
 
-        // Create a Minter resource and save it to storage
-        let minter <- create NFTMinter()
-        self.account.storage.save(<-minter, to: self.MinterStoragePath)
+        FindForge.addForgeType(<- create Forge())
+
+        FindForge.addPublicForgeType(forgeType: Type<@Forge>())
     }
 }
-

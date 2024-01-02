@@ -15,7 +15,7 @@ import (
 var (
 	ot         *OverflowTest
 	dandyIds   []uint64 // ids for test dandies minted
-	exampleIds []uint   // ids for test example nfts minted
+	exampleIds []uint64 // ids for test example nfts minted
 	packId     uint64   // the id for the test pack
 	packTypeId uint64
 )
@@ -156,15 +156,18 @@ func SetupFIND(o *OverflowState) error {
 		WithSigner("user1"),
 	)
 
+	stx("setupExampleNFTCollection", WithSigner("user1"))
+
 	er := stx("mintExampleNFT",
 		findSigner,
-		WithArg("address", "find"),
+		WithArg("address", "user1"),
 		WithArg("name", "Example1"),
 		WithArg("description", "An example NFT"),
 		WithArg("thumbnail", "http://foo.bar"),
+		WithArg("soulBound", false),
 	)
 
-	exampleNFTS := er.GetIdsFromEvent("NonFungibleToken.Deposit", "id")
+	exampleIds = er.GetIdsFromEvent("NonFungibleToken.Deposit", "id")
 
 	// we register example NFT in the catalog
 	exampleNFTIdentifier, _ := o.QualifiedIdentifier("ExampleNFT", "NFT")
@@ -173,8 +176,8 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("collectionIdentifier", exampleNFTIdentifier),
 		WithArg("contractName", exampleNFTIdentifier),
 		WithArg("contractAddress", "find"),
-		WithArg("addressWithNFT", "find"),
-		WithArg("nftID", exampleNFTS[0]),
+		WithArg("addressWithNFT", "user1"),
+		WithArg("nftID", exampleIds[0]),
 		WithArg("publicPathIdentifier", "exampleNFTCollection"),
 	)
 
@@ -212,6 +215,14 @@ func SetupFIND(o *OverflowState) error {
 		WithSigner("find"),
 		WithArg("nftName", "Dandy"),
 		WithArg("nftTypes", []string{dandyIdentifier}),
+		WithArg("cut", 0.0),
+	)
+
+	// add that we can sell dandies on the market
+	stx("tenantsetMarketOption",
+		WithSigner("find"),
+		WithArg("nftName", "Example"),
+		WithArg("nftTypes", []string{exampleNFTIdentifier}),
 		WithArg("cut", 0.0),
 	)
 

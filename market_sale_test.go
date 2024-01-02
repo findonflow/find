@@ -13,6 +13,7 @@ func TestMarketSale(t *testing.T) {
 
 	royaltyIdentifier := otu.identifier("FindMarket", "RoyaltyPaid")
 	dandyIdentifier := dandyNFTType(otu)
+	exampleIdentifier := exampleNFTType(otu)
 
 	id := dandyIds[0]
 	price := 10.0
@@ -410,407 +411,80 @@ func TestMarketSale(t *testing.T) {
 			)
 	})
 
-	/*
-						t.Run("Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {
-
-							otu.createDapperUser("user1").
-								createDapperUser("user2").
-								createDapperUser("find").
-								createDapperUser("find-admin")
-
-							otu.registerDUCInRegistry().
-								setExampleNFT().
-								sendExampleNFT("user1", "find", 0).
-								setFlowExampleMarketOption("find")
-
-							saleItemID := otu.listNFTForSaleDUC("user1", 0, price)
-
-							otu.checkRoyalty("user1", 0, "creator", exampleNFTType(otu), 0.01)
-
-							itemsForSale := otu.getItemsForSale("user1")
-							assert.Equal(t, 1, len(itemsForSale))
-							assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
-
-							otu.getNFTForMarketSale("user1", saleItemID[0], price)
-
-							otu.buyNFTForMarketSaleDUC("user2", "user1", saleItemID[0], price).
-								sendExampleNFT("user1", "user2", 0)
-
-						})
-
-						t.Run("Should be able to list an NFT for sale and buy it with DUC, royalties should be paid to merch account", func(t *testing.T) {
-
-							saleItemID := otu.listNFTForSaleDUC("user1", 0, price)
-
-							otu.checkRoyalty("user1", 0, "creator", exampleNFTType(otu), 0.01)
-
-							itemsForSale := otu.getItemsForSale("user1")
-							assert.Equal(t, 1, len(itemsForSale))
-							assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
-
-							otu.getNFTForMarketSale("user1", saleItemID[0], price)
-
-							name := "user2"
-							seller := "user1"
-							otu.O.Tx("buyNFTForSaleDapper",
-								WithSigner(name),
-								WithPayloadSigner("dapper"),
-								WithArg("address", seller),
-								WithArg("id", saleItemID[0]),
-								WithArg("amount", price),
-							).
-								AssertSuccess(otu.T).
-								AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
-									map[string]interface{}{
-										"address": otu.O.Address("find"),
-										"amount":  0.35,
-									})
-
-							otu.sendExampleNFT("user1", "user2", 0)
-
-						})
-
-						t.Run("Should be able to list an NFT for sale and buy it with DUC, royalties should be paid to merch account if royalty is higher than 0.44", func(t *testing.T) {
-
-							saleItemID := otu.listNFTForSaleDUC("user1", 0, 100.0)
-
-							otu.checkRoyalty("user1", 0, "creator", exampleNFTType(otu), 0.01)
-
-							itemsForSale := otu.getItemsForSale("user1")
-							assert.Equal(t, 1, len(itemsForSale))
-							assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
-
-							otu.getNFTForMarketSale("user1", saleItemID[0], 100.0)
-
-							name := "user2"
-							seller := "user1"
-							otu.O.Tx("buyNFTForSaleDapper",
-								WithSigner(name),
-								WithPayloadSigner("dapper"),
-								WithArg("address", seller),
-								WithArg("id", saleItemID[0]),
-								WithArg("amount", 100.0),
-							).
-								AssertSuccess(otu.T).
-								AssertEvent(otu.T, "FindMarket.RoyaltyPaid",
-									map[string]interface{}{
-										"address": otu.O.Address("find"),
-										"amount":  3.5,
-									})
-
-							otu.sendExampleNFT("user1", "user2", 0)
-
-						})
-
-						t.Run("Royalties should be sent to dapper residual account if royalty receiver is not working", func(t *testing.T) {
-
-							saleItemID := otu.listNFTForSaleDUC("user1", 0, price)
-
-							otu.checkRoyalty("user1", 0, "creator", exampleNFTType(otu), 0.01)
-
-							otu.unlinkDUCVaultReceiver("find")
-							otu.O.Tx("buyNFTForSaleDapper",
-								WithSigner("user2"),
-								WithPayloadSigner("dapper"),
-								WithArg("address", "user1"),
-								WithArg("id", saleItemID[0]),
-								WithArg("amount", price),
-							).
-								AssertSuccess(t).
-								AssertEvent(t,
-									"FindMarket.RoyaltyCouldNotBePaid",
-									map[string]interface{}{
-										"address":         otu.O.Address("find"),
-										"amount":          0.1,
-										"findName":        "find",
-										"residualAddress": otu.O.Address("residual"),
-										"royaltyName":     "creator",
-									},
-								)
-
-							otu.linkDUCVaultReceiver("find")
-							otu.sendExampleNFT("user1", "user2", 0)
-						})
-
-					//TODO: We do not support multiple buy in the FT regardless
-					ot.Run(t, "Should be able to list multiple dandies for sale and buy them in one go", func(t *testing.T) {
-						otu.O.Tx("listMultipleNFTForSale",
-							WithSigner("user1"),
-							WithArg("nftAliasOrIdentifiers", []string{dandyIdentifier, dandyIdentifier, dandyIdentifier}),
-							WithArg("ids", dandyIds),
-							WithArg("ftAliasOrIdentifiers", []string{"Flow", "Flow", "Flow"}),
-							WithArg("directSellPrices", `[10.0 , 10.0, 10.0]`),
-							WithArg("validUntil", otu.currentTime()+100.0),
-						).AssertSuccess(t)
-
-						scriptResult := otu.O.Script("getFindMarket", WithArg("user", "user1"))
-
-						var itemsForSale []SaleItemInformation
-						err := scriptResult.MarshalPointerAs("/itemsForSale/FindMarketSale/items", &itemsForSale)
-
-						assert.NoError(t, err)
-						assert.Equal(t, 3, len(itemsForSale))
-						assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
-						assert.Equal(t, "active_listed", itemsForSale[1].SaleType)
-						assert.Equal(t, "active_listed", itemsForSale[2].SaleType)
-
-						seller := "user1"
-						name := "user2"
-
-						otu.O.Tx("buyMultipleNFTForSale",
-							WithSigner("user2"),
-							WithAddresses("users", "user1", "user1", "user1"),
-							WithArg("ids", dandyIds),
-							WithArg("amounts", `[10.0 , 10.0, 10.0]`),
-						).
-							AssertSuccess(t).
-							AssertEvent(t, eventIdentifier, map[string]interface{}{
-								"amount": price,
-								"id":     dandyIds[0],
-								"seller": otu.O.Address(seller),
-								"buyer":  otu.O.Address(name),
-								"status": "sold",
-							}).
-							AssertEvent(t, eventIdentifier, map[string]interface{}{
-								"amount": price,
-								"id":     dandyIds[1],
-								"seller": otu.O.Address(seller),
-								"buyer":  otu.O.Address(name),
-								"status": "sold",
-							}).
-							AssertEvent(t, eventIdentifier, map[string]interface{}{
-								"amount": price,
-								"id":     dandyIds[2],
-								"seller": otu.O.Address(seller),
-								"buyer":  otu.O.Address(name),
-								"status": "sold",
-							})
-					})
-						t.Run("Should be able to list 15 dandies in one go", func(t *testing.T) {
-
-							number := 15
-
-							mintFund("devMintFusd").AssertSuccess(t)
-
-							ids := otu.mintThreeExampleDandies()
-							dandy := []string{dandyNFTType(otu), dandyNFTType(otu), dandyNFTType(otu)}
-							fusd := []string{"FUSD", "FUSD", "FUSD"}
-							prices := "[ 15.0, 15.0, 15.0 "
-
-							for len(ids) < number {
-								id := otu.mintThreeExampleDandies()
-								ids = append(ids, id...)
-							}
-
-							ids = ids[:number]
-
-							for len(dandy) < number {
-								dandy = append(dandy, dandy[0])
-								fusd = append(fusd, fusd[0])
-								prices = prices + ", 15.0"
-							}
-							prices = prices + "]"
-
-							// list multiple NFT for sale
-
-							otu.O.Tx("listMultipleNFTForSale",
-								WithSigner("user1"),
-								WithArg("nftAliasOrIdentifiers", dandy),
-								WithArg("ids", ids),
-								WithArg("ftAliasOrIdentifiers", fusd),
-								WithArg("directSellPrices", prices),
-								WithArg("validUntil", otu.currentTime()+100.0),
-							).
-								AssertSuccess(t)
-
-							otu.cancelAllNFTForSale("user1")
-
-						})
-
-						t.Run("Should be able to buy at max 5 dandies", func(t *testing.T) {
-
-							ids := otu.mintThreeExampleDandies()
-							dandy := []string{dandyNFTType(otu), dandyNFTType(otu), dandyNFTType(otu)}
-							fusd := []string{"FUSD", "FUSD", "FUSD"}
-							prices := "[ 10.0, 10.0, 10.0 , 10.0, 10.0]"
-							buyers := []string{"user1", "user1", "user1"}
-
-							id := otu.mintThreeExampleDandies()
-							ids = append(ids, id[0], id[1])
-							dandy = append(dandy, []string{dandyNFTType(otu), dandyNFTType(otu)}...)
-							fusd = append(fusd, []string{"FUSD", "FUSD"}...)
-							buyers = append(buyers, []string{"user1", "user1"}...)
-
-							// list multiple NFT for sale
-
-							otu.O.Tx("listMultipleNFTForSale",
-								WithSigner("user1"),
-								WithArg("nftAliasOrIdentifiers", dandy),
-								WithArg("ids", ids),
-								WithArg("ftAliasOrIdentifiers", fusd),
-								WithArg("directSellPrices", prices),
-								WithArg("validUntil", otu.currentTime()+100.0),
-							).
-								AssertSuccess(t)
-
-							otu.O.Tx("buyMultipleNFTForSale",
-								WithSigner("user2"),
-								WithAddresses("users", buyers...),
-								WithArg("ids", ids),
-								WithArg("amounts", prices),
-							).
-								AssertSuccess(t)
-
-							otu.cancelAllNFTForSale("user1")
-
-						})
-
-						t.Run("Should be able to list ExampleNFT for sale and buy it with DUC using MultipleNFT transaction", func(t *testing.T) {
-
-							ftIden, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
-							assert.NoError(t, err)
-
-							saleItemID := otu.O.Tx("listMultipleNFTForSaleDapper",
-								WithSigner("user1"),
-								WithArg("nftAliasOrIdentifiers", []string{exampleNFTType(otu)}),
-								WithArg("ids", []uint64{0}),
-								WithArg("ftAliasOrIdentifiers", []string{ftIden}),
-								WithArg("directSellPrices", `[10.0]`),
-								WithArg("validUntil", otu.currentTime()+100.0),
-							).
-								AssertSuccess(t).
-								GetIdsFromEvent(eventIdentifier, "id")
-
-							otu.checkRoyalty("user1", 0, "creator", exampleNFTType(otu), 0.01)
-
-							itemsForSale := otu.getItemsForSale("user1")
-							assert.Equal(t, 1, len(itemsForSale))
-							assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
-
-							otu.O.Tx("buyMultipleNFTForSaleDapper",
-								WithSigner("user2"),
-								WithPayloadSigner("dapper"),
-								WithAddresses("users", "user1"),
-								WithArg("ids", saleItemID[0:1]),
-								WithArg("amounts", `[10.0]`),
-							).
-								AssertSuccess(t).
-								AssertEvent(t, eventIdentifier, map[string]interface{}{
-									"amount": price,
-									"id":     saleItemID[0],
-									"seller": otu.O.Address("user1"),
-									"buyer":  otu.O.Address("user2"),
-									"status": "sold",
-								})
-
-							otu.sendExampleNFT("user1", "user2", 0)
-
-						})
-
-
-			  //TODO: do not have test data with soul bound
-				t.Run("Should not be able to list soul bound items", func(t *testing.T) {
-					otu.sendSoulBoundNFT("user1", "find")
-					// set market rules
-					otu.O.Tx("adminSetSellExampleNFTForFlow",
-						WithSigner("find"),
-						WithArg("tenant", "find"),
-					)
-
-					otu.O.Tx("listNFTForSale",
-						WithSigner("user1"),
-						WithArg("nftAliasOrIdentifier", exampleNFTType(otu)),
-						WithArg("id", 1),
-						WithArg("ftAliasOrIdentifier", "Flow"),
-						WithArg("directSellPrice", price),
-						WithArg("validUntil", otu.currentTime()+100.0),
-					).AssertFailure(t, "This item is soul bounded and cannot be traded")
-
-					listingTx("listNFTForSale",
-						WithSigner("user1"),
-						WithArg("nftAliasOrIdentifier", exampleNFTType(otu)),
-						WithArg("id", 1),
-						WithArg("ftAliasOrIdentifier", "Flow"),
-						WithArg("directSellPrice", price),
-						WithArg("validUntil", otu.currentTime()+100.0),
-					)
-				})
-
-
-		t.Run("not be able to buy an NFT with changed royalties, but should be able to cancel listing", func(t *testing.T) {
-			saleItem := otu.listExampleNFTForSale("user1", 0, price)
-
-			otu.checkRoyalty("user1", 0, "creator", exampleNFTType(otu), 0.01)
-
-			itemsForSale := otu.getItemsForSale("user1")
-			assert.Equal(t, 1, len(itemsForSale))
-			assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
-
-			otu.changeRoyaltyExampleNFT("user1", 0, true)
-
-			otu.checkRoyalty("user1", 0, "cheater", exampleNFTType(otu), 0.99)
-
-			otu.O.Tx("buyNFTForSale",
-				WithSigner("user2"),
-				WithArg("user", "user1"),
-				WithArg("id", saleItem[0]),
-				WithArg("amount", price),
-			).
-				AssertFailure(t, "The total Royalties to be paid is changed after listing.")
-
-			otu.O.Tx("delistNFTSale",
-				WithSigner("user1"),
-				WithArg("ids", saleItem[0:1]),
-			).
-				AssertSuccess(t)
-
-			otu.changeRoyaltyExampleNFT("user1", 0, false)
-		})
-
-		t.Run("should be able to get listings with royalty problems and relist", func(t *testing.T) {
-			otu.listExampleNFTForSale("user1", 0, price)
-
-			otu.checkRoyalty("user1", 0, "creator", exampleNFTType(otu), 0.01)
-
-			itemsForSale := otu.getItemsForSale("user1")
-			assert.Equal(t, 1, len(itemsForSale))
-			assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
-
-			otu.changeRoyaltyExampleNFT("user1", 0, true)
-
-			otu.checkRoyalty("user1", 0, "cheater", exampleNFTType(otu), 0.99)
-
-			ids, err := otu.O.Script("getRoyaltyChangedIds",
-				WithArg("user", "user1"),
-			).
-				GetAsJson()
-			if err != nil {
-				panic(err)
-			}
-
-			otu.O.Tx("relistMarketListings",
-				WithSigner("user1"),
-				WithArg("ids", ids),
-			).
-				AssertSuccess(t)
-		})
-
-		t.Run("should be able to get listings with royalty problems and cancel", func(t *testing.T) {
-			otu.changeRoyaltyExampleNFT("user1", 0, false)
-
-			ids, err := otu.O.Script("getRoyaltyChangedIds",
-				WithArg("user", "user1"),
-			).
-				GetAsJson()
-			if err != nil {
-				panic(err)
-			}
-
-			otu.O.Tx("cancelMarketListings",
-				WithSigner("user1"),
-				WithArg("ids", ids),
-			).
-				AssertSuccess(t)
-		})
-	*/
+	ot.Run(t, "Should not be able to list soul bound items", func(t *testing.T) {
+		otu.O.Tx("mintExampleNFT",
+			findSigner,
+			WithArg("address", "user1"),
+			WithArg("name", "Example2"),
+			WithArg("description", "An example NFT"),
+			WithArg("thumbnail", "http://foo.bar"),
+			WithArg("soulBound", true),
+		).AssertSuccess(t)
+
+		otu.O.Tx("listNFTForSale",
+			WithSigner("user1"),
+			WithArg("nftAliasOrIdentifier", exampleIdentifier),
+			WithArg("id", 1),
+			WithArg("ftAliasOrIdentifier", "Flow"),
+			WithArg("directSellPrice", price),
+			WithArg("validUntil", otu.currentTime()+100.0),
+		).AssertFailure(t, "This item is soul bounded and cannot be traded")
+	})
+
+	ot.Run(t, "not be able to buy an NFT with changed royalties, but should be able to cancel listing", func(t *testing.T) {
+		saleItem := otu.listExampleNFTForSale("user1", exampleIds[0], price)
+
+		otu.checkRoyalty("user1", 0, "creator", exampleIdentifier, 0.01)
+
+		itemsForSale := otu.getItemsForSale("user1")
+		assert.Equal(t, 1, len(itemsForSale))
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
+
+		otu.changeRoyaltyExampleNFT("user1", 0, true)
+
+		otu.checkRoyalty("user1", 0, "cheater", exampleIdentifier, 0.99)
+
+		otu.O.Tx("buyNFTForSale",
+			WithSigner("user2"),
+			WithArg("user", "user1"),
+			WithArg("id", saleItem[0]),
+			WithArg("amount", price),
+		).
+			AssertFailure(t, "The total Royalties to be paid is changed after listing.")
+
+		otu.O.Tx("delistNFTSale",
+			WithSigner("user1"),
+			WithArg("ids", saleItem[0:1]),
+		).
+			AssertSuccess(t)
+
+		otu.changeRoyaltyExampleNFT("user1", 0, false)
+	})
+
+	ot.Run(t, "should be able to get listings with royalty problems and relist", func(t *testing.T) {
+		otu.listExampleNFTForSale("user1", 0, price)
+
+		otu.checkRoyalty("user1", 0, "creator", exampleIdentifier, 0.01)
+
+		itemsForSale := otu.getItemsForSale("user1")
+		assert.Equal(t, 1, len(itemsForSale))
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
+
+		otu.changeRoyaltyExampleNFT("user1", 0, true)
+
+		otu.checkRoyalty("user1", 0, "cheater", exampleIdentifier, 0.99)
+
+		ids, err := otu.O.Script("getRoyaltyChangedIds",
+			WithArg("user", "user1"),
+		).
+			GetAsJson()
+		if err != nil {
+			panic(err)
+		}
+
+		otu.O.Tx("relistMarketListings",
+			WithSigner("user1"),
+			WithArg("ids", ids),
+		).AssertSuccess(t)
+	})
 }
