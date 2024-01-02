@@ -295,6 +295,12 @@ access(all) contract ExampleNFT: ViewResolver {
         return <- newNFT
     }
 
+
+    access(all) view fun getViews(): [Type] {
+        return  [ Type<MetadataViews.NFTCollectionData>(), Type<MetadataViews.NFTCollectionDisplay>() ]
+    }
+
+
     /// Function that resolves a metadata view for this contract.
     ///
     /// @param view: The Type of the desired view.

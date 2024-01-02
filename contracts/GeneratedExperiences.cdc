@@ -1,10 +1,11 @@
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import FungibleToken from "./standard/FungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
+import ViewResolver from "./standard/ViewResolver.cdc"
 import FindForge from "./FindForge.cdc"
 import FindPack from "./FindPack.cdc"
 
-access(all) contract GeneratedExperiences: NonFungibleToken {
+access(all) contract GeneratedExperiences: ViewResolver {
 
     access(all) var totalSupply: UInt64
 
@@ -21,7 +22,6 @@ access(all) contract GeneratedExperiences: NonFungibleToken {
 
     access(all) let CollectionName : String
 
-    // {Season : CollectionInfo}
     access(all) let collectionInfo: {UInt64 : CollectionInfo}
 
     access(all) struct CollectionInfo {
@@ -86,7 +86,8 @@ access(all) contract GeneratedExperiences: NonFungibleToken {
         }
     }
 
-    access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
+
+    access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
         access(all) let id: UInt64
         access(all) let info: Info
 
@@ -97,7 +98,13 @@ access(all) contract GeneratedExperiences: NonFungibleToken {
             self.info=info
         }
 
-        access(all) getViews(): [Type] {
+
+
+        access(all) view fun getID(): UInt64 {
+            return self.id
+        }
+
+        access(all) view fun getViews(): [Type] {
             return [
             Type<MetadataViews.Display>(),
             Type<MetadataViews.Royalties>(),
@@ -112,7 +119,7 @@ access(all) contract GeneratedExperiences: NonFungibleToken {
             ]
         }
 
-        access(all) resolveView(_ view: Type): AnyStruct? {
+        access(all) fun resolveView(_ view: Type): AnyStruct? {
 
             let collection = GeneratedExperiences.collectionInfo[self.info.season]!
 
@@ -150,36 +157,10 @@ access(all) contract GeneratedExperiences: NonFungibleToken {
                 return MetadataViews.ExternalURL("https://find.xyz/")
 
             case Type<MetadataViews.NFTCollectionData>():
-                return MetadataViews.NFTCollectionData(
-                    storagePath: GeneratedExperiences.CollectionStoragePath,
-                    publicPath: GeneratedExperiences.CollectionPublicPath,
-                    providerPath: GeneratedExperiences.CollectionPrivatePath,
-                    publicCollection: Type<&GeneratedExperiences.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-                    publicLinkedType: Type<&GeneratedExperiences.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-                    providerLinkedType: Type<&GeneratedExperiences.Collection{NonFungibleToken.Collection,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
-                    createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
-                        return <-GeneratedExperiences.createEmptyCollection()
-                    })
-                )
+                return GeneratedExperiences.getCollectionData()
+
             case Type<MetadataViews.NFTCollectionDisplay>():
-
-                var square = collection.squareImage
-
-                var banner = collection.bannerImage
-
-                let social : {String : MetadataViews.ExternalURL} = {}
-                for s in collection.socials.keys {
-                    social[s] = MetadataViews.ExternalURL(collection.socials[s]!)
-                }
-
-                return MetadataViews.NFTCollectionDisplay(
-                    name: GeneratedExperiences.CollectionName,
-                    description: collection.description,
-                    externalURL: MetadataViews.ExternalURL("https://find.xyz/mp/".concat(GeneratedExperiences.CollectionName)),
-                    squareImage: square,
-                    bannerImage: banner,
-                    socials: social
-                )
+                return GeneratedExperiences.getCollectionDisplay(self.info.season)
 
             case Type<MetadataViews.Traits>() :
 
@@ -206,68 +187,157 @@ access(all) contract GeneratedExperiences: NonFungibleToken {
         }
     }
 
-    access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
-        // dictionary of NFT conforming tokens
-        // NFT is a resource type with an `UInt64` ID field
-        access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+    access(all) resource Collection: NonFungibleToken.Collection {
+        /// dictionary of NFT conforming tokens
+        /// NFT is a resource type with an `UInt64` ID field
+        access(contract) var ownedNFTs: @{UInt64: GeneratedExperiences.NFT}
+
+        /// Return the default storage path for the collection
+        access(all) view fun getDefaultStoragePath(): StoragePath? {
+            return GeneratedExperiences.CollectionStoragePath
+        }
+
+        /// Return the default public path for the collection
+        access(all) view fun getDefaultPublicPath(): PublicPath? {
+            return GeneratedExperiences.CollectionPublicPath
+        }
 
         init () {
             self.ownedNFTs <- {}
         }
 
-        // withdraw removes an NFT from the collection and moves it to the caller
-        access(all) withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
-            let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
+        /// getSupportedNFTTypes returns a list of NFT types that this receiver accepts
+        access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
+            let supportedTypes: {Type: Bool} = {}
+            supportedTypes[Type<@GeneratedExperiences.NFT>()] = true
+            return supportedTypes
+        }
 
-            emit Withdraw(id: token.id, from: self.owner?.address)
+        /// Returns whether or not the given type is accepted by the collection
+        /// A collection that can accept any type should just return true by default
+        access(all) view fun isSupportedNFTType(type: Type): Bool {
+            if type == Type<@GeneratedExperiences.NFT>() {
+                return true
+            } else {
+                return false
+            }
+        }
+
+        /// withdraw removes an NFT from the collection and moves it to the caller
+        access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+            let token <- self.ownedNFTs.remove(key: withdrawID)
+            ?? panic("Could not withdraw an NFT with the provided ID from the collection")
 
             return <-token
         }
 
-        // deposit takes a NFT and adds it to the collections dictionary
-        // and adds the ID to the id array
-        access(all) deposit(token: @NonFungibleToken.NFT) {
+        /// deposit takes a NFT and adds it to the collections dictionary
+        /// and adds the ID to the id array
+        access(all) fun deposit(token: @{NonFungibleToken.NFT}) {
             let token <- token as! @GeneratedExperiences.NFT
 
-            let id: UInt64 = token.id
-
             // add the new token to the dictionary which removes the old one
-            let oldToken <- self.ownedNFTs[id] <- token
-
-            emit Deposit(id: id, to: self.owner?.address)
+            let oldToken <- self.ownedNFTs[token.getID()] <- token
 
             destroy oldToken
         }
 
-        // getIDs returns an array of the IDs that are in the collection
-        access(all) getIDs(): [UInt64] {
+        /// getIDs returns an array of the IDs that are in the collection
+        access(all) view fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
         }
 
-        // borrowNFT gets a reference to an NFT in the collection
-        // so that the caller can read its metadata and call its methods
-        access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT {
-            return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
+        /// Gets the amount of NFTs stored in the collection
+        access(all) view fun getLength(): Int {
+            return self.ownedNFTs.keys.length
         }
 
-        access(all) borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
-            let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
-            let ge = nft as! &GeneratedExperiences.NFT
-            return ge as &AnyResource{ViewResolver.Resolver}
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
+            return &self.ownedNFTs[id] 
         }
 
-        destroy() {
-            destroy self.ownedNFTs
+        /// Borrow the view resolver for the specified NFT ID
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}? {
+            if let nft = &self.ownedNFTs[id] as &GeneratedExperiences.NFT? {
+                return nft as &{ViewResolver.Resolver}
+            }
+            return nil
+        }
+
+        /// public function that anyone can call to create a new empty collection
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <- create GeneratedExperiences.Collection()
         }
     }
 
+
     // public function that anyone can call to create a new empty collection
-    access(all) createEmptyCollection(): @NonFungibleToken.Collection {
+    access(all) fun createEmptyCollection(): @GeneratedExperiences.Collection {
         return <- create Collection()
     }
 
+
+    access(all) view fun getViews(): [Type] {
+        return  [ Type<MetadataViews.NFTCollectionData>(), Type<MetadataViews.NFTCollectionDisplay>() ]
+    }
+
+    /// Function that resolves a metadata view for this contract.
+    ///
+    /// @param view: The Type of the desired view.
+    /// @return A structure representing the requested view.
+    ///
+    access(all) fun resolveView(_ view: Type): AnyStruct? {
+        switch view {
+        case Type<MetadataViews.NFTCollectionData>():
+            return GeneratedExperiences.getCollectionData()
+        case Type<MetadataViews.NFTCollectionDisplay>():
+            return GeneratedExperiences.getCollectionDisplay(0)
+        }
+        return nil
+    }
+
+    /// resolve a type to its CollectionData so you know where to store it
+    /// Returns `nil` if no collection type exists for the specified NFT type
+    access(all) view fun getCollectionData(): MetadataViews.NFTCollectionData? {
+
+        return MetadataViews.NFTCollectionData(
+            storagePath: GeneratedExperiences.CollectionStoragePath,
+            publicPath: GeneratedExperiences.CollectionPublicPath,
+            providerPath: GeneratedExperiences.CollectionPrivatePath,
+            publicCollection: Type<&GeneratedExperiences.Collection>(),
+            publicLinkedType: Type<&GeneratedExperiences.Collection>(),
+            providerLinkedType: Type<auth(NonFungibleToken.Withdrawable) &GeneratedExperiences.Collection>(),
+            createEmptyCollectionFunction: (fun (): @{NonFungibleToken.Collection} {
+                return <-GeneratedExperiences.createEmptyCollection()
+            })
+        )
+    }
+
+    access(all) view fun getCollectionDisplay(_ season: UInt64): MetadataViews.NFTCollectionDisplay? {
+        let collection = GeneratedExperiences.collectionInfo[season]!
+
+        var square = collection.squareImage
+
+        var banner = collection.bannerImage
+
+        let social : {String : MetadataViews.ExternalURL} = {}
+        for s in collection.socials.keys {
+            social[s] = MetadataViews.ExternalURL(collection.socials[s]!)
+        }
+
+        return MetadataViews.NFTCollectionDisplay(
+            name: GeneratedExperiences.CollectionName,
+            description: collection.description,
+            externalURL: MetadataViews.ExternalURL("https://find.xyz/mp/".concat(GeneratedExperiences.CollectionName)),
+            squareImage: square,
+            bannerImage: banner,
+            socials: social
+        )
+
+    }
+
     access(all) resource Forge: FindForge.Forge {
-        access(all) mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
+        access(all) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
             let info = data as? Info ?? panic("The data passed in is not in form as needed. Needed: ".concat(Type<Info>().identifier))
 
             // create a new NFT
@@ -280,20 +350,20 @@ access(all) contract GeneratedExperiences: NonFungibleToken {
             return <- newNFT
         }
 
-        access(all) addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
+        access(all) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
             let collectionInfo = data as? CollectionInfo ?? panic("The data passed in is not in form as needed. Needed: ".concat(Type<CollectionInfo>().identifier))
 
             // We cannot send in royalties directly, therefore we have to send in FindPack Royalties and generate it during minting
             let arr : [MetadataViews.Royalty] = []
             for r in collectionInfo.royaltiesInput {
                 // Try to get Token Switchboard
-                var receiverCap = getAccount(r.recipient).getCapability<&{FungibleToken.Receiver}>(/public/GenericFTReceiver)
-                // If it fails, try to get Find Profile
-                if !receiverCap.check(){
-                    receiverCap = getAccount(r.recipient).getCapability<&{FungibleToken.Receiver}>(/public/findProfileReceiver)
+                var receiverCap = getAccount(r.recipient).capabilities.get<&{FungibleToken.Receiver}>(/public/GenericFTReceiver)
+
+                if receiverCap == nil || !receiverCap!.check() {
+                    receiverCap = getAccount(r.recipient).capabilities.get<&{FungibleToken.Receiver}>(/public/findProfileReceiver)
                 }
 
-                arr.append(MetadataViews.Royalty(recipient: receiverCap, cut: r.cut, description: r.description))
+                arr.append(MetadataViews.Royalty(receiver: receiverCap!, cut: r.cut, description: r.description))
             }
             collectionInfo.setRoyalty(r: arr)
 
@@ -302,7 +372,7 @@ access(all) contract GeneratedExperiences: NonFungibleToken {
         }
     }
 
-    access(all) getForgeType() : Type {
+    access(all) fun getForgeType() : Type {
         return Type<@Forge>()
     }
 
@@ -322,12 +392,9 @@ access(all) contract GeneratedExperiences: NonFungibleToken {
         // Create a Collection resource and save it to storage
         let collection <- create Collection()
         self.account.storage.save(<-collection, to: self.CollectionStoragePath)
+        let cap = self.account.capabilities.storage.issue<&GeneratedExperiences.Collection>(GeneratedExperiences.CollectionStoragePath)
+        self.account.capabilities.publish(cap, at: GeneratedExperiences.CollectionPublicPath)
 
-        // create a public capability for the collection
-        self.account.link<&GeneratedExperiences.Collection{NonFungibleToken.Collection, ViewResolver.ResolverCollection}>(
-            self.CollectionPublicPath,
-            target: self.CollectionStoragePath
-        )
         FindForge.addForgeType(<- create Forge())
         emit ContractInitialized()
     }

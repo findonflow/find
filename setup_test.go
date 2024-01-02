@@ -209,7 +209,6 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("nftID", dandyIds[0]),
 		WithArg("publicPathIdentifier", "findDandy"),
 	)
-
 	// add that we can sell dandies on the market
 	stx("tenantsetMarketOption",
 		WithSigner("find"),
@@ -224,6 +223,50 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("nftName", "Example"),
 		WithArg("nftTypes", []string{exampleNFTIdentifier}),
 		WithArg("cut", 0.0),
+	)
+
+	// ============= We add generated experiences so we can mint it ==============
+	generatedExpForge, _ := o.QualifiedIdentifier("GeneratedExperiences", "Forge")
+
+	stx("adminAddForge",
+		WithSigner("find-admin"),
+		WithArg("type", generatedExpForge),
+		WithArg("name", "user1"),
+	)
+	season := []findGo.GeneratedExperiences_CollectionInfo{
+		{
+			Season: 1,
+			RoyaltiesInput: []findGo.FindPack_Royalty{
+				{
+					Recipient:   o.Address("user1"),
+					Cut:         0.1,
+					Description: "Royalty",
+				},
+			},
+			SquareImage: MetadataViews_Media_IPFS{
+				File: MetadataViews_IPFSFile{
+					Cid: "square",
+				},
+				MediaType: "png",
+			},
+			BannerImage: MetadataViews_Media_IPFS{
+				File: MetadataViews_IPFSFile{
+					Cid: "banner",
+				},
+				MediaType: "png",
+			},
+			Description: "Description",
+			Socials: map[string]string{
+				"twitter": "twitter",
+				"discord": "discord",
+			},
+		},
+	}
+
+	stx("devAdminAddSeasonGeneratedExperiences",
+		WithSigner("find-admin"),
+		WithArg("name", "user1"),
+		WithArg("season", season),
 	)
 
 	// set up packs
