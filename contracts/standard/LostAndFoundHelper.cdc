@@ -32,7 +32,7 @@ access(all) contract LostAndFoundHelper {
 
     }
 
-    access(all) constructResult(_ ticket: &LostAndFound.Ticket?, id:UInt64?) : LostAndFoundHelper.Ticket? {
+    access(all) fun constructResult(_ ticket: &LostAndFound.Ticket?, id:UInt64?) : LostAndFoundHelper.Ticket? {
         if ticket != nil {
             return LostAndFoundHelper.Ticket(ticket!, id: id)
         }

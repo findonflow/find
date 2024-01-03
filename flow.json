@@ -116,6 +116,35 @@
         "testnet": "0x324c34e1c517e4db"
       }
     },
+    "LostAndFound": {
+      "source": "./contracts/standard/LostAndFound.cdc",
+      "aliases": {
+        "testnet": "0xbe4635353f55bbd4",
+        "mainnet": "0x473d6a2c37eab5be"
+      }
+    },
+    "LostAndFoundHelper": {
+      "source": "./contracts/standard/LostAndFoundHelper.cdc",
+      "aliases": {
+        "testnet": "0xbe4635353f55bbd4",
+        "mainnet": "0x473d6a2c37eab5be"
+      }
+    },
+    "FeeEstimator": {
+      "source": "./contracts/standard/FeeEstimator.cdc",
+      "aliases": {
+        "testnet": "0xbe4635353f55bbd4",
+        "mainnet": "0x473d6a2c37eab5be"
+      }
+    },
+    "FlowStorageFees": {
+      "source": "./contracts/standard/FlowStorageFees.cdc",
+      "aliases": {
+        "emulator": "0xf8d6e0586b0a20c7",
+        "testnet": "0x8c5303eaa26202d6",
+        "mainnet": "0xe467b9dd11fa00df"
+      }
+    },
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
     "ProfileCache": "./contracts/ProfileCache.cdc",
     "FIND": "./contracts/FIND.cdc",
@@ -248,7 +277,10 @@
         "EmeraldIdentity",
         "DapperStorageRent",
         "NFTCatalog",
-        "NFTCatalogAdmin"
+        "NFTCatalogAdmin",
+        "LostAndFound",
+        "LostAndFoundHelper",
+        "FeeEstimator"
       ],
       "emulator-dapper": [
         "DapperUtilityCoin",

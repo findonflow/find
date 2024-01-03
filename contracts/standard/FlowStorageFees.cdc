@@ -1,18 +1,18 @@
 /*
- * The FlowStorageFees smart contract
- *
- * An account's storage capacity determines up to how much storage on chain it can use. 
- * A storage capacity is calculated by multiplying the amount of reserved flow with `StorageFee.storageMegaBytesPerReservedFLOW`
- * The minimum amount of flow tokens reserved for storage capacity is `FlowStorageFees.minimumStorageReservation` this is paid during account creation, by the creator.
- * 
- * At the end of all transactions, any account that had any value changed in their storage 
- * has their storage capacity checked against their storage used and their main flow token vault against the minimum reservation.
- * If any account fails this check the transaction wil fail.
- * 
- * An account moving/deleting its `FlowToken.Vault` resource will result 
- * in the transaction failing because the account will have no storage capacity.
- * 
- */
+* The FlowStorageFees smart contract
+*
+* An account's storage capacity determines up to how much storage on chain it can use. 
+* A storage capacity is calculated by multiplying the amount of reserved flow with `StorageFee.storageMegaBytesPerReservedFLOW`
+* The minimum amount of flow tokens reserved for storage capacity is `FlowStorageFees.minimumStorageReservation` this is paid during account creation, by the creator.
+* 
+* At the end of all transactions, any account that had any value changed in their storage 
+* has their storage capacity checked against their storage used and their main flow token vault against the minimum reservation.
+* If any account fails this check the transaction wil fail.
+* 
+* An account moving/deleting its `FlowToken.Vault` resource will result 
+* in the transaction failing because the account will have no storage capacity.
+* 
+*/
 
 import FungibleToken from "./FungibleToken.cdc"
 import FlowToken from "./FlowToken.cdc"
@@ -39,18 +39,18 @@ access(all) contract FlowStorageFees {
     access(all) resource Administrator {
 
         // Changes the amount of storage capacity an account has per accounts' reserved storage FLOW.
-        access(all) setStorageMegaBytesPerReservedFLOW(_ storageMegaBytesPerReservedFLOW: UFix64) {
+        access(all) fun setStorageMegaBytesPerReservedFLOW(_ storageMegaBytesPerReservedFLOW: UFix64) {
             if FlowStorageFees.storageMegaBytesPerReservedFLOW == storageMegaBytesPerReservedFLOW {
-              return
+                return
             }
             FlowStorageFees.storageMegaBytesPerReservedFLOW = storageMegaBytesPerReservedFLOW
             emit StorageMegaBytesPerReservedFLOWChanged(storageMegaBytesPerReservedFLOW)
         }
 
         // Changes the minimum amount of FLOW an account has to have reserved.
-        access(all) setMinimumStorageReservation(_ minimumStorageReservation: UFix64) {
+        access(all) fun setMinimumStorageReservation(_ minimumStorageReservation: UFix64) {
             if FlowStorageFees.minimumStorageReservation == minimumStorageReservation {
-              return
+                return
             }
             FlowStorageFees.minimumStorageReservation = minimumStorageReservation
             emit MinimumStorageReservationChanged(minimumStorageReservation)
@@ -60,37 +60,35 @@ access(all) contract FlowStorageFees {
     }
 
     // Returns megabytes
-    access(all) calculateAccountCapacity(_ accountAddress: Address): UFix64 {
-        let balanceRef = getAccount(accountAddress)
-            .getCapability<&FlowToken.Vault{FungibleToken.Balance}>(/public/flowTokenBalance)!
-            .borrow() ?? panic("Could not borrow FLOW balance capability")
+    access(all) fun calculateAccountCapacity(_ accountAddress: Address): UFix64 {
+        let balanceRef = getAccount(accountAddress).capabilities.borrow<&{FungibleToken.Vault}>(/public/flowTokenBalance) ?? panic("Could not borrow FLOW balance capability")
 
         // get address token balance
-        if balanceRef.balance < self.minimumStorageReservation {
+        if balanceRef.getBalance() < self.minimumStorageReservation {
             // if < then minimum return 0
             return 0.0
         } else {
             // return balance multiplied with megabytes per flow 
-            return balanceRef.balance * self.storageMegaBytesPerReservedFLOW
+            return balanceRef.getBalance() * self.storageMegaBytesPerReservedFLOW
         }
     }
 
     // Amount in Flow tokens
     // Returns megabytes
-    access(all) flowToStorageCapacity(_ amount: UFix64): UFix64 {
+    access(all) fun flowToStorageCapacity(_ amount: UFix64): UFix64 {
         return amount * FlowStorageFees.storageMegaBytesPerReservedFLOW
     }
 
     // Amount in megabytes
     // Returns Flow tokens
-    access(all) storageCapacityToFlow(_ amount: UFix64): UFix64 {
+    access(all) fun storageCapacityToFlow(_ amount: UFix64): UFix64 {
         // possible loss of precision
         // putting the result back into `flowToStorageCapacity` might not yield the same result
         return amount / FlowStorageFees.storageMegaBytesPerReservedFLOW
     }
 
     // converts storage used from UInt64 Bytes to UFix64 Megabytes.
-    access(all) convertUInt64StorageBytesToUFix64Megabytes(_ storage: UInt64): UFix64 {
+    access(all) fun convertUInt64StorageBytesToUFix64Megabytes(_ storage: UInt64): UFix64 {
         // safe convert UInt64 to UFix64 (without overflow)
         let f = UFix64(storage % 100000000 as UInt64) * 0.00000001 as UFix64 + UFix64(storage / 100000000 as UInt64)
         // decimal point correction. Megabytes to bytes have a conversion of 10^-6 while UFix64 minimum value is 10^-8
@@ -100,16 +98,15 @@ access(all) contract FlowStorageFees {
 
     // Gets "available" balance of an account
     // The available balance is its default token balance minus what is reserved for storage.
-    access(all) defaultTokenAvailableBalance(_ accountAddress: Address): UFix64 {
+    access(all) fun defaultTokenAvailableBalance(_ accountAddress: Address): UFix64 {
         //get balance of account
         let acct = getAccount(accountAddress)
         let balanceRef = acct
-            .getCapability(/public/flowTokenBalance)
-            .borrow<&FlowToken.Vault{FungibleToken.Balance}>()!
-        let balance = balanceRef.balance
+        .capabilities.borrow<&{FungibleToken.Vault}>(/public/flowTokenBalance)!
+        let balance = balanceRef.getBalance()
 
         // get how much should be reserved for storage
-        var reserved = self.storageCapacityToFlow(self.convertUInt64StorageBytesToUFix64Megabytes(acct.storageUsed))
+        var reserved = self.storageCapacityToFlow(self.convertUInt64StorageBytesToUFix64Megabytes(acct.storage.used))
         // at least self.minimumStorageReservation should be reserved
         if reserved < self.minimumStorageReservation {
             reserved = self.minimumStorageReservation
@@ -119,7 +116,7 @@ access(all) contract FlowStorageFees {
         if reserved > balance {
             return 0.0
         }
-        
+
         return balance - reserved
     }
 

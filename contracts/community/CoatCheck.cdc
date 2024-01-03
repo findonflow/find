@@ -25,8 +25,8 @@ access(all) contract CoatCheck {
     access(all) event CoatCheckInitialized(resourceID: UInt64)
 
     access(all) resource interface TicketPublic {
-        access(all) redeem(fungibleTokenReceiver: &{FungibleToken.Receiver}?, nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?)
-        access(all) getDetails(): CoatCheck.TicketDetails
+        access(all) fun redeem(fungibleTokenReceiver: &{FungibleToken.Receiver}?, nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?)
+        access(all) fun getDetails(): CoatCheck.TicketDetails
     }
 
     access(all) struct TicketDetails {
@@ -50,9 +50,9 @@ access(all) contract CoatCheck {
     // capabilities owned by the designated redeemer of a ticket
     access(all) resource Ticket: TicketPublic {
         // a ticket can have Fungible Tokens AND NonFungibleTokens
-        access(self) var fungibleTokenVaults: @[FungibleToken.Vault]?
-        access(self) var nonFungibleTokens: @[NonFungibleToken.NFT]?
-        
+        access(self) var fungibleTokenVaults: @[{FungibleToken.Vault}]?
+        access(self) var nonFungibleTokens: @[{NonFungibleToken.NFT}]?
+
         access(all) let details: TicketDetails
 
         // The following variables are maintained by the CoatCheck contract
@@ -60,8 +60,8 @@ access(all) contract CoatCheck {
         access(self) var storageFee: UFix64 // the storage fee taken to hold this ticket in storage. It is returned when the ticket is redeemed.
 
         init(
-            fungibleTokenVaults: @[FungibleToken.Vault]?,
-            nonFungibleTokens: @[NonFungibleToken.NFT]?,
+            fungibleTokenVaults: @[{FungibleToken.Vault}]?,
+            nonFungibleTokens: @[{NonFungibleToken.NFT}]?,
             redeemer: Address
         ) {
             assert(
@@ -72,8 +72,8 @@ access(all) contract CoatCheck {
             let ftTypes: [Type] = []
             let nftTypes: [Type] = []
 
-            let ticketVaults: @[FungibleToken.Vault] <- []
-            let ticketTokens: @[NonFungibleToken.NFT] <- []
+            let ticketVaults: @[{FungibleToken.Vault}] <- []
+            let ticketTokens: @[{NonFungibleToken.NFT}] <- []
 
             if fungibleTokenVaults != nil {
                 while fungibleTokenVaults?.length! > 0 {
@@ -106,7 +106,7 @@ access(all) contract CoatCheck {
             }
 
             self.details = TicketDetails(redeemer: redeemer, nftTypes: nftTypes, vaultTypes: ftTypes)
-        
+
             self.redeemed = false
             self.storageFee = 0.0
 
@@ -118,7 +118,7 @@ access(all) contract CoatCheck {
 
         // redeem the ticket using an optional receiver for fungible tokens and non-fungible tokens. The supplied receivers must be
         // owned by the redeemer of this ticket.
-        access(all) redeem(fungibleTokenReceiver: &{FungibleToken.Receiver}?, nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?) {
+        access(all) fun  redeem(fungibleTokenReceiver: &{FungibleToken.Receiver}?, nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?) {
             pre {
                 fungibleTokenReceiver == nil || (fungibleTokenReceiver!.owner!.address == self.details.redeemer) : "incorrect owner"
                 nonFungibleTokenReceiver == nil || (nonFungibleTokenReceiver!.owner!.address == self.details.redeemer) : "incorrect owner"
@@ -155,17 +155,8 @@ access(all) contract CoatCheck {
             destroy tokens
         }
 
-        access(all) getDetails(): CoatCheck.TicketDetails {
+        access(all) fun getDetails(): CoatCheck.TicketDetails {
             return self.details
-        }
-
-        destroy () {
-            pre {
-                self.redeemed : "not redeemed"
-            }
-        
-            destroy self.fungibleTokenVaults
-            destroy self.nonFungibleTokens
         }
     }
 
@@ -174,13 +165,13 @@ access(all) contract CoatCheck {
     access(all) resource interface ValetPublic {
         // redeem a ticket, supplying an optional receiver to use for depositing
         // any fts or nfts in the ticket
-        access(all) redeemTicket(
+        access(all) fun redeemTicket(
             ticketID: UInt64, 
             fungibleTokenReceiver: &{FungibleToken.Receiver}?,
             nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?,
         )
-        access(all) borrowTicket(ticketID: UInt64): &Ticket{TicketPublic}?
-        
+        access(all) fun borrowTicket(ticketID: UInt64): &Ticket?
+
     }
 
     access(all) resource Valet: ValetPublic {
@@ -201,8 +192,8 @@ access(all) contract CoatCheck {
         // Any extra tokens sent for the storage fee are sent back when the ticket is made
         access(account) fun createTicket(
             redeemer: Address, 
-            vaults: @[FungibleToken.Vault]?, 
-            tokens: @[NonFungibleToken.NFT]?, 
+            vaults: @[{FungibleToken.Vault}]?, 
+            tokens: @[{NonFungibleToken.NFT}]?, 
         ) {
             let ticket <- create Ticket(
                 fungibleTokenVaults: <-vaults,
@@ -215,9 +206,9 @@ access(all) contract CoatCheck {
             destroy oldTicket
         }
 
-        access(all) borrowTicket(ticketID: UInt64): &Ticket{TicketPublic}? {
-             if self.tickets[ticketID] != nil {
-                return &self.tickets[ticketID] as! &Ticket{TicketPublic}?
+        access(all) fun borrowTicket(ticketID: UInt64): &Ticket? {
+            if self.tickets[ticketID] != nil {
+                return &self.tickets[ticketID]
             } else {
                 return nil
             }
@@ -226,7 +217,7 @@ access(all) contract CoatCheck {
         // redeem the ticket using supplied receivers.
         // if a ticket has fungible tokens, the fungibleTokenReceiver is required.
         // if a ticket has nfts, the nonFungibleTokenReceiver is required.
-        access(all) redeemTicket(
+        access(all) fun redeemTicket(
             ticketID: UInt64, 
             fungibleTokenReceiver: &{FungibleToken.Receiver}?,
             nonFungibleTokenReceiver: &{NonFungibleToken.Collection}?
@@ -239,23 +230,18 @@ access(all) contract CoatCheck {
             ticket?.redeem(fungibleTokenReceiver: fungibleTokenReceiver, nonFungibleTokenReceiver: nonFungibleTokenReceiver)
             destroy ticket
         }
-
-        destroy () {
-            emit ValetDestroyed(resourceID: self.uuid)
-            destroy self.tickets
-        }
     }
 
-    access(all) getValetPublic(): &CoatCheck.Valet{CoatCheck.ValetPublic} {
-        return &self.valet as &CoatCheck.Valet{CoatCheck.ValetPublic}
+    access(all) fun getValetPublic(): &CoatCheck.Valet {
+        return &self.valet
     }
 
     access(account) fun getValet(): &CoatCheck.Valet {
-        return &self.valet as &CoatCheck.Valet
+        return &self.valet
     }
 
     init() {
         self.valet <- create Valet()
     }
 }
- 
+

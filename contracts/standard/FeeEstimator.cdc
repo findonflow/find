@@ -21,31 +21,31 @@ access(all) contract FeeEstimator {
             self.storageFee = storageFee
         }
 
-        access(all) withdraw(): @AnyResource {
-            let resource <- self.item <- nil
-            return <-resource!
+        access(all) fun withdraw(): @AnyResource {
+            let r <- self.item <- nil
+            return <-r!
         }
     }
 
-    access(all) hasStorageCapacity(_ addr: Address, _ storageFee: UFix64): Bool {
+    access(all) fun hasStorageCapacity(_ addr: Address, _ storageFee: UFix64): Bool {
         return FlowStorageFees.defaultTokenAvailableBalance(addr) > storageFee
     }
 
-    access(all) estimateDeposit(
+    access(all) fun estimateDeposit(
         item: @AnyResource,
     ): @DepositEstimate {
-        let storageUsedBefore = FeeEstimator.account.storageUsed
+        let storageUsedBefore = FeeEstimator.account.storage.used
         FeeEstimator.account.storage.save(<-item, to: /storage/temp)
-        let storageUsedAfter = FeeEstimator.account.storageUsed
+        let storageUsedAfter = FeeEstimator.account.storage.used
 
         let storageDiff = storageUsedAfter - storageUsedBefore
         let storageFee = FeeEstimator.storageUsedToFlowAmount(storageDiff)
-        let loadedItem <- FeeEstimator.account.load<@AnyResource>(from: /storage/temp)!
+        let loadedItem <- FeeEstimator.account.storage.load<@AnyResource>(from: /storage/temp)!
         let estimate <- create DepositEstimate(item: <-loadedItem, storageFee: storageFee)
         return <- estimate
     }
 
-    access(all) storageUsedToFlowAmount(_ storageUsed: UInt64): UFix64 {
+    access(all) fun storageUsedToFlowAmount(_ storageUsed: UInt64): UFix64 {
         let storageMB = FlowStorageFees.convertUInt64StorageBytesToUFix64Megabytes(storageUsed)
         return FlowStorageFees.storageCapacityToFlow(storageMB)
     }
