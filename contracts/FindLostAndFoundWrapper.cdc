@@ -2,6 +2,7 @@ import FungibleToken from "./standard/FungibleToken.cdc"
 import FlowToken from "./standard/FlowToken.cdc"
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
+import ViewResolver from "./standard/ViewResolver.cdc"
 import LostAndFound from "./standard/LostAndFound.cdc"
 import LostAndFoundHelper from "./standard/LostAndFoundHelper.cdc"
 import FlowStorageFees from "./standard/FlowStorageFees.cdc"
@@ -25,16 +26,16 @@ access(all) contract FindLostAndFoundWrapper {
     // Mapping of vault uuid to vault.  
     // A method to get around passing the "Vault" reference to Lost and Found to ensure it cannot be hacked. 
     // All vaults should be destroyed after deposit function
-    access(all) let storagePaymentVaults : @{UInt64 : FungibleToken.Vault}
+    access(all) let storagePaymentVaults : @{UInt64 : {FungibleToken.Vault}}
 
     // Deposit 
-    access(all) depositNFT(
+    access(all) fun depositNFT(
         receiver: Address,
         collectionPublicPath: PublicPath,
         item: FindViews.AuthNFTPointer,
         memo: String?,
-        storagePayment: &FungibleToken.Vault,
-        flowTokenRepayment: Capability<&FlowToken.Vault{FungibleToken.Receiver}> ,
+        storagePayment: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault},
+        flowTokenRepayment: Capability<&{FungibleToken.Receiver}> ,
         subsidizeReceiverStorage: Bool
     ) : UInt64? {
 
@@ -50,57 +51,59 @@ access(all) contract FindLostAndFoundWrapper {
         let type = item.getItemType()
 
         // calculate the required storage and check sufficient balance 
-        let senderStorageBeforeSend = getAccount(sender).storageUsed
+        let senderStorageBeforeSend = getAccount(sender).storage.used
 
         let item <- item.withdraw() 
 
-        let requiredStorage = senderStorageBeforeSend - getAccount(sender).storageUsed
-        let receiverAvailableStorage = getAccount(receiverAddress).storageCapacity - getAccount(receiverAddress).storageUsed
+        let requiredStorage = senderStorageBeforeSend - getAccount(sender).storage.used
+        let receiverAvailableStorage = getAccount(receiverAddress).storage.capacity- getAccount(receiverAddress).storage.used
 
         // Try to send before using Lost & FIND
-        let receiverCap = getAccount(receiverAddress).getCapability<&{NonFungibleToken.Receiver}>(collectionPublicPath)
-        if receiverCap.check() {
-            // If the receiver has sufficient storage, then subsidize it
-            var readyToSend = true
-            if receiverAvailableStorage < requiredStorage {
-                readyToSend = false 
-                if subsidizeReceiverStorage {
-                    readyToSend = FindLostAndFoundWrapper.subsidizeUserStorage(requiredStorage: requiredStorage, receiverAvailableStorage: receiverAvailableStorage, receiver: receiver, vault: storagePayment, sender: sender, uuid: item.uuid)
-                }
-            }   
+        if let receiverCap = getAccount(receiverAddress).capabilities.get<&{NonFungibleToken.Receiver}>(collectionPublicPath) {
+            if receiverCap.check() {
+                // If the receiver has sufficient storage, then subsidize it
+                var readyToSend = true
+                if receiverAvailableStorage < requiredStorage {
+                    readyToSend = false 
+                    if subsidizeReceiverStorage {
+                        readyToSend = FindLostAndFoundWrapper.subsidizeUserStorage(requiredStorage: requiredStorage, receiverAvailableStorage: receiverAvailableStorage, receiver: receiver, vault: storagePayment, sender: sender, uuid: item.uuid)
+                    }
+                }   
 
-            if readyToSend {
-                receiverCap.borrow()!.deposit(token: <- item)
-                emit NFTDeposited(receiver: receiverCap.address, receiverName: FIND.reverseLookup(receiverAddress), sender: sender, senderName: senderName, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
-                return nil
+                if readyToSend {
+                    receiverCap.borrow()!.deposit(token: <- item)
+                    emit NFTDeposited(receiver: receiverCap.address, receiverName: FIND.reverseLookup(receiverAddress), sender: sender, senderName: senderName, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
+                    return nil
+                }
             }
         }
 
-        let collectionPublicCap = getAccount(receiverAddress).getCapability<&{NonFungibleToken.Collection}>(collectionPublicPath)
-        if collectionPublicCap.check() {
-            // If the receiver has sufficient storage, then subsidize it
-            var readyToSend = true
-            if receiverAvailableStorage < requiredStorage {
-                readyToSend = false 
-                if subsidizeReceiverStorage {
-                    readyToSend = FindLostAndFoundWrapper.subsidizeUserStorage(requiredStorage: requiredStorage, receiverAvailableStorage: receiverAvailableStorage, receiver: receiver, vault: storagePayment, sender: sender, uuid: item.uuid)
-                }
-            }   
+        if let collectionPublicCap = getAccount(receiverAddress).capabilities.get<&{NonFungibleToken.Collection}>(collectionPublicPath) {
+            if collectionPublicCap.check() {
+                // If the receiver has sufficient storage, then subsidize it
+                var readyToSend = true
+                if receiverAvailableStorage < requiredStorage {
+                    readyToSend = false 
+                    if subsidizeReceiverStorage {
+                        readyToSend = FindLostAndFoundWrapper.subsidizeUserStorage(requiredStorage: requiredStorage, receiverAvailableStorage: receiverAvailableStorage, receiver: receiver, vault: storagePayment, sender: sender, uuid: item.uuid)
+                    }
+                }   
 
-            if readyToSend {
-                collectionPublicCap.borrow()!.deposit(token: <- item)
-                emit NFTDeposited(receiver: receiverCap.address, receiverName: FIND.reverseLookup(receiverAddress), sender: sender, senderName: senderName, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
-                return nil
+                if readyToSend {
+                    collectionPublicCap.borrow()!.deposit(token: <- item)
+                    emit NFTDeposited(receiver: receiverAddress, receiverName: FIND.reverseLookup(receiverAddress), sender: sender, senderName: senderName, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
+                    return nil
+                }
             }
         }
 
         // Calculate storage fees required 
         let estimate <- LostAndFound.estimateDeposit(
-                            redeemer: receiverAddress,
-                            item: <- item,
-                            memo: memo,
-                            display: display
-                        )
+            redeemer: receiverAddress,
+            item: <- item,
+            memo: memo,
+            display: display
+        )
         // we add 0.00005 here just incase it falls below
         // extra fees will be deposited back to the sender
         let vault <- storagePayment.withdraw(amount: estimate.storageFee + 0.00005)
@@ -110,7 +113,7 @@ access(all) contract FindLostAndFoundWrapper {
 
         let vaultRef = FindLostAndFoundWrapper.depositVault(<- vault)
 
-        let flowStorageFee = vaultRef.balance
+        let flowStorageFee = vaultRef.getBalance()
         let ticketID = LostAndFound.deposit(
             redeemer: receiverAddress,
             item: <- estimate.withdraw(),
@@ -129,13 +132,14 @@ access(all) contract FindLostAndFoundWrapper {
     }
 
     // Redeem 
-    access(all) redeemNFT(type: Type, ticketID: UInt64, receiverAddress: Address, collectionPublicPath: PublicPath) {
+    access(all) fun redeemNFT(type: Type, ticketID: UInt64, receiverAddress: Address, collectionPublicPath: PublicPath) {
 
-        let metadataViewsCap = getAccount(receiverAddress).getCapability<&{ViewResolver.ResolverCollection}>(collectionPublicPath)
+        let metadataViewsCap = getAccount(receiverAddress).capabilities.get<&{ViewResolver.ResolverCollection}>(collectionPublicPath)!
 
-        let receiverCap = getAccount(receiverAddress).getCapability<&{NonFungibleToken.Receiver}>(collectionPublicPath)
-        let collectionPublicCap = getAccount(receiverAddress).getCapability<&{NonFungibleToken.Collection}>(collectionPublicPath)
+        let receiverCap = getAccount(receiverAddress).capabilities.get<&{NonFungibleToken.Receiver}>(collectionPublicPath)!
+        let collectionPublicCap = getAccount(receiverAddress).capabilities.get<&{NonFungibleToken.Collection}>(collectionPublicPath)!
 
+        //TODO: this should prob be nil or something?
         if !receiverCap.check() && !collectionPublicCap.check() {
             emit TicketRedeemFailed(receiver: receiverAddress, receiverName: FIND.reverseLookup(receiverAddress), ticketID: ticketID, type: type.identifier, remark: "invalid capability")
             return
@@ -172,7 +176,7 @@ access(all) contract FindLostAndFoundWrapper {
     }
 
     // Check 
-    access(all) getTickets(user: Address, specificType: Type?) : {String : [LostAndFoundHelper.Ticket]} {
+    access(all) fun getTickets(user: Address, specificType: Type?) : {String : [LostAndFoundHelper.Ticket]} {
 
         let allTickets : {String : [LostAndFoundHelper.Ticket]} = {}
 
@@ -192,7 +196,7 @@ access(all) contract FindLostAndFoundWrapper {
             let bin = shelf.borrowBin(type: type)!
             let ids = bin.getTicketIDs()
             for id in ids {
-            let ticket = bin.borrowTicket(id: id)!
+                let ticket = bin.borrowTicket(id: id)!
                 ticketInfo.append(LostAndFoundHelper.Ticket(ticket, id: id))
             }
             allTickets[type.identifier] = ticketInfo
@@ -201,7 +205,7 @@ access(all) contract FindLostAndFoundWrapper {
         return allTickets
     }
 
-    access(all) getTicketIDs(user: Address, specificType: Type?) : {String : [UInt64]} {
+    access(all) fun getTicketIDs(user: Address, specificType: Type?) : {String : [UInt64]} {
 
         let allTickets : {String : [UInt64]} = {}
 
@@ -228,7 +232,7 @@ access(all) contract FindLostAndFoundWrapper {
     }
 
     // Check for all types that are in Lost and found which are NFTs
-    access(all) getSpecificRedeemableTypes(user: Address, specificType: Type?) : [Type] {
+    access(all) fun getSpecificRedeemableTypes(user: Address, specificType: Type?) : [Type] {
         let allTypes : [Type] = []
         if specificType != nil {
             for type in LostAndFound.getRedeemableTypes(user) {
@@ -241,15 +245,15 @@ access(all) contract FindLostAndFoundWrapper {
     }
 
     // Helper function
-    access(contract) fun depositVault(_ vault: @FungibleToken.Vault) : &FungibleToken.Vault {
+    access(contract) fun depositVault(_ vault: @{FungibleToken.Vault}) : auth (FungibleToken.Withdrawable) &{FungibleToken.Vault} {
         let uuid = vault.uuid
         self.storagePaymentVaults[uuid] <-! vault
-        return (&self.storagePaymentVaults[uuid] as &FungibleToken.Vault?)!
+        return (&self.storagePaymentVaults[uuid])!
     }
 
-    access(contract) fun destroyVault(_ uuid: UInt64, cap: Capability<&FlowToken.Vault{FungibleToken.Receiver}>) {
+    access(contract) fun destroyVault(_ uuid: UInt64, cap: Capability<&{FungibleToken.Receiver}>) {
         let vault <- self.storagePaymentVaults.remove(key: uuid) ?? panic("Invalid vault UUID. UUID: ".concat(uuid.toString()))
-        if vault.balance != nil {
+        if vault.getBalance() != nil {
             let ref = cap.borrow() ?? panic("The flow repayment capability is not valid")
             ref.deposit(from: <- vault)
             return
@@ -257,14 +261,17 @@ access(all) contract FindLostAndFoundWrapper {
         destroy vault
     }
 
-    access(contract) fun subsidizeUserStorage(requiredStorage: UInt64, receiverAvailableStorage: UInt64, receiver: Address, vault: &FungibleToken.Vault, sender: Address, uuid: UInt64) : Bool {
+    access(contract) fun subsidizeUserStorage(requiredStorage: UInt64, receiverAvailableStorage: UInt64, receiver: Address, vault: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}, sender: Address, uuid: UInt64) : Bool {
         let subsidizeCapacity = requiredStorage - receiverAvailableStorage
         let subsidizeAmount = FlowStorageFees.storageCapacityToFlow(FlowStorageFees.convertUInt64StorageBytesToUFix64Megabytes(subsidizeCapacity))
-        let flowReceiverCap = getAccount(receiver).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
-        if !flowReceiverCap.check() {
+        let flowReceiverCap = getAccount(receiver).capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+        if flowReceiverCap==nil{
             return false
         }
-        let flowReceiver = flowReceiverCap.borrow()! 
+        if !flowReceiverCap!.check() {
+            return false
+        }
+        let flowReceiver = flowReceiverCap!.borrow()! 
         if !flowReceiver.isInstance(Type<@FlowToken.Vault>()){
             return false
         }
@@ -279,4 +286,4 @@ access(all) contract FindLostAndFoundWrapper {
     }
 
 }
- 
+
