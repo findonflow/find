@@ -12,7 +12,6 @@ func TestMarketSale(t *testing.T) {
 	otu := &OverflowTestUtils{T: t, O: ot.O}
 
 	royaltyIdentifier := otu.identifier("FindMarket", "RoyaltyPaid")
-	dandyIdentifier := dandyNFTType(otu)
 	exampleIdentifier := exampleNFTType(otu)
 
 	id := dandyIds[0]

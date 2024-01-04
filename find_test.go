@@ -26,8 +26,7 @@ func TestFIND(t *testing.T) {
 
 	ot.Run(t, "Should be able to register a name", func(t *testing.T) {
 		otu.O.Script("getLeases").AssertWithPointerWant(t, "/0/name",
-			// TODO: why does this give me user2 now? is there some ordering that is different
-			autogold.Want("allLeases", "user2"),
+			autogold.Want("allLeases", "find"),
 		)
 	})
 
@@ -95,12 +94,12 @@ func TestFIND(t *testing.T) {
 	ot.Run(t, "Admin should be able to register without paying FUSD", func(t *testing.T) {
 		otu.O.Tx("adminRegisterName",
 			WithSigner("find-admin"),
-			WithArg("names", `["find-admin"]`),
+			WithArg("names", `["find-admin2"]`),
 			WithArg("user", "find"),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, otu.identifier("FIND", "Register"), map[string]interface{}{
-				"name": "find-admin",
+				"name": "find-admin2",
 			})
 	})
 

@@ -7,11 +7,11 @@ import Profile from "../contracts/Profile.cdc"
 // map of {User in string (find name or address) : [tag]}
 transaction(follows:{String : [String]}) {
 
-    let profile : &Profile.User
+    let profile : auth(Profile.Owner) &Profile.User
 
     prepare(account: auth(BorrowValue, SaveValue, PublishCapability, IssueStorageCapabilityController) &Account) {
 
-        self.profile =account.storage.borrow<&Profile.User>(from:Profile.storagePath) ?? panic("Cannot borrow reference to profile")
+        self.profile =account.storage.borrow<auth(Profile.Owner) &Profile.User>(from:Profile.storagePath) ?? panic("Cannot borrow reference to profile")
 
 
         let fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)

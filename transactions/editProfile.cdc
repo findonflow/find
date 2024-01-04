@@ -6,11 +6,11 @@ import Profile from "../contracts/Profile.cdc"
 
 transaction(name:String, description: String, avatar: String, tags:[String], allowStoringFollowers: Bool, linkTitles : {String: String}, linkTypes: {String:String}, linkUrls : {String:String}, removeLinks : [String]) {
 
-    let profile : &Profile.User
+    let profile : auth(Profile.Owner) &Profile.User
 
     prepare(account: auth(BorrowValue, SaveValue, PublishCapability, IssueStorageCapabilityController) &Account) {
 
-        self.profile =account.storage.borrow<&Profile.User>(from:Profile.storagePath) ?? panic("Cannot borrow reference to profile")
+        self.profile =account.storage.borrow<auth(Profile.Owner) &Profile.User>(from:Profile.storagePath) ?? panic("Cannot borrow reference to profile")
 
         let fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
         if fusdReceiver == nil {
