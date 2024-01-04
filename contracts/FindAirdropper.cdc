@@ -26,7 +26,7 @@ access(all) contract FindAirdropper {
         let vr = pointer.getViewResolver()
         let nftInfo = FindMarket.NFTInfo(vr, id: pointer.id, detail: true)
 
-        let receiverCap = getAccount(receiver).capabilities.get<&{NonFungibleToken.Receiver}>(path)!
+        let receiverCap = getAccount(receiver).capabilities.get<&{NonFungibleToken.Receiver}>(path)
         // calculate the required storage and check sufficient balance
         let senderStorageBeforeSend = getAccount(from).storage.used
 
@@ -41,11 +41,11 @@ access(all) contract FindAirdropper {
             return
         }
 
-        if receiverCap.check() {
+        if receiverCap !=nil && receiverCap!.check() {
 
             emit Airdropped(from: from , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid, nftInfo: nftInfo, context: context, remark: nil)
 
-            receiverCap.borrow()!.deposit(token: <- item)
+            receiverCap!.borrow()!.deposit(token: <- item)
             return
         } else {
             let collectionPublic = getAccount(receiver).capabilities.borrow<&{NonFungibleToken.Collection}>(path)

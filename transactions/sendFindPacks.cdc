@@ -6,29 +6,29 @@ import Admin from "../contracts/Admin.cdc"
 
 transaction(packInfo: FindPack.AirdropInfo) {
 
-	prepare(account: auth(BorrowValue) &Account) {
+    prepare(account: auth(BorrowValue) &Account) {
 
-		let pathIdentifier = "FindPack_".concat(packInfo.packTypeName).concat("_").concat(packInfo.packTypeId.toString())
+        let pathIdentifier = "FindPack_".concat(packInfo.packTypeName).concat("_").concat(packInfo.packTypeId.toString())
 
-		let pathCollection = FindPack.getPacksCollection(packTypeName: packInfo.packTypeName, packTypeId: packInfo.packTypeId)
+        let pathCollection = FindPack.getPacksCollection(packTypeName: packInfo.packTypeName, packTypeId: packInfo.packTypeId)
         let adminRef = account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
-		let ids = pathCollection.getIDs()
-		for i, user in packInfo.users {
-			let id = ids[i]
+        let ids = pathCollection.getIDs()
+        for i, user in packInfo.users {
+            let id = ids[i]
 
-			let address = FIND.resolve(user)
-			if address == nil {
-				panic("User cannot be resolved : ".concat(user))
-			}
+            let address = FIND.resolve(user)
+            if address == nil {
+                panic("User cannot be resolved : ".concat(user))
+            }
 
-			let uAccount = getAccount(address!)
-			let userPacks=uAccount.getCapability<&FindPack.Collection{NonFungibleToken.Receiver}>(FindPack.CollectionPublicPath).borrow() ?? panic("Could not find userPacks for ".concat(user))
-			let pointer = adminRef.getAuthPointer(pathIdentifier: pathIdentifier, id: id)
-			let ctx : {String : String } = {"message" : packInfo.message, "tenant" : "find"}
-			FindAirdropper.safeAirdrop(pointer: pointer, receiver: address!, path: FindPack.CollectionPublicPath, context: ctx , deepValidation: true)
-		}
-	}
+            let uAccount = getAccount(address!)
+            let userPacks=uAccount.capabilities.borrow<&{NonFungibleToken.Receiver}>(FindPack.CollectionPublicPath) ?? panic("Could not find userPacks for ".concat(user))
+            let pointer = adminRef.getAuthPointer(pathIdentifier: pathIdentifier, id: id)
+            let ctx : {String : String } = {"message" : packInfo.message, "tenant" : "find"}
+            FindAirdropper.safeAirdrop(pointer: pointer, receiver: address!, path: FindPack.CollectionPublicPath, context: ctx , deepValidation: true)
+        }
+    }
 }
 
- 
+
