@@ -60,6 +60,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
                 */
                 var providerCap=storage.issue<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>(path.storagePath)
 
+
                 let capcon = storage.getController(byCapabilityID:providerCap.id)!
                 capcon.setTag("sendNFT".concat(path.storagePath.toString()))
 

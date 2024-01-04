@@ -13,7 +13,7 @@ import Dandy from "../contracts/Dandy.cdc"
 //import "FindThoughts"
 
 transaction(name: String) {
-    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
+    prepare(account: auth (Profile.Owner, StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
         //if we do not have a profile it might be stored under a different address so we will just remove it
         let profileCapFirst = account.capabilities.get<&{Profile.Public}>(Profile.publicPath)
         if profileCapFirst != nil {
@@ -96,7 +96,7 @@ transaction(name: String) {
             created=true
         }
 
-        let profile=account.storage.borrow<&Profile.User>(from: Profile.storagePath)!
+        let profile=account.storage.borrow<auth(Profile.Owner) &Profile.User>(from: Profile.storagePath)!
 
         if !profile.hasWallet("Flow") {
             let flowWallet=Profile.Wallet( name:"Flow", receiver:account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!, balance:account.capabilities.get<&{FungibleToken.Vault}>(/public/flowTokenBalance)!, accept: Type<@FlowToken.Vault>(), tags: ["flow"])
@@ -119,6 +119,7 @@ transaction(name: String) {
             updated=true
         }
 
+        /*
         //If find name not set and we have a profile set it.
         if profile.getFindName() == "" {
             if let findName = FIND.reverseLookup(account.address) {
@@ -127,6 +128,7 @@ transaction(name: String) {
                 updated=false
             }
         }
+        */
 
         if created {
             profile.emitCreatedEvent()

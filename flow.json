@@ -289,8 +289,8 @@
       ],
       "emulator-find": [
         "FIND",
-        "Clock",
         "Profile",
+        "Clock",
         "Debug",
         "Dandy",
         "ExampleNFT",
