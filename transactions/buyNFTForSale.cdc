@@ -59,7 +59,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
             account.capabilities.publish(cap, at: cd.publicPath)
             self.targetCapability=cap
         } else {
-            var targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
+            var targetCapability= account.capabilities.get<&AnyResource>(nft.publicPath) as? Capability<&{NonFungibleToken.Collection}>
             if targetCapability == nil || !targetCapability!.check() {
                 let cd = item.getNFTCollectionData()
                 let cap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(cd.storagePath)
