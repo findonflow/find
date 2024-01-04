@@ -6,6 +6,7 @@ import FindPack from "../contracts/FindPack.cdc"
 import FindVerifier from "../contracts/FindVerifier.cdc"
 import FindForge from "../contracts/FindForge.cdc"
 import Admin from "../contracts/Admin.cdc"
+import Debug from "../contracts/Debug.cdc"
 import ViewResolver from "../contracts/standard/ViewResolver.cdc"
 
 // this is a simple tx to update the metadata of a given type of NeoVoucher
@@ -14,7 +15,7 @@ transaction(info: FindPack.PackRegisterInfo) {
 
     let admin: &Admin.AdminProxy
     let wallet: Capability<&{FungibleToken.Receiver}>
-    let providerCaps : {Type : Capability<auth (NonFungibleToken.Withdrawable) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>}
+    let providerCaps : {Type : Capability<auth (NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>}
     let types : [Type]
 
     prepare(account: auth(BorrowValue, IssueStorageCapabilityController, NonFungibleToken.Withdrawable) &Account) {
@@ -31,7 +32,10 @@ transaction(info: FindPack.PackRegisterInfo) {
             }
             let collectionInfo = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collection!.keys[0])!.collectionData
 
-            let providerCap = account.capabilities.storage.issue<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>(collectionInfo.storagePath)
+            let providerCap = account.capabilities.storage.issue<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>(collectionInfo.storagePath)
+            if !providerCap.check() {
+                panic("provider cap for user ".concat(account.address.toString()).concat(" and path ").concat(collectionInfo.storagePath.toString()).concat(" is not setup correctly"))
+            }
             let type = CompositeType(typeName)!
             self.types.append(type)
             self.providerCaps[type] = providerCap

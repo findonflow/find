@@ -2,6 +2,8 @@ package test_main
 
 import (
 	"testing"
+
+	. "github.com/bjartek/overflow"
 )
 
 func TestFindPack(t *testing.T) {
@@ -10,75 +12,46 @@ func TestFindPack(t *testing.T) {
 	buyer := "user1"
 
 	ot.Run(t, "Should be able to buy pack", func(_ *testing.T) {
+		otu.buyPack(buyer, packTypeName, packTypeId, 1, 4.20)
+	})
+
+	ot.Run(t, "Should be able to buy pack and open pack", func(t *testing.T) {
+		otu.buyPack(buyer, packTypeName, packTypeId, 1, 4.20)
+		otu.openPack(buyer, packId)
+	})
+
+	ot.Run(t, "Should be able to buy,  open and fulfill", func(t *testing.T) {
+		otu.buyPack(buyer, packTypeName, packTypeId, 1, 4.20)
+		otu.openPack(buyer, packId)
+		otu.fulfillPack(packId, packRewardIds, packSalt)
+	})
+
+	ot.Run(t, "Should be able to buy,  open and fulfill with no collection setup", func(t *testing.T) {
+		otu.buyPack("user3", packTypeName, packTypeId, 1, 4.20)
+		otu.openPack("user3", packId)
+		otu.fulfillPack(packId, packRewardIds, packSalt)
+	})
+
+	ot.Run(t, "Should get transferred to DLQ if try to open with wrong salt", func(t *testing.T) {
 		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
+		otu.openPack(buyer, packId)
+
+		otu.O.Tx("adminFulfillFindPack",
+			WithSigner("find-admin"),
+			WithArg("packId", packId),
+			WithArg("typeIdentifiers", []string{dandyIdentifier}),
+			WithArg("rewardIds", packRewardIds),
+			WithArg("salt", "wrong salt"),
+		).
+			AssertSuccess(t).
+			AssertEvent(t, otu.identifier("FindPack", "FulfilledError"), map[string]interface{}{
+				"packId":  packId,
+				"address": otu.O.Address(buyer),
+				"reason":  "The content of the pack was not verified with the hash provided at mint",
+			})
 	})
 
 	/*
-
-		t.Run("Should be able to buy pack and open pack", func(t *testing.T) {
-			id1 := otu.mintExampleNFTs()
-			ids := []uint64{id1}
-
-			otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
-			packId := otu.mintPack("user1", packTypeId, ids, singleType, salt)
-
-			otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
-			otu.openPack(buyer, packId)
-			packTypeId++
-		})
-
-		t.Run("Should be able to buy and open", func(t *testing.T) {
-			id1 := otu.mintExampleNFTs()
-			ids := []uint64{id1}
-
-			otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
-			packId := otu.mintPack("user1", packTypeId, ids, singleType, salt)
-
-			otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
-			otu.openPack(buyer, packId)
-			otu.fulfillPack(packId, ids, salt)
-			packTypeId++
-		})
-
-		t.Run("Should be able to buy and open with no collection setup", func(t *testing.T) {
-			id1 := otu.mintExampleNFTs()
-			ids := []uint64{id1}
-
-			otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
-			packId := otu.mintPack("user1", packTypeId, ids, singleType, salt)
-
-			otu.buyPack("user2", buyer, packTypeId, 1, 4.20)
-			otu.openPack("user2", packId)
-			otu.fulfillPack(packId, ids, salt)
-			packTypeId++
-		})
-
-		t.Run("Should get transferred to DLQ if try to open with wrong salt", func(t *testing.T) {
-			id1 := otu.mintExampleNFTs()
-			ids := []uint64{id1}
-
-			otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
-			packId := otu.mintPack("user1", packTypeId, ids, singleType, salt)
-
-			otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
-			otu.openPack(buyer, packId)
-
-			otu.O.Tx("adminFulfillFindPack",
-				WithSigner("find-admin"),
-				WithArg("packId", packId),
-				WithArg("typeIdentifiers", []string{exampleNFTType(otu)}),
-				WithArg("rewardIds", ids),
-				WithArg("salt", "wrong salt"),
-			).
-				AssertSuccess(t).
-				AssertEvent(t, otu.identifier("FindPack", "FulfilledError"), map[string]interface{}{
-					"packId":  packId,
-					"address": otu.O.Address(buyer),
-					"reason":  "The content of the pack was not verified with the hash provided at mint",
-				})
-			packTypeId++
-		})
-
 		t.Run("Should not be able to buy pack before drop is open", func(t *testing.T) {
 			id1 := otu.mintExampleNFTs()
 			ids := []uint64{id1}

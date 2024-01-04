@@ -343,15 +343,14 @@ access(all) contract FindPack {
         access(all) let extraData : {String : AnyStruct}
 
         access(all) let itemTypes: [Type]
-        //TODO not sure we even need to restrict this on interface anymore
-        access(contract) let providerCaps: {Type : Capability<auth (NonFungibleToken.Withdrawable) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>}
+        access(contract) let providerCaps: {Type : Capability<auth (NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>}
 
         access(contract) let primarySaleRoyalties : MetadataViews.Royalties
         access(contract) let royalties : MetadataViews.Royalties
 
         access(all) let requiresReservation: Bool
 
-        init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, openTime:UFix64, walletType:Type, itemTypes: [Type],  providerCaps: {Type : Capability<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>} , requiresReservation:Bool, storageRequirement: UInt64, saleInfos: [SaleInfo], primarySaleRoyalties : MetadataViews.Royalties, royalties : MetadataViews.Royalties, collectionDisplay: MetadataViews.NFTCollectionDisplay, packFields: {String : String} , extraData : {String : AnyStruct}) {
+        init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, openTime:UFix64, walletType:Type, itemTypes: [Type],  providerCaps: {Type : Capability<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>} , requiresReservation:Bool, storageRequirement: UInt64, saleInfos: [SaleInfo], primarySaleRoyalties : MetadataViews.Royalties, royalties : MetadataViews.Royalties, collectionDisplay: MetadataViews.NFTCollectionDisplay, packFields: {String : String} , extraData : {String : AnyStruct}) {
             self.name = name
             self.description = description
             self.thumbnailUrl = thumbnailUrl
@@ -981,6 +980,7 @@ access(all) contract FindPack {
                 }
 
                 if !rewards[type]!.check() {
+                    Debug.log("type that is not present in rewards cap ".concat(type.identifier))
                     emit FulfilledError(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receiver[type]!.address, reason: "Cannot borrow provider capability to withdraw nfts")
                     self.transferToDLQ(<- pack)
                     return

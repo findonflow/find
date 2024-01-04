@@ -2831,7 +2831,7 @@ func (otu *OverflowTestUtils) fulfillPack(packId uint64, ids []uint64, salt stri
 	o.Tx("adminFulfillFindPack",
 		WithSigner("find-admin"),
 		WithArg("packId", packId),
-		WithArg("typeIdentifiers", []string{exampleNFTType(otu)}),
+		WithArg("typeIdentifiers", []string{dandyNFTType(otu)}),
 		WithArg("rewardIds", ids),
 		WithArg("salt", salt),
 	).

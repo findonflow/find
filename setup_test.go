@@ -13,11 +13,15 @@ import (
 
 // we set the shared overflow test struct that will reset to known setup state after each test
 var (
-	ot         *OverflowTest
-	dandyIds   []uint64 // ids for test dandies minted
-	exampleIds []uint64 // ids for test example nfts minted
-	packId     uint64   // the id for the test pack
-	packTypeId uint64
+	ot              *OverflowTest
+	dandyIds        []uint64 // ids for test dandies minted
+	exampleIds      []uint64 // ids for test example nfts minted
+	packId          uint64   // the id for the test pack
+	packTypeId      uint64
+	packTypeName    string
+	packSalt        string
+	packRewardIds   []uint64
+	dandyIdentifier string
 )
 
 func TestMain(m *testing.M) {
@@ -107,6 +111,14 @@ func SetupFIND(o *OverflowState) error {
 		WithSigner("find"),
 		WithArg("name", "find"),
 		WithArg("amount", 100.0),
+	)
+
+	createUser(stx, 100.0, "find-admin")
+
+	stx("register",
+		WithSigner("find-admin"),
+		WithArg("name", "find-admin"),
+		WithArg("amount", 5.0),
 	)
 	// setup find forge
 	stx("setup_find_forge_1", WithSigner("find-forge"))
@@ -204,7 +216,7 @@ func SetupFIND(o *OverflowState) error {
 
 	dandyIds = result.GetIdsFromEvent("Dandy.Deposit", "id")
 
-	dandyIdentifier, _ := o.QualifiedIdentifier("Dandy", "NFT")
+	dandyIdentifier, _ = o.QualifiedIdentifier("Dandy", "NFT")
 	stx("devaddNFTCatalog",
 		WithSigner("account"),
 		WithArg("collectionIdentifier", dandyIdentifier),
@@ -274,11 +286,40 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("season", season),
 	)
 
+	// we mint dandy for testing
+	packDandyId, _ := stx("mintDandy",
+		user1Signer,
+		WithArg("name", "user1"),
+		WithArg("maxEdition", 1),
+		WithArg("artist", "Neo"),
+		WithArg("nftName", "Packed dandy"),
+		WithArg("nftDescription", `This is a packed dandy`),
+		WithArg("nftUrl", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
+		WithArg("collectionDescription", "Neo Collectibles FIND"),
+		WithArg("collectionExternalURL", "https://neomotorcycles.co.uk/index.html"),
+		WithArg("collectionSquareImage", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
+		WithArg("collectionBannerImage", "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1"),
+	).GetIdFromEvent("Dandy.Deposit", "id")
+
+	stx("sendNFTs",
+		WithSigner("user1"),
+		WithArg("nftIdentifiers", []string{dandyIdentifier}),
+		WithArg("allReceivers", `["find-admin"]`),
+		WithArg("ids", []uint64{packDandyId}),
+		WithArg("memos", `["Hello!"]`),
+		WithArg("donationTypes", `[nil]`),
+		WithArg("donationAmounts", `[nil]`),
+		WithArg("findDonationType", nil),
+		WithArg("findDonationAmount", nil),
+	)
+
 	// set up packs
 	packTypeId = uint64(1)
-	salt := "find"
+	packSalt = "find"
 	singleType := []string{dandyIdentifier}
 	minter := "user1"
+	packTypeName = minter
+	packRewardIds = []uint64{packDandyId}
 
 	info := generatePackStruct(o, minter, packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find")
 
@@ -293,8 +334,7 @@ func SetupFIND(o *OverflowState) error {
 	)
 
 	// mint a pack
-	packHash := utils.CreateSha3Hash([]uint64{dandyIds[0]}, singleType, salt)
-
+	packHash := utils.CreateSha3Hash(packRewardIds, singleType, packSalt)
 	packIdentTemplate, _ := o.QualifiedIdentifier("FindPack", "%s")
 
 	packId, _ = stx("adminMintFindPack",
@@ -302,7 +342,7 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("packTypeName", minter),
 		WithArg("typeId", packTypeId),
 		WithArg("hashes", []string{packHash}),
-	).GetIdFromEvent(fmt.Sprintf(packIdentTemplate, "Deposit"), "id")
+	).GetIdFromEvent("Deposit", "id")
 
 	publicPathIdentifier := "FindPack_" + minter + "_" + fmt.Sprint(packTypeId)
 

@@ -12,7 +12,7 @@ transaction(packId:UInt64) {
     let packs: &FindPack.Collection
     let receiver: { Type : Capability<&{NonFungibleToken.Receiver}>}
 
-    prepare(account: auth(BorrowValue) &Account) {
+    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
         self.packs=account.storage.borrow<&FindPack.Collection>(from: FindPack.CollectionStoragePath)!
 
         let packData = self.packs.borrowFindPack(id: packId) ?? panic("You do not own this pack. ID : ".concat(packId.toString()))
@@ -29,19 +29,15 @@ transaction(packId:UInt64) {
             }
             let collectionInfo = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collection!.keys[0])!.collectionData
 
-            let cap = account.getCapability<&{NonFungibleToken.Receiver}>(collectionInfo.publicPath)
-            let storage= account.storage.borrow<&NonFungibleToken.Collection>(from: collectionInfo.storagePath)
+
+            let storage= account.storage.borrow<&{NonFungibleToken.Collection}>(from: collectionInfo.storagePath)
             if storage == nil {
                 let newCollection <- FindPack.createEmptyCollectionFromPackData(packData: packMetadata, type: type)
                 account.storage.save(<- newCollection, to: collectionInfo.storagePath)
-                account.link<&{NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection}>( collectionInfo.publicPath, target: collectionInfo.storagePath)
+                let fc= account.capabilities.storage.issue<&FindPack.Collection>(collectionInfo.storagePath)
+                account.capabilities.publish(fc, at: collectionInfo.publicPath)
             }
-
-            if !cap.check() {
-                account.unlink(collectionInfo.publicPath)
-                account.link<&{NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection}>( collectionInfo.publicPath, target: collectionInfo.storagePath) 
-            }
-            self.receiver[type] = cap
+            self.receiver[type] = account.capabilities.get<&{NonFungibleToken.Collection}>(collectionInfo.publicPath)!
         }
 
     }
