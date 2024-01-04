@@ -288,8 +288,8 @@
         "FlowUtilityToken"
       ],
       "emulator-find": [
-        "FIND",
         "Profile",
+        "FIND",
         "Clock",
         "Debug",
         "Dandy",

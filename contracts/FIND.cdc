@@ -26,6 +26,7 @@ Taxonomy:
 */
 access(all) contract FIND {
 
+    access(all) entitlement Leasee
 
     //Old events not in use anymore we cannot remove
     access(all) event Sold()

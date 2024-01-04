@@ -49,7 +49,8 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 
         //TODO: maybe just use AnyResource here and cast to what we want?
         //
-        let col= account.storage.borrow<&{NonFungibleToken.Collection}>(from: nft.storagePath)
+
+        let col= account.storage.borrow<&AnyResource>(from: nft.storagePath) as? &{NonFungibleToken.Collection}?
         if col == nil {
             let cd = item.getNFTCollectionData()
             account.storage.save(<- cd.createEmptyCollection(), to: cd.storagePath)

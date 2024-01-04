@@ -340,6 +340,7 @@ access(all) contract Dandy :ViewResolver{
         emit Minted(id:nft.id, minter:nft.platform.name, name: name, description:description)
         return <-  nft
     }
+
     access(all) resource Forge: FindForge.Forge {
         access(all) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
             let info = data as? DandyInfo ?? panic("The data passed in is not in form of DandyInfo.")
