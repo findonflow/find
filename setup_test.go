@@ -103,6 +103,11 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("dapperAddress", "dapper"),
 	)
 
+	stx("register",
+		WithSigner("find"),
+		WithArg("name", "find"),
+		WithArg("amount", 100.0),
+	)
 	// setup find forge
 	stx("setup_find_forge_1", WithSigner("find-forge"))
 

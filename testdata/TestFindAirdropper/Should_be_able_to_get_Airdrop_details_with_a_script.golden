@@ -37,6 +37,7 @@
 				{
 					Address:     "0x179b6b1cb6755e31",
 					Description: "find forge",
+					Name:        "find",
 					AcceptTypes: []string{
 						"A.0ae53cb6e3f42a79.FlowToken.Vault",
 						"A.f8d6e0586b0a20c7.FUSD.Vault",
@@ -90,6 +91,7 @@
 				{
 					Address:     "0x179b6b1cb6755e31",
 					Description: "find forge",
+					Name:        "find",
 					AcceptTypes: []string{
 						"A.0ae53cb6e3f42a79.FlowToken.Vault",
 						"A.f8d6e0586b0a20c7.FUSD.Vault",
@@ -143,6 +145,7 @@
 				{
 					Address:     "0x179b6b1cb6755e31",
 					Description: "find forge",
+					Name:        "find",
 					AcceptTypes: []string{
 						"A.0ae53cb6e3f42a79.FlowToken.Vault",
 						"A.f8d6e0586b0a20c7.FUSD.Vault",
