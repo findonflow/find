@@ -68,6 +68,16 @@ access(all) contract FindThoughts {
         access(contract) fun internal_react(user: Address, reaction: String?) 
         access(all) fun getQuotedThought() : ThoughtPointer? 
         access(all) fun getHide() : Bool
+        access(all) fun getTags() : [String] {
+            return self.tags
+        }
+        access(all) fun getReactions() : {String:Int}{
+            return self.reactions
+        }
+
+        access(all) fun getNFTS() : [FindViews.ViewReadPointer] {
+            return self.nft
+        }
     }
 
     access(all) resource Thought : ThoughtPublic , ViewResolver.Resolver {
@@ -269,12 +279,15 @@ access(all) contract FindThoughts {
 
             let nfts : [FindMarket.NFTInfo] = []
             let extra : {String : AnyStruct} = {}
+            let nftPointers : [FindViews.ViewReadPointer] = []
             if nftPointer != nil {
                 let rv = nftPointer!.getViewResolver()
                 nfts.append(FindMarket.NFTInfo(rv, id: nftPointer!.id, detail: true))
+                nftPointers.append(nftPointer!)
             }
 
-            let thought <- create Thought(creator: address, header: header , body: body , created: Clock.time(), tags: tags, medias: medias, nft: [], quote: quote, stringTags: {}, scalars : {}, extras: extra)
+
+            let thought <- create Thought(creator: address, header: header , body: body , created: Clock.time(), tags: tags, medias: medias, nft: nftPointers, quote: quote, stringTags: {}, scalars : {}, extras: extra)
 
             self.sequence.append(thought.uuid)
 

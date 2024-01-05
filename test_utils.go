@@ -3026,6 +3026,72 @@ func (otu *OverflowTestUtils) removeRelatedAccount(user, wallet, network, addres
 	return otu
 }
 
+func (otu *OverflowTestUtils) reactToThought(thoughtId uint64, reaction string) *OverflowTestUtils {
+	t := otu.T
+	otu.O.Tx("reactToFindThoughts",
+		WithSigner("user2"),
+		WithArg("users", []string{"user1"}),
+		WithArg("ids", []uint64{thoughtId}),
+		WithArg("reactions", []string{reaction}),
+		WithArg("undoReactionUsers", `[]`),
+		WithArg("undoReactionIds", `[]`),
+	).
+		AssertSuccess(t).
+		AssertEvent(t, "FindThoughts.Reacted", map[string]interface{}{
+			"id":          thoughtId,
+			"by":          otu.O.Address("user2"),
+			"byName":      "user2",
+			"creator":     otu.O.Address("user1"),
+			"creatorName": "user1",
+			"reaction":    reaction,
+			"totalCount": map[string]interface{}{
+				"fire": 1,
+			},
+		})
+	return otu
+}
+
+func (otu *OverflowTestUtils) postExampleThought() uint64 {
+	t := otu.T
+	header := "This is header"
+	body := "This is body"
+	tags := []string{"tag1", "tag2", "@find"}
+	mediaHash := "ipfs://mediaHash"
+	mediaType := "mediaType"
+
+	cadMediaHash, err := otu.createOptional(mediaHash)
+	assert.NoError(t, err)
+	cadMediaType, err := otu.createOptional(mediaType)
+	assert.NoError(t, err)
+
+	thoughtId, _ := otu.O.Tx("publishFindThought",
+		WithSigner("user1"),
+		WithArg("header", header),
+		WithArg("body", body),
+		WithArg("tags", tags),
+		WithArg("mediaHash", cadMediaHash),
+		WithArg("mediaType", cadMediaType),
+		WithArg("quoteNFTOwner", nil),
+		WithArg("quoteNFTType", nil),
+		WithArg("quoteNFTId", nil),
+		WithArg("quoteCreator", nil),
+		WithArg("quoteId", nil),
+	).
+		AssertSuccess(t).
+		AssertEvent(t, "FindThoughts.Published", map[string]interface{}{
+			"creator":     otu.O.Address("user1"),
+			"creatorName": "user1",
+			"header":      header,
+			"message":     body,
+			"medias": []interface{}{
+				mediaHash,
+			},
+			"tags": []interface{}{"tag1", "tag2", "@find"},
+		}).
+		GetIdFromEvent("Published", "id")
+	return thoughtId
+}
+
 func (otu *OverflowTestUtils) createOptional(value any) (cadence.Value, error) {
 	val, err := cadence.NewValue(value)
 	if err != nil {
