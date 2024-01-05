@@ -1,9 +1,0 @@
-[]test_main.CollectionData{{
-	Collection:          "A.179b6b1cb6755e31.ExampleNFT.NFT",
-	Media:               "http://foo.bar",
-	MediaType:           "image/png",
-	Name:                "Example1",
-	NftDetailIdentifier: "A.179b6b1cb6755e31.ExampleNFT.NFT",
-	Source:              "NFTCatalog",
-	SubCollection:       "The Example Collection",
-}}

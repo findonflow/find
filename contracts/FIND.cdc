@@ -450,15 +450,22 @@ access(all) contract FIND {
             let lease = network.getLease(self.name)
             // if the network lease is nil, it is definitely not validated
             if lease == nil {
+                Debug.log("no lease")
                 return false
             }
+
             // regardless of the status (FREE / LOCKED / TAKEN)
-            // (because other functions checks that)
+            //TODO: these comments here are wrong... 
+            // (because other functions checks that) 
             // if this lease is not the current / latest owner, this lease is not valid anymore
             let registeredOwner = lease!.profile.address
             if registeredOwner == self.owner?.address {
+                if lease!.status() == LeaseStatus.FREE {
+                    return false
+                }
                 return true
             }
+
             return false
         }
     }
@@ -1198,6 +1205,7 @@ access(all) contract FIND {
 
         access(all) fun listForAuction(name :String, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64) {
 
+
             if !self.leases.containsKey(name) {
                 panic("Cannot list name for sale that is not registered to you name=".concat(name))
             }
@@ -1231,16 +1239,18 @@ access(all) contract FIND {
         }
 
         access(all) fun listForSale(name :String, directSellPrice:UFix64) {
-
+            Debug.log("list for sale")
             if !self.leases.containsKey(name) {
                 panic("Cannot list name for sale that is not registered to you name=".concat(name))
             }
 
+            Debug.log("list for sale2")
             let tokenRef = self.borrow(name)
 
             if !tokenRef.validate() {
                 panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
             }
+            Debug.log("list for sale3")
 
             tokenRef.setSalePrice(directSellPrice)
             emit Sale(name: name, uuid: tokenRef.uuid, seller: self.owner!.address, sellerName: FIND.reverseLookup(self.owner!.address), amount: tokenRef.salePrice!, status: "active_listed", vaultType:Type<@FUSD.Vault>().identifier, buyer:nil, buyerName:nil, buyerAvatar: nil, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil())
