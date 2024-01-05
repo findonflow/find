@@ -51,72 +51,61 @@ func TestFindPack(t *testing.T) {
 			})
 	})
 
+	ot.Run(t, "Should not be able to buy pack before drop is open", func(t *testing.T) {
+		otu.registerPackType("user1", 2, []string{dandyIdentifier}, 0.0, 200.0, 200.0, false, 0, "find-admin", "find")
+		otu.mintPack("user1", 2, packRewardIds, []string{dandyIdentifier}, packSalt)
+
+		otu.O.Tx("buyFindPack",
+			WithSigner(buyer),
+			WithArg("packTypeName", buyer),
+			WithArg("packTypeId", 2),
+			WithArg("numberOfPacks", 1),
+			WithArg("totalAmount", 4.2),
+		).
+			AssertFailure(t, "Cannot buy the pack now")
+	})
+
+	ot.Run(t, "Should not be able to open pack before drop is available", func(t *testing.T) {
+		otu.registerPackType("user1", 2, []string{dandyIdentifier}, 0.0, 1.0, 200.0, false, 0, "find-admin", "find")
+		newPackId := otu.mintPack("user1", 2, packRewardIds, []string{dandyIdentifier}, packSalt)
+		otu.buyPack(buyer, buyer, 2, 1, 4.20)
+		otu.O.Tx("openFindPack",
+			WithSigner(buyer),
+			WithArg("packId", newPackId),
+		).
+			AssertFailure(t, "You cannot open the pack yet")
+	})
+
+	//  Tests on Float implementation
+	ot.Run(t, "Should be able to buy nft if the user has the float and with a whitelist.", func(t *testing.T) {
+		floatID := otu.createFloatEvent("find")
+		otu.claimFloat("find", buyer, floatID)
+		otu.registerPackType("user1", 2, []string{dandyIdentifier}, 0.0, 1.0, 1.0, false, floatID, "find-admin", "find")
+		otu.mintPack("user1", 2, packRewardIds, []string{dandyIdentifier}, packSalt)
+		otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
+	})
+
+	//TODO:Dont want to bother with storage fillup now...
 	/*
-		t.Run("Should not be able to buy pack before drop is open", func(t *testing.T) {
-			id1 := otu.mintExampleNFTs()
-			ids := []uint64{id1}
-
-			otu.registerPackType("user1", packTypeId, singleType, 0.0, 2.0, 2.0, false, 0, "find-admin", "find")
-			otu.mintPack("user1", packTypeId, ids, singleType, salt)
-
-			otu.O.Tx("buyFindPack",
-				WithSigner(buyer),
-				WithArg("packTypeName", buyer),
-				WithArg("packTypeId", packTypeId),
-				WithArg("numberOfPacks", 1),
-				WithArg("totalAmount", 4.2),
-			).
-				AssertFailure(t, "Cannot buy the pack now")
-			packTypeId++
-		})
-
-		t.Run("Should not be able to open the pack before it is available", func(t *testing.T) {
-			id1 := otu.mintExampleNFTs()
-			ids := []uint64{id1}
-
-			otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 2.0, false, 0, "find-admin", "find")
-			packId := otu.mintPack("user1", packTypeId, ids, singleType, salt)
-
-			otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
-
-			otu.O.Tx("openFindPack",
-				WithSigner(buyer),
-				WithArg("packId", packId),
-			).
-				AssertFailure(t, "You cannot open the pack yet")
-			packTypeId++
-		})
-
-		t.Run("Should get transferred to DLQ if storage full", func(t *testing.T) {
-			id1 := otu.mintExampleNFTs()
-			ids := []uint64{id1}
-
-			otu.registerPackType("user1", packTypeId, singleType, 0.0, 1.0, 1.0, false, 0, "find-admin", "find")
-			packId := otu.mintPack("user1", packTypeId, ids, singleType, salt)
-
-			otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
-			otu.openPack(buyer, packId)
+		ot.Run(t, "Should get transferred to DLQ if storage full", func(t *testing.T) {
+			otu.buyPack("user3", packTypeName, packTypeId, 1, 4.20)
+			otu.openPack("user3", packId)
 
 			otu.O.Tx("devFillUpStorage",
 				WithSigner(buyer),
-			).
-				AssertSuccess(t)
-
-			// try to fill that up with Example NFT
+			).AssertSuccess(t)
 
 			res := otu.O.FillUpStorage(buyer)
 			require.NoError(t, res.Error)
 
 			fmt.Println(otu.O.GetFreeCapacity(buyer))
 
-			pid := map[uint64][]uint64{packId: ids}
-			types := map[uint64][]string{packId: {exampleNFTType(otu)}}
-
-			otu.O.Tx("adminFulfillPacks",
+			otu.O.Tx("adminFulfillFindPack",
 				WithSigner("find-admin"),
-				WithArg("types", types),
-				WithArg("rewards", pid),
-				WithArg("salts", map[uint64]string{packId: "wrong salt"}),
+				WithArg("packId", packId),
+				WithArg("typeIdentifiers", []string{dandyIdentifier}),
+				WithArg("rewardIds", packRewardIds),
+				WithArg("salt", packSalt),
 			).
 				AssertSuccess(t).
 				AssertEvent(t, otu.identifier("FindPack", "FulfilledError"), map[string]interface{}{
@@ -124,30 +113,10 @@ func TestFindPack(t *testing.T) {
 					"address": otu.O.Address(buyer),
 					"reason":  "Not enough flow to hold the content of the pack. Please top up your account",
 				})
-
-			otu.O.Tx("devRefillStorage",
-				WithSigner(buyer),
-			).
-				AssertSuccess(t)
-			packTypeId++
 		})
+	*/
 
-		//  Tests on Float implementation
-		t.Run("Should be able to buy nft if the user has the float and with a whitelist.", func(t *testing.T) {
-			id1 := otu.mintExampleNFTs()
-			ids := []uint64{id1}
-
-			floatID := otu.createFloatEvent("find")
-
-			otu.claimFloat("find", buyer, floatID)
-
-			otu.registerPackType("user1", packTypeId, singleType, 0.0, 10.0, 15.0, false, floatID, "find-admin", "find")
-			otu.mintPack("user1", packTypeId, ids, singleType, salt)
-
-			otu.buyPack(buyer, buyer, packTypeId, 1, 4.20)
-			packTypeId++
-		})
-
+	/*
 		t.Run("Should not be able to buy nft if the user doesnt have the float during the whitelist period, but can buy in public sale.", func(t *testing.T) {
 			id1 := otu.mintExampleNFTs()
 			ids := []uint64{id1}

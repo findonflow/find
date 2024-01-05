@@ -3,18 +3,18 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FlowStorageFees from "../contracts/standard/FlowStorageFees.cdc"
 
 transaction() {
-    prepare(acct: auth(BorrowValue) &Account) {
+    prepare(acct: auth(BorrowValue, SaveValue, FungibleToken.Withdrawable) &Account) {
 
-        let sender = acct.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault)
-            ?? panic("Cannot borrow FlowToken vault from authAcct storage")
+        let sender = acct.storage.borrow<auth(FungibleToken.Withdrawable) &FlowToken.Vault>(from: /storage/flowTokenVault)
+        ?? panic("Cannot borrow FlowToken vault from authAcct storage")
 
-        let storageUsed = acct.storageUsed
-        let storageCapacity = acct.storageCapacity
-        let extraFlowBalance = FlowStorageFees.storageCapacityToFlow(FlowStorageFees.convertUInt64StorageBytesToUFix64Megabytes(storageCapacity - storageUsed) - 0.2) // 0.1 Mb extra here for fillup
+        let storageUsed = acct.storage.used
+        let storageCapacity = acct.storage.capacity
+        let extraFlowBalance = FlowStorageFees.storageCapacityToFlow(FlowStorageFees.convertUInt64StorageBytesToUFix64Megabytes(storageCapacity - storageUsed) - 0.1) // 0.1 Mb extra here for fillup
 
         let vault <- sender.withdraw(amount: extraFlowBalance)
 
-        acct.save(<- vault, to: /storage/unusedFlow)
+        acct.storage.save(<- vault, to: /storage/unusedFlow)
 
     }
 }

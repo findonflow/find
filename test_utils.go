@@ -2689,11 +2689,13 @@ func (otu *OverflowTestUtils) registerPackType(user string, packTypeId uint64, i
 
 	info := generatePackStruct(otu.O, user, packTypeId, itemType, whitelistTime, buyTime, openTime, requiresReservation, floatId, clientAddress)
 
-	o.Tx("setupFindPackMinterPlatform",
-		WithSigner(user),
-		WithArg("lease", user),
-	).
-		AssertSuccess(t)
+	/*
+		o.Tx("setupFindPackMinterPlatform",
+			WithSigner(user),
+			WithArg("lease", user),
+		).
+			AssertSuccess(t)
+	*/
 
 	o.Tx("adminRegisterFindPackMetadataStruct",
 		WithSigner("find-admin"),
