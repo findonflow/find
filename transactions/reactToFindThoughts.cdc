@@ -4,29 +4,32 @@ import FIND from "../contracts/FIND.cdc"
 
 transaction(users: [String], ids: [UInt64] , reactions: [String], undoReactionUsers: [String], undoReactionIds: [UInt64]) {
 
-	let collection : &FindThoughts.Collection
+    let collection : &FindThoughts.Collection
 
-	prepare(account: auth(BorrowValue) &Account) {
-		let thoughtsCap= account.getCapability<&{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
-		if !thoughtsCap.check() {
-			account.storage.save(<- FindThoughts.createEmptyCollection(), to: FindThoughts.CollectionStoragePath)
-			account.link<&FindThoughts.Collection{FindThoughts.CollectionPublic , ViewResolver.ResolverCollection}>(
-				FindThoughts.CollectionPublicPath,
-				target: FindThoughts.CollectionStoragePath
-			)
-		}
-		self.collection=account.storage.borrow<&FindThoughts.Collection>(from: FindThoughts.CollectionStoragePath) ?? panic("Cannot borrow thoughts reference from path")
-	}
+    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, UnpublishCapability) &Account) {
 
-	execute {
-		for i, user in users {
-			let address = FIND.resolve(user) ?? panic("Cannot resolve user : ".concat(user))
-			self.collection.react(user: address, id: ids[i], reaction: reactions[i])
-		}
+        let col= account.storage.borrow<&FindThoughts.Collection>(from: FindThoughts.CollectionStoragePath)
+        if col == nil {
+            account.storage.save( <- FindThoughts.createEmptyCollection(), to: FindThoughts.CollectionStoragePath)
+            account.capabilities.unpublish(FindThoughts.CollectionPublicPath)
+            let cap = account.capabilities.storage.issue<&FindThoughts.Collection>(FindThoughts.CollectionStoragePath)
+            account.capabilities.publish(cap, at: FindThoughts.CollectionPublicPath)
+            self.collection=account.storage.borrow<&FindThoughts.Collection>(from: FindThoughts.CollectionStoragePath) ?? panic("Cannot borrow thoughts reference from path")
+        }else {
+            self.collection=col!
+        }
 
-		for i, user in undoReactionUsers {
-			let address = FIND.resolve(user) ?? panic("Cannot resolve user : ".concat(user))
-			self.collection.react(user: address, id: undoReactionIds[i], reaction: nil)
-		}
-	}
+    }
+
+    execute {
+        for i, user in users {
+            let address = FIND.resolve(user) ?? panic("Cannot resolve user : ".concat(user))
+            self.collection.react(user: address, id: ids[i], reaction: reactions[i])
+        }
+
+        for i, user in undoReactionUsers {
+            let address = FIND.resolve(user) ?? panic("Cannot resolve user : ".concat(user))
+            self.collection.react(user: address, id: undoReactionIds[i], reaction: nil)
+        }
+    }
 }

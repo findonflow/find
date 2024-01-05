@@ -148,6 +148,7 @@
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
     "ProfileCache": "./contracts/ProfileCache.cdc",
     "FIND": "./contracts/FIND.cdc",
+    "FindThoughts": "./contracts/FindThoughts.cdc",
     "FindAirdropper": "./contracts/FindAirdropper.cdc",
     "FindLostAndFoundWrapper": "./contracts/FindLostAndFoundWrapper.cdc",
     "FindFurnace": "./contracts/FindFurnace.cdc",
@@ -290,6 +291,7 @@
       "emulator-find": [
         "Profile",
         "FIND",
+        "FindThoughts",
         "Clock",
         "Debug",
         "Dandy",

@@ -1,332 +1,344 @@
 import FindViews from "./FindViews.cdc"
 import FindMarket from "./FindMarket.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
+import ViewResolver from "./standard/ViewResolver.cdc"
 import FINDNFTCatalog from "./FINDNFTCatalog.cdc"
 import FIND from "./FIND.cdc"
 import Clock from "./Clock.cdc"
 
 access(all) contract FindThoughts {
 
-	access(all) event Published(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], nfts:[FindMarket.NFTInfo], tags: [String], quoteOwner: Address?, quoteId: UInt64?)
-	access(all) event Edited(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], hide: Bool, tags: [String])
-	access(all) event Deleted(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], tags: [String])
-	access(all) event Reacted(id: UInt64, by: Address, byName: String?, creator: Address, creatorName: String?, header: String, reaction: String?, totalCount: {String : Int})
+    access(all) event Published(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], nfts:[FindMarket.NFTInfo], tags: [String], quoteOwner: Address?, quoteId: UInt64?)
+    access(all) event Edited(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], hide: Bool, tags: [String])
+    access(all) event Deleted(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], tags: [String])
+    access(all) event Reacted(id: UInt64, by: Address, byName: String?, creator: Address, creatorName: String?, header: String, reaction: String?, totalCount: {String : Int})
 
-	access(all) let CollectionStoragePath : StoragePath 
-	access(all) let CollectionPublicPath : PublicPath 
-	access(all) let CollectionPrivatePath : PrivatePath 
+    access(all) let CollectionStoragePath : StoragePath 
+    access(all) let CollectionPublicPath : PublicPath 
+    access(all) let CollectionPrivatePath : PrivatePath 
 
-	access(all) struct ThoughtPointer {
-		access(all) let cap: Capability<&FindThoughts.Collection{FindThoughts.CollectionPublic}>
-		access(all) let id: UInt64 
+    access(all) struct ThoughtPointer {
+        access(all) let cap: Capability<&{FindThoughts.CollectionPublic}>
+        access(all) let id: UInt64 
 
-		init(creator: Address, id: UInt64) {
-			let cap = getAccount(creator).getCapability<&FindThoughts.Collection{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
-			if !cap.check() {
-				panic("creator's find thought capability is not valid. Creator : ".concat(creator.toString()))
-			}
-			self.cap = cap
-			self.id = id 
-		}
+        init(creator: Address, id: UInt64) {
+            let cap = getAccount(creator).capabilities.get<&{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
+            if cap !=nil && !cap!.check() {
+                panic("creator's find thought capability is not valid. Creator : ".concat(creator.toString()))
+            }
+            self.cap = cap!
+            self.id = id 
+        }
 
-		access(all) borrowThoughtPublic() : &{ThoughtPublic}? {
-			if self.cap.check() {
-				let ref = self.cap.borrow()!
-				if ref.contains(self.id) {
-					return ref.borrowThoughtPublic(self.id)
-				}
-			}
-			return nil
-		}
+        access(all) fun borrowThoughtPublic() : &{ThoughtPublic}? {
+            if self.cap.check() {
+                let ref = self.cap.borrow()!
+                if ref.contains(self.id) {
+                    return ref.borrowThoughtPublic(self.id)
+                }
+            }
+            return nil
+        }
 
-		access(all) valid() : Bool {
-			if self.borrowThoughtPublic() != nil {
-				return true
-			}
-			return false
-		}
+        access(all) fun valid() : Bool {
+            if self.borrowThoughtPublic() != nil {
+                return true
+            }
+            return false
+        }
 
-		access(all) owner() : Address {
-			return self.cap.address
-		}
-	}
+        access(all) fun owner() : Address {
+            return self.cap.address
+        }
+    }
 
-	access(all) resource interface ThoughtPublic {
-		access(all) let id: UInt64 
-		access(all) let creator: Address 
-		access(all) var header: String 
-		access(all) var body: String 
-		access(all) let created: UFix64 
-		access(all) var lastUpdated: UFix64?
-		access(all) let medias: [MetadataViews.Media]
-		access(all) let nft: [FindViews.ViewReadPointer]
-		access(all) var tags: [String]
-		access(all) var reacted: {Address : String}
-		access(all) var reactions: {String : Int}
+    access(all) resource interface ThoughtPublic {
+        access(all) let id: UInt64 
+        access(all) let creator: Address 
+        access(all) var header: String 
+        access(all) var body: String 
+        access(all) let created: UFix64 
+        access(all) var lastUpdated: UFix64?
+        access(all) let medias: [MetadataViews.Media]
+        access(all) let nft: [FindViews.ViewReadPointer]
+        access(all) var tags: [String]
+        access(all) var reacted: {Address : String}
+        access(all) var reactions: {String : Int}
 
-		access(contract) fun internal_react(user: Address, reaction: String?) 
-		access(all) getQuotedThought() : ThoughtPointer? 
-		access(all) getHide() : Bool
-	}
+        access(contract) fun internal_react(user: Address, reaction: String?) 
+        access(all) fun getQuotedThought() : ThoughtPointer? 
+        access(all) fun getHide() : Bool
+    }
 
-	access(all) resource Thought : ThoughtPublic , ViewResolver.Resolver {
-		access(all) let id: UInt64 
-		access(all) let creator: Address 
-		access(all) var header: String 
-		access(all) var body: String 
-		access(all) let created: UFix64 
-		access(all) var lastUpdated: UFix64?
-		access(all) var tags: [String]
-		// user : Reactions
-		access(all) var reacted: {Address : String}
-		// Reactions : Counts
-		access(all) var reactions: {String : Int}
+    access(all) resource Thought : ThoughtPublic , ViewResolver.Resolver {
+        access(all) let id: UInt64 
+        access(all) let creator: Address 
+        access(all) var header: String 
+        access(all) var body: String 
+        access(all) let created: UFix64 
+        access(all) var lastUpdated: UFix64?
+        access(all) var tags: [String]
+        // user : Reactions
+        access(all) var reacted: {Address : String}
+        // Reactions : Counts
+        access(all) var reactions: {String : Int}
 
-		// only one image is enabled at the moment
-		access(all) let medias: [MetadataViews.Media]
+        // only one image is enabled at the moment
+        access(all) let medias: [MetadataViews.Media]
 
-		// These are here only for future extension
-		access(all) let nft: [FindViews.ViewReadPointer]
-		access(self) let stringTags: {String : String} 
-		access(self) let scalars: {String : UFix64} 
-		access(self) let extras: {String : AnyStruct} 
+        // These are here only for future extension
+        access(all) let nft: [FindViews.ViewReadPointer]
+        access(self) let stringTags: {String : String} 
+        access(self) let scalars: {String : UFix64} 
+        access(self) let extras: {String : AnyStruct} 
 
-		init(creator: Address , header: String , body: String , created: UFix64, tags: [String], medias: [MetadataViews.Media], nft: [FindViews.ViewReadPointer], quote: ThoughtPointer?, stringTags: {String : String}, scalars : {String : UFix64}, extras: {String : AnyStruct} ) {
-			self.id = self.uuid 
-			self.creator = creator
-			self.header = header
-			self.body = body
-			self.created = created
-			self.lastUpdated = nil
-			self.tags = tags
-			self.medias = medias
+        init(creator: Address , header: String , body: String , created: UFix64, tags: [String], medias: [MetadataViews.Media], nft: [FindViews.ViewReadPointer], quote: ThoughtPointer?, stringTags: {String : String}, scalars : {String : UFix64}, extras: {String : AnyStruct} ) {
+            self.id = self.uuid 
+            self.creator = creator
+            self.header = header
+            self.body = body
+            self.created = created
+            self.lastUpdated = nil
+            self.tags = tags
+            self.medias = medias
 
-			self.nft = nft
-			self.stringTags = stringTags
-			self.scalars = scalars
-			extras["quote"] = quote
-			extras["hidden"] = false
-			self.extras = extras
+            self.nft = nft
+            self.stringTags = stringTags
+            self.scalars = scalars
+            extras["quote"] = quote
+            extras["hidden"] = false
+            self.extras = extras
 
-			self.reacted = {}
-			self.reactions = {}
-		}
+            self.reacted = {}
+            self.reactions = {}
+        }
 
-		destroy(){
-			let address = self.owner?.address
-			let medias : [String] = []
-			for m in self.medias {
-				medias.append(m.file.uri())
-			}
-			
-			var name : String? = nil 
-			if address != nil {
-				name = FIND.reverseLookup(address!)
-			}
-			emit Deleted(id: self.id, creator: self.creator, creatorName: FIND.reverseLookup(self.creator), header: self.header, message: self.body, medias: medias, tags: self.tags)
-		}
+        /*
+        destroy(){
+            let address = self.owner?.address
+            let medias : [String] = []
+            for m in self.medias {
+                medias.append(m.file.uri())
+            }
 
-		access(all) getQuotedThought() : ThoughtPointer? {
-			if let r = self.extras["quote"] {
-				return r as! ThoughtPointer
-			}
-			return nil
-		}
+            var name : String? = nil 
+            if address != nil {
+                name = FIND.reverseLookup(address!)
+            }
+            emit Deleted(id: self.id, creator: self.creator, creatorName: FIND.reverseLookup(self.creator), header: self.header, message: self.body, medias: medias, tags: self.tags)
+        }
+        */
 
-		access(all) getHide() : Bool {
-			if let r = self.extras["hidden"] {
-				return r as! Bool
-			}
-			return false
-		}
+        access(all) fun getQuotedThought() : ThoughtPointer? {
+            if let r = self.extras["quote"] {
+                return r as! ThoughtPointer
+            }
+            return nil
+        }
 
-		access(all) hide(_ hide: Bool) {
-			self.extras["hidden"] = hide
-			let medias : [String] = []
-			for m in self.medias {
-				medias.append(m.file.uri())
-			}
-			emit Edited(id: self.id, creator: self.creator, creatorName: FIND.reverseLookup(self.creator), header: self.header, message: self.body, medias: medias, hide: hide, tags: self.tags)
-		}
+        access(all) fun getHide() : Bool {
+            if let r = self.extras["hidden"] {
+                return r as! Bool
+            }
+            return false
+        }
 
-		access(all) edit(header: String , body: String, tags: [String]) {
-			self.header = header 
-			self.body = body 
-			self.tags = tags 
-			let address = self.owner!.address
-			let medias : [String] = []
-			for m in self.medias {
-				medias.append(m.file.uri())
-			}
-			self.lastUpdated = Clock.time()
-			emit Edited(id: self.id, creator: address, creatorName: FIND.reverseLookup(address), header: self.header, message: self.body, medias: medias, hide: self.getHide(), tags: self.tags)
-		}
+        access(all) fun hide(_ hide: Bool) {
+            self.extras["hidden"] = hide
+            let medias : [String] = []
+            for m in self.medias {
+                medias.append(m.file.uri())
+            }
+            emit Edited(id: self.id, creator: self.creator, creatorName: FIND.reverseLookup(self.creator), header: self.header, message: self.body, medias: medias, hide: hide, tags: self.tags)
+        }
 
-		// To withdraw reaction, pass in nil
-		access(contract) fun internal_react(user: Address, reaction: String?) {
-			let owner = self.owner!.address
-			if let previousReaction = self.reacted[user] {
-				// reaction here cannot be nil, therefore we can ! 
-				self.reactions[previousReaction] = self.reactions[previousReaction]! - 1
-				if self.reactions[previousReaction]! == 0 {
-					self.reactions.remove(key: previousReaction)
-				}
-			} 
+        access(all) fun edit(header: String , body: String, tags: [String]) {
+            self.header = header 
+            self.body = body 
+            self.tags = tags 
+            let address = self.owner!.address
+            let medias : [String] = []
+            for m in self.medias {
+                medias.append(m.file.uri())
+            }
+            self.lastUpdated = Clock.time()
+            emit Edited(id: self.id, creator: address, creatorName: FIND.reverseLookup(address), header: self.header, message: self.body, medias: medias, hide: self.getHide(), tags: self.tags)
+        }
 
-			self.reacted[user] = reaction
-			
-			if reaction != nil {
-				var reacted = self.reactions[reaction!] ?? 0
-				reacted = reacted + 1
-				self.reactions[reaction!] = reacted
-			}
+        // To withdraw reaction, pass in nil
+        access(contract) fun internal_react(user: Address, reaction: String?) {
+            let owner = self.owner!.address
+            if let previousReaction = self.reacted[user] {
+                // reaction here cannot be nil, therefore we can ! 
+                self.reactions[previousReaction] = self.reactions[previousReaction]! - 1
+                if self.reactions[previousReaction]! == 0 {
+                    self.reactions.remove(key: previousReaction)
+                }
+            } 
 
-			emit Reacted(id: self.id, by: user, byName: FIND.reverseLookup(user), creator: owner, creatorName: FIND.reverseLookup(owner), header: self.header, reaction: reaction, totalCount: self.reactions)
-		}
+            self.reacted[user] = reaction
 
-        access(all) getViews(): [Type] {
-			return [
-				Type<MetadataViews.Display>()
-			]
-		}
+            if reaction != nil {
+                var reacted = self.reactions[reaction!] ?? 0
+                reacted = reacted + 1
+                self.reactions[reaction!] = reacted
+            }
 
-		access(all) resolveView(_ type: Type) : AnyStruct? {
-			switch type {
-			
-				case Type<MetadataViews.Display>(): 
+            emit Reacted(id: self.id, by: user, byName: FIND.reverseLookup(user), creator: owner, creatorName: FIND.reverseLookup(owner), header: self.header, reaction: reaction, totalCount: self.reactions)
+        }
 
-					let content = self.body.concat("  -- FIND Thought by ").concat(FIND.reverseLookup(self.owner!.address) ?? self.owner!.address.toString())
+        access(all) view fun getViews(): [Type] {
+            return [
+            Type<MetadataViews.Display>()
+            ]
+        }
 
-					return MetadataViews.Display(
-						name: self.header, 
-						description: content,
-						thumbnail: self.medias[0].file
-					)
+        access(all) view fun resolveView(_ type: Type) : AnyStruct? {
+            switch type {
 
-			}
-			return nil
-		}
-	}
+                case Type<MetadataViews.Display>(): 
 
-	access(all) resource interface CollectionPublic {
-		access(all) contains(_ id: UInt64) : Bool 
-		access(all) getIDs() : [UInt64]
-		access(all) borrowThoughtPublic(_ id: UInt64) : &FindThoughts.Thought{FindThoughts.ThoughtPublic} 
-	}
+                let content = self.body.concat("  -- FIND Thought by ").concat(self.owner!.address.toString())
 
-	access(all) resource Collection : CollectionPublic, ViewResolver.ResolverCollection {
-		access(self) let ownedThoughts : @{UInt64 : FindThoughts.Thought}
+                return MetadataViews.Display(
+                    name: self.header, 
+                    description: content,
+                    thumbnail: self.medias[0].file
+                )
 
-		access(self) let sequence : [UInt64] 
+            }
+            return nil
+        }
+    }
 
-		init() {
-			self.ownedThoughts <- {}
-			self.sequence = []
-		}
+    access(all) resource interface CollectionPublic {
+        access(all) fun contains(_ id: UInt64) : Bool 
 
-		destroy() {
-			destroy self.ownedThoughts
-		}
+        access(all) view fun borrowThoughtPublic(_ id: UInt64) : &{FindThoughts.ThoughtPublic}
+    }
 
-		access(all) contains(_ id: UInt64) : Bool {
-			return self.ownedThoughts.containsKey(id)
-		}
+    access(all) resource Collection : CollectionPublic, ViewResolver.ResolverCollection {
+        access(self) let ownedThoughts : @{UInt64 : FindThoughts.Thought}
 
-		access(all) getIDs() : [UInt64] {
-			return self.ownedThoughts.keys
-		}
+        access(self) let sequence : [UInt64] 
 
-		access(all) borrow(_ id: UInt64) : &FindThoughts.Thought {
-			pre{
-				self.ownedThoughts.containsKey(id) : "Cannot borrow Thought with ID : ".concat(id.toString())
-			}
-			return (&self.ownedThoughts[id] as &FindThoughts.Thought?)!
-		}
+        init() {
+            self.ownedThoughts <- {}
+            self.sequence = []
+        }
 
-		access(all) borrowThoughtPublic(_ id: UInt64) : &FindThoughts.Thought{FindThoughts.ThoughtPublic} {
-			pre{
-				self.ownedThoughts.containsKey(id) : "Cannot borrow Thought with ID : ".concat(id.toString())
-			}
-			return (&self.ownedThoughts[id] as &FindThoughts.Thought?)!
-		}
+        access(all) fun contains(_ id: UInt64) : Bool {
+            return self.ownedThoughts.containsKey(id)
+        }
 
-        access(all) borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
-			pre{
-				self.ownedThoughts.containsKey(id) : "Cannot borrow Thought with ID : ".concat(id.toString())
-			}
-			return (&self.ownedThoughts[id] as &FindThoughts.Thought?)!
-		}
+        access(all) view fun getIDs() : [UInt64] {
+            return self.ownedThoughts.keys
+        }
 
-		// TODO : Restructure this to take structs , and declare the structs in Trxn.  And identify IPFS and url
-		// So take pointer, thought pointer and media
-		access(all) access(all)lish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?) {
-			let medias : [MetadataViews.Media] = []
-			let m : [String] = []
-			if media != nil {
-				medias.append(media!)
-				m.append(media!.file.uri())
-			}
-			let address = self.owner!.address
+        access(all) fun borrow(_ id: UInt64) : &FindThoughts.Thought {
+            pre{
+                self.ownedThoughts.containsKey(id) : "Cannot borrow Thought with ID : ".concat(id.toString())
+            }
+            return (&self.ownedThoughts[id])!
+        }
 
-			let nfts : [FindMarket.NFTInfo] = []
-			let extra : {String : AnyStruct} = {}
-			if nftPointer != nil {
-				let rv = nftPointer!.getViewResolver()
-				nfts.append(FindMarket.NFTInfo(rv, id: nftPointer!.id, detail: true))
-			}
+        access(all) view fun borrowThoughtPublic(_ id: UInt64) : &{FindThoughts.ThoughtPublic} {
+            pre{
+                self.ownedThoughts.containsKey(id) : "Cannot borrow Thought with ID : ".concat(id.toString())
+            }
+            return (&self.ownedThoughts[id] as &FindThoughts.Thought?)!
+        }
 
-			let thought <- create Thought(creator: address, header: header , body: body , created: Clock.time(), tags: tags, medias: medias, nft: [], quote: quote, stringTags: {}, scalars : {}, extras: extra)
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
+            pre{
+                self.ownedThoughts.containsKey(id) : "Cannot borrow Thought with ID : ".concat(id.toString())
+            }
+            return (&self.ownedThoughts[id] as &FindThoughts.Thought?)!
+        }
 
-			self.sequence.append(thought.uuid)
+        // TODO : Restructure this to take structs , and declare the structs in Trxn.  And identify IPFS and url
+        // So take pointer, thought pointer and media
+        access(all) fun publish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?) {
+            let medias : [MetadataViews.Media] = []
+            let m : [String] = []
+            if media != nil {
+                medias.append(media!)
+                m.append(media!.file.uri())
+            }
+            let address = self.owner!.address
 
-			let creatorName = FIND.reverseLookup(address)
+            let nfts : [FindMarket.NFTInfo] = []
+            let extra : {String : AnyStruct} = {}
+            if nftPointer != nil {
+                let rv = nftPointer!.getViewResolver()
+                nfts.append(FindMarket.NFTInfo(rv, id: nftPointer!.id, detail: true))
+            }
 
-			emit Published(id: thought.id ,creator: address, creatorName: creatorName , header: header, message: body, medias: m, nfts: nfts, tags: tags, quoteOwner: quote?.owner(), quoteId: quote?.id)
+            let thought <- create Thought(creator: address, header: header , body: body , created: Clock.time(), tags: tags, medias: medias, nft: [], quote: quote, stringTags: {}, scalars : {}, extras: extra)
 
-			self.ownedThoughts[thought.uuid] <-! thought
-		}
+            self.sequence.append(thought.uuid)
 
-		access(all) delete(_ id: UInt64) {
-			pre{
-				self.ownedThoughts.containsKey(id) : "Does not contains Thought with ID : ".concat(id.toString())
-			}
+            let creatorName = FIND.reverseLookup(address)
 
-			let thought <- self.ownedThoughts.remove(key: id)!
-			self.sequence.remove(at: self.sequence.firstIndex(of: id)!)
+            emit Published(id: thought.id ,creator: address, creatorName: creatorName , header: header, message: body, medias: m, nfts: nfts, tags: tags, quoteOwner: quote?.owner(), quoteId: quote?.id)
 
-			let address = self.owner!.address
-			destroy thought
-		}
 
-		access(all) react(user: Address, id: UInt64, reaction: String?) {
-			let cap = FindThoughts.getFindThoughtsCapability(user)
-			let ref = cap.borrow() ?? panic("Cannot borrow reference to Find Thoughts Collection from user : ".concat(user.toString()))
+            self.ownedThoughts[thought.uuid] <-! thought
+        }
 
-			let thought = ref.borrowThoughtPublic(id)
-			thought.internal_react(user: self.owner!.address, reaction: reaction)
-		}
+        access(all) fun delete(_ id: UInt64) {
+            pre{
+                self.ownedThoughts.containsKey(id) : "Does not contains Thought with ID : ".concat(id.toString())
+            }
 
-		access(all) hide(id: UInt64, hide: Bool) {
-			let thought = self.borrow(id)
-			thought.hide(hide)
-		}
+            let thought <- self.ownedThoughts.remove(key: id)!
+            self.sequence.remove(at: self.sequence.firstIndex(of: id)!)
 
-	}
+            let address = self.owner!.address
 
-	access(all) createEmptyCollection() : @FindThoughts.Collection {
-		return <- create Collection()
-	}
+            let medias : [String] = []
+            for m in thought.medias {
+                medias.append(m.file.uri())
+            }
 
-	access(all) getFindThoughtsCapability(_ user: Address) : Capability<&FindThoughts.Collection{FindThoughts.CollectionPublic}> {
-		return getAccount(user).getCapability<&FindThoughts.Collection{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
-	}
+            var name : String? = nil 
+            if address != nil {
+                name = FIND.reverseLookup(address)
+            }
+            emit Deleted(id: thought.id, creator: thought.creator, creatorName: FIND.reverseLookup(thought.creator), header: thought.header, message: thought.body, medias: medias, tags: thought.tags)
 
-	init(){
-		self.CollectionStoragePath = /storage/FindThoughts 
-		self.CollectionPublicPath = /public/FindThoughts 
-		self.CollectionPrivatePath = /private/FindThoughts 
-	}
+            destroy thought
+        }
+
+        access(all) fun react(user: Address, id: UInt64, reaction: String?) {
+            let cap = FindThoughts.getFindThoughtsCapability(user)
+            let ref = cap.borrow() ?? panic("Cannot borrow reference to Find Thoughts Collection from user : ".concat(user.toString()))
+
+            let thought = ref.borrowThoughtPublic(id)
+            thought.internal_react(user: self.owner!.address, reaction: reaction)
+        }
+
+        access(all) fun hide(id: UInt64, hide: Bool) {
+            let thought = self.borrow(id)
+            thought.hide(hide)
+        }
+
+    }
+
+    access(all) fun createEmptyCollection() : @FindThoughts.Collection {
+        return <- create Collection()
+    }
+
+    access(all) fun getFindThoughtsCapability(_ user: Address) : Capability<&{FindThoughts.CollectionPublic}> {
+        return getAccount(user).capabilities.get<&{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)!
+    }
+
+    init(){
+        self.CollectionStoragePath = /storage/FindThoughts 
+        self.CollectionPublicPath = /public/FindThoughts 
+        self.CollectionPrivatePath = /private/FindThoughts 
+    }
 
 }
- 
- 
+
+
