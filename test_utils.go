@@ -2551,6 +2551,32 @@ func (otu *OverflowTestUtils) changeRoyaltyExampleNFT(user string, id uint64, ch
 	return otu
 }
 
+func (otu *OverflowTestUtils) SendNFTsLostAndFound(nftType string, id uint64, receiver string) uint64 {
+	t := otu.T
+	res := otu.O.Tx("sendNFTs",
+		WithSigner("user1"),
+		WithArg("nftIdentifiers", []string{nftType}),
+		WithArg("allReceivers", []string{otu.O.Address(receiver)}),
+		WithArg("ids", []uint64{id}),
+		WithArg("memos", `["Hello!"]`),
+		WithArg("donationTypes", `[nil]`),
+		WithArg("donationAmounts", `[nil]`),
+		WithArg("findDonationType", nil),
+		WithArg("findDonationAmount", nil),
+	).
+		AssertSuccess(t).
+		AssertEvent(t, "FindLostAndFoundWrapper.TicketDeposited", map[string]interface{}{
+			"receiver": otu.O.Address(receiver),
+			"sender":   otu.O.Address("user1"),
+			"type":     nftType,
+			"memo":     "Hello!",
+			"name":     "Neo Motorcycle 1 of 3",
+		})
+	ticketID, err := res.GetIdFromEvent("FindLostAndFoundWrapper.TicketDeposited", "ticketID")
+	assert.NoError(otu.T, err)
+	return ticketID
+}
+
 func (otu *OverflowTestUtils) createExampleNFTTicket() uint64 {
 	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
 	assert.NoError(otu.T, err)
