@@ -59,6 +59,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
             account.capabilities.publish(cap, at: cd.publicPath)
             self.targetCapability=cap
         } else {
+            //TODO: I do not think this works as intended
             var targetCapability= account.capabilities.get<&AnyResource>(nft.publicPath) as? Capability<&{NonFungibleToken.Collection}>
             if targetCapability == nil || !targetCapability!.check() {
                 let cd = item.getNFTCollectionData()

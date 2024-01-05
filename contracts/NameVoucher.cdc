@@ -7,7 +7,7 @@ import FungibleTokenSwitchboard from "./standard/FungibleTokenSwitchboard.cdc"
 import Profile from "./Profile.cdc"
 import FIND from "./FIND.cdc"
 import FindViews from "./FindViews.cdc"
-// import FindAirdropper from "./FindAirdropper.cdc"
+import FindAirdropper from "./FindAirdropper.cdc"
 
 access(all) contract NameVoucher {
 
@@ -133,7 +133,7 @@ access(all) contract NameVoucher {
 
     }
 
-    access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
+    access(all) resource Collection: NonFungibleToken.Collection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
@@ -183,10 +183,13 @@ access(all) contract NameVoucher {
             return &self.ownedNFTs[id] 
         }
 
-        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
-            let nft = &self.ownedNFTs[id] as &{NonFungibleToken.NFT}?
-            let vr = nft as! &NFT
-            return vr 
+
+        /// Borrow the view resolver for the specified NFT ID
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}? {
+            if let nft = &self.ownedNFTs[id] as &{NonFungibleToken.NFT}? {
+                return nft as &{ViewResolver.Resolver}
+            }
+            return nil
         }
 
         access(all) fun redeem(id: UInt64, name: String) {
@@ -294,6 +297,7 @@ access(all) contract NameVoucher {
         // Initialize the total supply
         self.totalSupply = 0
 
+        //TODO: why on earth are we doing this here in a contract initializer?
         // Check if the account already has a Switchboard resource
         if self.account.storage.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath) == nil {
             // Create a new Switchboard resource and put it into storage
@@ -342,6 +346,7 @@ access(all) contract NameVoucher {
 
         self.account.storage.save<@{NonFungibleToken.Collection}>(<- NameVoucher.createEmptyCollection(), to: NameVoucher.CollectionStoragePath)
         let collectionCap = self.account.capabilities.storage.issue<&NameVoucher.Collection>(NameVoucher.CollectionStoragePath)
+        self.account.capabilities.publish(collectionCap, at: self.CollectionPublicPath)
 
         emit ContractInitialized()
     }

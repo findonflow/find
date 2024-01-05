@@ -8,36 +8,36 @@ import FindAirdropper from "../contracts/FindAirdropper.cdc"
 
 transaction(users: [Address], minCharLength: UInt64) {
 
-	prepare(admin:AuthAccount) {
+    prepare(account:auth(BorrowValue, FungibleToken.Withdrawable) &Account) {
 
-		let client= admin.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
+        let client= account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
 
-		let vaultRef = admin.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault)!
-		let paymentVault <- vaultRef.withdraw(amount: 0.01 * UFix64(users.length))
-		let repayment = admin.getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+        let vaultRef = account.storage.borrow<auth(FungibleToken.Withdrawable) &FlowToken.Vault>(from: /storage/flowTokenVault)!
+        let paymentVault <- vaultRef.withdraw(amount: 0.01 * UFix64(users.length)) 
+        let repayment = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
 
-		let paymentVaultRef = &paymentVault as &FungibleToken.Vault
-		for user in users {
-			let id = client.mintNameVoucherToFind(
-				minCharLength: minCharLength
-			)
+        let paymentVaultRef = &paymentVault as auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+        for user in users {
+            let id = client.mintNameVoucherToFind(
+                minCharLength: minCharLength
+            )
 
-			let authPointer = client.getAuthPointer(pathIdentifier: "nameVoucher", id: id)
-			FindAirdropper.forcedAirdrop(
-					pointer: authPointer,
-					receiver: user,
-					path: NameVoucher.CollectionPublicPath,
-					context: {
-						"tenant" : "find"
-					},
-					storagePayment: paymentVaultRef,
-					flowTokenRepayment: repayment,
-					deepValidation: false
-			)
-		}
+            let authPointer = client.getAuthPointer(pathIdentifier: "nameVoucher", id: id)
+            FindAirdropper.forcedAirdrop(
+                pointer: authPointer,
+                receiver: user,
+                path: NameVoucher.CollectionPublicPath,
+                context: {
+                    "tenant" : "find"
+                },
+                storagePayment: paymentVaultRef,
+                flowTokenRepayment: repayment,
+                deepValidation: false
+            )
+        }
 
-		vaultRef.deposit(from: <- paymentVault)
+        vaultRef.deposit(from: <- paymentVault)
 
-	}
+    }
 
 }

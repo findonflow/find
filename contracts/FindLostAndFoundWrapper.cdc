@@ -7,6 +7,7 @@ import LostAndFound from "./standard/LostAndFound.cdc"
 import LostAndFoundHelper from "./standard/LostAndFoundHelper.cdc"
 import FlowStorageFees from "./standard/FlowStorageFees.cdc"
 import FIND from "./FIND.cdc"
+import Debug from "./Debug.cdc"
 import FindViews from "./FindViews.cdc"
 
 
@@ -134,13 +135,8 @@ access(all) contract FindLostAndFoundWrapper {
     // Redeem 
     access(all) fun redeemNFT(type: Type, ticketID: UInt64, receiverAddress: Address, collectionPublicPath: PublicPath) {
 
-        let metadataViewsCap = getAccount(receiverAddress).capabilities.get<&{ViewResolver.ResolverCollection}>(collectionPublicPath)!
-
-        let receiverCap = getAccount(receiverAddress).capabilities.get<&{NonFungibleToken.Receiver}>(collectionPublicPath)!
-        let collectionPublicCap = getAccount(receiverAddress).capabilities.get<&{NonFungibleToken.Collection}>(collectionPublicPath)!
-
-        //TODO: this should prob be nil or something?
-        if !receiverCap.check() && !collectionPublicCap.check() {
+        let cap= getAccount(receiverAddress).capabilities.get<&{NonFungibleToken.Collection}>(collectionPublicPath) 
+        if cap == nil || !cap!.check() {
             emit TicketRedeemFailed(receiver: receiverAddress, receiverName: FIND.reverseLookup(receiverAddress), ticketID: ticketID, type: type.identifier, remark: "invalid capability")
             return
         }
@@ -155,22 +151,17 @@ access(all) contract FindLostAndFoundWrapper {
         let memo = ticket.memo
 
         // if receiverCap is valid, pass that in, otherwise pass collectionPublicCap
-        shelf.redeem(type: type, ticketID: ticketID, receiver: receiverCap.check() ? receiverCap : collectionPublicCap)
-        var item : FindViews.ViewReadPointer? = nil
-        var display : MetadataViews.Display? = nil
-        var collectionDisplay : MetadataViews.NFTCollectionDisplay? = nil
+        shelf.redeem(type: type, ticketID: ticketID, receiver: cap!)
 
-        if metadataViewsCap.check() {
-            item = FindViews.ViewReadPointer(cap: metadataViewsCap, id: nftID)
-            display = item!.getDisplay()
-            collectionDisplay = MetadataViews.getNFTCollectionDisplay(item!.getViewResolver())
-        }
+        let viewResolver=cap!.borrow()!.borrowViewResolver(id: nftID)!
+        let display = MetadataViews.getDisplay(viewResolver)
+        let collectionDisplay= MetadataViews.getNFTCollectionDisplay(viewResolver)
 
         var senderName : String? = nil 
         if sender != nil {
             senderName = FIND.reverseLookup(sender!)
         }
-        emit NFTDeposited(receiver: receiverAddress, receiverName: FIND.reverseLookup(receiverAddress), sender: sender, senderName: senderName, type: type.identifier, id: nftID, uuid: item?.uuid, memo: memo, name: display?.name, description: display?.description, thumbnail: display?.thumbnail?.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
+        emit NFTDeposited(receiver: receiverAddress, receiverName: FIND.reverseLookup(receiverAddress), sender: sender, senderName: senderName, type: type.identifier, id: nftID, uuid: viewResolver.uuid, memo: memo, name: display?.name, description: display?.description, thumbnail: display?.thumbnail?.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
         emit TicketRedeemed(receiver: receiverAddress, receiverName: FIND.reverseLookup(receiverAddress), ticketID: ticketID, type: type.identifier)
 
     }

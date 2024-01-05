@@ -7,69 +7,42 @@ import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
 
 transaction(id: UInt64, name: String) {
 
-	var collection : &NameVoucher.Collection
-	let addr : Address
+    var collection : &NameVoucher.Collection
+    let addr : Address
 
-	prepare(account:AuthAccount) {
+    prepare(account: auth(BorrowValue, SaveValue, IssueStorageCapabilityController, PublishCapability) &Account) {
 
-		var nameVoucherRef= account.storage.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
-		if nameVoucherRef == nil {
-			account.storage.save<@NonFungibleToken.Collection>(<- NameVoucher.createEmptyCollection(), to: NameVoucher.CollectionStoragePath)
-			account.unlink(NameVoucher.CollectionPublicPath)
-			account.link<&NameVoucher.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
-				NameVoucher.CollectionPublicPath,
-				target: NameVoucher.CollectionStoragePath
-			)
-			account.unlink(NameVoucher.CollectionPrivatePath)
-			account.link<&NameVoucher.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
-				NameVoucher.CollectionPrivatePath,
-				target: NameVoucher.CollectionStoragePath
-			)
-			nameVoucherRef= account.storage.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
-		}
+        var col= account.storage.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
+        if col == nil {
+            account.storage.save( <- NameVoucher.createEmptyCollection(), to: NameVoucher.CollectionStoragePath)
+            let cap = account.capabilities.storage.issue<&NameVoucher.Collection>(NameVoucher.CollectionStoragePath)
+            account.capabilities.publish(cap, at: NameVoucher.CollectionPublicPath)
+            col= account.storage.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
+        }
+        self.collection = col!
+        self.addr = account.address
+    }
 
+    execute{
+        // check if it is there in collection
+        if self.collection.contains(id) {
+            self.collection.redeem(id: id, name: name)
+            return
+        }
 
-		let nameVoucherCap= account.getCapability<&NameVoucher.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(NameVoucher.CollectionPublicPath)
-		if !nameVoucherCap.check() {
-			account.unlink(NameVoucher.CollectionPublicPath)
-			account.link<&NameVoucher.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
-				NameVoucher.CollectionPublicPath,
-				target: NameVoucher.CollectionStoragePath
-			)
-		}
+        // check if it is there on L&F
+        let tickets = LostAndFound.borrowAllTicketsByType(addr: self.addr, type: Type<@NameVoucher.NFT>())
+        for ticket in tickets {
+            if ticket.uuid == id {
+                let tokenId = ticket.getNonFungibleTokenID()!
+                FindLostAndFoundWrapper.redeemNFT(type: Type<@NameVoucher.NFT>(), ticketID: id, receiverAddress: self.addr, collectionPublicPath: NameVoucher.CollectionPublicPath)
 
-		let nameVoucherProviderCap= account.getCapability<&NameVoucher.Collection{NonFungibleToken.Provider,NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(NameVoucher.CollectionPrivatePath)
-		if !nameVoucherProviderCap.check() {
-			account.unlink(NameVoucher.CollectionPrivatePath)
-			account.link<&NameVoucher.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
-				NameVoucher.CollectionPrivatePath,
-				target: NameVoucher.CollectionStoragePath
-			)
-		}
-		self.collection = nameVoucherRef!
-		self.addr = account.address
-	}
+                self.collection.redeem(id: tokenId, name: name)
+                return
+            }
+        }
 
-	execute{
-		// check if it is there in collection
-		if self.collection.contains(id) {
-			self.collection.redeem(id: id, name: name)
-			return
-		}
-
-		// check if it is there on L&F
-		let tickets = LostAndFound.borrowAllTicketsByType(addr: self.addr, type: Type<@NameVoucher.NFT>())
-		for ticket in tickets {
-			if ticket.uuid == id {
-				let tokenId = ticket.getNonFungibleTokenID()!
-				FindLostAndFoundWrapper.redeemNFT(type: Type<@NameVoucher.NFT>(), ticketID: id, receiverAddress: self.addr, collectionPublicPath: NameVoucher.CollectionPublicPath)
-
-				self.collection.redeem(id: tokenId, name: name)
-				return
-			}
-		}
-
-		panic("There is no ID or Ticket ID : ".concat(id.toString()))
-	}
+        panic("There is no ID or Ticket ID : ".concat(id.toString()))
+    }
 
 }

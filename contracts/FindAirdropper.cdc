@@ -77,8 +77,6 @@ access(all) contract FindAirdropper {
         let vr = pointer.getViewResolver()
         let nftInfo = FindMarket.NFTInfo(vr, id: pointer.id, detail: true)
 
-        let receiverCap = getAccount(receiver).capabilities.get<&{NonFungibleToken.Receiver}>(path)!
-
         // use LostAndFound for dropping
         let ticketID = FindLostAndFoundWrapper.depositNFT(
             receiver: receiver,
