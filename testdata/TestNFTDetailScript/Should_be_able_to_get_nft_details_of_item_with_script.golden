@@ -1,185 +1,99 @@
-`{
-    "allowedListingActions": {
-        "FindMarketAuctionEscrow": {
-            "ListingDetails": [
-                {
-                    "ftAlias": "Flow",
-                    "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                    "royalties": [
-                        {
-                            "address": "0x179b6b1cb6755e31",
-                            "cut": 0.025,
-                            "royaltyName": "find"
-                        },
-                        {
-                            "address": "0xf669cb8d41ce0c74",
-                            "cut": 0.05,
-                            "findName": "user1",
-                            "royaltyName": "creator"
-                        },
-                        {
-                            "address": "0x179b6b1cb6755e31",
-                            "cut": 0.025,
-                            "royaltyName": "find forge"
-                        }
-                    ]
-                }
-            ],
-            "ftAlias": [
-                "Flow"
-            ],
-            "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
-            ],
-            "listingType": "A.179b6b1cb6755e31.FindMarketAuctionEscrow.SaleItem",
-            "status": "active"
-        },
-        "FindMarketDirectOfferEscrow": {
-            "ListingDetails": [
-                {
-                    "ftAlias": "Flow",
-                    "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                    "royalties": [
-                        {
-                            "address": "0x179b6b1cb6755e31",
-                            "cut": 0.025,
-                            "royaltyName": "find"
-                        },
-                        {
-                            "address": "0xf669cb8d41ce0c74",
-                            "cut": 0.05,
-                            "findName": "user1",
-                            "royaltyName": "creator"
-                        },
-                        {
-                            "address": "0x179b6b1cb6755e31",
-                            "cut": 0.025,
-                            "royaltyName": "find forge"
-                        }
-                    ]
-                }
-            ],
-            "ftAlias": [
-                "Flow"
-            ],
-            "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
-            ],
-            "listingType": "A.179b6b1cb6755e31.FindMarketDirectOfferEscrow.SaleItem",
-            "status": "active"
-        },
-        "FindMarketSale": {
-            "ListingDetails": [
-                {
-                    "ftAlias": "Flow",
-                    "ftIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-                    "royalties": [
-                        {
-                            "address": "0x179b6b1cb6755e31",
-                            "cut": 0.025,
-                            "royaltyName": "find"
-                        },
-                        {
-                            "address": "0xf669cb8d41ce0c74",
-                            "cut": 0.05,
-                            "findName": "user1",
-                            "royaltyName": "creator"
-                        },
-                        {
-                            "address": "0x179b6b1cb6755e31",
-                            "cut": 0.025,
-                            "royaltyName": "find forge"
-                        }
-                    ]
-                }
-            ],
-            "ftAlias": [
-                "Flow"
-            ],
-            "ftIdentifiers": [
-                "A.0ae53cb6e3f42a79.FlowToken.Vault"
-            ],
-            "listingType": "A.179b6b1cb6755e31.FindMarketSale.SaleItem",
-            "status": "active"
-        }
-    },
-    "findMarket": {
-        "FindMarketSale": {
-            "amount": 10,
-            "ftAlias": "Flow",
-            "ftTypeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
-            "listingId": 603,
-            "listingStatus": "active",
-            "listingTypeIdentifier": "A.179b6b1cb6755e31.FindMarketSale.SaleItem",
-            "listingValidUntil": 101,
-            "nftId": 603,
-            "nftIdentifier": "A.179b6b1cb6755e31.Dandy.NFT",
-            "saleType": "active_listed",
-            "seller": "0xf669cb8d41ce0c74",
-            "sellerName": "user1"
-        }
-    },
-    "linkedForMarket": true,
-    "nftDetail": {
-        "collection": {
-            "bannerImage": {
-                "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1": "image"
-            },
-            "description": "Neo Collectibles FIND",
-            "externalURL": "https://neomotorcycles.co.uk/index.html",
-            "name": "user1",
-            "socials": {
-                "Discord": "discord.gg/",
-                "Twitter": "https://twitter.com/home"
-            },
-            "squareImage": {
-                "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image"
-            }
-        },
-        "description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
-        "editions": [
-            {
-                "max": 3,
-                "number": 2
-            },
-            {
-                "max": 3,
-                "name": "set",
-                "number": 2
-            }
-        ],
-        "externalViewURL": "https://find.xyz/collection/user1/dandy/ID1",
-        "id": 603,
-        "media": {
-            "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image/png"
-        },
-        "name": "Neo Motorcycle 2 of 3",
-        "soulBounded": false,
-        "thumbnail": "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-        "traits": [
-            {
-                "displayType": "String",
-                "name": "NeoMotorCycleTag",
-                "value": "Tag1"
-            },
-            {
-                "displayType": "Numeric",
-                "name": "Speed",
-                "value": 100
-            },
-            {
-                "displayType": "Date",
-                "name": "Birthday",
-                "value": 1660145023
-            }
-        ],
-        "type": "A.179b6b1cb6755e31.Dandy.NFT",
-        "uuid": 603,
-        "views": [
-            "A.179b6b1cb6755e31.FindViews.Nounce",
-            "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
-            "A.f8d6e0586b0a20c7.MetadataViews.Royalties",
-            "A.179b6b1cb6755e31.FindViews.CreativeWork"
-        ]
-    }
-}`
+test_main.NFTDetailsReturnData{
+	AllowedListingActions: map[string]test_main.FindMarketSaleListing{
+		"FindMarketSale": {
+			ListingType: "A.179b6b1cb6755e31.FindMarketSale.SaleItem",
+			Status:      "active",
+			ListingDetails: []test_main.ListingDetails{
+				{
+					FtAlias:      "Flow",
+					FtIdentifier: "A.0ae53cb6e3f42a79.FlowToken.Vault",
+					Royalties: []test_main.ListingRoyalties{
+						{
+							Address:     "0x179b6b1cb6755e31",
+							FindName:    "find",
+							RoyaltyName: "find",
+							Cut:         0.025,
+						},
+						{
+							Address:     "0xf669cb8d41ce0c74",
+							FindName:    "user1",
+							RoyaltyName: "creator",
+							Cut:         0.05,
+						},
+						{
+							Address:     "0x179b6b1cb6755e31",
+							FindName:    "find",
+							RoyaltyName: "find forge",
+							Cut:         0.025,
+						},
+					},
+				},
+			},
+			FtAlias:       []string{"Flow"},
+			FtIdentifiers: []string{"A.0ae53cb6e3f42a79.FlowToken.Vault"},
+		},
+	},
+	FindMarket: test_main.FindMarket{FindMarketSale: test_main.FindMarketSale{
+		FtAlias:               "Flow",
+		FtTypeIdentifier:      "A.0ae53cb6e3f42a79.FlowToken.Vault",
+		ListingStatus:         "active",
+		ListingTypeIdentifier: "A.179b6b1cb6755e31.FindMarketSale.SaleItem",
+		NftIdentifier:         "A.179b6b1cb6755e31.Dandy.NFT",
+		SaleType:              "active_listed",
+		Seller:                "0xf669cb8d41ce0c74",
+		SellerName:            "user1",
+		Amount:                10,
+		ListingValidUntil:     101,
+	}},
+	NftDetail: test_main.NftDetail{
+		Collection: test_main.Collection{
+			BannerImage: map[string]string{"https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1": "image"},
+			SquareImage: map[string]string{"https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image"},
+			Socials: test_main.Socials{
+				Discord: "discord.gg/",
+				Twitter: "https://twitter.com/home",
+			},
+			Description: "Neo Collectibles FIND",
+			Name:        "user1",
+		},
+		Media:       map[string]string{"https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp": "image/png"},
+		Description: "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
+		Name:        "Neo Motorcycle 2 of 3",
+		Thumbnail:   "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+		Type:        "A.179b6b1cb6755e31.Dandy.NFT",
+		Editions: []interface{}{
+			map[string]interface{}{
+				"max":    3,
+				"number": 2,
+			},
+			map[string]interface{}{
+				"max":    3,
+				"name":   "set",
+				"number": 2,
+			},
+		},
+		Traits: []interface{}{
+			map[string]interface{}{
+				"displayType": "String",
+				"name":        "NeoMotorCycleTag",
+				"value":       "Tag1",
+			},
+			map[string]interface{}{
+				"displayType": "Numeric",
+				"name":        "Speed",
+				"value":       100,
+			},
+			map[string]interface{}{
+				"displayType": "Date",
+				"name":        "Birthday",
+				"value":       1.660145023e+09,
+			},
+		},
+		Views: []string{
+			"A.179b6b1cb6755e31.FindViews.Nounce",
+			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
+			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
+		},
+	},
+	LinkedForMarket: true,
+}

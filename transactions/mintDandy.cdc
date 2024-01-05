@@ -71,8 +71,6 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
             FindForge.mint(lease: lease, forgeType: forgeType, data: mintData, receiver: nftReceiver)
 
-            // let token <- minter.mint(minter: name, forgeMinter: Type<@Dandy.ForgeMinter>().identifier, mintData: mintData)
-
             i=i+1
         }
 

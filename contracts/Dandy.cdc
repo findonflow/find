@@ -180,9 +180,6 @@ access(all) contract Dandy :ViewResolver{
                 return self.resolveDisplay()
             }
 
-            if self.schemas.keys.contains(type.identifier) {
-                return self.schemas[type.identifier]!.result
-            }
 
             if type == Type<MetadataViews.NFTCollectionData>() {
                 return MetadataViews.NFTCollectionData(
@@ -196,6 +193,11 @@ access(all) contract Dandy :ViewResolver{
                         return <- Dandy.createEmptyCollection()
                     }
                 )
+            }
+
+
+            if self.schemas.keys.contains(type.identifier) {
+                return self.schemas[type.identifier]!.result
             }
             return nil
         }
