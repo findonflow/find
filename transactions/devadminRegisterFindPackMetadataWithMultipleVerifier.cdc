@@ -14,14 +14,14 @@ import Admin from "../contracts/Admin.cdc"
 
 transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Address, openTime:UFix64, royaltyCut: UFix64, royaltyAddress: Address, requiresReservation: Bool, startTime:{String : UFix64}, endTime: {String : UFix64}, floatEventId: {String : UInt64}, price: {String : UFix64}, purchaseLimit:{String: UInt64}, checkAll: Bool) {
 
-	let admin: &Admin.AdminProxy
+	let admin: auth(Admin.Owner) &Admin.AdminProxy
 	let wallet: Capability<&{FungibleToken.Receiver}>
 	let royaltyWallet: Capability<&{FungibleToken.Receiver}>
 	let providerCaps : {Type : Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>}
 	let itemTypes : [Type]
 
 	prepare(account: auth(BorrowValue) &Account) {
-		self.admin =account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
+		self.admin =account.storage.borrow<auth(Admin.Owner) &Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
 		self.wallet = getAccount(wallet).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 		self.royaltyWallet = getAccount(royaltyAddress).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 

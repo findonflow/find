@@ -13,13 +13,13 @@ import ViewResolver from "../contracts/standard/ViewResolver.cdc"
 
 transaction(info: FindPack.PackRegisterInfo) {
 
-    let admin: &Admin.AdminProxy
+    let admin: auth(Admin.Owner) &Admin.AdminProxy
     let wallet: Capability<&{FungibleToken.Receiver}>
     let providerCaps : {Type : Capability<auth (NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>}
     let types : [Type]
 
     prepare(account: auth(BorrowValue, IssueStorageCapabilityController, NonFungibleToken.Withdrawable) &Account) {
-        self.admin =account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
+        self.admin =account.storage.borrow<auth(Admin.Owner) &Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
         self.wallet = getAccount(info.paymentAddress).capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
 
         //for each tier you need a providerAddress and path

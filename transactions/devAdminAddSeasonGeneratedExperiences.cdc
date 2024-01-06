@@ -17,7 +17,7 @@ transaction(name: String, season: [GeneratedExperiences.CollectionInfo]) {
             account.capabilities.publish(cap, at: GeneratedExperiences.CollectionPublicPath)
         }
 
-        let adminRef = account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+        let adminRef = account.storage.borrow<auth(Admin.Owner) &Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
         let forgeType = GeneratedExperiences.getForgeType()
         if !FindForge.checkMinterPlatform(name: name, forgeType: forgeType ) {

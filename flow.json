@@ -284,19 +284,16 @@
         "LostAndFoundHelper",
         "FeeEstimator"
       ],
-      "emulator-dapper": [
-        "DapperUtilityCoin",
-        "FlowUtilityToken"
-      ],
+      "emulator-dapper": ["DapperUtilityCoin", "FlowUtilityToken"],
       "emulator-find": [
         "Profile",
-        "FIND",
         "FindThoughts",
         "Clock",
         "Debug",
         "Dandy",
         "ExampleNFT",
         "Admin",
+        "FIND",
         "FindLostAndFoundWrapper",
         "FindAirdropper",
         "FindMarketAdmin",
@@ -325,9 +322,7 @@
         "NameVoucher"
       ],
       "emulator-find-admin": [],
-      "emulator-find-forge": [
-        "GeneratedExperiences"
-      ],
+      "emulator-find-forge": ["GeneratedExperiences"],
       "emulator-find-lease": [],
       "emulator-user1": [],
       "emulator-user2": [],

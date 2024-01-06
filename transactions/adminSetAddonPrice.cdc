@@ -2,10 +2,10 @@ import Admin from "../contracts/Admin.cdc"
 
 transaction(addon:String, price:UFix64) {
 
-    let adminRef : &Admin.AdminProxy
+    let adminRef : auth(Admin.Owner) &Admin.AdminProxy
 
     prepare(account: auth(BorrowValue) &Account){
-        self.adminRef = account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+        self.adminRef = account.storage.borrow<auth(Admin.Owner) &Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
         
     }
     execute{

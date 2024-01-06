@@ -10,7 +10,7 @@ transaction(users: [Address], minCharLength: UInt64) {
 
     prepare(account:auth(BorrowValue, FungibleToken.Withdrawable) &Account) {
 
-        let client= account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
+        let client= account.storage.borrow<auth(Admin.Owner) &Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
 
         let vaultRef = account.storage.borrow<auth(FungibleToken.Withdrawable) &FlowToken.Vault>(from: /storage/flowTokenVault)!
         let paymentVault <- vaultRef.withdraw(amount: 0.01 * UFix64(users.length)) 

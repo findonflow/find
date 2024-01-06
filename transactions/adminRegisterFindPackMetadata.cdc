@@ -12,13 +12,13 @@ import Admin from "../contracts/Admin.cdc"
 
 transaction(forge: String, name: String, description:String, typeId: UInt64, externalURL: String, thumbnailHash: String, bannerHash: String, social: {String : String}, wallet: Address, walletType: String, openTime:UFix64, primaryRoyaltyRecipients : [Address], primaryRoyaltyCuts: [UFix64], primaryRoyaltyDescriptions: [String], secondaryRoyaltyRecipients: [Address], secondaryRoyaltyCuts: [UFix64],  secondaryRoyaltyDescriptions: [String], requiresReservation: Bool, startTime:{String : UFix64}, endTime: {String : UFix64}, floatEventId: {String : UInt64}, price: {String : UFix64}, purchaseLimit:{String: UInt64}, packFields : {String:String}, nftTypes: [String], storageRequirement: UInt64) {
 
-	let admin: &Admin.AdminProxy
+	let admin: auth(Admin.Owner) &Admin.AdminProxy
 	let wallet: Capability<&{FungibleToken.Receiver}>
 	let providerCaps : {Type : Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>}
 	let types : [Type]
 
 	prepare(account: auth(BorrowValue) &Account) {
-		self.admin =account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
+		self.admin =account.storage.borrow<auth(Admin.Owner) &Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
 		self.wallet = getAccount(wallet).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 
 		//for each tier you need a providerAddress and path

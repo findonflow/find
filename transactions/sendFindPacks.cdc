@@ -11,7 +11,7 @@ transaction(packInfo: FindPack.AirdropInfo) {
         let pathIdentifier = "FindPack_".concat(packInfo.packTypeName).concat("_").concat(packInfo.packTypeId.toString())
 
         let pathCollection = FindPack.getPacksCollection(packTypeName: packInfo.packTypeName, packTypeId: packInfo.packTypeId)
-        let adminRef = account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+        let adminRef = account.storage.borrow<auth(Admin.Owner) &Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
         let ids = pathCollection.getIDs()
         for i, user in packInfo.users {

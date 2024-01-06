@@ -15,7 +15,7 @@ transaction(
     let client: &Admin.AdminProxy
 
     prepare(account: auth(BorrowValue) &Account) {
-        self.client= account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
+        self.client= account.storage.borrow<auth(Admin.Owner) &Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
         self.receiverCap= getAccount(recipient).capabilities.get<&{NonFungibleToken.Collection}>(CharityNFT.CollectionPublicPath)
     }
 

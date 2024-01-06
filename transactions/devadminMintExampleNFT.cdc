@@ -10,7 +10,7 @@ import Profile from "../contracts/Profile.cdc"
 
 transaction(name: String, artist:String, nftName:String, nftDescription:String, traits: [UInt64], nftUrl:String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String, collectionBannerImage: String) {
     prepare(account: auth(BorrowValue) &Account){
-        let adminRef = account.storage.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+        let adminRef = account.storage.borrow<auth(Admin.Owner) &Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 		
 		let address = FIND.lookupAddress(name) ?? panic("Cannot find user with name : ".concat(name))
 
