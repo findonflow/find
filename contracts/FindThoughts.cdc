@@ -8,6 +8,8 @@ import Clock from "./Clock.cdc"
 
 access(all) contract FindThoughts {
 
+    access(all) entitlement Owner
+
     access(all) event Published(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], nfts:[FindMarket.NFTInfo], tags: [String], quoteOwner: Address?, quoteId: UInt64?)
     access(all) event Edited(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], hide: Bool, tags: [String])
     access(all) event Deleted(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], tags: [String])
@@ -80,7 +82,12 @@ access(all) contract FindThoughts {
         }
     }
 
-    access(all) resource Thought : ThoughtPublic , ViewResolver.Resolver {
+    access(all) resource interface ThoughtPrivate {
+        access(Owner) fun hide(_ hide: Bool)
+        access(Owner) fun edit(header: String , body: String, tags: [String])
+    }
+
+    access(all) resource Thought : ThoughtPublic, ThoughtPrivate, ViewResolver.Resolver {
         access(all) let id: UInt64 
         access(all) let creator: Address 
         access(all) var header: String 
@@ -153,7 +160,7 @@ access(all) contract FindThoughts {
             return false
         }
 
-        access(all) fun hide(_ hide: Bool) {
+        access(Owner) fun hide(_ hide: Bool) {
             self.extras["hidden"] = hide
             let medias : [String] = []
             for m in self.medias {
@@ -162,7 +169,7 @@ access(all) contract FindThoughts {
             emit Edited(id: self.id, creator: self.creator, creatorName: FIND.reverseLookup(self.creator), header: self.header, message: self.body, medias: medias, hide: hide, tags: self.tags)
         }
 
-        access(all) fun edit(header: String , body: String, tags: [String]) {
+        access(Owner) fun edit(header: String , body: String, tags: [String]) {
             self.header = header 
             self.body = body 
             self.tags = tags 
@@ -244,8 +251,8 @@ access(all) contract FindThoughts {
         access(all) view fun getIDs() : [UInt64] {
             return self.ownedThoughts.keys
         }
-
-        access(all) fun borrow(_ id: UInt64) : &FindThoughts.Thought {
+        
+        access(Owner) fun borrow(_ id: UInt64) : auth(Owner) &{FindThoughts.ThoughtPrivate} {
             pre{
                 self.ownedThoughts.containsKey(id) : "Cannot borrow Thought with ID : ".concat(id.toString())
             }
@@ -268,7 +275,7 @@ access(all) contract FindThoughts {
 
         // TODO : Restructure this to take structs , and declare the structs in Trxn.  And identify IPFS and url
         // So take pointer, thought pointer and media
-        access(all) fun publish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?) {
+        access(Owner) fun publish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?) {
             let medias : [MetadataViews.Media] = []
             let m : [String] = []
             if media != nil {
@@ -299,7 +306,7 @@ access(all) contract FindThoughts {
             self.ownedThoughts[thought.uuid] <-! thought
         }
 
-        access(all) fun delete(_ id: UInt64) {
+        access(Owner) fun delete(_ id: UInt64) {
             pre{
                 self.ownedThoughts.containsKey(id) : "Does not contains Thought with ID : ".concat(id.toString())
             }
@@ -323,7 +330,7 @@ access(all) contract FindThoughts {
             destroy thought
         }
 
-        access(all) fun react(user: Address, id: UInt64, reaction: String?) {
+        access(Owner) fun react(user: Address, id: UInt64, reaction: String?) {
             let cap = FindThoughts.getFindThoughtsCapability(user)
             let ref = cap.borrow() ?? panic("Cannot borrow reference to Find Thoughts Collection from user : ".concat(user.toString()))
 
@@ -331,7 +338,7 @@ access(all) contract FindThoughts {
             thought.internal_react(user: self.owner!.address, reaction: reaction)
         }
 
-        access(all) fun hide(id: UInt64, hide: Bool) {
+        access(Owner) fun hide(id: UInt64, hide: Bool) {
             let thought = self.borrow(id)
             thought.hide(hide)
         }

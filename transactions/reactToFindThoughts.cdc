@@ -4,17 +4,17 @@ import FIND from "../contracts/FIND.cdc"
 
 transaction(users: [String], ids: [UInt64] , reactions: [String], undoReactionUsers: [String], undoReactionIds: [UInt64]) {
 
-    let collection : &FindThoughts.Collection
+    let collection : auth(FindThoughts.Owner) &FindThoughts.Collection
 
     prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, UnpublishCapability) &Account) {
 
-        let col= account.storage.borrow<&FindThoughts.Collection>(from: FindThoughts.CollectionStoragePath)
+        let col= account.storage.borrow<auth(FindThoughts.Owner) &FindThoughts.Collection>(from: FindThoughts.CollectionStoragePath)
         if col == nil {
             account.storage.save( <- FindThoughts.createEmptyCollection(), to: FindThoughts.CollectionStoragePath)
             account.capabilities.unpublish(FindThoughts.CollectionPublicPath)
-            let cap = account.capabilities.storage.issue<&FindThoughts.Collection>(FindThoughts.CollectionStoragePath)
+            let cap = account.capabilities.storage.issue<auth(FindThoughts.Owner) &FindThoughts.Collection>(FindThoughts.CollectionStoragePath)
             account.capabilities.publish(cap, at: FindThoughts.CollectionPublicPath)
-            self.collection=account.storage.borrow<&FindThoughts.Collection>(from: FindThoughts.CollectionStoragePath) ?? panic("Cannot borrow thoughts reference from path")
+            self.collection=account.storage.borrow<auth(FindThoughts.Owner) &FindThoughts.Collection>(from: FindThoughts.CollectionStoragePath) ?? panic("Cannot borrow thoughts reference from path")
         }else {
             self.collection=col!
         }
