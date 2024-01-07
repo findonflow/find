@@ -31,7 +31,7 @@ transaction(ids: {String : [UInt64]}) {
 
         var saleType = Type<@FindMarketSale.SaleItemCollection>()
         if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {
-            let saleItems= account.storage.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(saleType))!
+            let saleItems= account.storage.borrow<auth(FindMarketSale.Seller) &FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(saleType))!
             for id in ids {
                 saleItems.relist(id)
             }

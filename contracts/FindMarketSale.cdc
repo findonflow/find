@@ -12,6 +12,7 @@ import FindMarket from "./FindMarket.cdc"
 A Find Market for direct sales
 */
 access(all) contract FindMarketSale {
+    access(all) entitlement Seller
 
     access(all) event Sale(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo?, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt:UFix64?)
 
@@ -247,7 +248,7 @@ access(all) contract FindMarketSale {
             destroy <- self.items.remove(key: id)
         }
 
-        access(all) fun listForSale(pointer: FindViews.AuthNFTPointer, vaultType: Type, directSellPrice:UFix64, validUntil: UFix64?, extraField: {String:AnyStruct}) {
+        access(Seller) fun listForSale(pointer: FindViews.AuthNFTPointer, vaultType: Type, directSellPrice:UFix64, validUntil: UFix64?, extraField: {String:AnyStruct}) {
 
 
             // ensure it is not a 0 dollar listing
@@ -295,7 +296,7 @@ access(all) contract FindMarketSale {
 
         }
 
-        access(all) fun delist(_ id: UInt64) {
+        access(Seller) fun delist(_ id: UInt64) {
             if !self.items.containsKey(id) {
                 panic("Unknown item with id=".concat(id.toString()))
             }
@@ -315,7 +316,7 @@ access(all) contract FindMarketSale {
             destroy saleItem
         }
 
-        access(all) fun relist(_ id: UInt64) {
+        access(Seller) fun relist(_ id: UInt64) {
             let saleItem = self.borrow(id)
 
             let pointer = saleItem.getPointer()

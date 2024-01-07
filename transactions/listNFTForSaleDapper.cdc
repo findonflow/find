@@ -11,7 +11,7 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
 transaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {
 
-	let saleItems : &FindMarketSale.SaleItemCollection?
+	let saleItems : auth(FindMarketSale.Seller) &FindMarketSale.SaleItemCollection?
 	let pointer : FindViews.AuthNFTPointer
 	let vaultType : Type
 
@@ -62,7 +62,7 @@ transaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: Strin
 			)
 		}
 		// Get the salesItemRef from tenant
-		self.saleItems= account.storage.borrow<&FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
+		self.saleItems= account.storage.borrow<auth(FindMarketSale.Seller) &FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
 		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
 		self.vaultType= ft.type
 	}

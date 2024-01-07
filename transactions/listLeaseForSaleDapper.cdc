@@ -3,10 +3,11 @@ import FIND from "../contracts/FIND.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
+import FindMarketSale from "../contracts/FindMarketSale.cdc"
 
 transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {
 
-	let saleItems : &FindLeaseMarketSale.SaleItemCollection?
+	let saleItems : auth(FindMarketSale.Seller) &FindLeaseMarketSale.SaleItemCollection?
 	let pointer : FindLeaseMarket.AuthLeasePointer
 	let vaultType : Type
 
@@ -27,7 +28,7 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix
 			account.link<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath, target: leaseStoragePath)
 		}
 
-		self.saleItems= account.storage.borrow<&FindLeaseMarketSale.SaleItemCollection>(from: leaseStoragePath)!
+		self.saleItems= account.storage.borrow<auth(FindMarketSale.Seller) &FindLeaseMarketSale.SaleItemCollection>(from: leaseStoragePath)!
 
 		// Get supported NFT and FT Information from Registries from input alias
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
