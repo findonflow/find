@@ -414,6 +414,8 @@ access(all) contract FindForge {
         access(all) fun addCapability(_ cap: Capability<&FIND.Network>)
     }
 
+    access(all) entitlement ForgeOwner
+
     //admin proxy with capability receiver 
     access(all) resource ForgeAdminProxy: ForgeAdminProxyClient {
 
@@ -431,7 +433,7 @@ access(all) contract FindForge {
             self.capability = cap
         }
 
-        access(all) fun fulfillForgeOrder(_ contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {
+        access(ForgeOwner) fun fulfillForgeOrder(_ contractName: String, forgeType: Type) : MetadataViews.NFTCollectionDisplay {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }

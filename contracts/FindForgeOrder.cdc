@@ -116,9 +116,10 @@ access(all) contract FindForgeOrder {
         access(all) fun borrow(_ id: UInt64): &{FindForgeOrder.Order}?
         access(all) fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}
         access(all) view fun getIDs(): [UInt64]
-        access(all) fun withdraw(withdrawID: UInt64): @{FindForgeOrder.Order}
         access(all) fun deposit(token: @{FindForgeOrder.Order})
     }
+
+    access(all) entitlement Owner
 
     access(all) resource Collection : OrderCollection, ViewResolver.ResolverCollection {
         access(all) let orders: @{UInt64: {FindForgeOrder.Order}}
@@ -129,7 +130,7 @@ access(all) contract FindForgeOrder {
 
 
         // withdraw removes an NFT from the collection and moves it to the caller
-        access(all) fun withdraw(withdrawID: UInt64): @{FindForgeOrder.Order} {
+        access(Owner) fun withdraw(withdrawID: UInt64): @{FindForgeOrder.Order} {
             let token <- self.orders.remove(key: withdrawID) ?? panic("missing Order : ".concat(withdrawID.toString()))
 
             emit Withdraw(id: token.getID(), from: self.owner?.address)
@@ -174,14 +175,14 @@ access(all) contract FindForgeOrder {
         } 
         emit ForgeOrdered(lease: leaseName, mintType: mintType, collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s)
         FindForgeOrder.contractNames[order.contractName] = order.id
-        let col = FindForgeOrder.account.storage.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
+        let col = FindForgeOrder.account.storage.borrow<auth(Owner) &FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
         col.deposit(token: <- order)
     }
 
     access(account) fun cancelForgeOrder(leaseName: String, mintType: String) {
         let contractName = "Find".concat(FindUtils.firstUpperLetter(leaseName)).concat(mintType)
         let id = FindForgeOrder.contractNames[contractName] ?? panic("Forge is not ordered. identifier : ".concat(contractName))
-        let queuedCol = FindForgeOrder.account.storage.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
+        let queuedCol = FindForgeOrder.account.storage.borrow<auth(Owner) &FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
         let order <- queuedCol.withdraw(withdrawID: id) 
         let c = order.getCollectionDisplay()
         let s : {String : String} = {}
@@ -195,7 +196,7 @@ access(all) contract FindForgeOrder {
     access(account) fun fulfillForgeOrder(_ contractName: String, forgeType: Type) : &{FindForgeOrder.Order} {
         let id = FindForgeOrder.contractNames[contractName] ?? panic("Forge is not ordered. identifier : ".concat(contractName))
 
-        let queuedCol = FindForgeOrder.account.storage.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
+        let queuedCol = FindForgeOrder.account.storage.borrow<auth(Owner) &FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
         let order <- queuedCol.withdraw(withdrawID: id) 
         let c = order.getCollectionDisplay()
         let s : {String : String} = {}
@@ -204,7 +205,7 @@ access(all) contract FindForgeOrder {
         } 
         emit ForgeOrderCompleted(lease: order.getLeaseName(), mintType: order.getMintType(), collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s, contractName : contractName)
 
-        let completedCol = FindForgeOrder.account.storage.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.CompletedCollectionStoragePath)!
+        let completedCol = FindForgeOrder.account.storage.borrow<auth(Owner) &FindForgeOrder.Collection>(from: FindForgeOrder.CompletedCollectionStoragePath)!
         completedCol.deposit(token: <- order)
         let ref = completedCol.borrow(id)
         return ref!
