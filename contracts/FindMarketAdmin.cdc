@@ -5,6 +5,7 @@ import FindMarket from "./FindMarket.cdc"
 import FindMarketCutStruct from "./FindMarketCutStruct.cdc"
 
 access(all) contract FindMarketAdmin {
+    access(all) entitlement Owner
 
     //store the proxy for the admin
     access(all) let AdminProxyPublicPath: PublicPath
@@ -37,7 +38,7 @@ access(all) contract FindMarketAdmin {
             self.capability = cap
         }
 
-        access(all) fun createFindMarket(name: String, address:Address, findCutSaleItem: FindMarket.TenantSaleItem?) : Capability<&FindMarket.Tenant> {
+        access(Owner) fun createFindMarket(name: String, address:Address, findCutSaleItem: FindMarket.TenantSaleItem?) : Capability<&FindMarket.Tenant> {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
@@ -45,7 +46,7 @@ access(all) contract FindMarketAdmin {
             return  FindMarket.createFindMarket(name:name, address:address, findCutSaleItem: findCutSaleItem)
         }
 
-        access(all) fun removeFindMarketTenant(tenant: Address) {
+        access(Owner) fun removeFindMarketTenant(tenant: Address) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
@@ -53,68 +54,68 @@ access(all) contract FindMarketAdmin {
             FindMarket.removeFindMarketTenant(tenant: tenant)
         }
 
-        access(all) fun getFindMarketClient():  &FindMarket.TenantClient{
+        access(Owner) fun getFindMarketClient():  &FindMarket.TenantClient{
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
 
             let path = FindMarket.TenantClientStoragePath
-            return FindMarketAdmin.account.storage.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Find market tenant client Reference.")
+            return FindMarketAdmin.account.storage.borrow<auth(FindMarket.TenantClientOwner) &FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Find market tenant client Reference.")
         }
 
         /// ===================================================================================
         // Find Market Options
         /// ===================================================================================
-        access(all) fun addSaleItemType(_ type: Type) {
+        access(Owner) fun addSaleItemType(_ type: Type) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
             FindMarket.addSaleItemType(type)
         }
 
-        access(all) fun addMarketBidType(_ type: Type) {
+        access(Owner) fun addMarketBidType(_ type: Type) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
             FindMarket.addMarketBidType(type)
         }
 
-        access(all) fun addSaleItemCollectionType(_ type: Type) {
+        access(Owner) fun addSaleItemCollectionType(_ type: Type) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
             FindMarket.addSaleItemCollectionType(type)
         }
 
-        access(all) fun addMarketBidCollectionType(_ type: Type) {
+        access(Owner) fun addMarketBidCollectionType(_ type: Type) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
             FindMarket.addMarketBidCollectionType(type)
         }
 
-        access(all) fun removeSaleItemType(_ type: Type) {
+        access(Owner) fun removeSaleItemType(_ type: Type) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
             FindMarket.removeSaleItemType(type)
         }
 
-        access(all) fun removeMarketBidType(_ type: Type) {
+        access(Owner) fun removeMarketBidType(_ type: Type) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
             FindMarket.removeMarketBidType(type)
         }
 
-        access(all) fun removeSaleItemCollectionType(_ type: Type) {
+        access(Owner) fun removeSaleItemCollectionType(_ type: Type) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
             FindMarket.removeSaleItemCollectionType(type)
         }
 
-        access(all) fun removeMarketBidCollectionType(_ type: Type) {
+        access(Owner) fun removeMarketBidCollectionType(_ type: Type) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
@@ -124,7 +125,7 @@ access(all) contract FindMarketAdmin {
         /// ===================================================================================
         // Tenant Rules Management
         /// ===================================================================================
-        access(all) fun getTenantRef(_ tenant: Address) : &FindMarket.Tenant {
+        access(Owner) fun getTenantRef(_ tenant: Address) : &FindMarket.Tenant {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
@@ -134,7 +135,7 @@ access(all) contract FindMarketAdmin {
             return cap
         }
 
-        access(all) fun addFindBlockItem(tenant: Address, item: FindMarket.TenantSaleItem) {
+        access(Owner) fun addFindBlockItem(tenant: Address, item: FindMarket.TenantSaleItem) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
@@ -142,7 +143,7 @@ access(all) contract FindMarketAdmin {
             tenant.addSaleItem(item, type: "find")
         }
 
-        access(all) fun removeFindBlockItem(tenant: Address, name: String) {
+        access(Owner) fun removeFindBlockItem(tenant: Address, name: String) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
@@ -150,7 +151,7 @@ access(all) contract FindMarketAdmin {
             tenant.removeSaleItem(name, type: "find")
         }
 
-        access(all) fun setFindCut(tenant: Address, saleItem: FindMarket.TenantSaleItem) {
+        access(Owner) fun setFindCut(tenant: Address, saleItem: FindMarket.TenantSaleItem) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
@@ -158,7 +159,7 @@ access(all) contract FindMarketAdmin {
             tenant.addSaleItem(saleItem, type: "cut")
         }
 
-        access(all) fun setExtraCut(tenant: Address, types: [Type], category: String, cuts: FindMarketCutStruct.Cuts) {
+        access(Owner) fun setExtraCut(tenant: Address, types: [Type], category: String, cuts: FindMarketCutStruct.Cuts) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
@@ -166,7 +167,7 @@ access(all) contract FindMarketAdmin {
             tenant.setExtraCut(types: types, category: category, cuts: cuts)
         }
 
-        access(all) fun setMarketOption(tenant: Address, saleItem: FindMarket.TenantSaleItem) {
+        access(Owner) fun setMarketOption(tenant: Address, saleItem: FindMarket.TenantSaleItem) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
@@ -175,7 +176,7 @@ access(all) contract FindMarketAdmin {
             //Emit Event here
         }
 
-        access(all) fun removeMarketOption(tenant: Address, name: String) {
+        access(Owner) fun removeMarketOption(tenant: Address, name: String) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
@@ -183,7 +184,7 @@ access(all) contract FindMarketAdmin {
             tenant.removeSaleItem(name, type: "tenant")
         }
 
-        access(all) fun enableMarketOption(tenant: Address, name: String) {
+        access(Owner) fun enableMarketOption(tenant: Address, name: String) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
@@ -191,7 +192,7 @@ access(all) contract FindMarketAdmin {
             tenant.alterMarketOption(name: name, status: "active")
         }
 
-        access(all) fun deprecateMarketOption(tenant: Address, name: String) {
+        access(Owner) fun deprecateMarketOption(tenant: Address, name: String) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
@@ -199,7 +200,7 @@ access(all) contract FindMarketAdmin {
             tenant.alterMarketOption(name: name, status: "deprecated")
         }
 
-        access(all) fun stopMarketOption(tenant: Address, name: String) {
+        access(Owner) fun stopMarketOption(tenant: Address, name: String) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
@@ -207,7 +208,7 @@ access(all) contract FindMarketAdmin {
             tenant.alterMarketOption(name: name, status: "stopped")
         }
 
-        access(all) fun setupSwitchboardCut(tenant: Address) {
+        access(Owner) fun setupSwitchboardCut(tenant: Address) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
@@ -219,7 +220,7 @@ access(all) contract FindMarketAdmin {
         // Royalty Residual
         /// ===================================================================================
 
-        access(all) fun setResidualAddress(_ address: Address) {
+        access(Owner) fun setResidualAddress(_ address: Address) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }

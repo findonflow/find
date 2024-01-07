@@ -128,7 +128,5 @@ access(all) contract FindAirdropper {
         }
         emit AirdroppedToLostAndFound(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid,  nftInfo: nftInfo, context: context, remark: nil, ticketID: ticketID!)
     }
-
-
 }
 

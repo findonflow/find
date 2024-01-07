@@ -13,7 +13,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 
 transaction(tenant: Address, market: String){
     prepare(account: auth(BorrowValue) &Account){
-        let adminRef = account.storage.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+        let adminRef = account.storage.borrow<auth(FindMarketAdmin.Owner) &FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
 		let tenantRef = adminRef.getTenantRef(tenant)
 

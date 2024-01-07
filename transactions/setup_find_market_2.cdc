@@ -11,7 +11,7 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 transaction(tenant: String, tenantAddress: Address, findCut: UFix64) {
 
     prepare(account: auth(BorrowValue) &Account) {
-        let adminClient=account.storage.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath)!
+        let adminClient=account.storage.borrow<auth(FindMarketAdmin.Owner) &FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath)!
 
         // pass in the default cut rules here
         let rules = [

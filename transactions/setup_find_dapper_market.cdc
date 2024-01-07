@@ -11,7 +11,7 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 transaction(tenant: String, adminAddress: Address, tenantAddress: Address, findCut: UFix64) {
 	//versus account
 	prepare(account: auth(BorrowValue) &Account) {
-		let adminClient=account.storage.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath)!
+		let adminClient=account.storage.borrow<auth(FindMarketAdmin.Owner) &FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath)!
 
 		// pass in the default cut rules here
 		let cut = [

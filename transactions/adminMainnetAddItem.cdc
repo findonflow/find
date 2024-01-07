@@ -4,10 +4,10 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 
 transaction(tenant: Address, ftName: String, ftTypes: [String] , nftName: String, nftTypes: [String], listingName: String, listingTypes: [String]) {
 
-    let adminRef : &FindMarketAdmin.AdminProxy
+    let adminRef : auth(FindMarketAdmin.Owner) &FindMarketAdmin.AdminProxy
 
     prepare(account: auth(BorrowValue) &Account){
-        self.adminRef = account.storage.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+        self.adminRef = account.storage.borrow<auth(FindMarketAdmin.Owner) &FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
     }
     execute{

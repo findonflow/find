@@ -1163,6 +1163,8 @@ access(all) resource interface TenantClientPublic  {
     access(all) fun addCapability(_ cap: Capability<&Tenant>)
 }
 
+access(all) entitlement TenantClientOwner
+
 /*
 
 A tenantClient should be able to:
@@ -1189,32 +1191,32 @@ access(all) resource TenantClient: TenantClientPublic {
         self.capability = nil
     }
 
-    access(all) fun setMarketOption(saleItem: TenantSaleItem) {
+    access(TenantClientOwner) fun setMarketOption(saleItem: TenantSaleItem) {
         let tenant = self.getTenantRef()
         tenant.addSaleItem(saleItem, type: "tenant")
     }
 
-    access(all) fun removeMarketOption(name: String) {
+    access(TenantClientOwner) fun removeMarketOption(name: String) {
         let tenant = self.getTenantRef()
         tenant.removeSaleItem(name, type: "tenant")
     }
 
-    access(all) fun enableMarketOption(_ name: String) {
+    access(TenantClientOwner) fun enableMarketOption(_ name: String) {
         let tenant = self.getTenantRef()
         tenant.alterMarketOption(name: name, status: "active")
     }
 
-    access(all) fun deprecateMarketOption(_ name: String) {
+    access(TenantClientOwner) fun deprecateMarketOption(_ name: String) {
         let tenant = self.getTenantRef()
         tenant.alterMarketOption(name: name, status: "deprecated")
     }
 
-    access(all) fun stopMarketOption(_ name: String) {
+    access(TenantClientOwner) fun stopMarketOption(_ name: String) {
         let tenant = self.getTenantRef()
         tenant.alterMarketOption(name: name, status: "stopped")
     }
 
-    access(all) fun getTenantRef() : &Tenant {
+    access(TenantClientOwner) fun getTenantRef() : &Tenant {
         if self.capability == nil {
             panic("TenantClient is not present")
         }
@@ -1225,7 +1227,7 @@ access(all) resource TenantClient: TenantClientPublic {
         return self.capability!.borrow()!
     }
 
-    access(all) fun setExtraCut(types: [Type], category: String, cuts: FindMarketCutStruct.Cuts) {
+    access(TenantClientOwner) fun setExtraCut(types: [Type], category: String, cuts: FindMarketCutStruct.Cuts) {
         let tenant = self.getTenantRef()
         tenant.setExtraCut(types: types, category: category, cuts: cuts)
     }

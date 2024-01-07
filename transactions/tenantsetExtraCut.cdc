@@ -11,7 +11,7 @@ transaction(ftTypes: [String], category: String, cuts: [FindMarketCutStruct.Thre
 
         let allCuts = FindMarketCutStruct.Cuts(cuts:cuts)
 
-        let clientRef = account.storage.borrow<&FindMarket.TenantClient>(from: FindMarket.TenantClientStoragePath) ?? panic("Cannot borrow Tenant Client Reference.")
+        let clientRef = account.storage.borrow<auth(FindMarket.TenantClientOwner) &FindMarket.TenantClient>(from: FindMarket.TenantClientStoragePath) ?? panic("Cannot borrow Tenant Client Reference.")
         clientRef.setExtraCut(types: types, category: category, cuts: allCuts)
     }
 }
