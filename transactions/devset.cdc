@@ -3,7 +3,7 @@ import FIND from "../contracts/FIND.cdc"
 
 transaction(name: String, target: String) {
 
-	var relatedAccounts : &FindRelatedAccounts.Accounts?
+	var relatedAccounts : auth(FindRelatedAccounts.Owner) &FindRelatedAccounts.Accounts?
 	let address : Address?
 
 	prepare(account: auth(BorrowValue) &Account) {
@@ -11,12 +11,12 @@ transaction(name: String, target: String) {
 
 		self.address = FIND.resolve(target)
 
-		self.relatedAccounts= account.storage.borrow<&FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
+		self.relatedAccounts= account.storage.borrow<auth(FindRelatedAccounts.Owner) &FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
 		if self.relatedAccounts == nil {
 			let relatedAccounts <- FindRelatedAccounts.createEmptyAccounts()
 			account.storage.save(<- relatedAccounts, to: FindRelatedAccounts.storagePath)
 			account.link<&FindRelatedAccounts.Accounts{FindRelatedAccounts.Public}>(FindRelatedAccounts.publicPath, target: FindRelatedAccounts.storagePath)
-			self.relatedAccounts= account.storage.borrow<&FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
+			self.relatedAccounts= account.storage.borrow<auth(FindRelatedAccounts.Owner) &FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
 		}
 
 		let cap = account.getCapability<&FindRelatedAccounts.Accounts{FindRelatedAccounts.Public}>(FindRelatedAccounts.publicPath)

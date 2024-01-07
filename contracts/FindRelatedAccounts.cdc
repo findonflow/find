@@ -1,4 +1,5 @@
 access(all) contract FindRelatedAccounts {
+    access(all) entitlement Owner
 
     access(all) let storagePath: StoragePath
     access(all) let publicPath: PublicPath
@@ -142,7 +143,7 @@ access(all) contract FindRelatedAccounts {
             return tempRes
         }
 
-        access(all) fun addFlowAccount(name: String, address:Address) {
+        access(Owner) fun addFlowAccount(name: String, address:Address) {
             let network = "Flow"
             let id = FindRelatedAccounts.getIdentifier(name: name, network: network, address: address.toString())
             if self.accounts[id] != nil {
@@ -152,7 +153,7 @@ access(all) contract FindRelatedAccounts {
             emit RelatedAccount(user: self.owner!.address, walletId: id, walletName: name, address: address.toString(), network: network, action: "add")
         }
 
-        access(all) fun addRelatedAccount(name: String, network: String, address: String) {
+        access(Owner) fun addRelatedAccount(name: String, network: String, address: String) {
             let id = FindRelatedAccounts.getIdentifier(name: name, network: network, address: address)
             if self.accounts[id] != nil {
                 return
@@ -161,17 +162,17 @@ access(all) contract FindRelatedAccounts {
             emit RelatedAccount(user: self.owner!.address, walletId: id, walletName: name, address: address, network: network, action: "add")
         }
 
-        access(all) fun updateFlowAccount(name: String, oldAddress: Address, address:Address) {
+        access(Owner) fun updateFlowAccount(name: String, oldAddress: Address, address:Address) {
             self.removeRelatedAccount(name: name, network: "Flow", address: oldAddress.toString())
             self.addFlowAccount(name: name, address: address)
         }
 
-        access(all) fun updateRelatedAccount(name: String, network: String, oldAddress: String, address: String) {
+        access(Owner) fun updateRelatedAccount(name: String, network: String, oldAddress: String, address: String) {
             self.removeRelatedAccount(name: name, network: network, address: oldAddress)
             self.addRelatedAccount(name: name, network: network, address: address)
         }
 
-        access(all) fun removeRelatedAccount(name: String, network: String, address: String) {
+        access(Owner) fun removeRelatedAccount(name: String, network: String, address: String) {
             let id = FindRelatedAccounts.getIdentifier(name: name, network: network, address: address)
             if self.accounts[id] == nil {
                 panic(network.concat(" address is not added as related account : ").concat(address))
