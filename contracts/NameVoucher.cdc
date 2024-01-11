@@ -133,6 +133,8 @@ access(all) contract NameVoucher {
 
     }
 
+    access(all) entitlement Owner
+
     access(all) resource Collection: NonFungibleToken.Collection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
@@ -192,7 +194,7 @@ access(all) contract NameVoucher {
             return nil
         }
 
-        access(all) fun redeem(id: UInt64, name: String) {
+        access(Owner) fun redeem(id: UInt64, name: String) {
             let nft <- self.ownedNFTs.remove(key: id) ?? panic("Cannot find voucher with ID ".concat(id.toString()))
             let typedNFT <- nft as! @NameVoucher.NFT
             let nameLength = UInt64(name.length)

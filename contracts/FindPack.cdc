@@ -825,9 +825,6 @@ access(all) contract FindPack {
             return <-nft
         }
 
-
-
-
         access(all) view fun getIDsWithTypes(): {Type: [UInt64]} {
             return {}
         }

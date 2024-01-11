@@ -7,17 +7,17 @@ import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
 
 transaction(id: UInt64, name: String) {
 
-    var collection : &NameVoucher.Collection
+    var collection : auth(NameVoucher.Owner) &NameVoucher.Collection
     let addr : Address
 
     prepare(account: auth(BorrowValue, SaveValue, IssueStorageCapabilityController, PublishCapability) &Account) {
 
-        var col= account.storage.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
+        var col= account.storage.borrow<auth(NameVoucher.Owner) &NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
         if col == nil {
             account.storage.save( <- NameVoucher.createEmptyCollection(), to: NameVoucher.CollectionStoragePath)
-            let cap = account.capabilities.storage.issue<&NameVoucher.Collection>(NameVoucher.CollectionStoragePath)
+            let cap = account.capabilities.storage.issue<auth(NameVoucher.Owner) &NameVoucher.Collection>(NameVoucher.CollectionStoragePath)
             account.capabilities.publish(cap, at: NameVoucher.CollectionPublicPath)
-            col= account.storage.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
+            col= account.storage.borrow<auth(NameVoucher.Owner) &NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
         }
         self.collection = col!
         self.addr = account.address

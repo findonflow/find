@@ -309,7 +309,6 @@
         "FindRulesCache",
         "FINDNFTCatalog",
         "FINDNFTCatalogAdmin",
-        "FIND",
         "FindPack",
         "FindVerifier",
         "FindFurnace",
@@ -319,7 +318,8 @@
         "FindMarketCutInterface",
         "FindMarketInfrastructureCut",
         "Dev",
-        "NameVoucher"
+        "NameVoucher",
+        "FIND"
       ],
       "emulator-find-admin": [],
       "emulator-find-forge": ["GeneratedExperiences"],
