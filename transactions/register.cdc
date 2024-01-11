@@ -1,6 +1,6 @@
-import "FUSD" 
-import "FIND"
-import "FungibleToken"
+import FUSD from "../contracts/standard/FUSD.cdc"
+import FIND from "../contracts/FIND.cdc"
+import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 
 transaction(name: String, amount: UFix64) {
 
@@ -8,7 +8,7 @@ transaction(name: String, amount: UFix64) {
     let leases : &FIND.LeaseCollection?
     let price : UFix64
 
-    prepare(account: auth(BorrowValue, FungibleToken.Withdrawable) &Account) {
+    prepare(account: auth(BorrowValue) &Account) {
 
         self.price=FIND.calculateCost(name)
         log("The cost for registering this name is ".concat(self.price.toString()))

@@ -2088,7 +2088,5 @@ access(all) contract FIND {
             publicEnabled: false
         )
         self.account.storage.save(<-network, to: FIND.NetworkStoragePath)
-        //not sure if this last line here is needed
-        self.account.capabilities.storage.issue<&Network>(FIND.NetworkStoragePath)
     }
 }
