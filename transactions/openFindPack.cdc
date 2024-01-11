@@ -9,11 +9,11 @@ import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 /// @param packId: The id of the pack to open
 transaction(packId:UInt64) {
 
-    let packs: &FindPack.Collection
+    let packs: auth(FindPack.Owner) &FindPack.Collection
     let receiver: { Type : Capability<&{NonFungibleToken.Receiver}>}
 
     prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
-        self.packs=account.storage.borrow<&FindPack.Collection>(from: FindPack.CollectionStoragePath)!
+        self.packs=account.storage.borrow<auth(FindPack.Owner) &FindPack.Collection>(from: FindPack.CollectionStoragePath)!
 
         let packData = self.packs.borrowFindPack(id: packId) ?? panic("You do not own this pack. ID : ".concat(packId.toString()))
         let packMetadata = packData.getMetadata()
@@ -34,7 +34,7 @@ transaction(packId:UInt64) {
             if storage == nil {
                 let newCollection <- FindPack.createEmptyCollectionFromPackData(packData: packMetadata, type: type)
                 account.storage.save(<- newCollection, to: collectionInfo.storagePath)
-                let fc= account.capabilities.storage.issue<&FindPack.Collection>(collectionInfo.storagePath)
+                let fc= account.capabilities.storage.issue<auth(FindPack.Owner) &FindPack.Collection>(collectionInfo.storagePath)
                 account.capabilities.publish(fc, at: collectionInfo.publicPath)
             }
             self.receiver[type] = account.capabilities.get<&{NonFungibleToken.Collection}>(collectionInfo.publicPath)!

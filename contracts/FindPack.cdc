@@ -589,6 +589,8 @@ access(all) contract FindPack {
         access(all) fun buy(packTypeName: String, typeId: UInt64, vault: @{FungibleToken.Vault}, collectionCapability: Capability<&Collection>)
     }
 
+    access(all) entitlement Owner
+
     // Collection
     // A collection of FindPack NFTs owned by an account
     //
@@ -599,7 +601,7 @@ access(all) contract FindPack {
         access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
 
         //this has to be called on the DLQ collection
-        access(all) fun requeue(packId:UInt64) {
+        access(Owner) fun requeue(packId:UInt64) {
             let token <- self.withdraw(withdrawID: packId) as! @NFT
 
             let address=token.resetOpenedBy()
@@ -609,7 +611,7 @@ access(all) contract FindPack {
             emit Requeued(packId:packId, address: cap.address)
         }
 
-        access(all) fun open(packId: UInt64, receiverCap: {Type : Capability<&{NonFungibleToken.Receiver}>}) {
+        access(Owner) fun open(packId: UInt64, receiverCap: {Type : Capability<&{NonFungibleToken.Receiver}>}) {
             for cap in receiverCap.values {
                 if !cap.check() {
                     panic("Receiver cap is not valid")

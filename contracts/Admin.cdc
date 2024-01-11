@@ -302,7 +302,7 @@ access(all) contract Admin {
                 self.capability != nil: "Cannot create Admin, capability is not set"
             }
 
-            let cap= Admin.account.storage.borrow<&FindPack.Collection>(from: FindPack.DLQCollectionStoragePath)!
+            let cap= Admin.account.storage.borrow<auth(FindPack.Owner) &FindPack.Collection>(from: FindPack.DLQCollectionStoragePath)!
             cap.requeue(packId: packId)
         }
 
