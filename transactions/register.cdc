@@ -5,7 +5,7 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 transaction(name: String, amount: UFix64) {
 
     let vaultRef : auth(FungibleToken.Withdrawable) &FUSD.Vault?
-    let leases : &FIND.LeaseCollection?
+    let leases : auth(FIND.LeaseOwner) &FIND.LeaseCollection?
     let price : UFix64
 
     prepare(account: auth(BorrowValue) &Account) {
@@ -13,7 +13,7 @@ transaction(name: String, amount: UFix64) {
         self.price=FIND.calculateCost(name)
         log("The cost for registering this name is ".concat(self.price.toString()))
         self.vaultRef = account.storage.borrow<auth(FungibleToken.Withdrawable) &FUSD.Vault>(from: /storage/fusdVault)
-        self.leases=account.storage.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)
+        self.leases=account.storage.borrow<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(from: FIND.LeaseStoragePath)
     }
 
     pre{

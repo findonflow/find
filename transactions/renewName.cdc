@@ -11,7 +11,7 @@ transaction(name: String, amount: UFix64) {
     prepare(acct: auth(BorrowValue) &Account) {
         self.price=FIND.calculateCost(name)
         self.vaultRef = acct.storage.borrow<auth (FungibleToken.Withdrawable) &FUSD.Vault>(from: /storage/fusdVault)
-        self.finLeases= acct.storage.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
+        self.finLeases= acct.storage.borrow<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
     }
 
     pre{

@@ -8,7 +8,7 @@ transaction(name: String, amount: UFix64, recipient: String) {
 	let vaultRef : &FUSD.Vault? 
 	let receiverLease : Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>
 	let receiverProfile : Capability<&{Profile.Public}>
-	let leases : &FIND.LeaseCollection?
+	let leases : auth(FIND.LeaseOwner) &FIND.LeaseCollection?
 
 	prepare(acct: auth(BorrowValue) &Account) {
 
@@ -21,7 +21,7 @@ transaction(name: String, amount: UFix64, recipient: String) {
 
 		self.vaultRef = acct.borrow<&FUSD.Vault>(from: /storage/fusdVault)
 
-		self.leases=acct.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)
+		self.leases=acct.borrow<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(from: FIND.LeaseStoragePath)
 
 		let receiver = getAccount(address)
 		self.receiverLease = receiver.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)

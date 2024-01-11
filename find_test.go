@@ -26,7 +26,7 @@ func TestFIND(t *testing.T) {
 
 	ot.Run(t, "Should be able to register a name", func(t *testing.T) {
 		otu.O.Script("getLeases").AssertWithPointerWant(t, "/0/name",
-			autogold.Want("allLeases", "user2"),
+			autogold.Want("allLeases", "find-admin"),
 		)
 	})
 

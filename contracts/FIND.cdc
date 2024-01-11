@@ -299,6 +299,8 @@ access(all) contract FIND {
     =============================================================
     */
 
+    access(all) entitlement LeaseOwner
+
     /*
 
     Lease is a resource you get back when you register a lease.
@@ -348,40 +350,40 @@ access(all) contract FIND {
             self.addons[addon]=true
         }
 
-        access(all) fun setExtentionOnLateBid(_ time: UFix64) {
+        access(LeaseOwner) fun setExtentionOnLateBid(_ time: UFix64) {
             self.auctionExtensionOnLateBid=time
         }
 
-        access(all) fun setAuctionDuration(_ duration: UFix64) {
+        access(LeaseOwner) fun setAuctionDuration(_ duration: UFix64) {
             self.auctionDuration=duration
         }
 
-        access(all) fun setSalePrice(_ price: UFix64?) {
+        access(LeaseOwner) fun setSalePrice(_ price: UFix64?) {
             self.salePrice=price
         }
 
-        access(all) fun setReservePrice(_ price: UFix64?) {
+        access(LeaseOwner) fun setReservePrice(_ price: UFix64?) {
             self.auctionReservePrice=price
         }
 
-        access(all) fun setMinBidIncrement(_ price: UFix64) {
+        access(LeaseOwner) fun setMinBidIncrement(_ price: UFix64) {
             self.auctionMinBidIncrement=price
         }
 
-        access(all) fun setStartAuctionPrice(_ price: UFix64?) {
+        access(LeaseOwner) fun setStartAuctionPrice(_ price: UFix64?) {
             self.auctionStartPrice=price
         }
 
-        access(all) fun setCallback(_ callback: Capability<&{BidCollectionPublic}>?) {
+        access(LeaseOwner) fun setCallback(_ callback: Capability<&{BidCollectionPublic}>?) {
             self.offerCallback=callback
         }
 
-        access(all) fun extendLease(_ vault: @FUSD.Vault) {
+        access(LeaseOwner) fun extendLease(_ vault: @FUSD.Vault) {
             let network= self.networkCap.borrow() ?? panic("The network is not up")
             network.renew(name: self.name, vault:<-  vault)
         }
 
-        access(all) fun extendLeaseDapper(merchAccount: Address, vault: @DapperUtilityCoin.Vault) {
+        access(LeaseOwner) fun extendLeaseDapper(merchAccount: Address, vault: @DapperUtilityCoin.Vault) {
             let network= self.networkCap.borrow() ?? panic("The network is not up")
             network.renewDapper(merchAccount: merchAccount, name: self.name, vault:<-  vault)
         }
@@ -470,6 +472,8 @@ access(all) contract FIND {
         }
     }
 
+    access(all) entitlement AuctionOwner
+
     /* An Auction for a lease */
     access(all) resource Auction {
         access(contract) var endsAt: UFix64
@@ -498,7 +502,7 @@ access(all) contract FIND {
             return cb.getBalance(self.name)
         }
 
-        access(all) fun addBid(callback: Capability<&{BidCollectionPublic}>, timestamp: UFix64, lease: &Lease) {
+        access(account) fun addBid(callback: Capability<&{BidCollectionPublic}>, timestamp: UFix64, lease: &Lease) {
             let offer=callback.borrow()!
             offer.setBidType(name: self.name, type: "auction")
 
@@ -615,7 +619,6 @@ access(all) contract FIND {
         access(all) fun getLeaseUUID(_ name: String) : UInt64
     }
 
-
     access(all) resource LeaseCollection: LeaseCollectionPublic {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
@@ -652,7 +655,7 @@ access(all) contract FIND {
             }
             let addonPrice = network.addonPrices[addon]!
 
-            let lease = self.borrow(name)
+            let lease = self.borrowAuth(name)
 
             if !lease.validate() {
                 panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
@@ -692,7 +695,7 @@ access(all) contract FIND {
             }
             let addonPrice = network.addonPrices[addon]!
 
-            let lease = self.borrow(name)
+            let lease = self.borrowAuth(name)
 
             if !lease.validate() {
                 panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
@@ -736,7 +739,7 @@ access(all) contract FIND {
             }
             let addonPrice = network.addonPrices[addon]!
 
-            let lease = self.borrow(name)
+            let lease = self.borrowAuth(name)
 
             if !lease.validate() {
                 panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
@@ -753,7 +756,7 @@ access(all) contract FIND {
         }
 
         access(all) fun getAddon(name: String) : [String] {
-            let lease = self.borrow(name)
+            let lease = self.borrowAuth(name)
             if !lease.validate() {
                 return []
             }
@@ -761,7 +764,7 @@ access(all) contract FIND {
         }
 
         access(all) fun checkAddon(name:String, addon: String) : Bool {
-            let lease = self.borrow(name)
+            let lease = self.borrowAuth(name)
             if !lease.validate() {
                 return false
             }
@@ -769,14 +772,14 @@ access(all) contract FIND {
         }
 
         access(all) fun getLeaseUUID(_ name: String) : UInt64 {
-            return self.borrow(name).uuid
+            return self.borrowAuth(name).uuid
         }
 
         access(all) fun getLease(_ name: String) : LeaseInformation? {
             if !self.leases.containsKey(name) {
                 return nil
             }
-            let token=self.borrow(name)
+            let token=self.borrowAuth(name)
 
             if !token.validate() {
                 return nil
@@ -825,9 +828,9 @@ access(all) contract FIND {
         }
 
         //call this to start an auction for this lease
-        access(all) fun startAuction(_ name: String) {
+        access(LeaseOwner) fun startAuction(_ name: String) {
             let timestamp=Clock.time()
-            let lease = self.borrow(name)
+            let lease = self.borrowAuth(name)
 
             if !lease.validate() {
                 panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
@@ -877,7 +880,7 @@ access(all) contract FIND {
                 panic("Cannot cancel a bid that is in an auction=".concat(name))
             }
 
-            let lease= self.borrow(name)
+            let lease= self.borrowAuth(name)
 
             if let callback = lease.offerCallback {
 
@@ -902,7 +905,7 @@ access(all) contract FIND {
                 panic("Invalid name=".concat(name))
             }
 
-            let lease = self.borrow(name)
+            let lease = self.borrowAuth(name)
 
             if !lease.validate() {
                 panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
@@ -956,7 +959,7 @@ access(all) contract FIND {
             }
 
             let timestamp=Clock.time()
-            let lease = self.borrow(name)
+            let lease = self.borrowAuth(name)
 
             if !lease.validate() {
                 panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
@@ -1028,13 +1031,13 @@ access(all) contract FIND {
         }
 
         //cancel will cancel and auction or reject a bid if no auction has started
-        access(all) fun cancel(_ name: String) {
+        access(AuctionOwner) fun cancel(_ name: String) {
 
             if !self.leases.containsKey(name) {
                 panic("Invalid name=".concat(name))
             }
 
-            let lease = self.borrow(name)
+            let lease = self.borrowAuth(name)
             //if we have a callback there is no auction and it is a blind bid
             if let cb= lease.offerCallback {
 
@@ -1114,7 +1117,7 @@ access(all) contract FIND {
                 panic( "Invalid name=".concat(name))
             }
 
-            let lease = self.borrow(name)
+            let lease = self.borrowAuth(name)
 
             if !lease.validate() {
                 panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
@@ -1203,14 +1206,14 @@ access(all) contract FIND {
 
         }
 
-        access(all) fun listForAuction(name :String, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64) {
+        access(LeaseOwner) fun listForAuction(name :String, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64) {
 
 
             if !self.leases.containsKey(name) {
                 panic("Cannot list name for sale that is not registered to you name=".concat(name))
             }
 
-            let tokenRef = self.borrow(name)
+            let tokenRef = self.borrowAuth(name)
 
             if !tokenRef.validate() {
                 panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
@@ -1238,14 +1241,14 @@ access(all) contract FIND {
             emit EnglishAuction(name: name, uuid: tokenRef.uuid, seller: self.owner!.address, sellerName:FIND.reverseLookup(self.owner!.address), amount: tokenRef.auctionStartPrice!, auctionReservePrice: tokenRef.auctionReservePrice!, status: "active_listed", vaultType:Type<@FUSD.Vault>().identifier, buyer:nil, buyerName:nil, buyerAvatar: nil, endsAt: nil, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
         }
 
-        access(all) fun listForSale(name :String, directSellPrice:UFix64) {
+        access(LeaseOwner) fun listForSale(name :String, directSellPrice:UFix64) {
             Debug.log("list for sale")
             if !self.leases.containsKey(name) {
                 panic("Cannot list name for sale that is not registered to you name=".concat(name))
             }
 
             Debug.log("list for sale2")
-            let tokenRef = self.borrow(name)
+            let tokenRef = self.borrowAuth(name)
 
             if !tokenRef.validate() {
                 panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
@@ -1257,25 +1260,25 @@ access(all) contract FIND {
         }
 
 
-        access(all) fun delistAuction(_ name: String) {
+        access(AuctionOwner) fun delistAuction(_ name: String) {
 
             if !self.leases.containsKey(name) {
                 panic("Cannot delist name for sale that is not registered to you name=".concat(name))
             }
 
-            let tokenRef = self.borrow(name)
+            let tokenRef = self.borrowAuth(name)
 
             tokenRef.setStartAuctionPrice(nil)
             tokenRef.setReservePrice(nil)
         }
 
 
-        access(all) fun delistSale(_ name: String) {
+        access(LeaseOwner) fun delistSale(_ name: String) {
             if !self.leases.containsKey(name) {
                 panic("Cannot list name for sale that is not registered to you name=".concat(name))
             }
 
-            let tokenRef = self.borrow(name)
+            let tokenRef = self.borrowAuth(name)
             emit Sale(name: name, uuid:tokenRef.uuid, seller: self.owner!.address, sellerName: FIND.reverseLookup(self.owner!.address), amount: tokenRef.salePrice!, status: "cancel", vaultType:Type<@FUSD.Vault>().identifier, buyer:nil, buyerName:nil, buyerAvatar: nil, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil())
             tokenRef.setSalePrice(nil)
         }
@@ -1283,7 +1286,7 @@ access(all) contract FIND {
         //note that when moving a name
         access(all) fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection>) {
 
-            let lease = self.borrow(name)
+            let lease = self.borrowAuth(name)
             if !lease.validate() {
                 panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
             }
@@ -1335,6 +1338,10 @@ access(all) contract FIND {
             return (&self.leases[name] as &FIND.Lease?)!
         }
 
+        access(LeaseOwner) fun borrowAuth(_ name: String): auth(LeaseOwner) &FIND.Lease {
+            return (&self.leases[name] as auth(LeaseOwner) &FIND.Lease?)!
+        }
+
         //borrow the auction
         access(all) fun borrowAuction(_ name: String): &FIND.Auction {
             return (&self.auctions[name] as &FIND.Auction?)!
@@ -1342,7 +1349,7 @@ access(all) contract FIND {
 
 
         //This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
-        access(all) fun register(name: String, vault: @FUSD.Vault){
+        access(LeaseOwner) fun register(name: String, vault: @FUSD.Vault){
             let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)!
             let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
 
@@ -1357,7 +1364,7 @@ access(all) contract FIND {
         }
 
         //This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
-        access(all) fun registerDapper(merchAccount: Address, name: String, vault: @DapperUtilityCoin.Vault){
+        access(LeaseOwner) fun registerDapper(merchAccount: Address, name: String, vault: @DapperUtilityCoin.Vault){
             let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)!
             let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
 
@@ -1370,8 +1377,8 @@ access(all) contract FIND {
             network.registerDapper(merchAccount: merchAccount, name:name, vault: <- vault, profile: profileCap, leases: leases)
         }
 
-        access(all) fun cleanUpInvalidatedLease(_ name: String) {
-            let lease = self.borrow(name)
+        access(LeaseOwner) fun cleanUpInvalidatedLease(_ name: String) {
+            let lease = self.borrowAuth(name)
             if lease.validate() {
                 panic("This is a valid lease. You cannot clean this up. Lease : ".concat(name))
             }
@@ -1490,11 +1497,11 @@ access(all) contract FIND {
             return self.profiles[name]
         }
 
-        access(all) fun setAddonPrice(name:String, price:UFix64) {
+        access(account) fun setAddonPrice(name:String, price:UFix64) {
             self.addonPrices[name]=price
         }
 
-        access(all) fun setPrice(defaultPrice: UFix64, additionalPrices: {Int: UFix64}) {
+        access(account) fun setPrice(defaultPrice: UFix64, additionalPrices: {Int: UFix64}) {
             self.defaultPrice=defaultPrice
             self.lengthPrices=additionalPrices
         }
@@ -1724,11 +1731,11 @@ access(all) contract FIND {
             }
         }
 
-        access(all) fun setWallet(_ wallet: Capability<&{FungibleToken.Receiver}>) {
+        access(account) fun setWallet(_ wallet: Capability<&{FungibleToken.Receiver}>) {
             self.wallet=wallet
         }
 
-        access(all) fun setPublicEnabled(_ enabled: Bool) {
+        access(account) fun setPublicEnabled(_ enabled: Bool) {
             self.publicEnabled=enabled
         }
 
@@ -1878,7 +1885,6 @@ access(all) contract FIND {
             destroy oldToken
             leaseCollection.registerBid(name: name, callback: callbackCapability)
         }
-
 
         //increase a bid, will not work if the auction has already started
         access(all) fun increaseBid(name: String, vault: @{FungibleToken.Vault}) {

@@ -2,10 +2,10 @@ import FIND from "../contracts/FIND.cdc"
 
 transaction(name: String, directSellPrice:UFix64) {
 
-    let finLeases : &FIND.LeaseCollection?
+    let finLeases : auth(FIND.LeaseOwner) &FIND.LeaseCollection?
 
     prepare(acct: auth(BorrowValue) &Account) {
-        self.finLeases= acct.storage.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
+        self.finLeases= acct.storage.borrow<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
     }
 
     pre{
