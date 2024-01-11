@@ -1,8 +1,8 @@
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
-//import FindViews from "./FindViews.cdc"
+import ViewResolver from "./standard/ViewResolver.cdc"
 
-access(all) contract Bl0x: NonFungibleToken {
+access(all) contract Bl0x: ViewResolver {
 
     access(all) var totalSupply: UInt64
 
@@ -13,7 +13,6 @@ access(all) contract Bl0x: NonFungibleToken {
 
     access(all) let CollectionStoragePath: StoragePath
     access(all) let CollectionPublicPath: PublicPath
-    access(all) let CollectionPrivatePath: PrivatePath
 
     access(self) var rarities : [String]
     access(account) let royalties : [MetadataViews.Royalty]
@@ -68,7 +67,7 @@ access(all) contract Bl0x: NonFungibleToken {
         }
     }
 
-    access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
+    access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
 
         access(all) let id:UInt64
         access(all) let serial:UInt64
@@ -82,7 +81,7 @@ access(all) contract Bl0x: NonFungibleToken {
             serial:UInt64,
             rootHash:String,
             season:UInt64,
-            traits: {String: UInt64}
+            traits: {String: UInt64} 
         ) {
             self.nounce=0
             self.serial=serial
@@ -93,7 +92,11 @@ access(all) contract Bl0x: NonFungibleToken {
             self.royalties=MetadataViews.Royalties(Bl0x.royalties)
         }
 
-        access(all) getViews(): [Type] {
+        access(all) view fun getID(): UInt64 {
+            return self.id
+        }
+
+        access(all) view fun getViews(): [Type] {
             return  [
             Type<MetadataViews.Display>(),
             Type<MetadataViews.Medias>(),
@@ -108,9 +111,9 @@ access(all) contract Bl0x: NonFungibleToken {
             ]
         }
 
-        access(all) resolveView(_ view: Type): AnyStruct? {
+        access(all) fun resolveView(_ view: Type): AnyStruct? {
 
-            let imageFile=MetadataViews.IPFSFile( url: self.rootHash, path: "thumbnail/".concat(self.serial.toString()).concat(".webp"))
+            let imageFile=MetadataViews.IPFSFile( cid: self.rootHash, path: "thumbnail/".concat(self.serial.toString()).concat(".webp"))
 
 
             var fullExtension=".png"
@@ -129,7 +132,7 @@ access(all) contract Bl0x: NonFungibleToken {
                 fullExtension=".gif"
                 fullMediaType="image/gif"
             }
-            let fullFile=MetadataViews.IPFSFile( url: self.rootHash, path: "fullsize/".concat(self.serial.toString()).concat(fullExtension))
+            let fullFile=MetadataViews.IPFSFile( cid: self.rootHash, path: "fullsize/".concat(self.serial.toString()).concat(fullExtension))
             let fullMedia=MetadataViews.Media(file:fullFile, mediaType: fullMediaType)
 
             let season=self.season
@@ -183,11 +186,11 @@ access(all) contract Bl0x: NonFungibleToken {
             case Type<MetadataViews.NFTCollectionData>():
                 return MetadataViews.NFTCollectionData(storagePath: Bl0x.CollectionStoragePath,
                 publicPath: Bl0x.CollectionPublicPath,
-                providerPath: Bl0x.CollectionPrivatePath,
-                publicCollection: Type<&Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
-                publicLinkedType: Type<&Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
-                providerLinkedType: Type<&Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
-                createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Bl0x.createEmptyCollection()})
+                providerPath: /private/bl0xNFTCollection,
+                publicCollection: Type<&Collection>(),
+                publicLinkedType: Type<&Collection>(),
+                providerLinkedType: Type<auth(NonFungibleToken.Withdrawable) &Collection>(),
+                createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {return <- Bl0x.createEmptyCollection()}))
 
                 case Type<MetadataViews.Rarity>(): 
                 return MetadataViews.Rarity(score:nil, max:nil, description: self.getRarity()) 
@@ -198,11 +201,11 @@ access(all) contract Bl0x: NonFungibleToken {
             return nil
         }
 
-        access(all) increaseNounce() {
+        access(all) fun increaseNounce() {
             self.nounce=self.nounce+1
         }
 
-        access(all) getRarity() : String {
+        access(all) fun getRarity() : String {
             var traitRarity : [String] = []
             for trait in self.getAllTraitsMetadata().values {
                 traitRarity.append(trait.metadata["rarity"]!)
@@ -219,7 +222,7 @@ access(all) contract Bl0x: NonFungibleToken {
             return rarity 
         }
 
-        access(all) getTraitsAsTraits() : MetadataViews.Traits {
+        access(all) fun getTraitsAsTraits() : MetadataViews.Traits {
             let traits=self.getAllTraitsMetadata()
 
             let mvt : [MetadataViews.Trait] = []
@@ -233,7 +236,7 @@ access(all) contract Bl0x: NonFungibleToken {
             return MetadataViews.Traits(mvt)
         }
 
-        access(all) getAllTraitsMetadataAsArray() : [{String : String}] {
+        access(all) fun getAllTraitsMetadataAsArray() : [{String : String}] {
             let traits = self.traits
             if self.serial == 885 {
                 traits.remove(key: "Module")
@@ -252,7 +255,7 @@ access(all) contract Bl0x: NonFungibleToken {
             return traitMetadata
         }
 
-        access(all) getAllTraitsMetadata() : {String : Trait} {
+        access(all) fun getAllTraitsMetadata() : {String : Trait} {
 
             let traits = self.traits
             if self.serial == 885 {
@@ -275,14 +278,19 @@ access(all) contract Bl0x: NonFungibleToken {
     access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
-        access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+        access(all) var ownedNFTs: @{UInt64: Bl0x.NFT}
 
-        init () {
+        access(self) var storagePath: StoragePath
+        access(self) var publicPath: PublicPath
+
+          init () {
             self.ownedNFTs <- {}
+            let identifier = "bl0xNFTCollection"
+            self.storagePath = StoragePath(identifier: identifier)!
+            self.publicPath = PublicPath(identifier: identifier)!
         }
-
         // withdraw removes an NFT from the collection and moves it to the caller
-        access(all) withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+        access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
             emit Withdraw(id: token.id, from: self.owner?.address)
@@ -292,7 +300,7 @@ access(all) contract Bl0x: NonFungibleToken {
 
         // deposit takes a NFT and adds it to the collections dictionary
         // and adds the ID to the id array
-        access(all) deposit(token: @NonFungibleToken.NFT) {
+        access(all) fun deposit(token: @{NonFungibleToken.NFT}) {
             let token <- token as! @NFT
 
             let id: UInt64 = token.id
@@ -308,27 +316,62 @@ access(all) contract Bl0x: NonFungibleToken {
             destroy oldToken
         }
 
+        /// getSupportedNFTTypes returns a list of NFT types that this receiver accepts
+        access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
+            let supportedTypes: {Type: Bool} = {}
+            supportedTypes[Type<@Bl0x.NFT>()] = true
+            return supportedTypes
+        }
+
+        /// Return the default storage path for the collection
+        access(all) view fun getDefaultStoragePath(): StoragePath? {
+            return self.storagePath
+        }
+
+        /// Return the default public path for the collection
+        access(all) view fun getDefaultPublicPath(): PublicPath? {
+            return self.publicPath
+        }
+
+        /// Returns whether or not the given type is accepted by the collection
+        /// A collection that can accept any type should just return true by default
+        access(all) view fun isSupportedNFTType(type: Type): Bool {
+            if type == Type<@Bl0x.NFT>() {
+                return true
+            } else {
+                return false
+            }
+        }
+
         // getIDs returns an array of the IDs that are in the collection
-        access(all) getIDs(): [UInt64] {
+        access(all) view fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
+        }
+
+        access(all) view fun getLength(): Int {
+            return self.ownedNFTs.keys.length
         }
 
         // borrowNFT gets a reference to an NFT in the collection
         // so that the caller can read its metadata and call its methods
-        access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT {
-            return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
+            return (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
         }
 
-        access(all) borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
-            let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
-            let bl0x = nft as! &NFT
-            return bl0x as &AnyResource{ViewResolver.Resolver}
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}? {
+            if let nft = &self.ownedNFTs[id] as &Bl0x.NFT? {
+                return nft as &{ViewResolver.Resolver}
+            }
+            return nil
         }
 
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <- create Bl0x.Collection()
+        }
     }
 
     // public function that anyone can call to create a new empty collection
-    access(all) createEmptyCollection(): @NonFungibleToken.Collection {
+    access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
         return <- create Collection()
     }
 
@@ -359,7 +402,7 @@ access(all) contract Bl0x: NonFungibleToken {
             //TODO: discuss that fields we want in this event. Or do we prefer to use the richer deposit event, since this is really done in the backend
             //emit Minted(id:newNFT.id, address:recipient.owner!.address)
             // deposit it in the recipient's account using their reference
-            recipient.deposit(token: <-newNFT)
+            recipient.deposit(token: <- (newNFT as! @{NonFungibleToken.NFT}))
 
         }
 
@@ -377,25 +420,26 @@ access(all) contract Bl0x: NonFungibleToken {
                 self.metadata=metadata
             }
 
-            access(all) getName() : String{
+            access(all) fun getName() : String{
                 return self.metadata["name"]!
             }
 
-            access(all) getRarity() : String{
+            access(all) fun getRarity() : String{
                 return self.metadata["rarity"]!
             }
         }
+
         access(self) let traits : {UInt64: Trait}
 
         access(account) fun addTrait(_ trait:Trait) {
             self.traits[trait.id]=trait
         }
 
-        access(all) getTraits() : {UInt64:Trait}{
+        access(all) fun getTraits() : {UInt64:Trait}{
             return self.traits
         }
 
-        access(all) getTrait(_ id:UInt64) : Trait? {
+        access(all) fun getTrait(_ id:UInt64) : Trait? {
             return self.traits[id]
         }
 
@@ -428,17 +472,15 @@ access(all) contract Bl0x: NonFungibleToken {
             // Set the named paths
             self.CollectionStoragePath = /storage/bl0xNFTs
             self.CollectionPublicPath = /public/bl0xNFTs
-            self.CollectionPrivatePath = /private/bl0xNFTs
+  
 
-            self.account.storage.save<@NonFungibleToken.Collection>(<- Bl0x.createEmptyCollection(), to: Bl0x.CollectionStoragePath)
-            self.account.link<&Bl0x.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
-                Bl0x.CollectionPublicPath,
-                target: Bl0x.CollectionStoragePath
-            )
-            self.account.link<&Bl0x.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
-                Bl0x.CollectionPrivatePath,
-                target: Bl0x.CollectionStoragePath
-            )
+            // Create a Collection resource and save it to storage
+            let collection <- create Collection()
+            self.account.storage.save(<-collection, to: self.CollectionStoragePath)
+
+            // create a public capability for the collection
+            let collectionCap = self.account.capabilities.storage.issue<&Bl0x.Collection>(self.CollectionStoragePath)
+            self.account.capabilities.publish(collectionCap, at: self.CollectionPublicPath)
 
             emit ContractInitialized()
         }

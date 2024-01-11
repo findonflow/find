@@ -78,7 +78,7 @@ test_main.NFTDetailsReturnData{
 				map[string]interface{}{
 					"cut":         0.025,
 					"description": "find forge",
-					"receiver":    "Capability<&{A.ee82856bf20e2aa6.FungibleToken.Receiver}>(address: 0x179b6b1cb6755e31, id: 26)",
+					"receiver":    "Capability<&{A.ee82856bf20e2aa6.FungibleToken.Receiver}>(address: 0x179b6b1cb6755e31, id: 27)",
 				},
 			}},
 		},
