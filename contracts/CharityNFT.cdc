@@ -1,8 +1,9 @@
 
 import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
+import ViewResolver from "./standard/ViewResolver.cdc"
 
-access(all) contract CharityNFT: NonFungibleToken {
+access(all) contract CharityNFT: ViewResolver {
 
     access(all) var totalSupply: UInt64
 
@@ -14,7 +15,7 @@ access(all) contract CharityNFT: NonFungibleToken {
     access(all) event Deposit(id: UInt64, to: Address?)
     access(all) event Minted(id: UInt64, metadata: {String:String}, to:Address)
 
-    access(all) resource NFT: NonFungibleToken.INFT, Public, ViewResolver.Resolver {
+    access(all) resource NFT: NonFungibleToken.NFT, Public, ViewResolver.Resolver {
         access(all) let id: UInt64
 
         access(self) let metadata: {String: String}
@@ -24,11 +25,15 @@ access(all) contract CharityNFT: NonFungibleToken {
             self.metadata = metadata
         }
 
-        access(all) getMetadata() : { String : String} {
+        access(all) view fun getMetadata() : { String : String} {
             return self.metadata
         }
 
-        access(all) getViews(): [Type] {
+        access(all) view fun getID(): UInt64 {
+            return self.id
+        }
+
+        access(all) view fun getViews(): [Type] {
             return [
             Type<MetadataViews.Display>() ,
             Type<MetadataViews.Royalties>() ,
@@ -39,7 +44,7 @@ access(all) contract CharityNFT: NonFungibleToken {
             ]
         }
 
-        access(all) resolveView(_ view: Type): AnyStruct? {
+        access(all) view fun resolveView(_ view: Type): AnyStruct? {
             switch view {
 
                 case Type<MetadataViews.Display>() : 
@@ -79,13 +84,10 @@ access(all) contract CharityNFT: NonFungibleToken {
                     storagePath: CharityNFT.CollectionStoragePath,
                     publicPath: CharityNFT.CollectionPublicPath,
                     providerPath: /private/findCharityCollection,
-                    publicCollection: Type<&CharityNFT.Collection{CharityNFT.CollectionPublic}>(),
-                    publicLinkedType: Type<&CharityNFT.Collection{NonFungibleToken.Receiver, NonFungibleToken.Collection, CharityNFT.CollectionPublic, ViewResolver.ResolverCollection}>(),
-                    providerLinkedType: Type<&CharityNFT.Collection{NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, CharityNFT.CollectionPublic, ViewResolver.ResolverCollection}>(),
-                    createEmptyCollectionFunction: fun () : @NonFungibleToken.Collection {
-                        return <- CharityNFT.createEmptyCollection()
-                    }
-                )
+                    publicCollection: Type<&CharityNFT.Collection>(),
+                    publicLinkedType: Type<&CharityNFT.Collection>(),
+                    providerLinkedType: Type<auth(NonFungibleToken.Withdrawable) &CharityNFT.Collection>(),
+                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {return <- CharityNFT.createEmptyCollection()}))
 
                 case Type<MetadataViews.Edition>() : 
                 let edition = self.metadata["edition"] 
@@ -109,7 +111,7 @@ access(all) contract CharityNFT: NonFungibleToken {
 
         }
 
-        access(all) parseUInt64(_ string: String) : UInt64? {
+        access(all) view fun parseUInt64(_ string: String) : UInt64? {
             let chars : {Character : UInt64} = {
                 "0" : 0 , 
                 "1" : 1 , 
@@ -140,29 +142,33 @@ access(all) contract CharityNFT: NonFungibleToken {
     //The public interface can show metadata and the content for the Art piece
     access(all) resource interface Public {
         access(all) let id: UInt64
-        access(all) getMetadata() : {String : String}
+        access(all) view fun getMetadata() : {String : String}
     }
 
     //Standard NFT collectionPublic interface that can also borrowArt as the correct type
     access(all) resource interface CollectionPublic {
-
-        access(all) deposit(token: @NonFungibleToken.NFT)
-        access(all) getIDs(): [UInt64]
-        access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT
-        access(all) borrowCharity(id: UInt64): &{Public}?
+        access(all) fun deposit(token: @{NonFungibleToken.NFT})
+        access(all) view fun getIDs(): [UInt64]
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}?
+        access(all) fun borrowCharity(id: UInt64): &{Public}?
     }
 
     access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, CollectionPublic , ViewResolver.ResolverCollection{
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
-        access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+        access(all) var ownedNFTs: @{UInt64: CharityNFT.NFT}
+        access(self) var storagePath: StoragePath
+        access(self) var publicPath: PublicPath
 
         init () {
             self.ownedNFTs <- {}
+            let identifier = "charityNFTCollection"
+            self.storagePath = StoragePath(identifier: identifier)!
+            self.publicPath = PublicPath(identifier: identifier)!
         }
 
         // withdraw removes an NFT from the collection and moves it to the caller
-        access(all) withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+        access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT. WithdrawID : ".concat(withdrawID.toString()))
 
             emit Withdraw(id: token.id, from: self.owner?.address)
@@ -172,7 +178,7 @@ access(all) contract CharityNFT: NonFungibleToken {
 
         // deposit takes a NFT and adds it to the collections dictionary
         // and adds the ID to the id array
-        access(all) deposit(token: @NonFungibleToken.NFT) {
+        access(all) fun deposit(token: @{NonFungibleToken.NFT}) {
             let token <- token as! @CharityNFT.NFT
 
             let id: UInt64 = token.id
@@ -186,20 +192,20 @@ access(all) contract CharityNFT: NonFungibleToken {
         }
 
         // getIDs returns an array of the IDs that are in the collection
-        access(all) getIDs(): [UInt64] {
+        access(all) view fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
         }
 
         // borrowNFT gets a reference to an NFT in the collection
         // so that the caller can read its metadata and call its methods
-        access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT {
-            return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
+            return (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
         }
 
         //borrow charity
-        access(all) borrowCharity(id: UInt64): &{CharityNFT.Public}? {
+        access(all) fun borrowCharity(id: UInt64): &{CharityNFT.Public}? {
             if self.ownedNFTs[id] != nil {
-                let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+                let ref = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
                 return ref as! &NFT
             } else {
                 return nil
@@ -207,18 +213,53 @@ access(all) contract CharityNFT: NonFungibleToken {
         }
 
         //borrow view resolver
-        access(all) borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
             if self.ownedNFTs[id] == nil {
                 panic("NFT does not exist. ID : ".concat(id.toString()))
             }
 
-            let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+            let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
             return nft as! &CharityNFT.NFT
+        }
+
+        /// getSupportedNFTTypes returns a list of NFT types that this receiver accepts
+        access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
+            let supportedTypes: {Type: Bool} = {}
+            supportedTypes[Type<@CharityNFT.NFT>()] = true
+            return supportedTypes
+        }
+
+        /// Return the default storage path for the collection
+        access(all) view fun getDefaultStoragePath(): StoragePath? {
+            return self.storagePath
+        }
+
+        /// Return the default public path for the collection
+        access(all) view fun getDefaultPublicPath(): PublicPath? {
+            return self.publicPath
+        }
+
+        /// Returns whether or not the given type is accepted by the collection
+        /// A collection that can accept any type should just return true by default
+        access(all) view fun isSupportedNFTType(type: Type): Bool {
+            if type == Type<@CharityNFT.NFT>() {
+                return true
+            } else {
+                return false
+            }
+        }
+
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <- create CharityNFT.Collection()
+        }
+
+        access(all) view fun getLength(): Int {
+            return self.ownedNFTs.keys.length
         }
     }
 
     // public function that anyone can call to create a new empty collection
-    access(all) createEmptyCollection(): @NonFungibleToken.Collection {
+    access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
         return <- create Collection()
     }
 
