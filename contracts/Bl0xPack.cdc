@@ -6,8 +6,9 @@ import Clock from "../contracts/Clock.cdc"
 import Debug from "./Debug.cdc"
 import FLOAT from "../contracts/standard/FLOAT.cdc"
 import Bl0x from "../contracts/Bl0x.cdc"
+import ViewResolver from "./standard/ViewResolver.cdc"
 
-access(all) contract Bl0xPack: NonFungibleToken {
+access(all) contract Bl0xPack: ViewResolver {
     // Events
     access(all) event ContractInitialized()
     access(all) event Withdraw(id: UInt64, from: Address?)
@@ -62,14 +63,14 @@ access(all) contract Bl0xPack: NonFungibleToken {
 
         access(all) let storageRequirement: UInt64
 
-        access(contract) let providerCap: Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}> 
+        access(contract) let providerCap: Capability<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection}> 
 
         access(contract) let royaltyCap: Capability<&{FungibleToken.Receiver}>?
         access(contract) let royaltyCut: UFix64
 
         access(all) let requiresReservation: Bool
 
-        init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, price: UFix64, buyTime:UFix64, openTime:UFix64, walletType:Type, providerCap: Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>, requiresReservation:Bool, royaltyCut: UFix64, royaltyWallet: Capability<&{FungibleToken.Receiver}>, floatEventId:UInt64?, whiteListTime: UFix64?, storageRequirement: UInt64) {
+        init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, price: UFix64, buyTime:UFix64, openTime:UFix64, walletType:Type, providerCap: Capability<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>, requiresReservation:Bool, royaltyCut: UFix64, royaltyWallet: Capability<&{FungibleToken.Receiver}>, floatEventId:UInt64?, whiteListTime: UFix64?, storageRequirement: UInt64) {
             self.name = name
             self.description = description
             self.thumbnailUrl = thumbnailUrl
@@ -94,14 +95,14 @@ access(all) contract Bl0xPack: NonFungibleToken {
             self.requiresReservation=requiresReservation
         }
 
-        access(all) getThumbnail() : AnyStruct{MetadataViews.File} {
+        access(all) fun getThumbnail() : {MetadataViews.File} {
             if let hash = self.thumbnailHash {
                 return MetadataViews.IPFSFile(cid: hash, path:nil)
             }
             return MetadataViews.HTTPFile(url:self.thumbnailUrl!)
         }
 
-        access(all) canBeOpened() : Bool {
+        access(all) fun canBeOpened() : Bool {
             return self.openTime >= Clock.time()
         }
     }
@@ -111,11 +112,11 @@ access(all) contract Bl0xPack: NonFungibleToken {
         self.packMetadata[typeId]= metadata
     }
 
-    access(all) getMetadata(typeId: UInt64): Metadata? {
+    access(all) view fun getMetadata(typeId: UInt64): Metadata? {
         return self.packMetadata[typeId]
     }
 
-    access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
+    access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
         // The token's ID
         access(all) let id: UInt64
 
@@ -136,15 +137,19 @@ access(all) contract Bl0xPack: NonFungibleToken {
             self.hash=hash
         }
 
-        access(all) getOpenedBy() : Capability<&{NonFungibleToken.Receiver}> {
+        access(all) fun getOpenedBy() : Capability<&{NonFungibleToken.Receiver}> {
             if self.openedBy== nil {
                 panic("Pack is not opened")
             }
             return self.openedBy!
         }
 
-        access(all) getHash() : String{
+        access(all) fun getHash() : String{
             return self.hash
+        }
+
+        access(all) view fun getID(): UInt64 {
+            return self.id
         }
 
         access(contract) fun setTypeId(_ id: UInt64) {
@@ -168,15 +173,15 @@ access(all) contract Bl0xPack: NonFungibleToken {
             self.openedBy=cap
         }
 
-        access(all) getTypeID() :UInt64 {
+        access(all) fun getTypeID() :UInt64 {
             return self.typeId
         }
 
-        access(all) getMetadata(): Metadata {
+        access(all) view fun getMetadata(): Metadata {
             return Bl0xPack.getMetadata(typeId: self.typeId)!
         }
 
-        access(all) getViews(): [Type] {
+        access(all) view fun getViews(): [Type] {
             return [
             Type<MetadataViews.Display>(), 
             Type<Metadata>(),
@@ -184,11 +189,11 @@ access(all) contract Bl0xPack: NonFungibleToken {
             ]
         }
 
-        access(all) getThumbnail() : AnyStruct{MetadataViews.File} {
+        access(all) view fun getThumbnail() : {MetadataViews.File} {
             return self.getMetadata().getThumbnail()
         }
 
-        access(all) resolveView(_ view: Type): AnyStruct? {
+        access(all) view fun resolveView(_ view: Type): AnyStruct? {
             let metadata = self.getMetadata()
             switch view {
             case Type<MetadataViews.Display>():
@@ -213,14 +218,11 @@ access(all) contract Bl0xPack: NonFungibleToken {
                 return MetadataViews.NFTCollectionData(
                     storagePath: Bl0xPack.CollectionStoragePath,
                     publicPath: Bl0xPack.CollectionPublicPath,
-                    providerPath: /private/Bl0xPackCollection,
-                    publicCollection: Type<&Bl0xPack.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Bl0xPack.CollectionPublic}>(),
-                    publicLinkedType: Type<&Bl0xPack.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Bl0xPack.CollectionPublic}>(),
-                    providerLinkedType: Type<&Bl0xPack.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection, Bl0xPack.CollectionPublic}>(),
-                    createEmptyCollectionFunction: fun () : @NonFungibleToken.Collection {
-                        return <- Bl0xPack.createEmptyCollection()
-                    }
-                )
+                    providerPath: /private/bl0xPackCollection,
+                    publicCollection: Type<&Bl0xPack.Collection>(),
+                    publicLinkedType: Type<&Bl0xPack.Collection>(),
+                    providerLinkedType: Type<auth(NonFungibleToken.Withdrawable) &Bl0xPack.Collection>(),
+                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {return <- Bl0xPack.createEmptyCollection()}))
 
                 case Type<MetadataViews.NFTCollectionDisplay>(): 
                 let externalURL = MetadataViews.ExternalURL("https://find.xyz/mp/bl0xPack")
@@ -234,14 +236,16 @@ access(all) contract Bl0xPack: NonFungibleToken {
     }
 
     access(all) resource interface CollectionPublic {
-        access(all) deposit(token: @NonFungibleToken.NFT)
-        access(all) getIDs(): [UInt64]
-        access(all) getPacksLeftForType(_ type:UInt64) : UInt64
-        access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT
-        access(all) borrowBl0xPack(id: UInt64): &Bl0xPack.NFT? 
-        access(all) buy(typeId: UInt64, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) 
-        access(all) buyWithSignature(packId: UInt64, signature:String, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) 
+        access(all) fun deposit(token: @{NonFungibleToken.NFT})
+        access(all) view fun getIDs(): [UInt64]
+        access(all) view fun getPacksLeftForType(_ type:UInt64) : UInt64
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}?
+        access(all) fun borrowBl0xPack(id: UInt64): &Bl0xPack.NFT? 
+        access(all) fun buy(typeId: UInt64, vault: @{FungibleToken.Vault}, collectionCapability: Capability<&Collection>) 
+        access(all) fun buyWithSignature(packId: UInt64, signature:String,  vault: @{FungibleToken.Vault}, collectionCapability: Capability<&Collection>) 
     }
+    
+    access(all) entitlement Owner
 
     // Collection
     // A collection of Bl0xPack NFTs owned by an account
@@ -250,9 +254,14 @@ access(all) contract Bl0xPack: NonFungibleToken {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         //
-        access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+        access(all) var ownedNFTs: @{UInt64: Bl0xPack.NFT}
 
         access(all) var nftsPerType: {UInt64:UInt64}
+
+        access(self) var storagePath: StoragePath
+
+        access(self) var publicPath: PublicPath
+
 
         // since maps are not ordered in cadence this will pick any random key and that works really well
         access(self) fun getPackIdForType(_ typeId: UInt64): UInt64? {
@@ -267,17 +276,21 @@ access(all) contract Bl0xPack: NonFungibleToken {
         }
 
         //this has to be called on the DLQ collection
-        access(all) requeue(packId:UInt64) {
+        access(Owner) fun requeue(packId:UInt64) {
             let token <- self.withdraw(withdrawID: packId) as! @NFT
 
             let address=token.resetOpendBy()
-            let cap=getAccount(address).getCapability<&Collection{NonFungibleToken.Receiver}>(Bl0xPack.CollectionPublicPath)
+            let cap=getAccount(address).capabilities.get<&Collection>(Bl0xPack.CollectionPublicPath)!
             let receiver = cap.borrow()!
             receiver.deposit(token: <- token)
             emit Requeued(packId:packId, address: cap.address)
         }
 
-        access(all) open(packId: UInt64, receiverCap: Capability<&{NonFungibleToken.Receiver}>) {
+        access(all) view fun getLength(): Int {
+            return self.ownedNFTs.keys.length
+        }
+
+        access(Owner) fun open(packId: UInt64, receiverCap: Capability<&{NonFungibleToken.Receiver}>) {
             if !receiverCap.check() {
                 panic("Receiver cap is not valid")
             }
@@ -293,7 +306,7 @@ access(all) contract Bl0xPack: NonFungibleToken {
             token.setOpenedBy(receiverCap)
 
             // establish the receiver for Redeeming Bl0xPack
-            let receiver = Bl0xPack.account.getCapability<&{NonFungibleToken.Receiver}>(Bl0xPack.OpenedCollectionPublicPath).borrow()!
+            let receiver = Bl0xPack.account.capabilities.get<&{NonFungibleToken.Receiver}>(Bl0xPack.OpenedCollectionPublicPath)!.borrow()!
 
             // deposit for consumption
             receiver.deposit(token: <- token)
@@ -302,7 +315,7 @@ access(all) contract Bl0xPack: NonFungibleToken {
         }
 
         //TODO: pre that needs requiresReservation
-        access(all) buyWithSignature(packId: UInt64, signature:String, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) {
+        access(all) fun buyWithSignature(packId: UInt64, signature:String,  vault: @{FungibleToken.Vault}, collectionCapability: Capability<&Collection>) {
             pre {
                 self.owner!.address == Bl0xPack.account.address : "You can only buy pack directly from the Bl0xPack account"
             }
@@ -326,7 +339,7 @@ access(all) contract Bl0xPack: NonFungibleToken {
             }
 
 
-            if metadata.price != vault.balance {
+            if metadata.price != vault.getBalance() {
                 panic("Vault does not contain required amount of FT ".concat(metadata.price.toString()))
             }
 
@@ -359,7 +372,7 @@ access(all) contract Bl0xPack: NonFungibleToken {
             }
 
             if metadata.royaltyCut != 0.0 && metadata.royaltyCap != nil && metadata.royaltyCap!.check() {
-                metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * metadata.royaltyCut))
+                metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: vault.getBalance() * metadata.royaltyCut))
             } 
 
             metadata.wallet.borrow()!.deposit(from: <- vault)
@@ -368,7 +381,7 @@ access(all) contract Bl0xPack: NonFungibleToken {
             emit Purchased(packId: packId, address: collectionCapability.address, amount:metadata.price)
         }
 
-        access(all) buy(typeId: UInt64, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) {
+        access(all) fun buy(typeId: UInt64, vault: @{FungibleToken.Vault}, collectionCapability: Capability<&Collection>) {
             pre {
                 self.owner!.address == Bl0xPack.account.address : "You can only buy pack directly from the Bl0xPack account"
             }
@@ -418,13 +431,13 @@ access(all) contract Bl0xPack: NonFungibleToken {
                 panic("The vault sent in is not of the desired type ".concat(metadata.walletType.identifier))
             }
 
-            if metadata.price != vault.balance {
+            if metadata.price != vault.getBalance() {
                 panic("Vault does not contain required amount of FT ".concat(metadata.price.toString()))
             }
 
             //TODO: test
             if metadata.royaltyCut != 0.0 && metadata.royaltyCap != nil && metadata.royaltyCap!.check() {
-                metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * metadata.royaltyCut))
+                metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: vault.getBalance() * metadata.royaltyCut))
             } 
 
             metadata.wallet.borrow()!.deposit(from: <- vault)
@@ -437,7 +450,7 @@ access(all) contract Bl0xPack: NonFungibleToken {
         // withdraw
         // Removes an NFT from the collection and moves it to the caller
         //
-        access(all) withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+        access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("Could not withdraw nft")
 
             let nft <- token as! @NFT
@@ -455,7 +468,7 @@ access(all) contract Bl0xPack: NonFungibleToken {
         // Takes a NFT and adds it to the collections dictionary
         // and adds the ID to the id array
         //
-        access(all) deposit(token: @NonFungibleToken.NFT) {
+        access(all) fun deposit(token: @{NonFungibleToken.NFT}) {
             let token <- token as! @Bl0xPack.NFT
 
             let id: UInt64 = token.id
@@ -470,15 +483,20 @@ access(all) contract Bl0xPack: NonFungibleToken {
             destroy oldToken
         }
 
+
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <- create Bl0xPack.Collection()
+        }
+
         // getIDs
         // Returns an array of the IDs that are in the collection
         //
-        access(all) getIDs(): [UInt64] {
+        access(all) view fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
         }
 
         //return the number of packs left of a type
-        access(all) getPacksLeftForType(_ type:UInt64) : UInt64 {
+        access(all) view fun getPacksLeftForType(_ type:UInt64) : UInt64 {
             return self.nftsPerType[type] ?? 0
         }
 
@@ -486,8 +504,35 @@ access(all) contract Bl0xPack: NonFungibleToken {
         // Gets a reference to an NFT in the collection
         // so that the caller can read its metadata and call its methods
         //
-        access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT {
-            return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
+            return &self.ownedNFTs[id] as &{NonFungibleToken.NFT}?
+        }
+
+           /// getSupportedNFTTypes returns a list of NFT types that this receiver accepts
+        access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
+            let supportedTypes: {Type: Bool} = {}
+            supportedTypes[Type<@Bl0xPack.NFT>()] = true
+            return supportedTypes
+        }
+
+        /// Return the default storage path for the collection
+        access(all) view fun getDefaultStoragePath(): StoragePath? {
+            return self.storagePath
+        }
+
+        /// Return the default public path for the collection
+        access(all) view fun getDefaultPublicPath(): PublicPath? {
+            return self.publicPath
+        }
+
+        /// Returns whether or not the given type is accepted by the collection
+        /// A collection that can accept any type should just return true by default
+        access(all) view fun isSupportedNFTType(type: Type): Bool {
+            if type == Type<@Bl0xPack.NFT>() {
+                return true
+            } else {
+                return false
+            }
         }
 
         // borrowBl0xPack
@@ -495,19 +540,20 @@ access(all) contract Bl0xPack: NonFungibleToken {
         // exposing all of its fields.
         // This is safe as there are no functions that can be called on the Bl0xPack.
         //
-        access(all) borrowBl0xPack(id: UInt64): &Bl0xPack.NFT? {
+        access(all) fun borrowBl0xPack(id: UInt64): &Bl0xPack.NFT? {
             if self.ownedNFTs[id] != nil {
-                let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
-                return ref as! &Bl0xPack.NFT
+                let ref = (&self.ownedNFTs[id] as &Bl0xPack.NFT?)
+                return ref
             } else {
                 return nil
             }
         }
 
-        access(all) borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
-            let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
-            let exampleNFT = nft as! &NFT
-            return exampleNFT 
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}? {
+            if let nft = &self.ownedNFTs[id] as &Bl0xPack.NFT? {
+                return nft as &{ViewResolver.Resolver}
+            }
+            return nil
         }
 
         // initializer
@@ -515,10 +561,13 @@ access(all) contract Bl0xPack: NonFungibleToken {
         init () {
             self.ownedNFTs <- {}
             self.nftsPerType= {}
+            let identifier = "bl0xPackNFTCollection"
+            self.storagePath = StoragePath(identifier: identifier)!
+            self.publicPath = PublicPath(identifier: identifier)!
         }
     }
 
-    access(all) createEmptyCollection(): @NonFungibleToken.Collection {
+    access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
         return <- create Collection()
     }
 
@@ -533,7 +582,7 @@ access(all) contract Bl0xPack: NonFungibleToken {
 
     access(account) fun fulfill(packId: UInt64, rewardIds:[UInt64], salt:String) {
 
-        let openedPacksCollection = Bl0xPack.account.storage.borrow<&Bl0xPack.Collection>(from: Bl0xPack.OpenedCollectionStoragePath)!
+        let openedPacksCollection = Bl0xPack.account.storage.borrow<auth(NonFungibleToken.Withdrawable) &Bl0xPack.Collection>(from: Bl0xPack.OpenedCollectionStoragePath)!
         let pack <- openedPacksCollection.withdraw(withdrawID: packId) as! @Bl0xPack.NFT
 
         let receiver= pack.getOpenedBy()
@@ -553,7 +602,7 @@ access(all) contract Bl0xPack: NonFungibleToken {
         }
 
         let receiverAccount=getAccount(receiver.address)
-        let freeStorage=receiverAccount.storageCapacity - receiverAccount.storageUsed
+        let freeStorage=receiverAccount.storage.capacity - receiverAccount.storage.used
         Debug.log("Free capacity from account ".concat(freeStorage.toString()))
 
         if pack.getMetadata().storageRequirement > freeStorage {
@@ -583,7 +632,7 @@ access(all) contract Bl0xPack: NonFungibleToken {
         let source=rewards.borrow()!
         for reward in rewardIds {
 
-            let metadata=source.borrowViewResolver(id: reward).resolveView(Type<Bl0x.Metadata>())! as! Bl0x.Metadata
+            let metadata=source.borrowViewResolver(id: reward)!.resolveView(Type<Bl0x.Metadata>())! as! Bl0x.Metadata
             emit PackReveal(packId:packId, address:receiver.address, packTypeId: pack.getTypeID(), rewardId: reward, nftName:metadata.name, nftImage:metadata.image, nftRarity: metadata.rarity)
             let token <- source.withdraw(withdrawID: reward)
             target.deposit(token: <-token)
@@ -599,11 +648,11 @@ access(all) contract Bl0xPack: NonFungibleToken {
     }
 
 
-    access(all) getPacksCollection() : &Bl0xPack.Collection{CollectionPublic} {
-        return Bl0xPack.account.getCapability<&Bl0xPack.Collection{Bl0xPack.CollectionPublic}>(Bl0xPack.CollectionPublicPath).borrow() ?? panic("Could not borow Bl0xPack collection")
+    access(all) fun getPacksCollection() : &Bl0xPack.Collection {
+        return Bl0xPack.account.capabilities.borrow<&Bl0xPack.Collection>(Bl0xPack.CollectionPublicPath) ?? panic("Could not borow Bl0xPack collection")
     }
 
-    access(all) canBuy(packTypeId:UInt64, user:Address) : Bool {
+    access(all) fun canBuy(packTypeId:UInt64, user:Address) : Bool {
 
         let packs=Bl0xPack.getPacksCollection()
 
@@ -644,9 +693,9 @@ access(all) contract Bl0xPack: NonFungibleToken {
         return true
     }
 
-    access(all) hasFloat(floatEventId:UInt64, user:Address) : Bool {
+    access(all) fun hasFloat(floatEventId:UInt64, user:Address) : Bool {
 
-        let float = getAccount(user).getCapability(FLOAT.FLOATCollectionPublicPath).borrow<&FLOAT.Collection{FLOAT.CollectionPublic}>() 
+        let float = getAccount(user).capabilities.borrow<&FLOAT.Collection>(FLOAT.FLOATCollectionPublicPath)
 
         if float == nil {
             return false
@@ -686,22 +735,21 @@ access(all) contract Bl0xPack: NonFungibleToken {
         // this contract will hold a Collection that Bl0xPack can be deposited to and Admins can Consume them to transfer nfts to the depositing account
         let openedCollection <- create Collection()
         self.account.storage.save(<- openedCollection, to: self.OpenedCollectionStoragePath) 
-        self.account.link<&Bl0xPack.Collection{NonFungibleToken.Receiver, NonFungibleToken.Collection, Bl0xPack.CollectionPublic, ViewResolver.ResolverCollection}>(Bl0xPack.OpenedCollectionPublicPath, target: Bl0xPack.OpenedCollectionStoragePath)
+        let openedCollectionCap = self.account.capabilities.storage.issue<&Bl0xPack.Collection>(self.OpenedCollectionStoragePath)
+        self.account.capabilities.publish(openedCollectionCap, at: self.OpenedCollectionPublicPath)
 
 
         //a DLQ storage slot so that the opener can put items that cannot be opened/transferred here.
         let dlqCollection <- create Collection()
         self.account.storage.save(<- dlqCollection, to: self.DLQCollectionStoragePath) 
-        self.account.link<&Bl0xPack.Collection{NonFungibleToken.Receiver, NonFungibleToken.Collection, Bl0xPack.CollectionPublic, ViewResolver.ResolverCollection}>(Bl0xPack.DLQCollectionPublicPath, target: Bl0xPack.DLQCollectionStoragePath)
+        let dlqCollectionCap = self.account.capabilities.storage.issue<&Bl0xPack.Collection>(self.DLQCollectionStoragePath)
+        self.account.capabilities.publish(dlqCollectionCap, at: self.DLQCollectionPublicPath)
 
-        self.account.storage.save<@NonFungibleToken.Collection>( <- self.createEmptyCollection(), to: self.CollectionStoragePath)
 
-        self.account.link<&Bl0xPack.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, Bl0xPack.CollectionPublic, ViewResolver.ResolverCollection}>(
-            Bl0xPack.CollectionPublicPath,
-            target: Bl0xPack.CollectionStoragePath
-        )
+        self.account.storage.save( <- self.createEmptyCollection(), to: self.CollectionStoragePath)
+        let collectionCap = self.account.capabilities.storage.issue<&Bl0xPack.Collection>(self.CollectionStoragePath)
+        self.account.capabilities.publish(collectionCap, at: self.CollectionPublicPath)
 
         emit ContractInitialized()
-
     }
 }

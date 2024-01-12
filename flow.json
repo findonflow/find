@@ -193,7 +193,8 @@
     "FindMarketCutStruct": "./contracts/FindMarketCutStruct.cdc",
     "FindMarketInfrastructureCut": "./contracts/FindMarketInfrastructureCut.cdc",
     "Dev": "./contracts/Dev.cdc",
-    "Bl0x": "./contracts/Bl0x.cdc"
+    "Bl0x": "./contracts/Bl0x.cdc",
+    "Bl0xPack": "./contracts/Bl0xPack.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -321,7 +322,8 @@
         "Dev",
         "NameVoucher",
         "FIND",
-        "Bl0x"
+        "Bl0x",
+        "Bl0xPack"
       ],
       "emulator-find-admin": [],
       "emulator-find-forge": ["GeneratedExperiences"],
