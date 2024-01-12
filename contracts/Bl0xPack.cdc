@@ -95,7 +95,7 @@ access(all) contract Bl0xPack: ViewResolver {
             self.requiresReservation=requiresReservation
         }
 
-        access(all) fun getThumbnail() : {MetadataViews.File} {
+        access(all) view fun getThumbnail() : {MetadataViews.File} {
             if let hash = self.thumbnailHash {
                 return MetadataViews.IPFSFile(cid: hash, path:nil)
             }
