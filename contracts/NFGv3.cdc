@@ -2,7 +2,7 @@ import NonFungibleToken from "./standard/NonFungibleToken.cdc"
 import FungibleToken from "./standard/FungibleToken.cdc"
 import MetadataViews from "./standard/MetadataViews.cdc"
 import FindForge from "./FindForge.cdc"
-import ViewResolver from "./ViewResolver.cdc"
+import ViewResolver from "./standard/ViewResolver.cdc"
 
 access(all) contract NFGv3: ViewResolver {
 
@@ -226,18 +226,6 @@ access(all) contract NFGv3: ViewResolver {
             return self.ownedNFTs.keys.length
         }
 
-		// borrowNFT gets a reference to an NFT in the collection
-		// so that the caller can read its metadata and call its methods
-		access(all) view fun borrowNFT(id: UInt64): &{NonFungibleToken.NFT}? {
-			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)
-		}
-
-		access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
-			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
-			let flomies = nft as! &NFT
-			return flomies as &{ViewResolver.Resolver}
-		}
-
 		access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
             return <- create NFGv3.Collection()
         }
@@ -275,7 +263,7 @@ access(all) contract NFGv3: ViewResolver {
     }
 
     // public function that anyone can call to create a new empty collection
-    access(all) createEmptyCollection(): @NonFungibleToken.Collection {
+    access(all) createEmptyCollection(): @{NonFungibleToken.Collection} {
         return <- create Collection()
     }
 
@@ -325,7 +313,7 @@ access(all) contract NFGv3: ViewResolver {
         self.account.storage.save(<-collection, to: self.CollectionStoragePath)
         let collectionCap = self.account.capabilities.storage.issue<@NonFungibleToken.Collection>(self.CollectionStoragePath)
 		self.account.capabilities.publish(collectionCap, at: self.CollectionPublicPath)
-        
+
         FindForge.addForgeType(<- create Forge())
         emit ContractInitialized()
     }
