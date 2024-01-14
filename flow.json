@@ -197,7 +197,9 @@
     "Bl0xPack": "./contracts/Bl0xPack.cdc",
     "CharityNFT": "./contracts/CharityNFT.cdc",
     "Flomies": "./contracts/Flomies.cdc",
-    "NFGv3": "./contracts/NFGv3.cdc"
+    "NFGv3": "./contracts/NFGv3.cdc",
+    "PartyFavorz": "./contracts/PartyFavorz.cdc",
+    "PartyFavorzExtraData": "./contracts/PartyFavorzExtraData.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -329,7 +331,9 @@
         "Bl0xPack",
         "CharityNFT",
         "Flomies",
-        "NFGv3"
+        "NFGv3",
+        "PartyFavorz",
+        "PartyFavorzExtraData"
       ],
       "emulator-find-admin": [],
       "emulator-find-forge": ["GeneratedExperiences"],

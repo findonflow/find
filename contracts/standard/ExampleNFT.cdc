@@ -369,7 +369,7 @@ access(all) contract ExampleNFT: ViewResolver {
 
 
     access(all)resource Forge: FindForge.Forge {
-        access(all) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
+        access(FindForge.ForgeOwner) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
             let info = data as? ExampleNFTInfo ?? panic("The data passed in is not in form of ExampleNFTInfo.")
             let royalties : [MetadataViews.Royalty] = []
             if platform.platformPercentCut != 0.0 {
@@ -386,7 +386,7 @@ access(all) contract ExampleNFT: ViewResolver {
             royalties: MetadataViews.Royalties(royalties))
         }
 
-        access(all) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
+        access(FindForge.ForgeOwner) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
             let type = data.getType()
 
             switch type {

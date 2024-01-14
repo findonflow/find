@@ -665,7 +665,7 @@ access(all) contract Wearables: NonFungibleToken {
 		}
 
 		// getIDs returns an array of the IDs that are in the collection
-		access(all) getIDs(): [UInt64] {
+		access(all) view fun getIDs(): [UInt64] {
 			return self.ownedNFTs.keys
 		}
 
@@ -677,14 +677,14 @@ access(all) contract Wearables: NonFungibleToken {
 
 		//a borrow method for the generic view resolver pattern
 		access(all) borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
-			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+			let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
 			let wearable = nft as! &NFT
 			return wearable
 		}
 
 		//This function is here so that other accounts in the doodles ecosystem can borrow it to perform cross-contract interactions. like bumping the equipped counter
 		access(account) fun borrowWearableNFT(id: UInt64) : &Wearables.NFT {
-			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+			let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
 			let wearable = nft as! &NFT
 			return wearable
 		}

@@ -99,7 +99,7 @@ access(all) contract TopShot: NonFungibleToken {
 
     access(all) resource interface MomentCollectionPublic {
         access(all) deposit(token: @NonFungibleToken.NFT)
-        access(all) getIDs(): [UInt64]
+        access(all) view fun getIDs(): [UInt64]
         access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT
         access(all) borrowMoment(id: UInt64): &TopShot.NFT? {
             // If the result isn't nil, the id of the returned reference
@@ -171,7 +171,7 @@ access(all) contract TopShot: NonFungibleToken {
         }
 
         // getIDs returns an array of the IDs that are in the Collection
-        access(all) getIDs(): [UInt64] {
+        access(all) view fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
         }
 
@@ -202,7 +202,7 @@ access(all) contract TopShot: NonFungibleToken {
         // Returns: A reference to the NFT
         access(all) borrowMoment(id: UInt64): &TopShot.NFT? {
             if self.ownedNFTs[id] != nil {
-                let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+                let ref = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
                 return ref as! &TopShot.NFT
             } else {
                 return nil
@@ -210,7 +210,7 @@ access(all) contract TopShot: NonFungibleToken {
         }
 
         access(all) borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
-            let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+            let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
             let topShotNFT = nft as! &TopShot.NFT
             return topShotNFT as &AnyResource{ViewResolver.Resolver}
         }

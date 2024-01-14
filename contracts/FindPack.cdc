@@ -1139,7 +1139,7 @@ access(all) contract FindPack {
     }
 
     access(all) resource Forge: FindForge.Forge {
-        access(all) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
+        access(FindForge.ForgeOwner) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
 
             let royalties : [MetadataViews.Royalty] = []
             // there should be no find cut for the pack.
@@ -1150,7 +1150,7 @@ access(all) contract FindPack {
             return <- FindPack.mintNFT(packTypeName: platform.name, typeId: input.typeId , hash: input.hash, royalties: royalties)
         }
 
-        access(all) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
+        access(FindForge.ForgeOwner) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
             let type = data.getType()
 
             switch type {

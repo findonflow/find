@@ -86,7 +86,7 @@ access(all) contract FlovatarComponentTemplate {
 
     // Standard CollectionPublic interface that can also borrow Component Templates
     access(all) resource interface CollectionPublic {
-        access(all) getIDs(): [UInt64]
+        access(all) view fun getIDs(): [UInt64]
         access(all) borrowComponentTemplate(id: UInt64): &{FlovatarComponentTemplate.Public}?
     }
 
@@ -114,7 +114,7 @@ access(all) contract FlovatarComponentTemplate {
         }
 
         // getIDs returns an array of the IDs that are in the collection
-        access(all) getIDs(): [UInt64] {
+        access(all) view fun getIDs(): [UInt64] {
             return self.ownedComponentTemplates.keys
         }
 

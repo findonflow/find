@@ -79,7 +79,7 @@ access(all) contract PartyFavorz: ViewResolver {
 			]
 		}
 
-		access(all) view fun resolveView(_ view: Type): AnyStruct? {
+		access(all) fun resolveView(_ view: Type): AnyStruct? {
 			let imageFile = MetadataViews.IPFSFile( cid: self.info.thumbnailHash, path: nil)
 
 			switch view {
@@ -129,13 +129,11 @@ access(all) contract PartyFavorz: ViewResolver {
 				return MetadataViews.NFTCollectionData(
 					storagePath: PartyFavorz.CollectionStoragePath,
 					publicPath: PartyFavorz.CollectionPublicPath,
-					providerPath: PartyFavorz.CollectionPrivatePath,
-					publicCollection: Type<&PartyFavorz.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-					publicLinkedType: Type<&PartyFavorz.Collection{NonFungibleToken.Collection,NonFungibleToken.Receiver,ViewResolver.ResolverCollection}>(),
-					providerLinkedType: Type<&PartyFavorz.Collection{NonFungibleToken.Collection,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
-					createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
-						return <-PartyFavorz.createEmptyCollection()
-					})
+					providerPath: /private/PartyFavorzCollection,
+					publicCollection: Type<&PartyFavorz.Collection>(),
+					publicLinkedType: Type<&PartyFavorz.Collection>(),
+					providerLinkedType: Type<auth (NonFungibleToken.Withdrawable) &PartyFavorz.Collection>(),
+					createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {return <- PartyFavorz.createEmptyCollection()})
 				)
 			case Type<MetadataViews.NFTCollectionDisplay>():
 
@@ -228,7 +226,7 @@ access(all) contract PartyFavorz: ViewResolver {
 	access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
-		access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+		access(all) var ownedNFTs: @{UInt64: PartyFavorz.NFT}
     	access(self) var storagePath: StoragePath
         access(self) var publicPath: PublicPath
 
@@ -240,7 +238,7 @@ access(all) contract PartyFavorz: ViewResolver {
 		}
 
 		// withdraw removes an NFT from the collection and moves it to the caller
-		access(NonFungibleToken.Withdrawable) withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+		access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
 			emit Withdraw(id: token.id, from: self.owner?.address)
@@ -270,12 +268,12 @@ access(all) contract PartyFavorz: ViewResolver {
 
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
-		access(all) view fun borrowNFT(id: UInt64): &{NonFungibleToken.NFT}? {
-			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)
+		access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
+			return (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
 		}
 
 		access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
-			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+			let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
 			let PartyFavorz = nft as! &PartyFavorz.NFT
 			return PartyFavorz as &{ViewResolver.Resolver}
 		}
@@ -314,10 +312,6 @@ access(all) contract PartyFavorz: ViewResolver {
                 return false
             }
         }
-
-		destroy() {
-			destroy self.ownedNFTs
-		}
 	}
 
 	// public function that anyone can call to create a new empty collection
@@ -325,10 +319,8 @@ access(all) contract PartyFavorz: ViewResolver {
 		return <- create Collection()
 	}
 
-	access(all) entitlement ForgeOwner
-
 	access(all) resource Forge: FindForge.Forge {
-		access(ForgeOwner) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
+		access(FindForge.ForgeOwner) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
 			let info = data as? {String : AnyStruct} ?? panic("The data passed in is not in form as needed.")
 
 			assert(info.length == 5, message: "Please make sure to pass in `Info, season, royalties, squareImage, bannerImage`")
@@ -348,14 +340,14 @@ access(all) contract PartyFavorz: ViewResolver {
 		}
 
 
-		access(ForgeOwner) addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
+		access(FindForge.ForgeOwner) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
 			// not used here 
 
 			panic("Not supported for PartyFavorz Contract") 
         }
 	}
 
-	access(all) getForgeType() : Type {
+	access(all) fun getForgeType() : Type {
 		return Type<@Forge>()
 	}
 
@@ -368,8 +360,9 @@ access(all) contract PartyFavorz: ViewResolver {
 		self.CollectionPublicPath = /public/PartyFavorzCollection
 		self.MinterStoragePath = /storage/PartyFavorzMinter
 
-		let partyFavorz = getAccount(0xded455fa967d350e).capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
-		let artist = getAccount(0x34f2bf4a80bb0f69).capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
+		// TODO: Fix this to run on tests
+		let partyFavorz = self.account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
+		let artist = self.account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
 
 		self.royalties = [
 							MetadataViews.Royalty(receiver: partyFavorz, cut: 0.03, description: "Party Favorz"), 
@@ -379,7 +372,7 @@ access(all) contract PartyFavorz: ViewResolver {
 		// Create a Collection resource and save it to storage
 		let collection <- create Collection()
 		self.account.storage.save(<-collection, to: self.CollectionStoragePath)
-		let collectionCap = self.account.capabilities.storage.issue<@NonFungibleToken.Collection>(self.CollectionStoragePath)
+		let collectionCap = self.account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(self.CollectionStoragePath)
 		self.account.capabilities.publish(collectionCap, at: self.CollectionPublicPath)
 
 		FindForge.addForgeType(<- create Forge())

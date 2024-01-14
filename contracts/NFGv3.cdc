@@ -76,7 +76,7 @@ access(all) contract NFGv3: ViewResolver {
             ]
         }
 
-        access(all) view fun resolveView(_ view: Type): AnyStruct? {
+        access(all) fun resolveView(_ view: Type): AnyStruct? {
             switch view {
             case Type<MetadataViews.Traits>():
                 let traits = MetadataViews.Traits([MetadataViews.Trait(name: "Birthday", value: self.info.birthday, displayType: "date", rarity: nil)])
@@ -128,7 +128,7 @@ access(all) contract NFGv3: ViewResolver {
                 return MetadataViews.NFTCollectionData(
                     storagePath: NFGv3.CollectionStoragePath,
                     publicPath: NFGv3.CollectionPublicPath,
-                    providerPath: NFGv3.CollectionPrivatePath,
+                    providerPath: /private/NFGv3Collection,
                     publicCollection: Type<&NFGv3.Collection>(),
                     publicLinkedType: Type<&NFGv3.Collection>(),
                     providerLinkedType: Type<auth(NonFungibleToken.Withdrawable) &NFGv3.Collection>(),
@@ -170,7 +170,7 @@ access(all) contract NFGv3: ViewResolver {
     access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
-        access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+        access(all) var ownedNFTs: @{UInt64: NFGv3.NFT}
         access(self) var storagePath: StoragePath
         access(self) var publicPath: PublicPath
 
@@ -212,12 +212,12 @@ access(all) contract NFGv3: ViewResolver {
 
         // borrowNFT gets a reference to an NFT in the collection
         // so that the caller can read its metadata and call its methods
-        access(all) view fun borrowNFT(id: UInt64): &{NonFungibleToken.NFT} {
-            return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
+            return (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
         }
 
         access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
-            let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+            let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
             let nfgNFT = nft as! &NFGv3.NFT
             return nfgNFT as &{ViewResolver.Resolver}
         }
@@ -256,21 +256,15 @@ access(all) contract NFGv3: ViewResolver {
                 return false
             }
         }
-
-        destroy() {
-            destroy self.ownedNFTs
-        }
     }
 
     // public function that anyone can call to create a new empty collection
-    access(all) createEmptyCollection(): @{NonFungibleToken.Collection} {
+    access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
         return <- create Collection()
     }
 
-    access(all) entitlement ForgeOwner
-
     access(all) resource Forge: FindForge.Forge {
-        access(ForgeOwner) mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
+        access(FindForge.ForgeOwner) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
             let info = data as? Info ?? panic("The data passed in is not in form of NFGv3Info.")
             let royalties : [MetadataViews.Royalty] = []
             royalties.append(MetadataViews.Royalty(receiver:platform.platform, cut: platform.platformPercentCut, description: "find forge"))
@@ -288,14 +282,14 @@ access(all) contract NFGv3: ViewResolver {
             return <- newNFT
         }
 
-        access(ForgeOwner) addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
+        access(FindForge.ForgeOwner) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
             // not used here 
 
             panic("Not supported for NFGv3 Contract") 
         }
     }
 
-    access(all) getForgeType() : Type {
+    access(all) fun getForgeType() : Type {
         return Type<@Forge>()
     }
 
@@ -311,7 +305,7 @@ access(all) contract NFGv3: ViewResolver {
         // Create a Collection resource and save it to storage
         let collection <- create Collection()
         self.account.storage.save(<-collection, to: self.CollectionStoragePath)
-        let collectionCap = self.account.capabilities.storage.issue<@NonFungibleToken.Collection>(self.CollectionStoragePath)
+        let collectionCap = self.account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(self.CollectionStoragePath)
 		self.account.capabilities.publish(collectionCap, at: self.CollectionPublicPath)
 
         FindForge.addForgeType(<- create Forge())

@@ -337,7 +337,7 @@ access(all) contract GeneratedExperiences: ViewResolver {
     }
 
     access(all) resource Forge: FindForge.Forge {
-        access(all) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
+        access(FindForge.ForgeOwner) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
             let info = data as? Info ?? panic("The data passed in is not in form as needed. Needed: ".concat(Type<Info>().identifier))
 
             // create a new NFT
@@ -350,7 +350,7 @@ access(all) contract GeneratedExperiences: ViewResolver {
             return <- newNFT
         }
 
-        access(all) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
+        access(FindForge.ForgeOwner) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
             let collectionInfo = data as? CollectionInfo ?? panic("The data passed in is not in form as needed. Needed: ".concat(Type<CollectionInfo>().identifier))
 
             // We cannot send in royalties directly, therefore we have to send in FindPack Royalties and generate it during minting

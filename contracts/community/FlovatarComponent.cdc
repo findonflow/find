@@ -238,7 +238,7 @@ access(all) contract FlovatarComponent: NonFungibleToken {
     access(all) resource interface CollectionPublic {
 
         access(all) deposit(token: @NonFungibleToken.NFT)
-        access(all) getIDs(): [UInt64]
+        access(all) view fun getIDs(): [UInt64]
         access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT
         access(all) borrowComponent(id: UInt64): &FlovatarComponent.NFT? {
             // If the result isn't nil, the id of the returned reference
@@ -285,7 +285,7 @@ access(all) contract FlovatarComponent: NonFungibleToken {
         }
 
         // getIDs returns an array of the IDs that are in the collection
-        access(all) getIDs(): [UInt64] {
+        access(all) view fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
         }
 
@@ -299,7 +299,7 @@ access(all) contract FlovatarComponent: NonFungibleToken {
         // so that the caller can read data and call methods from it.
         access(all) borrowComponent(id: UInt64): &FlovatarComponent.NFT? {
             if self.ownedNFTs[id] != nil {
-                let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+                let ref = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
                 return ref as! &FlovatarComponent.NFT
             } else {
                 return nil
@@ -314,7 +314,7 @@ access(all) contract FlovatarComponent: NonFungibleToken {
             pre {
                 self.ownedNFTs[id] != nil : "NFT does not exist"
             }
-            let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+            let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
             let componentNFT = nft as! &FlovatarComponent.NFT
             return componentNFT as &AnyResource{ViewResolver.Resolver}
         }

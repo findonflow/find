@@ -545,7 +545,7 @@ access(all) contract Flovatar: NonFungibleToken {
     // Standard NFT collectionPublic interface that can also borrowFlovatar as the correct type
     access(all) resource interface CollectionPublic {
         access(all) deposit(token: @NonFungibleToken.NFT)
-        access(all) getIDs(): [UInt64]
+        access(all) view fun getIDs(): [UInt64]
         access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT
         access(all) borrowFlovatar(id: UInt64): &Flovatar.NFT{Flovatar.Public, ViewResolver.Resolver}? {
             // If the result isn't nil, the id of the returned reference
@@ -592,7 +592,7 @@ access(all) contract Flovatar: NonFungibleToken {
         }
 
         // getIDs returns an array of the IDs that are in the collection
-        access(all) getIDs(): [UInt64] {
+        access(all) view fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
         }
 
@@ -606,7 +606,7 @@ access(all) contract Flovatar: NonFungibleToken {
         // so that the caller can read data and call methods from it.
         access(all) borrowFlovatar(id: UInt64): &Flovatar.NFT{Flovatar.Public, ViewResolver.Resolver}? {
             if self.ownedNFTs[id] != nil {
-                let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+                let ref = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
                 let flovatarNFT = ref as! &Flovatar.NFT
                 return flovatarNFT as &Flovatar.NFT{Flovatar.Public, ViewResolver.Resolver}
             } else {
@@ -618,7 +618,7 @@ access(all) contract Flovatar: NonFungibleToken {
         // so that the caller can read data and call methods from it, like setting the optional components.
         access(all) borrowFlovatarPrivate(id: UInt64): &{Flovatar.Private}? {
             if self.ownedNFTs[id] != nil {
-                let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+                let ref = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
                 return ref as! &Flovatar.NFT
             } else {
                 return nil
@@ -633,7 +633,7 @@ access(all) contract Flovatar: NonFungibleToken {
             pre {
                 self.ownedNFTs[id] != nil : "NFT does not exist"
             }
-            let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+            let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
             let flovatarNFT = nft as! &Flovatar.NFT
             return flovatarNFT as &AnyResource{ViewResolver.Resolver}
         }

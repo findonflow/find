@@ -133,7 +133,7 @@ access(all) contract FlovatarPack {
 
     //Pack CollectionPublic interface that allows users to purchase a Pack
     access(all) resource interface CollectionPublic {
-        access(all) getIDs(): [UInt64]
+        access(all) view fun getIDs(): [UInt64]
         access(all) deposit(token: @FlovatarPack.Pack)
         access(all) purchase(tokenId: UInt64, recipientCap: Capability<&{FlovatarPack.CollectionPublic}>, buyTokens: @FungibleToken.Vault, signature: String)
         access(all) purchaseDapper(tokenId: UInt64, recipientCap: Capability<&{FlovatarPack.CollectionPublic}>, buyTokens: @FungibleToken.Vault, signature: String, expectedPrice: UFix64)
@@ -154,7 +154,7 @@ access(all) contract FlovatarPack {
         }
 
         // getIDs returns an array of the IDs that are in the collection
-        access(all) getIDs(): [UInt64] {
+        access(all) view fun getIDs(): [UInt64] {
             return self.ownedPacks.keys
         }
 

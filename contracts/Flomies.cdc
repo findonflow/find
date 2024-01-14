@@ -87,9 +87,9 @@ access(all) contract Flomies: ViewResolver{
             return self.id
         }
 
-		access(all) view fun resolveView(_ view: Type): AnyStruct? {
+		access(all) fun resolveView(_ view: Type): AnyStruct? {
 
-			let imageFile=MetadataViews.IPFSFile( url: self.rootHash, path: self.serial.toString().concat(".png"))
+			let imageFile=MetadataViews.IPFSFile( cid: self.rootHash, path: self.serial.toString().concat(".png"))
 			var fullMediaType="image/png"
 			let traits = self.traits
 
@@ -145,7 +145,7 @@ access(all) contract Flomies: ViewResolver{
 			case Type<MetadataViews.NFTCollectionData>():
 				return MetadataViews.NFTCollectionData(storagePath: Flomies.CollectionStoragePath,
 				publicPath: Flomies.CollectionPublicPath,
-				providerPath: Flomies.CollectionPrivatePath,
+				providerPath: /private/FlomiesCollection,
 				publicCollection: Type<&Collection>(),
 				publicLinkedType: Type<&Collection>(),
 				providerLinkedType: Type<auth(NonFungibleToken.Withdrawable) &Collection>(),
@@ -241,7 +241,7 @@ access(all) contract Flomies: ViewResolver{
 		}
 
 		// getIDs returns an array of the IDs that are in the collection
-		access(all) getIDs(): [UInt64] {
+		access(all) view fun getIDs(): [UInt64] {
 			return self.ownedNFTs.keys
 		}
 
@@ -251,12 +251,12 @@ access(all) contract Flomies: ViewResolver{
 
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
-		access(all) view fun borrowNFT(id: UInt64): &{NonFungibleToken.NFT}? {
-			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)
+		access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
+			return (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
 		}
 
 		access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
-			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+			let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
 			let flomies = nft as! &NFT
 			return flomies as &{ViewResolver.Resolver}
 		}
@@ -291,10 +291,6 @@ access(all) contract Flomies: ViewResolver{
                 return false
             }
         }
-
-		destroy() {
-			destroy self.ownedNFTs
-		}
 	}
 
 	// public function that anyone can call to create a new empty collection
@@ -310,7 +306,7 @@ access(all) contract Flomies: ViewResolver{
 		serial:UInt64,
 		rootHash:String,
 		traits: [UInt64]
-	) : @NonFungibleToken.NFT {
+	) : @{NonFungibleToken.NFT} {
 
 		Flomies.totalSupply = Flomies.totalSupply + 1
 		// create a new NFT
@@ -360,10 +356,8 @@ access(all) contract Flomies: ViewResolver{
 		self.royalties.appendAll(cutInfo)
 	}
 
-	access(all) entitlement ForgeOwner
-
-	access(all) fun resource Forge: FindForge.Forge {
-		access(ForgeOwner) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
+	access(all) resource Forge: FindForge.Forge {
+		access(FindForge.ForgeOwner) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
 			let info = data as? {String : AnyStruct} ?? panic("The data passed in is not in form of {String : AnyStruct}")
 
 			let serial = info["serial"]! as? UInt64 ?? panic("Serial is missing")
@@ -377,7 +371,7 @@ access(all) contract Flomies: ViewResolver{
 			)
 		}
 
-		access(ForgeOwner) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
+		access(FindForge.ForgeOwner) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
 			let type = data.getType() 
 
 			switch type {
@@ -411,8 +405,9 @@ access(all) contract Flomies: ViewResolver{
 		self.CollectionStoragePath = /storage/flomiesNFT
 		self.CollectionPublicPath = /public/flomiesNFT
 
-		self.account.storage.save<@NonFungibleToken.Collection>(<- Flomies.createEmptyCollection(), to: Flomies.CollectionStoragePath)
-		let collectionCap = self.account.capabilities.storage.issue<@NonFungibleToken.Collection>(self.CollectionStoragePath)
+       	let collection <- create Collection()
+        self.account.storage.save(<-collection, to: self.CollectionStoragePath)
+		let collectionCap = self.account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(self.CollectionStoragePath)
 		self.account.capabilities.publish(collectionCap, at: self.CollectionPublicPath)
 
 		FindForge.addForgeType(<- create Forge())

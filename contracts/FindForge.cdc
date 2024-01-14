@@ -77,11 +77,11 @@ access(all) contract FindForge {
 
     // ForgeMinter Interface 
     access(all) resource interface Forge{
-        access(all) fun mint(platform: MinterPlatform, data: AnyStruct, verifier: &Verifier) : @{NonFungibleToken.NFT}
-        access(all) fun addContractData(platform: MinterPlatform, data: AnyStruct, verifier: &Verifier)
+        access(ForgeOwner) fun mint(platform: MinterPlatform, data: AnyStruct, verifier: &Verifier) : @{NonFungibleToken.NFT}
+        access(ForgeOwner) fun addContractData(platform: MinterPlatform, data: AnyStruct, verifier: &Verifier)
     }
 
-    access(contract) fun borrowForge(_ type: Type) : &{Forge}? {
+    access(contract) fun borrowForge(_ type: Type) : auth(ForgeOwner) &{Forge}? {
         return &FindForge.forgeTypes[type] 
     }
 

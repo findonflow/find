@@ -1,4 +1,3 @@
-
 access(all) contract PartyFavorzExtraData {
 	access(all) let extraData : {UInt64 : {String : AnyStruct}}
 
@@ -17,7 +16,7 @@ access(all) contract PartyFavorzExtraData {
 		self.extraData[id]!.remove(key: field)!
 	}
 
-	access(all) getData(id: UInt64, field: String) : AnyStruct? {
+	access(all) fun getData(id: UInt64, field: String) : AnyStruct? {
 		let partyfavorz = self.extraData[id]
 		if partyfavorz == nil {
 			return nil
