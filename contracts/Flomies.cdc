@@ -18,7 +18,6 @@ access(all) contract Flomies: ViewResolver{
 
 	access(all) let CollectionStoragePath: StoragePath
 	access(all) let CollectionPublicPath: PublicPath
-	access(all) let CollectionPrivatePath: PrivatePath
 
 	access(account) var royalties : [MetadataViews.Royalty]
 	access(self) let traits : {UInt64: MetadataViews.Trait}
@@ -215,7 +214,7 @@ access(all) contract Flomies: ViewResolver{
 		}
 
 		// withdraw removes an NFT from the collection and moves it to the caller
-		access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+		access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
 			emit Withdraw(id: token.id, from: self.owner?.address)
@@ -256,20 +255,20 @@ access(all) contract Flomies: ViewResolver{
 			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)
 		}
 
-		access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-            return <- create Bl0xPack.Collection()
-        }
-
 		access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
 			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
 			let flomies = nft as! &NFT
 			return flomies as &{ViewResolver.Resolver}
 		}
 
-		          /// getSupportedNFTTypes returns a list of NFT types that this receiver accepts
+		access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <- create Flomies.Collection()
+        }
+
+		/// getSupportedNFTTypes returns a list of NFT types that this receiver accepts
         access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
             let supportedTypes: {Type: Bool} = {}
-            supportedTypes[Type<@Bl0xPack.NFT>()] = true
+            supportedTypes[Type<@Flomies.NFT>()] = true
             return supportedTypes
         }
 
@@ -286,32 +285,11 @@ access(all) contract Flomies: ViewResolver{
         /// Returns whether or not the given type is accepted by the collection
         /// A collection that can accept any type should just return true by default
         access(all) view fun isSupportedNFTType(type: Type): Bool {
-            if type == Type<@Bl0xPack.NFT>() {
+            if type == Type<@Flomies.NFT>() {
                 return true
             } else {
                 return false
             }
-        }
-
-        // borrowBl0xPack
-        // Gets a reference to an NFT in the collection as a Bl0xPack.NFT,
-        // exposing all of its fields.
-        // This is safe as there are no functions that can be called on the Bl0xPack.
-        //
-        access(all) fun borrowBl0xPack(id: UInt64): &Bl0xPack.NFT? {
-            if self.ownedNFTs[id] != nil {
-                let ref = (&self.ownedNFTs[id] as &Bl0xPack.NFT?)
-                return ref
-            } else {
-                return nil
-            }
-        }
-
-        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}? {
-            if let nft = &self.ownedNFTs[id] as &Bl0xPack.NFT? {
-                return nft as &{ViewResolver.Resolver}
-            }
-            return nil
         }
 
 		destroy() {

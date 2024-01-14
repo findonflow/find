@@ -196,7 +196,8 @@
     "Bl0x": "./contracts/Bl0x.cdc",
     "Bl0xPack": "./contracts/Bl0xPack.cdc",
     "CharityNFT": "./contracts/CharityNFT.cdc",
-    "Flomies": "./contracts/Flomies.cdc"
+    "Flomies": "./contracts/Flomies.cdc",
+    "NFGv3": "./contracts/NFGv3.cdc"
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
@@ -327,7 +328,8 @@
         "Bl0x",
         "Bl0xPack",
         "CharityNFT",
-        "Flomies"
+        "Flomies",
+        "NFGv3"
       ],
       "emulator-find-admin": [],
       "emulator-find-forge": ["GeneratedExperiences"],
