@@ -291,7 +291,10 @@
         "LostAndFoundHelper",
         "FeeEstimator"
       ],
-      "emulator-dapper": ["DapperUtilityCoin", "FlowUtilityToken"],
+      "emulator-dapper": [
+        "DapperUtilityCoin",
+        "FlowUtilityToken"
+      ],
       "emulator-find": [
         "Profile",
         "FindThoughts",
@@ -305,6 +308,7 @@
         "FindMarketAdmin",
         "FindViews",
         "FindMarket",
+        "FindLeaseMarket",
         "FindMarketSale",
         "Sender",
         "FindRelatedAccounts",
@@ -336,7 +340,9 @@
         "PartyFavorzExtraData"
       ],
       "emulator-find-admin": [],
-      "emulator-find-forge": ["GeneratedExperiences"],
+      "emulator-find-forge": [
+        "GeneratedExperiences"
+      ],
       "emulator-find-lease": [],
       "emulator-user1": [],
       "emulator-user2": [],
