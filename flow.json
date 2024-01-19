@@ -311,6 +311,7 @@
         "FindLeaseMarket",
         "FindLeaseMarketSale",
         "FindLeaseMarketAuctionSoft",
+        "FindLeaseMarketDirectOfferSoft",
         "FindMarketSale",
         "Sender",
         "FindRelatedAccounts",
