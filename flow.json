@@ -313,6 +313,7 @@
         "FindLeaseMarketAuctionSoft",
         "FindLeaseMarketDirectOfferSoft",
         "FindMarketSale",
+        "FindMarketAuctionEscrow",
         "Sender",
         "FindRelatedAccounts",
         "FTRegistry",
