@@ -310,6 +310,7 @@
         "FindMarket",
         "FindLeaseMarket",
         "FindLeaseMarketSale",
+        "FindLeaseMarketAuctionSoft",
         "FindMarketSale",
         "Sender",
         "FindRelatedAccounts",
