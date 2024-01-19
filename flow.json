@@ -309,6 +309,7 @@
         "FindViews",
         "FindMarket",
         "FindLeaseMarket",
+        "FindLeaseMarketSale",
         "FindMarketSale",
         "Sender",
         "FindRelatedAccounts",

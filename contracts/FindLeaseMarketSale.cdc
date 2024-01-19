@@ -9,7 +9,10 @@ import FindMarket from "./FindMarket.cdc"
 
 A Find Market for direct sales
 */
+//TODO: entitlements
 access(all) contract FindLeaseMarketSale {
+
+    access(all) entitlement Seller
 
     access(all) event Sale(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, leaseInfo: FindLeaseMarket.LeaseInfo?, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt:UFix64?)
 
@@ -36,83 +39,83 @@ access(all) contract FindLeaseMarketSale {
             self.saleItemExtraField=saleItemExtraField
         }
 
-        access(all) getSaleType() : String {
+        access(all) fun getSaleType() : String {
             return "active_listed"
         }
 
-        access(all) getListingType() : Type {
+        access(all) fun getListingType() : Type {
             return Type<@SaleItem>()
         }
 
-        access(all) getListingTypeIdentifier(): String {
+        access(all) fun getListingTypeIdentifier(): String {
             return Type<@SaleItem>().identifier
         }
 
-        access(all) setBuyer(_ address:Address) {
+        access(all) fun setBuyer(_ address:Address) {
             self.buyer=address
         }
 
-        access(all) getBuyer(): Address? {
+        access(all) fun getBuyer(): Address? {
             return self.buyer
         }
 
-        access(all) getBuyerName() : String? {
+        access(all) fun getBuyerName() : String? {
             if let address = self.buyer {
                 return FIND.reverseLookup(address)
             }
             return nil
         }
 
-        access(all) getLeaseName() : String {
+        access(all) fun getLeaseName() : String {
             return self.pointer.name
         }
 
-        access(all) getItemType() : Type {
+        access(all) fun getItemType() : Type {
             return Type<@FIND.Lease>()
         }
 
-        access(all) getId() : UInt64 {
+        access(all) fun getId() : UInt64 {
             return self.pointer.getUUID()
         }
 
-        access(all) getSeller() : Address {
+        access(all) fun getSeller() : Address {
             return self.pointer.owner()
         }
 
-        access(all) getSellerName() : String? {
+        access(all) fun getSellerName() : String? {
             let address = self.pointer.owner()
             return FIND.reverseLookup(address)
         }
 
-        access(all) getBalance() : UFix64 {
+        access(all) fun getBalance() : UFix64 {
             return self.salePrice
         }
 
-        access(all) getAuction(): FindLeaseMarket.AuctionItem? {
+        access(all) fun getAuction(): FindLeaseMarket.AuctionItem? {
             return nil
         }
 
-        access(all) getFtType() : Type  {
+        access(all) fun getFtType() : Type  {
             return self.vaultType
         }
 
-        access(all) setValidUntil(_ time: UFix64?) {
+        access(all) fun setValidUntil(_ time: UFix64?) {
             self.validUntil=time
         }
 
-        access(all) getValidUntil() : UFix64? {
+        access(all) fun getValidUntil() : UFix64? {
             return self.validUntil
         }
 
-        access(all) toLeaseInfo() : FindLeaseMarket.LeaseInfo {
+        access(all) fun toLeaseInfo() : FindLeaseMarket.LeaseInfo {
             return FindLeaseMarket.LeaseInfo(self.pointer)
         }
 
-        access(all) checkPointer() : Bool {
+        access(all) fun checkPointer() : Bool {
             return self.pointer.valid()
         }
 
-        access(all) getSaleItemExtraField() : {String : AnyStruct} {
+        access(all) fun getSaleItemExtraField() : {String : AnyStruct} {
             return self.saleItemExtraField
         }
 
@@ -120,35 +123,35 @@ access(all) contract FindLeaseMarketSale {
 
     access(all) resource interface SaleItemCollectionPublic {
         //fetch all the tokens in the collection
-        access(all) getNameSales(): [String]
-        access(all) containsNameSale(_ name: String): Bool
-        access(all) borrowSaleItem(_ name: String) : &{FindLeaseMarket.SaleItem}
-        access(all) buy(name: String, vault: @FungibleToken.Vault, to: Address)
+        access(all) fun getNameSales(): [String]
+        access(all) fun containsNameSale(_ name: String): Bool
+        access(all) fun borrowSaleItem(_ name: String) : &{FindLeaseMarket.SaleItem}
+        access(all) fun buy(name: String, vault: @{FungibleToken.Vault}, to: Address)
     }
 
     access(all) resource SaleItemCollection: SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic {
         //is this the best approach now or just put the NFT inside the saleItem?
         access(contract) var items: @{String: SaleItem}
 
-        access(contract) let tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>
+        access(contract) let tenantCapability: Capability<&{FindMarket.TenantPublic}>
 
-        init (_ tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>) {
+        init (_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) {
             self.items <- {}
             self.tenantCapability=tenantCapability
         }
 
-        access(self) fun getTenant() : &FindMarket.Tenant{FindMarket.TenantPublic} {
+        access(self) fun getTenant() : &{FindMarket.TenantPublic} {
             pre{
                 self.tenantCapability.check() : "Tenant client is not linked anymore"
             }
             return self.tenantCapability.borrow()!
         }
 
-        access(all) getListingType() : Type {
+        access(all) fun getListingType() : Type {
             return Type<@SaleItem>()
         }
 
-        access(all) buy(name: String, vault: @FungibleToken.Vault, to: Address)  {
+        access(all) fun buy(name: String, vault: @{FungibleToken.Vault}, to: Address)  {
             pre {
                 self.items.containsKey(name) : "Invalid name=".concat(name)
                 self.owner!.address != to : "You cannot buy your own listing"
@@ -156,8 +159,8 @@ access(all) contract FindLeaseMarketSale {
 
             let saleItem=self.borrow(name)
 
-            if saleItem.salePrice != vault.balance {
-                panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(vault.balance.toString()))
+            if saleItem.salePrice != vault.getBalance() {
+                panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(vault.getBalance().toString()))
             }
 
             if saleItem.validUntil != nil && saleItem.validUntil! < Clock.time() {
@@ -195,7 +198,7 @@ access(all) contract FindLeaseMarketSale {
             destroy <- self.items.remove(key: name)
         }
 
-        access(all) listForSale(pointer: FindLeaseMarket.AuthLeasePointer, vaultType: Type, directSellPrice:UFix64, validUntil: UFix64?, extraField: {String:AnyStruct}) {
+        access(Seller) fun listForSale(pointer: FindLeaseMarket.AuthLeasePointer, vaultType: Type, directSellPrice:UFix64, validUntil: UFix64?, extraField: {String:AnyStruct}) {
 
             // ensure it is not a 0 dollar listing
             if directSellPrice <= 0.0 {
@@ -222,7 +225,7 @@ access(all) contract FindLeaseMarketSale {
 
         }
 
-        access(all) delist(_ name: String) {
+        access(Seller) fun delist(_ name: String) {
             pre {
                 self.items.containsKey(name) : "Unknown name lease=".concat(name)
             }
@@ -250,38 +253,38 @@ access(all) contract FindLeaseMarketSale {
             destroy saleItem
         }
 
-        access(all) getNameSales(): [String] {
+        access(all) fun getNameSales(): [String] {
             return self.items.keys
         }
 
-        access(all) containsNameSale(_ name: String): Bool {
+        access(all) fun containsNameSale(_ name: String): Bool {
             return self.items.containsKey(name)
         }
 
-        access(all) borrow(_ name: String): &SaleItem {
-            return (&self.items[name] as &SaleItem?)!
+        access(all) fun borrow(_ name: String): &SaleItem {
+            return (&self.items[name])!
         }
 
-        access(all) borrowSaleItem(_ name: String) : &{FindLeaseMarket.SaleItem} {
+        access(all) fun borrowSaleItem(_ name: String) : &{FindLeaseMarket.SaleItem} {
             pre{
                 self.items.containsKey(name) : "This name sale does not exist : ".concat(name)
             }
-            return (&self.items[name] as &SaleItem{FindLeaseMarket.SaleItem}?)!
+            return (&self.items[name])!
         }
 
     }
 
     //Create an empty lease collection that store your leases to a name
-    access(all) createEmptySaleItemCollection(_ tenantCapability: Capability<&FindMarket.Tenant{FindMarket.TenantPublic}>): @SaleItemCollection {
+    access(all) fun createEmptySaleItemCollection(_ tenantCapability: Capability<&{FindMarket.TenantPublic}>): @SaleItemCollection {
         return <- create SaleItemCollection(tenantCapability)
     }
 
-    access(all) getSaleItemCapability(marketplace:Address, user:Address) : Capability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>? {
-        pre{
-            FindMarket.getTenantCapability(marketplace) != nil : "Invalid tenant"
+    access(all) fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>? {
+        if FindMarket.getTenantCapability(marketplace) == nil {
+            panic("Invalid tenant")
         }
         if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
-            return getAccount(user).getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
+            return getAccount(user).capabilities.get<&{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))!
         }
         return nil
     }
