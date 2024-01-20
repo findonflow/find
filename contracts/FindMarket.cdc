@@ -132,7 +132,7 @@ access(all) contract FindMarket {
             panic("Account not properly set up, cannot borrow sale item collection")
         }
         let ref=optRef!
-        let item=ref.borrowSaleItem(id)
+        let item=ref.borrowSaleItem(id)!!
         if !item.checkPointer() {
             panic("this is a ghost listing. SaleItem id : ".concat(id.toString()))
         }
@@ -246,7 +246,7 @@ access(all) contract FindMarket {
 
         for id in listID {
             //if this id is not present in this Market option then we just skip it
-            let item=ref.borrowSaleItem(id)
+            let item=ref.borrowSaleItem(id)!
             if !item.checkPointer() {
                 if getGhost {
                     ghost.append(FindMarket.GhostListing(listingType: listingType, id:id))
@@ -407,7 +407,7 @@ access(all) contract FindMarket {
             panic("Seller account is not properly set up, cannot borrow sale item collection. Seller address : ".concat(saleItemCollectionCap.address.toString()))
         }
         let sale=saleRef!
-        let item=sale.borrowSaleItem(id)
+        let item=sale.borrowSaleItem(id)!
         if !item.checkPointer() {
             panic("this is a ghost listing. SaleItem id : ".concat(id.toString()))
         }
@@ -1628,7 +1628,7 @@ access(all) resource interface SaleItemCollectionPublic {
     access(all) fun getIds(): [UInt64]
     access(all) fun getRoyaltyChangedIds(): [UInt64]
     access(all) fun containsId(_ id: UInt64): Bool
-    access(account) fun borrowSaleItem(_ id: UInt64) : &{SaleItem}
+    access(account) fun borrowSaleItem(_ id: UInt64) : &{SaleItem}?
     access(all) fun getListingType() : Type
 }
 
