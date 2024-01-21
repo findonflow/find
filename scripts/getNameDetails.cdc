@@ -51,9 +51,9 @@ access(all) fun main(user: String) : NameReport? {
 	if let address=FIND.resolve(user) {
 		let account=getAccount(address)
 		if account.balance != 0.0 {
-			let bidCap = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
-			let leaseCap = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-			let profile=account.getCapability<&{Profile.Public}>(Profile.publicPath).borrow()
+			let bidCap = account.capabilities.get<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)!
+			let leaseCap = account.capabilities.get<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
+			let profile=account.capabilities.get<&{Profile.Public}>(Profile.publicPath)!.borrow()
 
 			var profileReport = profile?.asReport()
 			if profileReport != nil && profileReport!.findName != FIND.reverseLookup(address) {
@@ -89,10 +89,10 @@ access(all) fun main(user: String) : NameReport? {
 			}
 
 			var isDapper=false
-			if let receiver =account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver).borrow() {
+			if let receiver =account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver).borrow() {
 			 	isDapper=receiver.isInstance(Type<@TokenForwarding.Forwarder>())
 			} else {
-				if let duc = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver).borrow() {
+				if let duc = account.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver).borrow() {
 					isDapper = duc.isInstance(Type<@TokenForwarding.Forwarder>())
 				} else {
 					isDapper = false

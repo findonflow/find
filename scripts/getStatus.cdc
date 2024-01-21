@@ -413,7 +413,7 @@ access(all) struct LeaseInfo {
 
 }
 
-access(all) LeaseInfoFromFindLeaseMarket(_ l: FindLeaseMarket.LeaseInfo?) : LeaseInfo? {
+access(all) fun LeaseInfoFromFindLeaseMarket(_ l: FindLeaseMarket.LeaseInfo?) : LeaseInfo? {
 	if l == nil {
 		return nil
 	}
@@ -428,7 +428,7 @@ access(all) LeaseInfoFromFindLeaseMarket(_ l: FindLeaseMarket.LeaseInfo?) : Leas
 	)
 }
 
-access(all) LeaseInfoFromFIND(_ l: FIND.LeaseInformation?) : LeaseInfo? {
+access(all) fun LeaseInfoFromFIND(_ l: FIND.LeaseInformation?) : LeaseInfo? {
 	if l == nil {
 		return nil
 	}
@@ -443,7 +443,7 @@ access(all) LeaseInfoFromFIND(_ l: FIND.LeaseInformation?) : LeaseInfo? {
 	)
 }
 
-access(all) SaleItemInformationFromFindLeaseMarket(_ s: FindLeaseMarket.SaleItemInformation) : SaleItemInformation {
+access(all) fun SaleItemInformationFromFindLeaseMarket(_ s: FindLeaseMarket.SaleItemInformation) : SaleItemInformation {
 	return SaleItemInformation(
 		leaseIdentifier: s.leaseIdentifier,
 		leaseName: s.leaseName,
@@ -466,7 +466,7 @@ access(all) SaleItemInformationFromFindLeaseMarket(_ s: FindLeaseMarket.SaleItem
 	)
 }
 
-access(all) SaleReportFromFindLeaseMarket(_ s: FindLeaseMarket.SaleItemCollectionReport) : SaleItemCollectionReport {
+access(all) fun SaleItemInformationFromFindLeaseMarket(_ s: FindLeaseMarket.SaleItemCollectionReport) : SaleItemCollectionReport {
 
 	var listing: [SaleItemInformation] = []
 	for i in s.items {

@@ -21,11 +21,12 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix
 		let leaseSaleItemType= Type<@FindLeaseMarketSale.SaleItemCollection>()
 		let leasePublicPath=leaseTenant.getPublicPath(leaseSaleItemType)
 		let leaseStoragePath= leaseTenant.getStoragePath(leaseSaleItemType)
-		let leaseSaleItemCap= account.getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath)
+		let leaseSaleItemCap= account.capabilities.get<&FindLeaseMarketSale.SaleItemCollection>(leasePublicPath)
 		if !leaseSaleItemCap.check() {
 			//The link here has to be a capability not a tenant, because it can change.
 			account.storage.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
-			account.link<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath, target: leaseStoragePath)
+			let leaseSaleItemCap= account.capabilities.get<&FindLeaseMarketSale.SaleItemCollection>(leasePublicPath)!
+			account.capabilities.publish(leaseSaleItemCap, at: leasePublicPath)
 		}
 
 		self.saleItems= account.storage.borrow<auth(FindMarketSale.Seller) &FindLeaseMarketSale.SaleItemCollection>(from: leaseStoragePath)!
