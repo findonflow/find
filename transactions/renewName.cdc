@@ -6,7 +6,7 @@ transaction(name: String, amount: UFix64) {
 
     let price : UFix64
     let vaultRef : auth (FungibleToken.Withdrawable) &FUSD.Vault? 
-    let finLeases : &FIND.LeaseCollection? 
+    let finLeases : auth(FIND.LeaseOwner) &FIND.LeaseCollection? 
 
     prepare(acct: auth(BorrowValue) &Account) {
         self.price=FIND.calculateCost(name)

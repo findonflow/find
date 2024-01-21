@@ -15,7 +15,7 @@ transaction(nftAliasOrIdentifiers: [String], ids: [AnyStruct], ftAliasOrIdentifi
 	let pointers : [FindViews.AuthNFTPointer]
 	let leaseNames : [String]
 	let vaultTypes : [Type]
-	let finLeases : &FIND.LeaseCollection
+	let finLeases : auth(FIND.LeaseOwner) &FIND.LeaseCollection
 
 	prepare(account: auth(BorrowValue) &Account) {
 

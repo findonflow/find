@@ -5,12 +5,12 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 	
 	let profile : &Profile.User
 
-	prepare(account: auth(BorrowValue) &Account) {
+	prepare(account: auth(BorrowValue, StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
 
 		self.profile =account.storage.borrow<&Profile.User>(from:Profile.storagePath) ?? panic("You do not have a profile set up, initialize the user first")
 
 		let leaseCollection = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-		if !leaseCollection.check() {
+		if !leaseCollection!.check() {
 			account.storage.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
 			account.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
 

@@ -3,7 +3,7 @@ import Profile from "../contracts/Profile.cdc"
 
 transaction(name: String) {
 
-	let finLeases : &FIND.LeaseCollection?
+	let finLeases : auth(FIND.LeaseOwner) &FIND.LeaseCollection?
 
 	prepare(account: auth(BorrowValue) &Account) {
 		self.finLeases= account.storage.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath) 

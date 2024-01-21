@@ -254,7 +254,7 @@ access(all) contract FindMarketAuctionEscrow {
         access(all) fun containsId(_ id: UInt64): Bool
         access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance:UFix64)
 
-        //place a bid on a token
+        //place a bid on a tokenƒ
         access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&{MarketBidCollectionPublic}>, vaultType:Type)
 
         //anybody should be able to fulfill an auction as long as it is done
@@ -265,15 +265,15 @@ access(all) contract FindMarketAuctionEscrow {
         //is this the best approach now or just put the NFT inside the saleItem?
         access(contract) var items: @{UInt64: SaleItem}
 
-        access(contract) let tenantCapability: Capability<&FindMarket.Tenant>
+        access(contract) let tenantCapability: Capability<&{FindMarket.TenantPublic}>
 
-        init (_ tenantCapability: Capability<&FindMarket.Tenant>) {
+        init (_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) {
             self.items <- {}
             self.tenantCapability=tenantCapability
         }
 
 
-        access(self) fun getTenant() : &FindMarket.Tenant {
+        access(self) fun getTenant() : &{FindMarket.TenantPublic} {
             if !self.tenantCapability.check()  {
                 panic("Tenant client is not linked anymore")
             }
@@ -752,16 +752,16 @@ access(all) contract FindMarketAuctionEscrow {
 
         access(contract) var bids : @{UInt64: Bid}
         access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
-        access(contract) let tenantCapability: Capability<&FindMarket.Tenant>
+        access(contract) let tenantCapability: Capability<&{FindMarket.TenantPublic}>
 
         //not sure we can store this here anymore. think it needs to be in every bid
-        init(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&FindMarket.Tenant>) {
+        init(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&{FindMarket.TenantPublic}>) {
             self.bids <- {}
             self.receiver=receiver
             self.tenantCapability=tenantCapability
         }
 
-        access(self) fun getTenant() : &FindMarket.Tenant {
+        access(self) fun getTenant() : &{FindMarket.TenantPublic} {
             if !self.tenantCapability.check()  {
                 panic("Tenant client is not linked anymore")
             }
@@ -885,11 +885,11 @@ access(all) contract FindMarketAuctionEscrow {
     }
 
     //Create an empty lease collection that store your leases to a name
-    access(all) fun createEmptySaleItemCollection(_ tenantCapability: Capability<&FindMarket.Tenant>): @SaleItemCollection {
+     access(all) fun createEmptySaleItemCollection(_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) : @SaleItemCollection {
         return <- create SaleItemCollection(tenantCapability)
     }
 
-    access(all) fun createEmptyMarketBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&FindMarket.Tenant>) : @MarketBidCollection {
+    access(all) fun createEmptyMarketBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&{FindMarket.TenantPublic}>) : @MarketBidCollection {
         return <- create MarketBidCollection(receiver: receiver, tenantCapability:tenantCapability)
     }
 

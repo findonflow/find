@@ -59,8 +59,8 @@ transaction(dapperMerchantAccountAddress: Address) {
 		//FlowUtility token
 
 		let futReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-		let dapperFUTReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-		if !futReceiver.check(){
+		let dapperFUTReceiver = dapper.capabilities.get<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+		if !futReceiver!.check(){
 			let futForwarder <- TokenForwarding.createNewForwarder(recipient: dapperFUTReceiver)
 			acct.save(<-futForwarder, to: /storage/flowUtilityTokenReceiver)
 			acct.link<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver, target: /storage/flowUtilityTokenReceiver)

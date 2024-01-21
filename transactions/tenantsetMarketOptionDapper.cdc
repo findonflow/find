@@ -50,7 +50,7 @@ transaction(nftName: String, nftTypes: [String], cut: UFix64){
 		var royalty : MetadataViews.Royalty? = nil
 		if cut != 0.0 {
 			royalty = MetadataViews.Royalty(
-				receiver: account.getCapability<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath),
+				receiver: account.capabilities.get<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)!,
 				cut: cut,
 				description: "tenant"
 			)

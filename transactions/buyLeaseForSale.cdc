@@ -26,14 +26,14 @@ transaction(leaseName: String, amount: UFix64) {
 		let leaseSaleItemType= Type<@FindLeaseMarketSale.SaleItemCollection>()
 		let leasePublicPath=leaseTenant.getPublicPath(leaseSaleItemType)
 		let leaseStoragePath= leaseTenant.getStoragePath(leaseSaleItemType)
-		let leaseSaleItemCap= account.getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath)
-		if !leaseSaleItemCap.check() {
+		let leaseSaleItemCap= account.capabilities.get<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath)
+		if leaseSaleItemCap == nil {
 			//The link here has to be a capability not a tenant, because it can change.
 			account.storage.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
 			account.link<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath, target: leaseStoragePath)
 		}
 
-		self.saleItemsCap= getAccount(address).getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath)
+		self.saleItemsCap= getAccount(address).capabilities.get<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath)!
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindLeaseMarketSale.SaleItemCollection>())
 
 		let item= FindLeaseMarket.assertOperationValid(tenant: leaseMarketplace, name: leaseName, marketOption: marketOption)

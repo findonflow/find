@@ -4,27 +4,27 @@ import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
 
 transaction(dapperAddress: Address) {
-	prepare(account: auth(BorrowValue) &Account) {
+	prepare(account: auth(BorrowValue, SaveValue, Capabilities) &Account) {
 
 		let dapper=getAccount(dapperAddress)
 		//this is only for emulator
-		let ducReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-		if !ducReceiver.check() {
+		let ducReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+		if ducReceiver == nil {
 			// Create a new Forwarder resource for DUC and store it in the new account's storage
-			let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver))
+			let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)!)
 			account.storage.save(<-ducForwarder, to: /storage/dapperUtilityCoinVault)
-			// Publish a Receiver capability for the new account, which is linked to the DUC Forwarder
-			account.link<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver,target: /storage/dapperUtilityCoinVault)
+			let receiverCap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/dapperUtilityCoinVault)
+			account.capabilities.publish(receiverCap, at: /public/dapperUtilityCoinVault)
 		}
 
 		//this is only for emulator
-		let futReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-		if !futReceiver.check() {
+		let futReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+		if futReceiver == nil {
 			// Create a new Forwarder resource for FUT and store it in the new account's storage
-			let futForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver))
+			let futForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.capabilities.get<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)!)
 			account.storage.save(<-futForwarder, to: /storage/flowUtilityTokenReceiver)
-			// Publish a Receiver capability for the new account, which is linked to the FUT Forwarder
-			account.link<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver,target: /storage/flowUtilityTokenReceiver)
+			let receiverCap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/flowUtilityTokenReceiver)
+			account.capabilities.publish(receiverCap, at: /public/flowUtilityTokenReceiver)
 		}
 	}
 }

@@ -2,7 +2,7 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
 
 transaction(leases: [String]) {
-	let saleItems : &FindLeaseMarketSale.SaleItemCollection?
+	let saleItems : auth(FindMarketSale.Seller) &FindLeaseMarketSale.SaleItemCollection?
 
 	prepare(account: auth(BorrowValue) &Account) {
 

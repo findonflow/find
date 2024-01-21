@@ -317,9 +317,6 @@ access(all) contract DapperUtilityCoin: ViewResolver  {
         let vaultCap = self.account.capabilities.storage.issue<&Vault>(/storage/dapperUtilityCoinVault)
         self.account.capabilities.publish(vaultCap, at: /public/dapperUtilityCoinVault)
 
-
-
-
         // Create a public capability to the stored Vault that only exposes
         // the `deposit` method through the `Receiver` interface
         let recieverCap = self.account.capabilities.storage.issue<&{FungibleToken.Receiver}>(
