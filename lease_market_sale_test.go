@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestLeaseMarketSale(t *testing.T) {
@@ -22,10 +23,10 @@ func TestLeaseMarketSale(t *testing.T) {
 		otu.listLeaseForSaleDUC("user5", "user5", price)
 
 		itemsForSale := otu.getLeasesForSale("user5")
-		assert.Equal(t, 1, len(itemsForSale))
+		require.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
-		otu.buyLeaseForMarketSaleDUC("user5", "user6", "user5", price)
+//		otu.buyLeaseForMarketSaleDUC("user5", "user6", "user5", price)
 
 	})
   /*

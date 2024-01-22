@@ -7,7 +7,7 @@ import FindMarketSale from "../contracts/FindMarketSale.cdc"
 
 transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {
 
-    let saleItems : auth(FindLeaseMarketSale.Seller) &FindLeaseMarketSale.SaleItemCollection?
+    let saleItems : auth(FindLeaseMarketSale.Seller) &FindLeaseMarketSale.SaleItemCollection
     let pointer : FindLeaseMarket.AuthLeasePointer
     let vaultType : Type
 
@@ -25,7 +25,7 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix
         if leaseSaleItemCap == nil {
             //The link here has to be a capability not a tenant, because it can change.
             account.storage.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
-            let leaseSaleItemCap= account.capabilities.storage.issue<&FindLeaseMarketSale.SaleItemCollection>(leaseStoragePath)
+            let leaseSaleItemCap= account.capabilities.storage.issue<&{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}>(leaseStoragePath)
             account.capabilities.publish(leaseSaleItemCap, at: leasePublicPath)
         }
 
@@ -45,8 +45,7 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix
     }
 
     execute{
-        self.saleItems!.listForSale(pointer: self.pointer, vaultType: self.vaultType, directSellPrice: directSellPrice, validUntil: validUntil, extraField: {})
-
+        self.saleItems.listForSale(pointer: self.pointer, vaultType: self.vaultType, directSellPrice: directSellPrice, validUntil: validUntil, extraField: {})
     }
 
 }

@@ -592,7 +592,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
     }
 
     //Create an empty lease collection that store your leases to a name
-     access(all) fun createEmptySaleItemCollection(_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) : @SaleItemCollection {
+    access(all) fun createEmptySaleItemCollection(_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) : @SaleItemCollection {
         return <- create SaleItemCollection(tenantCapability)
     }
 
@@ -622,9 +622,9 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
     }
 
     init() {
-        FindLeaseMarket.addSaleItemType(Type<@SaleItem>())
-        FindLeaseMarket.addSaleItemCollectionType(Type<@SaleItemCollection>())
-        FindLeaseMarket.addMarketBidType(Type<@Bid>())
-        FindLeaseMarket.addMarketBidCollectionType(Type<@MarketBidCollection>())
+        //        FindLeaseMarket.addSaleItemType(Type<@SaleItem>())
+        //       FindLeaseMarket.addSaleItemCollectionType(Type<@SaleItemCollection>())
+        //      FindLeaseMarket.addMarketBidType(Type<@Bid>())
+        //     FindLeaseMarket.addMarketBidCollectionType(Type<@MarketBidCollection>())
     }
 }

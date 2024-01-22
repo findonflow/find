@@ -4,6 +4,7 @@ import Clock from "./Clock.cdc"
 import FIND from "./FIND.cdc"
 import FindLeaseMarket from "./FindLeaseMarket.cdc"
 import FindMarket from "./FindMarket.cdc"
+import Debug from "../contracts/Debug.cdc"
 
 /*
 
@@ -199,6 +200,7 @@ access(all) contract FindLeaseMarketSale {
         }
 
         access(Seller) fun listForSale(pointer: FindLeaseMarket.AuthLeasePointer, vaultType: Type, directSellPrice:UFix64, validUntil: UFix64?, extraField: {String:AnyStruct}) {
+            Debug.log("foo")
 
             // ensure it is not a 0 dollar listing
             if directSellPrice <= 0.0 {

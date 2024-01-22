@@ -30,8 +30,6 @@ access(all) contract FindLeaseMarket {
         return FindMarket.getTenantCapability(tenant)!.borrow()!
     }
 
-
-
     access(all) fun getSaleItemTypes() : [Type] {
         return self.saleItemTypes
     }
@@ -45,9 +43,10 @@ access(all) contract FindLeaseMarket {
         var caps : [Capability<&{FindLeaseMarket.SaleItemCollectionPublic}>] = []
         for type in self.getSaleItemCollectionTypes() {
             if type != nil {
-                let cap = getAccount(address).capabilities.get<&{FindLeaseMarket.SaleItemCollectionPublic}>(tenantRef.getPublicPath(type))!
-                if cap.check() {
-                    caps.append(cap)
+                if let cap = getAccount(address).capabilities.get<&{FindLeaseMarket.SaleItemCollectionPublic}>(tenantRef.getPublicPath(type)) {
+                    if cap.check() {
+                        caps.append(cap)
+                    }
                 }
             }
         }
@@ -57,7 +56,8 @@ access(all) contract FindLeaseMarket {
     access(all) fun getSaleItemCollectionCapability(tenantRef: &{FindMarket.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindLeaseMarket.SaleItemCollectionPublic}> {
         for type in self.getSaleItemCollectionTypes() {
             if FindMarket.getMarketOptionFromType(type) == marketOption{
-                let cap = getAccount(address).capabilities.get<&{FindLeaseMarket.SaleItemCollectionPublic}>(tenantRef.getPublicPath(type))!
+                let path=tenantRef.getPublicPath(type)
+                let cap = getAccount(address).capabilities.get<&{FindLeaseMarket.SaleItemCollectionPublic}>(path) ?? panic("failed getting collection for ".concat(address.toString().concat(" ").concat(path.toString())))
                 return cap
             }
         }

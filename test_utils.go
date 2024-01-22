@@ -2132,8 +2132,7 @@ func (otu *OverflowTestUtils) listLeaseForSaleDUC(user string, name string, pric
 		WithArg("ftAliasOrIdentifier", ftIden),
 		WithArg("directSellPrice", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
-	).
-		AssertSuccess(otu.T)
+	).AssertSuccess(otu.T)
 
 	return otu
 }
