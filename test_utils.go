@@ -2126,13 +2126,15 @@ func (otu *OverflowTestUtils) listLeaseForSaleDUC(user string, name string, pric
 	ftIden, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
 	assert.NoError(otu.T, err)
 
-	otu.O.Tx("listLeaseForSaleDapper",
+	res := otu.O.Tx("listLeaseForSaleDapper",
 		WithSigner(user),
 		WithArg("leaseName", name),
 		WithArg("ftAliasOrIdentifier", ftIden),
 		WithArg("directSellPrice", price),
 		WithArg("validUntil", otu.currentTime()+100.0),
-	).AssertSuccess(otu.T)
+	)
+
+	res.AssertSuccess(otu.T)
 
 	return otu
 }
