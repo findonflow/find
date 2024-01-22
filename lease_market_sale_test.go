@@ -26,7 +26,7 @@ func TestLeaseMarketSale(t *testing.T) {
 		require.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
-//		otu.buyLeaseForMarketSaleDUC("user5", "user6", "user5", price)
+		otu.buyLeaseForMarketSaleDUC("user6", "user5", "user5", price)
 
 	})
   /*
