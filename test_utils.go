@@ -1560,7 +1560,8 @@ func (otu *OverflowTestUtils) getLeasesForSale(name string) []SaleItemInformatio
 		WithArg("user", name),
 	).MarshalAs(&findReport)
 	if err != nil {
-		swallowErr(err)
+		panic(err)
+		//		swallowErr(err)
 	}
 	var list []SaleItemInformation
 	for _, saleItemCollectionReport := range findReport.LeasesForSale {

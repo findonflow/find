@@ -61,6 +61,7 @@ transaction(name: String) {
 
         let tenant = tenantCapability.borrow()!
 
+        /*
         let dosSaleType= Type<@FindMarketDirectOfferSoft.SaleItemCollection>()
         let dosSalePublicPath=FindMarket.getPublicPath(dosSaleType, name: tenant.name)
         let dosSaleStoragePath= FindMarket.getStoragePath(dosSaleType, name:tenant.name)
@@ -70,6 +71,7 @@ transaction(name: String) {
             let dosSaleCap= account.capabilities.storage.issue<&FindMarketDirectOfferSoft.SaleItemCollection>(dosSaleStoragePath)
             account.capabilities.publish(dosSaleCap, at: dosSalePublicPath)
         }
+        */
 
         let leaseTenantCapability= FindMarket.getTenantCapability(FindMarket.getFindTenantAddress())!
         let leaseTenant = leaseTenantCapability.borrow()!

@@ -41,6 +41,8 @@ func TestMain(m *testing.M) {
 /*
 * user1 and user2 are the same
 * user3 does not have a name
+* user4 is normal user without anything registered
+* user5 and user6 are dapper users like user1 and user2
  */
 func SetupFIND(o *OverflowState) error {
 	stx := o.TxFN(WithPanicInteractionOnError(true))
@@ -163,6 +165,8 @@ func SetupFIND(o *OverflowState) error {
 		"Flow",
 		"FUSD",
 		"USDC",
+		"DUC",
+		"FUT",
 	}
 
 	for _, alias := range tokens {
@@ -356,6 +360,33 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("publicPathIdentifier", publicPathIdentifier),
 	)
 
+	createDapperUser(stx, "user5")
+
+	stx("devRegisterDapper",
+		WithSigner("user5"),
+		WithPayloadSigner("dapper"),
+		WithArg("merchAccount", "dapper"),
+		WithArg("name", "user5"),
+		WithArg("amount", 5.0),
+	)
+	createDapperUser(stx, "user6")
+
+	stx("devRegisterDapper",
+		WithSigner("user6"),
+		WithPayloadSigner("dapper"),
+		WithArg("merchAccount", "dapper"),
+		WithArg("name", "user6"),
+		WithArg("amount", 5.0),
+	)
+
+	findleaseQI, _ := o.QualifiedIdentifier("FIND", "Lease")
+	stx("tenantsetLeaseOptionDapper",
+		WithSigner("find"),
+		WithArg("nftName", "Lease"),
+		WithArg("nftType", findleaseQI),
+		WithArg("cut", 0.0),
+	)
+
 	return nil
 }
 
@@ -385,4 +416,12 @@ func createUser(stx OverflowTransactionFunction, fusd float64, name string) {
 			WithArg("amount", fusd),
 		)
 	}
+}
+
+func createDapperUser(stx OverflowTransactionFunction, name string) {
+	nameSigner := WithSigner(name)
+	nameArg := WithArg("name", name)
+
+	stx("initDapperAccount", nameSigner, WithArg("dapperAddress", "dapper"))
+	stx("createProfileDapper", nameSigner, nameArg)
 }

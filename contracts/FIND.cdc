@@ -149,7 +149,7 @@ access(all) contract FIND {
         if let address = FIND.resolve(input) {
             let account = getAccount(address)
             if let cap = account.capabilities.get<&{Profile.Public}>(Profile.publicPath) {
-                return cap!.borrow()
+                return cap.borrow()
             }
         }
         return nil
@@ -526,8 +526,8 @@ access(all) contract FIND {
             if profile == nil {
                 panic("Create a profile before you make a bid")
             }
-            let bidderName= profile!.getName()
-            let bidderAvatar= profile!.getAvatar()
+            let bidderName= profile.getName()
+            let bidderAvatar= profile.getAvatar()
             let owner=lease.owner!.address
             let ownerName=self.name
 
@@ -556,9 +556,9 @@ access(all) contract FIND {
         access(all) let auctionStartPrice: UFix64?
         access(all) let auctionReservePrice: UFix64?
         access(all) let extensionOnLateBid: UFix64?
-        access(all) let addons: &[String]
+        access(all) let addons: [String]
 
-        init(name: String, status:LeaseStatus, validUntil: UFix64, lockedUntil:UFix64, latestBid: UFix64?, auctionEnds: UFix64?, salePrice: UFix64?, latestBidBy: Address?, auctionStartPrice: UFix64?, auctionReservePrice: UFix64?, extensionOnLateBid:UFix64?, address:Address, addons: &[String]){
+        init(name: String, status:LeaseStatus, validUntil: UFix64, lockedUntil:UFix64, latestBid: UFix64?, auctionEnds: UFix64?, salePrice: UFix64?, latestBidBy: Address?, auctionStartPrice: UFix64?, auctionReservePrice: UFix64?, extensionOnLateBid:UFix64?, address:Address, addons: [String]){
 
             self.name=name
             var s="TAKEN"
@@ -582,6 +582,9 @@ access(all) contract FIND {
             self.cost=FIND.calculateCost(name)
             self.addons=addons
 
+        }
+        access(all) fun getAddons() : [String] {
+            return self.addons
         }
 
     }
@@ -802,7 +805,7 @@ access(all) contract FIND {
                 }
             }
 
-            return LeaseInformation(name:  name, status: token.getLeaseStatus(), validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLockedUntil(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: latestBidBy, auctionStartPrice: token.auctionStartPrice, auctionReservePrice: token.auctionReservePrice, extensionOnLateBid: token.auctionExtensionOnLateBid, address: token.owner!.address, addons: token.addons.keys)
+            return LeaseInformation(name:  name, status: token.getLeaseStatus(), validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLockedUntil(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: latestBidBy, auctionStartPrice: token.auctionStartPrice, auctionReservePrice: token.auctionReservePrice, extensionOnLateBid: token.auctionExtensionOnLateBid, address: token.owner!.address, addons: token.getAddon())
         }
 
         access(account) fun getNames() : [String] {
@@ -995,7 +998,7 @@ access(all) contract FIND {
                 cbRef.cancel(name)
             }
 
-            lease.setCallback(callback!)
+            lease.setCallback(callback)
 
 
 
@@ -1147,7 +1150,7 @@ access(all) contract FIND {
                 let vault <- offer.fulfillLease(<- token)
                 if self.networkCut != 0.0 {
                     let cutAmount= soldFor * self.networkCut
-                    let networkWallet = self.networkWallet!.borrow() ?? panic("The network wallet is not set up properly. Wallet address : ".concat(self.networkWallet.address.toString()))
+                    let networkWallet = self.networkWallet.borrow() ?? panic("The network wallet is not set up properly. Wallet address : ".concat(self.networkWallet.address.toString()))
                     networkWallet.deposit(from: <- vault.withdraw(amount: cutAmount))
                     if lease.salePrice == nil || lease.salePrice != soldFor {
                         emit RoyaltyPaid(name: name, uuid: lease.uuid, address: self.networkWallet.address, findName:FIND.reverseLookup(self.networkWallet.address), royaltyName:"Network", amount: cutAmount, vaultType:vault.getType().identifier, saleType: "DirectOffer")
@@ -1335,7 +1338,7 @@ access(all) contract FIND {
         // borrowNFT gets a reference to an NFT in the collection
         // so that the caller can read its metadata and call its methods
         access(all) fun borrow(_ name: String): &FIND.Lease {
-            return (&self.leases[name] as &FIND.Lease?)!
+            return (&self.leases[name])!
         }
 
         access(LeaseOwner) fun borrowAuth(_ name: String): auth(LeaseOwner) &FIND.Lease {
@@ -1922,7 +1925,7 @@ access(all) contract FIND {
         }
 
         access(all) fun borrowBid(_ name: String): &Bid {
-            return (&self.bids[name] as &Bid?)!
+            return (&self.bids[name])!
         }
 
         access(contract) fun setBidType(name: String, type: String) {

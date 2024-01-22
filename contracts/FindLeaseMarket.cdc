@@ -381,16 +381,16 @@ access(all) contract FindLeaseMarket {
     }
 
     access(all) struct AuthLeasePointer : LeasePointer {
-        access(self) let cap: Capability<auth(FIND.Leasee) &{FIND.LeaseCollectionPublic}>
+        access(self) let cap: Capability<auth(FIND.Leasee) &FIND.LeaseCollection>
         access(all) let name: String
         access(all) let uuid: UInt64
 
         // Passing in the reference here to ensure that is the owner
-        init(ref:&FIND.LeaseCollection, name: String) {
-            self.cap=getAccount(ref.owner!.address).capabilities.get<auth(FIND.Leasee) &{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
+        init(cap:Capability<auth(FIND.Leasee) &FIND.LeaseCollection>, name: String) {
+            self.cap=cap
             self.name=name
 
-            if !ref.getNames().contains(name) {
+            if !self.cap.borrow()!.getNames().contains(name) {
                 panic("Please pass in the corresponding lease collection reference.")
             }
 
