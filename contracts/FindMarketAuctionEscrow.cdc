@@ -885,7 +885,7 @@ access(all) contract FindMarketAuctionEscrow {
     }
 
     //Create an empty lease collection that store your leases to a name
-     access(all) fun createEmptySaleItemCollection(_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) : @SaleItemCollection {
+    access(all) fun createEmptySaleItemCollection(_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) : @SaleItemCollection {
         return <- create SaleItemCollection(tenantCapability)
     }
 
@@ -914,10 +914,9 @@ access(all) contract FindMarketAuctionEscrow {
     }
 
     init() {
-        //TODO: we need to add this back but it breaks the tests
-        //        FindMarket.addSaleItemType(Type<@SaleItem>())
-        //       FindMarket.addSaleItemCollectionType(Type<@SaleItemCollection>())
-        //      FindMarket.addMarketBidType(Type<@Bid>())
-        //     FindMarket.addMarketBidCollectionType(Type<@MarketBidCollection>())
+        FindMarket.addSaleItemType(Type<@SaleItem>())
+        FindMarket.addSaleItemCollectionType(Type<@SaleItemCollection>())
+        FindMarket.addMarketBidType(Type<@Bid>())
+        FindMarket.addMarketBidCollectionType(Type<@MarketBidCollection>())
     }
 }

@@ -109,13 +109,14 @@ access(all) contract FindMarket {
         return caps
     }
 
-    access(all) fun getSaleItemCollectionCapability(tenantRef: &{FindMarket.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindMarket.SaleItemCollectionPublic}> {
+    access(all) fun getSaleItemCollectionCapability(tenantRef: &{FindMarket.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindMarket.SaleItemCollectionPublic}>? {
         for type in self.getSaleItemCollectionTypes() {
             if self.getMarketOptionFromType(type) == marketOption{
-                let cap = getAccount(address).capabilities.get<&{FindMarket.SaleItemCollectionPublic}>(tenantRef.getPublicPath(type))!
-                return cap
+                let path=tenantRef.getPublicPath(type)
+                return getAccount(address).capabilities.get<&{FindMarket.SaleItemCollectionPublic}>(path)
             }
         }
+
         panic("Cannot find market option : ".concat(marketOption))
     }
 
@@ -127,12 +128,13 @@ access(all) contract FindMarket {
         let tenantRef=self.getTenant(tenant)
 
         let collectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
-        let optRef = collectionCap.borrow()
+
+        let optRef = collectionCap?.borrow()
         if optRef == nil {
             panic("Account not properly set up, cannot borrow sale item collection")
         }
         let ref=optRef!
-        let item=ref.borrowSaleItem(id)!!
+        let item=ref!.borrowSaleItem(id)!
         if !item.checkPointer() {
             panic("this is a ghost listing. SaleItem id : ".concat(id.toString()))
         }
@@ -149,8 +151,8 @@ access(all) contract FindMarket {
             let marketOption = self.getMarketOptionFromType(type)
 
             let collectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
-            if let optRef = collectionCap.borrow() {
-                let ids = optRef.getRoyaltyChangedIds()
+            if let optRef = collectionCap?.borrow() {
+                let ids = optRef!.getRoyaltyChangedIds()
                 if ids.length > 0 {
                     report[marketOption] = ids
                 }
@@ -226,11 +228,11 @@ access(all) contract FindMarket {
         let ghost: [FindMarket.GhostListing] =[]
         let info: [FindMarket.SaleItemInformation] =[]
         let collectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
-        let optRef = collectionCap.borrow()
+        let optRef = collectionCap?.borrow()
         if optRef == nil {
             return FindMarket.SaleItemCollectionReport(items: info, ghosts: ghost)
         }
-        let ref=optRef!
+        let ref=optRef!!
 
         var listID : [UInt64]= []
         if let id = itemId{
@@ -318,11 +320,10 @@ access(all) contract FindMarket {
         return caps
     }
 
-    access(all) fun getMarketBidCollectionCapability(tenantRef: &{FindMarket.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindMarket.MarketBidCollectionPublic}> {
+    access(all) fun getMarketBidCollectionCapability(tenantRef: &{FindMarket.TenantPublic}, marketOption: String, address: Address) : Capability<&{FindMarket.MarketBidCollectionPublic}>? {
         for type in self.getMarketBidCollectionTypes() {
             if self.getMarketOptionFromType(type) == marketOption{
-                let cap = getAccount(address).capabilities.get<&{FindMarket.MarketBidCollectionPublic}>(tenantRef.getPublicPath(type))!
-                return cap
+                return  getAccount(address).capabilities.get<&{FindMarket.MarketBidCollectionPublic}>(tenantRef.getPublicPath(type))
             }
         }
         panic("Cannot find market option : ".concat(marketOption))
@@ -355,12 +356,12 @@ access(all) contract FindMarket {
         let info: [FindMarket.BidInfo] =[]
         let collectionCap = self.getMarketBidCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
 
-        let optRef = collectionCap.borrow()
+        let optRef = collectionCap?.borrow()
         if optRef==nil {
             return FindMarket.BidItemCollectionReport(items: info, ghosts: ghost)
         }
 
-        let ref=optRef!
+        let ref=optRef!!
 
         let listingType = ref.getBidType()
         var listID : [UInt64]= []
@@ -394,20 +395,20 @@ access(all) contract FindMarket {
 
         let tenantRef=self.getTenant(tenant)
         let collectionCap = self.getMarketBidCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
-        let optRef = collectionCap.borrow()
+        let optRef = collectionCap?.borrow()
         if optRef == nil {
-            panic("Account not properly set up, cannot borrow bid item collection. Account address : ".concat(collectionCap.address.toString()))
+            panic("Account not properly set up, cannot borrow bid item collection")
         }
-        let ref=optRef!
+        let ref=optRef!!
         let bidItem=ref.borrowBidItem(id)
 
         let saleItemCollectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: bidItem.getSellerAddress())
-        let saleRef = saleItemCollectionCap.borrow()
+        let saleRef = saleItemCollectionCap?.borrow()
         if saleRef == nil {
-            panic("Seller account is not properly set up, cannot borrow sale item collection. Seller address : ".concat(saleItemCollectionCap.address.toString()))
+            panic("Seller account is not properly set up, cannot borrow sale item collection")
         }
         let sale=saleRef!
-        let item=sale.borrowSaleItem(id)!
+        let item=sale!.borrowSaleItem(id)!
         if !item.checkPointer() {
             panic("this is a ghost listing. SaleItem id : ".concat(id.toString()))
         }

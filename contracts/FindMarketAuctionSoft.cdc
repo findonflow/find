@@ -822,7 +822,7 @@ access(all) contract FindMarketAuctionSoft {
     }
 
     //Create an empty lease collection that store your leases to a name
-     access(all) fun createEmptySaleItemCollection(_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) : @SaleItemCollection {
+    access(all) fun createEmptySaleItemCollection(_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) : @SaleItemCollection {
         return <- create SaleItemCollection(tenantCapability)
     }
 
@@ -851,11 +851,10 @@ access(all) contract FindMarketAuctionSoft {
     }
 
     init() {
-        // TODO: 
-        // FindMarket.addSaleItemType(Type<@SaleItem>())
-        // FindMarket.addSaleItemCollectionType(Type<@SaleItemCollection>())
-        // FindMarket.addMarketBidType(Type<@Bid>())
-        // FindMarket.addMarketBidCollectionType(Type<@MarketBidCollection>())
+        FindMarket.addSaleItemType(Type<@SaleItem>())
+        FindMarket.addSaleItemCollectionType(Type<@SaleItemCollection>())
+        FindMarket.addMarketBidType(Type<@Bid>())
+        FindMarket.addMarketBidCollectionType(Type<@MarketBidCollection>())
     }
 
 }

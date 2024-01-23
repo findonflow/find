@@ -1,8 +1,6 @@
 package main
 
 func main() {
-
-	//TODO; fix
 	/*
 		// cronjob ready, read blockHeight from file
 		o := overflow.NewOverflowTestnet().Start()
