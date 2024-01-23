@@ -6,7 +6,8 @@ import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 import DapperStorageRent from "../contracts/standard/DapperStorageRent.cdc"
-import TopShot from "../contracts/community/TopShot.cdc"
+
+//import TopShot from "../contracts/community/TopShot.cdc"
 import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 
@@ -14,12 +15,15 @@ import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 transaction(address: Address, id: UInt64, amount: UFix64) {
 
     let targetCapability : Capability<&{NonFungibleToken.Receiver}>
-    let walletReference : &FungibleToken.Vault
+    let walletReference : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
     let receiver : Address
 
-    let saleItemsCap: Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}>
+
+    //TODO: should we use concrete implementation here or not?
+    let saleItemsCap: Capability<&{FindMarketSale.SaleItemCollectionPublic}>
+
     let balanceBeforeTransfer: UFix64
-    prepare(dapper: auth(BorrowValue) &Account, account: auth(BorrowValue) &Account) {
+    prepare(dapper: auth(BorrowValue) &Account, account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, UnpublishCapability) &Account) {
         let marketplace = FindMarket.getFindTenantAddress()
         self.receiver=account.address
         let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
@@ -28,13 +32,12 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
         let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
         let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
 
-        let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath)
-        if !saleItemCap.check() {
-            //The link here has to be a capability not a tenant, because it can change.
-            account.storage.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
-            account.link<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
+        let saleItemCap= account.capabilities.get<&{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath)
+        if saleItemCap==nil {
+            account.storage.save(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
+            let cap = account.capabilities.storage.issue<&{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(storagePath)
+            account.capabilities.publish(cap, at: publicPath)
         }
-
         self.saleItemsCap= FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
         let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())
 
@@ -56,32 +59,37 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
             panic("This FT is not supported by the Find Market in Dapper Wallet. Type : ".concat(item.getFtType().identifier))
         }
 
-        self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
 
-        if !self.targetCapability.check() {
+        let col= account.storage.borrow<&AnyResource>(from: nft.storagePath) as? &{NonFungibleToken.Collection}?
+        if col == nil {
             let cd = item.getNFTCollectionData()
-            if let storage = account.storage.borrow<&AnyResource>(from: cd.storagePath) {
-                if let st = account.storage.borrow<&TopShot.Collection>(from: cd.storagePath) {
-                    // here means the topShot is not linked in the way it should be. We can relink that for our use
-                    account.unlink(cd.publicPath)
-                    account.link<&TopShot.Collection{TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.Collection,ViewResolver.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-                } else {
-                    panic("This collection public link is not set up properly.")
-                }
-            } else {
-                account.storage.save(<- cd.createEmptyCollection(), to: cd.storagePath)
-                account.link<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-                account.link<&{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
+            account.storage.save(<- cd.createEmptyCollection(), to: cd.storagePath)
+            account.capabilities.unpublish(cd.publicPath)
+            let cap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(cd.storagePath)
+            account.capabilities.publish(cap, at: cd.publicPath)
+            self.targetCapability=cap
+        } else {
+            //TODO: I do not think this works as intended
+            var targetCapability= account.capabilities.get<&AnyResource>(nft.publicPath) as? Capability<&{NonFungibleToken.Collection}>
+            if targetCapability == nil || !targetCapability!.check() {
+                let cd = item.getNFTCollectionData()
+                let cap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(cd.storagePath)
+                account.capabilities.unpublish(cd.publicPath)
+                account.capabilities.publish(cap, at: cd.publicPath)
+                targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
             }
+            self.targetCapability=targetCapability!
+
         }
 
+        //TODO: handle topshot
 
-        self.walletReference = dapper.borrow<&FungibleToken.Vault>(from: ftVaultPath!) ?? panic("No suitable wallet linked for this account")
-        self.balanceBeforeTransfer = self.walletReference.balance
+        self.walletReference = dapper.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: ftVaultPath!) ?? panic("No suitable wallet linked for this account")
+        self.balanceBeforeTransfer = self.walletReference.getBalance()
     }
 
     pre {
-        self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
+        self.walletReference.getBalance() > amount : "Your wallet does not have enough funds to pay for this item"
     }
 
     execute {
@@ -92,6 +100,6 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 
     // Check that all dapper Coin was routed back to Dapper
     post {
-        self.walletReference.balance == self.balanceBeforeTransfer: "Dapper Coin leakage"
+        self.walletReference.getBalance() == self.balanceBeforeTransfer: "Dapper Coin leakage"
     }
 }

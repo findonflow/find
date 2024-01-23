@@ -22,6 +22,7 @@ var (
 	packSalt        string
 	packRewardIds   []uint64
 	dandyIdentifier string
+	dapperDandyId   uint64
 )
 
 func TestMain(m *testing.M) {
@@ -369,6 +370,34 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("name", "user5"),
 		WithArg("amount", 5.0),
 	)
+
+	// we mint dandy for testing
+	dapperDandyId, _ = stx("mintDandy",
+		user1Signer,
+		WithArg("name", "user1"),
+		WithArg("maxEdition", 1),
+		WithArg("artist", "Neo"),
+		WithArg("nftName", "Dapper dandy"),
+		WithArg("nftDescription", `This is a packed dandy`),
+		WithArg("nftUrl", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
+		WithArg("collectionDescription", "Neo Collectibles FIND"),
+		WithArg("collectionExternalURL", "https://neomotorcycles.co.uk/index.html"),
+		WithArg("collectionSquareImage", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
+		WithArg("collectionBannerImage", "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1"),
+	).GetIdFromEvent("Dandy.Deposit", "id")
+
+	stx("sendNFTs",
+		WithSigner("user1"),
+		WithArg("nftIdentifiers", []string{dandyIdentifier}),
+		WithArg("allReceivers", `["user5"]`),
+		WithArg("ids", []uint64{dapperDandyId}),
+		WithArg("memos", `["Hello!"]`),
+		WithArg("donationTypes", `[nil]`),
+		WithArg("donationAmounts", `[nil]`),
+		WithArg("findDonationType", nil),
+		WithArg("findDonationAmount", nil),
+	)
+
 	createDapperUser(stx, "user6")
 
 	stx("devRegisterDapper",

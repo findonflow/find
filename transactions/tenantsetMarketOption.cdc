@@ -3,6 +3,8 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import FUSD from "../contracts/standard/FUSD.cdc"
 import FiatToken from "../contracts/standard/FiatToken.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
+import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
+import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 //import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 //import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
@@ -19,8 +21,10 @@ transaction(nftName: String, nftTypes: [String], cut: UFix64){
 
         let defaultRules : [FindMarket.TenantRule] = [
         FindMarket.TenantRule(
-            name: "Flow",
+            name: "Standard",
             types:[
+            Type<@DapperUtilityCoin.Vault>(), 
+            Type<@FlowUtilityToken.Vault>(),
             Type<@FlowToken.Vault>()
             ],
             ruleType: "ft",

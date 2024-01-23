@@ -2112,7 +2112,7 @@ func (otu *OverflowTestUtils) setDUCExampleNFT() *OverflowTestUtils {
 }
 
 func (otu *OverflowTestUtils) listNFTForSaleDUC(name string, id uint64, price float64) []uint64 {
-	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
+	nftIden, err := otu.O.QualifiedIdentifier("Dandy", "NFT")
 	assert.NoError(otu.T, err)
 
 	ftIden, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
@@ -2161,7 +2161,7 @@ func (otu *OverflowTestUtils) getNFTForMarketSale(seller string, id uint64, pric
 	).GetWithPointer("/name")
 
 	assert.NoError(otu.T, err)
-	assert.Equal(otu.T, "DUCExampleNFT", result)
+	assert.Equal(otu.T, "Neo Motorcycle 1 of 1", result)
 
 	return otu
 }

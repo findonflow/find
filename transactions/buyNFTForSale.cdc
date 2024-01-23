@@ -15,7 +15,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
     let saleItemsCap: Capability<&{FindMarketSale.SaleItemCollectionPublic}>
 
 
-    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, UnpublishCapability, FungibleToken.Withdrawable) &Account) {
+    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, UnpublishCapability) &Account) {
 
         let marketplace = FindMarket.getFindTenantAddress()
         let tenantCapability= FindMarket.getTenantCapability(marketplace)!
@@ -25,12 +25,13 @@ transaction(user: String, id: UInt64, amount: UFix64) {
         let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
         let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
 
-        let saleItemCap= account.capabilities.get<&FindMarketSale.SaleItemCollection>(publicPath)
+        let saleItemCap= account.capabilities.get<&{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath)
         if saleItemCap==nil {
             account.storage.save(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
-            let cap = account.capabilities.storage.issue<&FindMarketSale.SaleItemCollection>(storagePath)
+            let cap = account.capabilities.storage.issue<&{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(storagePath)
             account.capabilities.publish(cap, at: publicPath)
         }
+
         let resolveAddress = FIND.resolve(user)
         if resolveAddress == nil {
             panic("The address input is not a valid name nor address. Input : ".concat(user))
