@@ -715,10 +715,10 @@ access(all) contract FindLeaseMarketAuctionSoft {
     }
 
     init() {
-        //        FindLeaseMarket.addSaleItemType(Type<@SaleItem>())
-        //       FindLeaseMarket.addSaleItemCollectionType(Type<@SaleItemCollection>())
-        //      FindLeaseMarket.addMarketBidType(Type<@Bid>())
-        //     FindLeaseMarket.addMarketBidCollectionType(Type<@MarketBidCollection>())
+        FindLeaseMarket.addSaleItemType(Type<@SaleItem>())
+        FindLeaseMarket.addSaleItemCollectionType(Type<@SaleItemCollection>())
+        FindLeaseMarket.addMarketBidType(Type<@Bid>())
+        FindLeaseMarket.addMarketBidCollectionType(Type<@MarketBidCollection>())
     }
 
 }
