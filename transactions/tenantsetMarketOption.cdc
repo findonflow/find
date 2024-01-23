@@ -5,7 +5,7 @@ import FiatToken from "../contracts/standard/FiatToken.cdc"
 import FindMarketSale from "../contracts/FindMarketSale.cdc"
 import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
-//import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
+import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
 //import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import FungibleToken from "../contracts/standard/FungibleToken.cdc"
@@ -38,7 +38,7 @@ transaction(nftName: String, nftTypes: [String], cut: UFix64){
         ),
         FindMarket.TenantRule(
             name: "Escrow",
-            types:[Type<@FindMarketSale.SaleItem>()],
+            types:[Type<@FindMarketSale.SaleItem>(),  Type<@FindMarketAuctionEscrow.SaleItem>()],
             //types:[Type<@FindMarketSale.SaleItem>(), Type<@FindMarketAuctionEscrow.SaleItem>(), Type<@FindMarketDirectOfferEscrow.SaleItem>()],
             ruleType: "listing",
             allow:true

@@ -1,7 +1,7 @@
 test_main.NFTDetailsReturnData{
 	AllowedListingActions: map[string]test_main.FindMarketSaleListing{
-		"FindMarketSale": {
-			ListingType: "A.179b6b1cb6755e31.FindMarketSale.SaleItem",
+		"FindMarketAuctionEscrow": {
+			ListingType: "A.179b6b1cb6755e31.FindMarketAuctionEscrow.SaleItem",
 			Status:      "active",
 			ListingDetails: []test_main.ListingDetails{
 				{
@@ -29,6 +29,36 @@ test_main.NFTDetailsReturnData{
 					},
 				},
 			},
+			FtAlias:       []string{"Flow"},
+			FtIdentifiers: []string{"A.0ae53cb6e3f42a79.FlowToken.Vault"},
+		},
+		"FindMarketSale": {
+			ListingType: "A.179b6b1cb6755e31.FindMarketSale.SaleItem",
+			Status:      "active",
+			ListingDetails: []test_main.ListingDetails{{
+				FtAlias:      "Flow",
+				FtIdentifier: "A.0ae53cb6e3f42a79.FlowToken.Vault",
+				Royalties: []test_main.ListingRoyalties{
+					{
+						Address:     "0x179b6b1cb6755e31",
+						FindName:    "find",
+						RoyaltyName: "find",
+						Cut:         0.025,
+					},
+					{
+						Address:     "0xf669cb8d41ce0c74",
+						FindName:    "user1",
+						RoyaltyName: "creator",
+						Cut:         0.05,
+					},
+					{
+						Address:     "0x179b6b1cb6755e31",
+						FindName:    "find",
+						RoyaltyName: "find forge",
+						Cut:         0.025,
+					},
+				},
+			}},
 			FtAlias:       []string{"Flow"},
 			FtIdentifiers: []string{"A.0ae53cb6e3f42a79.FlowToken.Vault"},
 		},

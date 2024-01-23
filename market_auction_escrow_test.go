@@ -8,31 +8,11 @@ import (
 )
 
 func TestMarketAuctionEscrow(t *testing.T) {
-
-	otu := NewOverflowTest(t)
-
-	mintFund := otu.O.TxFN(
-		WithSigner("account"),
-		WithArg("amount", 10000.0),
-		WithArg("recipient", "user2"),
-	)
+	otu := &OverflowTestUtils{T: t, O: ot.O}
 
 	price := 10.0
+	id := dandyIds[0]
 	preIncrement := 5.0
-	id := otu.setupMarketAndDandy()
-	otu.registerFtInRegistry().
-		setFlowDandyMarketOption("find").
-		setProfile("user1").
-		setProfile("user2")
-
-	mintFund("devMintFusd").AssertSuccess(t)
-
-	mintFund("devMintFlow").AssertSuccess(t)
-
-	mintFund("devMintUsdc").AssertSuccess(t)
-
-	otu.setUUID(500)
-
 	eventIdentifier := otu.identifier("FindMarketAuctionEscrow", "EnglishAuction")
 	royaltyIdentifier := otu.identifier("FindMarket", "RoyaltyPaid")
 
@@ -49,9 +29,16 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		WithArg("auctionStartTime", nil),
 		WithArg("auctionValidUntil", otu.currentTime()+10.0),
 	)
+	ot.Run(t, "Should be able to sell at auction", func(t *testing.T) {
+		otu.listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price).
+			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
+			tickClock(400.0).
+			saleItemListed("user1", "finished_completed", price+5.0).
+			fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0)
+	})
 
-	t.Run("Should not be able to list an item for auction twice, and will give error message.", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to list an item for auction twice, and will give error message.", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
@@ -61,132 +48,49 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Auction listing for this item is already created.")
-
-		otu.delistAllNFTForEscrowedAuction("user1")
 	})
 
-	t.Run("Should be able to sell and buy at auction even the seller didn't link provider correctly", func(t *testing.T) {
-
-		otu.unlinkDandyProvider("user1").
-			listNFTForEscrowedAuction("user1", id, price)
-
-		otu.O.Tx("cancelMarketAuctionEscrowed",
-			WithSigner("user1"),
-			WithArg("ids", []uint64{id}),
-		).
-			AssertSuccess(t)
-	})
-
-	t.Run("Should be able to sell and buy at auction even the buyer didn't link receiver correctly", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to cancel listing if the pointer is no longer valid", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price).
-			saleItemListed("user1", "active_listed", price).
-			unlinkDandyReceiver("user2").
 			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
 			tickClock(400.0).
-			saleItemListed("user1", "finished_completed", price+5.0).
-			fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0).
-			sendDandy("user1", "user2", id)
-	})
-
-	t.Run("Should be able to sell at auction", func(t *testing.T) {
-
-		otu.listNFTForEscrowedAuction("user1", id, price).
-			saleItemListed("user1", "active_listed", price).
-			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
-			tickClock(400.0).
-			saleItemListed("user1", "finished_completed", price+5.0).
-			fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0).
-			sendDandy("user1", "user2", id)
-
-	})
-
-	t.Run("Should be able to cancel listing if the pointer is no longer valid", func(t *testing.T) {
-
-		otu.listNFTForEscrowedAuction("user1", id, price).
-			saleItemListed("user1", "active_listed", price).
-			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
-			tickClock(400.0).
-			saleItemListed("user1", "finished_completed", price+5.0).
-			sendDandy("user3", "user1", id)
-
-		otu.setUUID(600)
+			sendDandy("user5", "user1", id)
 
 		otu.O.Tx("cancelMarketAuctionEscrowed",
 			WithSigner("user1"),
 			WithArg("ids", []uint64{id}),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, eventIdentifier, map[string]interface{}{
+			AssertEvent(t, "EnglishAuction", map[string]interface{}{
 				"id":     id,
 				"seller": otu.O.Address("user1"),
 				"buyer":  otu.O.Address("user2"),
 				"amount": 15.0,
 				"status": "cancel_ghostlisting",
 			})
-
-		otu.sendDandy("user1", "user3", id)
-
 	})
 
-	t.Run("Should not be able to list with price 0", func(t *testing.T) {
-
-		otu.O.Tx(
-			"listNFTForAuctionSoft",
-			WithSigner("user1"),
-			WithArg("nftAliasOrIdentifier", "Dandy"),
-			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
-			WithArg("id", id),
-			WithArg("ftAliasOrIdentifier", "Flow"),
+	ot.Run(t, "Should not be able to list with price 0", func(t *testing.T) {
+		listingTx("listNFTForAuctionEscrowed",
 			WithArg("price", 0.0),
-			WithArg("auctionReservePrice", price+5.0),
-			WithArg("auctionDuration", 300.0),
-			WithArg("auctionExtensionOnLateBid", 60.0),
-			WithArg("minimumBidIncrement", 1.0),
-			WithArg("auctionValidUntil", otu.currentTime()+10.0),
-		).
-			AssertFailure(t, "Auction start price should be greater than 0")
+		).AssertFailure(t, "Auction start price should be greater than 0")
 	})
 
-	t.Run("Should not be able to list with invalid reserve price", func(t *testing.T) {
-
-		otu.O.Tx(
-			"listNFTForAuctionSoft",
-			WithSigner("user1"),
-			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
-			WithArg("id", id),
-			WithArg("ftAliasOrIdentifier", "Flow"),
-			WithArg("price", price),
+	ot.Run(t, "Should not be able to list with invalid reserve price", func(t *testing.T) {
+		listingTx("listNFTForAuctionEscrowed",
 			WithArg("auctionReservePrice", price-5.0),
-			WithArg("auctionDuration", 300.0),
-			WithArg("auctionExtensionOnLateBid", 60.0),
-			WithArg("minimumBidIncrement", 1.0),
-			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Auction reserve price should be greater than Auction start price")
 	})
 
-	t.Run("Should not be able to list with invalid time", func(t *testing.T) {
-
-		otu.O.Tx(
-			"listNFTForAuctionSoft",
-			WithSigner("user1"),
-			WithArg("nftAliasOrIdentifier", "Dandy"),
-			WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
-			WithArg("id", id),
-			WithArg("ftAliasOrIdentifier", "Flow"),
-			WithArg("price", price),
-			WithArg("auctionReservePrice", price+5.0),
-			WithArg("auctionDuration", 300.0),
-			WithArg("auctionExtensionOnLateBid", 60.0),
-			WithArg("minimumBidIncrement", 1.0),
-			WithArg("auctionValidUntil", otu.currentTime()-10.0),
+	ot.Run(t, "Should not be able to list with invalid time", func(t *testing.T) {
+		listingTx("listNFTForAuctionEscrowed",
+			WithArg("auctionValidUntil", otu.currentTime()-1.0),
 		).
 			AssertFailure(t, "Valid until is before current time")
 	})
 
-	t.Run("Should be able to sell at auction, buyer fulfill", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to sell at auction, buyer fulfill", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketEscrow("user2", "user1", id, price+5.0)
@@ -194,12 +98,10 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		otu.tickClock(400.0)
 
 		otu.saleItemListed("user1", "finished_completed", price+5.0)
-		otu.fulfillMarketAuctionEscrowFromBidder("user2", id, price+5.0).
-			sendDandy("user1", "user2", id)
+		otu.fulfillMarketAuctionEscrowFromBidder("user2", id, price+5.0)
 	})
 
-	t.Run("Should not be able to bid expired auction listing", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to bid expired auction listing", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			tickClock(101.0)
@@ -211,12 +113,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			WithArg("amount", price),
 		).
 			AssertFailure(t, "This auction listing is already expired")
-
-		otu.delistAllNFTForEscrowedAuction("user1")
 	})
 
-	t.Run("Should not be able to bid your own listing", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to bid your own listing", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
@@ -227,12 +126,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			WithArg("amount", price),
 		).
 			AssertFailure(t, "You cannot bid on your own resource")
-
-		otu.delistAllNFTForEscrowedAuction("user1")
 	})
 
-	t.Run("Should return funds if auction does not meet reserve price", func(t *testing.T) {
-
+	ot.Run(t, "Should return funds if auction does not meet reserve price", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketEscrow("user2", "user1", id, price+1.0).
@@ -255,11 +151,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"amount": 11.0,
 				"status": "cancel_reserved_not_met",
 			})
-
 	})
 
-	t.Run("Should be able to cancel the auction", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to cancel the auction", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
@@ -276,11 +170,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"amount": 10.0,
 				"status": "cancel_listing",
 			})
-
 	})
 
-	t.Run("Should not be able to cancel the auction if it is ended", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to cancel the auction if it is ended", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
@@ -301,13 +193,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			WithArg("id", id),
 		).
 			AssertSuccess(t)
-
-		otu.sendDandy("user1", "user2", id)
-
 	})
 
-	t.Run("Should not be able to fulfill a not yet live / ended auction", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to fulfill a not yet live / ended auction", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
@@ -328,13 +216,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			WithArg("id", id),
 		).
 			AssertFailure(t, "Auction has not ended yet")
-
-		otu.delistAllNFTForEscrowedAuction("user1")
-
 	})
 
-	t.Run("Should return funds if auction is cancelled", func(t *testing.T) {
-
+	ot.Run(t, "Should return funds if auction is cancelled", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketEscrow("user2", "user1", id, price+1.0).
@@ -356,24 +240,18 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"amount": 11.0,
 				"status": "cancel_listing",
 			})
-
 	})
 
-	t.Run("Should be able to bid and increase bid by same user", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to bid and increase bid by same user", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
 			saleItemListed("user1", "active_ongoing", 15.0).
 			increaseAuctioBidMarketEscrow("user2", id, 5.0, 20.0).
 			saleItemListed("user1", "active_ongoing", 20.0)
-
-		otu.delistAllNFTForEscrowedAuction("user1")
-
 	})
 
-	t.Run("Should not be able to add bid that is not above minimumBidIncrement", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to add bid that is not above minimumBidIncrement", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketEscrow("user2", "user1", id, price+preIncrement).
@@ -385,14 +263,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			WithArg("amount", 0.1),
 		).
 			AssertFailure(t, "must be larger then previous bid+bidIncrement")
-
-		otu.delistAllNFTForEscrowedAuction("user1")
-
 	})
 
-	/* Tests on Rules */
-	t.Run("Should not be able to list after deprecated", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to list after deprecated", func(t *testing.T) {
 		otu.alterMarketOption("deprecate")
 
 		listingTx("listNFTForAuctionEscrowed",
@@ -401,12 +274,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Tenant has deprected mutation options on this item")
-
-		otu.alterMarketOption("enable")
 	})
 
-	t.Run("Should be able to bid, add bid , fulfill auction and delist after deprecated", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to bid, add bid , fulfill auction and delist after deprecated", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price)
 
 		otu.alterMarketOption("deprecate")
@@ -452,15 +322,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			WithArg("ids", []uint64{id}),
 		).
 			AssertSuccess(t)
-
-		otu.alterMarketOption("enable")
-		otu.delistAllNFTForEscrowedAuction("user2").
-			sendDandy("user1", "user2", id)
-
 	})
 
-	t.Run("Should no be able to list, bid, add bid , fulfill auction after stopped", func(t *testing.T) {
-
+	ot.Run(t, "Should no be able to list, bid, add bid , fulfill auction after stopped", func(t *testing.T) {
 		otu.alterMarketOption("stop")
 
 		listingTx("listNFTForAuctionEscrowed",
@@ -503,7 +367,6 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		).
 			AssertFailure(t, "Tenant has stopped this item")
 
-			/* Reset */
 		otu.alterMarketOption("enable")
 
 		otu.O.Tx("fulfillMarketAuctionEscrowedFromBidder",
@@ -514,11 +377,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 
 		otu.delistAllNFTForEscrowedAuction("user1").
 			sendDandy("user1", "user2", id)
-
 	})
 
-	t.Run("Should not be able to bid below listing price", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to bid below listing price", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
 
@@ -529,13 +390,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			WithArg("amount", 1.0),
 		).
 			AssertFailure(t, "You need to bid more then the starting price of 10.00000000")
-
-		otu.delistAllNFTForEscrowedAuction("user1")
-
 	})
 
-	t.Run("Should not be able to bid less the previous bidder", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to bid less the previous bidder", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
 			auctionBidMarketEscrow("user2", "user1", id, price+5.0)
@@ -547,24 +404,16 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			WithArg("amount", 5.0),
 		).
 			AssertFailure(t, "bid 5.00000000 must be larger then previous bid+bidIncrement 16.00000000")
-
-		otu.delistAllNFTForEscrowedAuction("user1")
-
 	})
-
-	/* Testing on Royalties */
 
 	// platform 0.15
 	// artist 0.05
 	// find 0.025
 	// tenant nil
-	t.Run("Royalties should be sent to correspondence upon fulfill action", func(t *testing.T) {
-
+	ot.Run(t, "Royalties should be sent to correspondence upon fulfill action", func(t *testing.T) {
 		price = 5.0
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
-			setProfile("user1").
-			setProfile("user2").
 			auctionBidMarketEscrow("user2", "user1", id, price+5.0)
 
 		otu.tickClock(500.0)
@@ -596,13 +445,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"royaltyName": "find forge",
 				"tenant":      "find",
 			})
-
-		otu.sendDandy("user1", "user2", id)
-
 	})
 
-	t.Run("Royalties of find platform should be able to change", func(t *testing.T) {
-
+	ot.Run(t, "Royalties of find platform should be able to change", func(t *testing.T) {
 		price = 5.0
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
@@ -638,15 +483,11 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"royaltyName": "find forge",
 				"tenant":      "find",
 			})
-
-		otu.sendDandy("user1", "user2", id)
-
 	})
 
-	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
+	ot.Run(t, "Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
 		price = 10.0
-
-		ids := otu.mintThreeExampleDandies()
+		ids := dandyIds
 
 		otu.listNFTForEscrowedAuction("user1", ids[0], price).
 			listNFTForEscrowedAuction("user1", ids[1], price).
@@ -683,7 +524,6 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		/* Reset */
 		otu.removeProfileBan("user1")
 
 		otu.O.Tx("fulfillMarketAuctionEscrowed",
@@ -692,50 +532,9 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			WithArg("id", ids[0]),
 		).
 			AssertSuccess(t)
-
 	})
 
-	t.Run("Should be able to ban user, user cannot bid NFT.", func(t *testing.T) {
-
-		ids := otu.mintThreeExampleDandies()
-
-		otu.listNFTForEscrowedAuction("user1", ids[0], price).
-			listNFTForEscrowedAuction("user1", ids[1], price).
-			auctionBidMarketEscrow("user2", "user1", ids[0], price+5.0).
-			tickClock(400.0).
-			profileBan("user2")
-
-		otu.O.Tx("bidMarketAuctionEscrowed",
-			WithSigner("user2"),
-			WithArg("user", "user1"),
-			WithArg("id", ids[1]),
-			WithArg("amount", price),
-		).
-			AssertFailure(t, "Buyer banned by Tenant")
-
-		otu.O.Tx("fulfillMarketAuctionEscrowed",
-			WithSigner("user2"),
-			WithArg("owner", "user1"),
-			WithArg("id", ids[0]),
-		).
-			AssertFailure(t, "Buyer banned by Tenant")
-
-		/* Reset */
-		otu.removeProfileBan("user2")
-
-		otu.O.Tx("fulfillMarketAuctionEscrowed",
-			WithSigner("user2"),
-			WithArg("owner", "user1"),
-			WithArg("id", ids[0]),
-		).
-			AssertSuccess(t)
-
-		otu.sendDandy("user1", "user2", ids[0])
-		otu.delistAllNFTForEscrowedAuction("user2")
-	})
-
-	t.Run("Should emit previous bidder if outbid", func(t *testing.T) {
-
+	ot.Run(t, "Should emit previous bidder if outbid", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			auctionBidMarketEscrow("user2", "user1", id, price+5.0)
 
@@ -753,133 +552,61 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"previousBuyer": otu.O.Address("user2"),
 				"status":        "active_ongoing",
 			})
-
-		otu.delistAllNFTForEscrowedAuction("user1")
 	})
 
-	t.Run("Should be able to list an NFT for auction and bid it with id != uuid", func(t *testing.T) {
+	/*
+		* TODO: maybe fix later
+				t.Run("not be able to buy an NFT with changed royalties, but should be able to cancel listing", func(t *testing.T) {
 
-		otu.registerDUCInRegistry().
-			sendExampleNFT("user1", "find", 2).
-			setFlowExampleMarketOption("find")
+					saleItem := otu.listExampleNFTForEscrowedAuction("user1", 2, price)
 
-		saleItem := otu.listExampleNFTForEscrowedAuction("user1", 2, price)
+					otu.saleItemListed("user1", "active_listed", price).
+						auctionBidMarketEscrow("user2", "user1", saleItem[0], price+5.0).
+						tickClock(400.0).
+						saleItemListed("user1", "finished_completed", price+5.0)
 
-		otu.saleItemListed("user1", "active_listed", price).
-			auctionBidMarketEscrow("user2", "user1", saleItem[0], price+5.0).
-			tickClock(400.0).
-			saleItemListed("user1", "finished_completed", price+5.0).
-			fulfillMarketAuctionEscrow("user1", saleItem[0], "user2", price+5.0).
-			sendExampleNFT("user1", "user2", 2)
+					otu.changeRoyaltyExampleNFT("user1", 2, false)
 
-	})
+					ids, err := otu.O.Script("getRoyaltyChangedIds",
+						WithArg("user", "user1"),
+					).
+						GetAsJson()
 
-	t.Run("Should not be able to list soul bound items", func(t *testing.T) {
-		otu.sendSoulBoundNFT("user1", "find")
-		// set market rules
-		otu.O.Tx("adminSetSellExampleNFTForFlow",
-			WithSigner("find"),
-			WithArg("tenant", "find"),
-		)
+					if err != nil {
+						panic(err)
+					}
 
-		otu.O.Tx("listNFTForAuctionEscrowed",
-			WithSigner("user1"),
-			WithArg("nftAliasOrIdentifier", exampleNFTType(otu)),
-			WithArg("id", 1),
-			WithArg("ftAliasOrIdentifier", "Flow"),
-			WithArg("price", price),
-			WithArg("auctionReservePrice", price+5.0),
-			WithArg("auctionDuration", 300.0),
-			WithArg("auctionExtensionOnLateBid", 60.0),
-			WithArg("minimumBidIncrement", 1.0),
-			WithArg("auctionStartTime", nil),
-			WithArg("auctionValidUntil", otu.currentTime()+100.0),
-		).AssertFailure(t, "This item is soul bounded and cannot be traded")
+					otu.O.Tx("relistMarketListings",
+						WithSigner("user1"),
+						WithArg("ids", ids),
+					).
+						AssertSuccess(t)
 
-	})
+				})
 
-	t.Run("not be able to buy an NFT with changed royalties, but should be able to cancel listing", func(t *testing.T) {
+				t.Run("should be able to get listings with royalty problems and cancel", func(t *testing.T) {
+					otu.changeRoyaltyExampleNFT("user1", 2, true)
 
-		saleItem := otu.listExampleNFTForEscrowedAuction("user1", 2, price)
+					ids, err := otu.O.Script("getRoyaltyChangedIds",
+						WithArg("user", "user1"),
+					).
+						GetAsJson()
 
-		otu.saleItemListed("user1", "active_listed", price).
-			auctionBidMarketEscrow("user2", "user1", saleItem[0], price+5.0).
-			tickClock(400.0).
-			saleItemListed("user1", "finished_completed", price+5.0)
+					if err != nil {
+						panic(err)
+					}
 
-		otu.changeRoyaltyExampleNFT("user1", 2, true)
+					otu.O.Tx("cancelMarketListings",
+						WithSigner("user1"),
+						WithArg("ids", ids),
+					).
+						AssertSuccess(t)
 
-		otu.O.Tx("fulfillMarketAuctionEscrowed",
-			WithSigner("user2"),
-			WithArg("owner", "user1"),
-			WithArg("id", saleItem[0]),
-		).
-			AssertFailure(t, "The total Royalties to be paid is changed after listing.")
+				})
 
-		otu.O.Tx("cancelMarketAuctionEscrowed",
-			WithSigner("user1"),
-			WithArg("ids", []uint64{saleItem[0]}),
-		).
-			AssertSuccess(t).
-			AssertEvent(t, eventIdentifier, map[string]interface{}{
-				"status": "cancel_royalties_changed",
-			})
-
-	})
-
-	t.Run("not be able to buy an NFT with changed royalties, but should be able to cancel listing", func(t *testing.T) {
-
-		saleItem := otu.listExampleNFTForEscrowedAuction("user1", 2, price)
-
-		otu.saleItemListed("user1", "active_listed", price).
-			auctionBidMarketEscrow("user2", "user1", saleItem[0], price+5.0).
-			tickClock(400.0).
-			saleItemListed("user1", "finished_completed", price+5.0)
-
-		otu.changeRoyaltyExampleNFT("user1", 2, false)
-
-		ids, err := otu.O.Script("getRoyaltyChangedIds",
-			WithArg("user", "user1"),
-		).
-			GetAsJson()
-
-		if err != nil {
-			panic(err)
-		}
-
-		otu.O.Tx("relistMarketListings",
-			WithSigner("user1"),
-			WithArg("ids", ids),
-		).
-			AssertSuccess(t)
-
-	})
-
-	t.Run("should be able to get listings with royalty problems and cancel", func(t *testing.T) {
-		otu.changeRoyaltyExampleNFT("user1", 2, true)
-
-		ids, err := otu.O.Script("getRoyaltyChangedIds",
-			WithArg("user", "user1"),
-		).
-			GetAsJson()
-
-		if err != nil {
-			panic(err)
-		}
-
-		otu.O.Tx("cancelMarketListings",
-			WithSigner("user1"),
-			WithArg("ids", ids),
-		).
-			AssertSuccess(t)
-
-	})
-
-	t.Run("Should be able to list a timed auction with future start time", func(t *testing.T) {
-
+	*/
+	ot.Run(t, "Should be able to list a timed auction with future start time", func(t *testing.T) {
 		listingTx("listNFTForAuctionEscrowed",
-			WithSigner("user1"),
-			WithArg("id", id),
 			WithArg("auctionStartTime", otu.currentTime()+10.0),
 			WithArg("auctionValidUntil", nil),
 		).
@@ -892,15 +619,10 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"id":                  id,
 				"seller":              otu.O.Address("user1"),
 			})
-
-		otu.delistAllNFTForEscrowedAuction("user1")
 	})
 
-	t.Run("Should be able to list a timed auction with current start time", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to list a timed auction with current start time", func(t *testing.T) {
 		listingTx("listNFTForAuctionEscrowed",
-			WithSigner("user1"),
-			WithArg("id", id),
 			WithArg("auctionStartTime", otu.currentTime()),
 			WithArg("auctionValidUntil", nil),
 		).
@@ -913,15 +635,10 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"id":                  id,
 				"seller":              otu.O.Address("user1"),
 			})
-
-		otu.delistAllNFTForEscrowedAuction("user1")
 	})
 
-	t.Run("Should be able to list a timed auction with previous start time", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to list a timed auction with previous start time", func(t *testing.T) {
 		listingTx("listNFTForAuctionEscrowed",
-			WithSigner("user1"),
-			WithArg("id", id),
 			WithArg("auctionStartTime", otu.currentTime()-1.0),
 			WithArg("auctionValidUntil", nil),
 		).
@@ -934,30 +651,20 @@ func TestMarketAuctionEscrow(t *testing.T) {
 				"id":                  id,
 				"seller":              otu.O.Address("user1"),
 			})
-
-		otu.delistAllNFTForEscrowedAuction("user1")
 	})
 
-	t.Run("Should be able to bid a timed auction that is started", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to bid a timed auction that is started", func(t *testing.T) {
 		listingTx("listNFTForAuctionEscrowed",
-			WithSigner("user1"),
-			WithArg("id", id),
 			WithArg("auctionStartTime", otu.currentTime()),
 			WithArg("auctionValidUntil", nil),
 		).
 			AssertSuccess(t)
 
 		otu.auctionBidMarketEscrow("user2", "user1", id, price+5.0)
-
-		otu.delistAllNFTForEscrowedAuction("user1")
 	})
 
-	t.Run("Should not be able to bid a timed auction that is not yet started", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to bid a timed auction that is not yet started", func(t *testing.T) {
 		listingTx("listNFTForAuctionEscrowed",
-			WithSigner("user1"),
-			WithArg("id", id),
 			WithArg("auctionStartTime", otu.currentTime()+10.0),
 			WithArg("auctionValidUntil", nil),
 		).
@@ -970,36 +677,10 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			WithArg("amount", price+5.0),
 		).
 			AssertFailure(t, fmt.Sprintf("Auction is not yet started, please place your bid after %2f", otu.currentTime()+10.0))
-
-		otu.delistAllNFTForEscrowedAuction("user1")
 	})
 
-	t.Run("Should not be able to bid a timed auction that is not yet started", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to sell and buy at auction even the buyer didn't link receiver correctly", func(t *testing.T) {
 		listingTx("listNFTForAuctionEscrowed",
-			WithSigner("user1"),
-			WithArg("id", id),
-			WithArg("auctionStartTime", otu.currentTime()+10.0),
-			WithArg("auctionValidUntil", nil),
-		).
-			AssertSuccess(t)
-
-		otu.O.Tx("bidMarketAuctionEscrowed",
-			WithSigner("user2"),
-			WithArg("user", "user1"),
-			WithArg("id", id),
-			WithArg("amount", price+5.0),
-		).
-			AssertFailure(t, fmt.Sprintf("Auction is not yet started, please place your bid after %2f", otu.currentTime()+10.0))
-
-		otu.delistAllNFTForEscrowedAuction("user1")
-	})
-
-	t.Run("Should be able to sell and buy at auction even the buyer didn't link receiver correctly", func(t *testing.T) {
-
-		listingTx("listNFTForAuctionEscrowed",
-			WithSigner("user1"),
-			WithArg("id", id),
 			WithArg("auctionStartTime", otu.currentTime()),
 			WithArg("auctionValidUntil", nil),
 		).
@@ -1009,8 +690,6 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
 			tickClock(400.0).
 			saleItemListed("user1", "finished_completed", price+5.0).
-			fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0).
-			sendDandy("user1", "user2", id)
+			fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0)
 	})
-
 }

@@ -61,7 +61,9 @@ transaction(user: String, id: UInt64, amount: UFix64) {
             self.targetCapability=cap
         } else {
             //TODO: I do not think this works as intended
-            var targetCapability= account.capabilities.get<&AnyResource>(nft.publicPath) as? Capability<&{NonFungibleToken.Collection}>
+            //var targetCapability= account.capabilities.get<&AnyResource>(nft.publicPath) as? Capability<&{NonFungibleToken.Collection}>
+            //this works
+            var targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
             if targetCapability == nil || !targetCapability!.check() {
                 let cd = item.getNFTCollectionData()
                 let cap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(cd.storagePath)
@@ -70,7 +72,6 @@ transaction(user: String, id: UInt64, amount: UFix64) {
                 targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
             }
             self.targetCapability=targetCapability!
-
         }
 
         self.walletReference = account.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
