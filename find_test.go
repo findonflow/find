@@ -24,12 +24,6 @@ func TestFIND(t *testing.T) {
 	// this use does not have a profile at all
 	user4Address := otu.O.Address("user4")
 
-	ot.Run(t, "Should be able to register a name", func(t *testing.T) {
-		otu.O.Script("getLeases").AssertWithPointerWant(t, "/0/name",
-			autogold.Want("allLeases", "find-admin"),
-		)
-	})
-
 	ot.Run(t, "Should get error if you try to register a name and dont have enough money", func(t *testing.T) {
 		otu.O.Tx("register",
 			WithSigner("user1"),

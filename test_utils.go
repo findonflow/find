@@ -1545,7 +1545,8 @@ func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation
 		WithArg("user", name),
 	).MarshalAs(&findReport)
 	if err != nil {
-		swallowErr(err)
+		require.NoError(otu.T, err)
+		//    panic(err)
 	}
 	var list []SaleItemInformation
 	for _, saleItemCollectionReport := range findReport.ItemsForSale {
@@ -1554,13 +1555,25 @@ func (otu *OverflowTestUtils) getItemsForSale(name string) []SaleItemInformation
 	return list
 }
 
+func (otu *OverflowTestUtils) getNamesForSale(name string) []LeaseInformation {
+	var findReport FINDReport
+	result := otu.O.Script("getFindNameMarket",
+		WithArg("user", name),
+	)
+	err := result.MarshalAs(&findReport)
+	if err != nil {
+		require.NoError(otu.T, err)
+	}
+	return findReport.Leases
+}
+
 func (otu *OverflowTestUtils) getLeasesForSale(name string) []SaleItemInformation {
 	var findReport FINDReport
 	err := otu.O.Script("getFindLeaseMarket",
 		WithArg("user", name),
 	).MarshalAs(&findReport)
 	if err != nil {
-		panic(err)
+		require.NoError(otu.T, err)
 		//		swallowErr(err)
 	}
 	var list []SaleItemInformation
@@ -3181,12 +3194,27 @@ type FINDReport struct {
 	Profile         interface{}                          `json:"profile"`
 	Bids            []interface{}                        `json:"bids"`
 	RelatedAccounts map[string]interface{}               `json:"relatedAccounts"`
-	Leases          []interface{}                        `json:"leases"`
+	Leases          []LeaseInformation                   `json:"leases"`
 	PrivateMode     string                               `json:"privateMode"`
 	LeasesForSale   map[string]SaleItemCollectionReport  `json:"leasesForSale"`
 	LeasesBids      map[string]MarketBidCollectionPublic `json:"leasesBids"`
 	ItemsForSale    map[string]SaleItemCollectionReport  `json:"itemsForSale"`
 	MarketBids      map[string]MarketBidCollectionPublic `json:"marketBids"`
+}
+
+type LeaseInformation struct {
+	Addons             []string `json:"addons"`
+	Address            string   `json:"address"`
+	Cost               int      `json:"cost"`
+	CurrentTime        int      `json:"currentTime"`
+	ExtensionOnLateBid int      `json:"extensionOnLateBid"`
+	LatestBid          int      `json:"latestBid"`
+	LatestBidBy        string   `json:"latestBidBy"`
+	LockedUntil        int      `json:"lockedUntil"`
+	Name               string   `json:"name"`
+	SalePrice          int      `json:"salePrice"`
+	Status             string   `json:"status"`
+	ValidUntil         int      `json:"validUntil"`
 }
 
 type SaleItemCollectionReport struct {

@@ -4,11 +4,11 @@ import FUSD from "../contracts/standard/FUSD.cdc"
 
 transaction(name: String, amount: UFix64) {
 
-    let vaultRef : &FUSD.Vault?
+    let vaultRef : auth (FungibleToken.Withdrawable) &FUSD.Vault?
     let bids : &FIND.BidCollection?
 
     prepare(account: auth(BorrowValue) &Account) {
-        self.vaultRef = account.storage.borrow<&FUSD.Vault>(from: /storage/fusdVault)
+        self.vaultRef = account.storage.borrow< auth (FungibleToken.Withdrawable) &FUSD.Vault>(from: /storage/fusdVault)
         self.bids = account.storage.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath)
     }
 

@@ -1115,7 +1115,7 @@ access(all) contract FIND {
             return self.fulfill(name)
         }
 
-        access(all) fun fulfill(_ name: String) {
+        access(LeaseOwner) fun fulfill(_ name: String) {
             if !self.leases.containsKey(name) {
                 panic( "Invalid name=".concat(name))
             }
@@ -1133,6 +1133,8 @@ access(all) contract FIND {
             let oldProfile=lease.getProfile()!
 
             if let cb= lease.offerCallback {
+                let salePrice=lease.salePrice
+                let uuid=lease.uuid
                 let offer= cb.borrow()!
                 let newProfile= getAccount(cb.address).capabilities.get<&{Profile.Public}>(Profile.publicPath)!
                 let avatar= newProfile.borrow()?.getAvatar() ?? panic("Create a profile before you fulfill a bid")
@@ -1140,6 +1142,7 @@ access(all) contract FIND {
 
                 //move the token to the new profile
                 lease.move(profile: newProfile)
+
                 if lease.salePrice == nil || lease.salePrice != soldFor {
                     emit DirectOffer(name: name, uuid: lease.uuid, seller: lease.owner!.address, sellerName: FIND.reverseLookup(lease.owner!.address), amount: soldFor, status: "sold", vaultType:Type<@FUSD.Vault>().identifier, buyer:newProfile.address, buyerName:FIND.reverseLookup(newProfile.address), buyerAvatar: avatar, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
                 } else {
@@ -1152,10 +1155,10 @@ access(all) contract FIND {
                     let cutAmount= soldFor * self.networkCut
                     let networkWallet = self.networkWallet.borrow() ?? panic("The network wallet is not set up properly. Wallet address : ".concat(self.networkWallet.address.toString()))
                     networkWallet.deposit(from: <- vault.withdraw(amount: cutAmount))
-                    if lease.salePrice == nil || lease.salePrice != soldFor {
-                        emit RoyaltyPaid(name: name, uuid: lease.uuid, address: self.networkWallet.address, findName:FIND.reverseLookup(self.networkWallet.address), royaltyName:"Network", amount: cutAmount, vaultType:vault.getType().identifier, saleType: "DirectOffer")
+                    if salePrice == nil || salePrice != soldFor {
+                        emit RoyaltyPaid(name: name, uuid: uuid, address: self.networkWallet.address, findName:FIND.reverseLookup(self.networkWallet.address), royaltyName:"Network", amount: cutAmount, vaultType:vault.getType().identifier, saleType: "DirectOffer")
                     } else {
-                        emit RoyaltyPaid(name: name, uuid: lease.uuid, address: self.networkWallet.address, findName:FIND.reverseLookup(self.networkWallet.address), royaltyName:"Network", amount: cutAmount, vaultType:vault.getType().identifier, saleType: "Sale")
+                        emit RoyaltyPaid(name: name, uuid: uuid, address: self.networkWallet.address, findName:FIND.reverseLookup(self.networkWallet.address), royaltyName:"Network", amount: cutAmount, vaultType:vault.getType().identifier, saleType: "Sale")
                     }
                 }
 
@@ -1186,6 +1189,7 @@ access(all) contract FIND {
 
 
 
+            let uuid=lease.uuid
             //move the token to the new profile
             lease.move(profile: newProfile)
             emit EnglishAuction(name: name, uuid:lease.uuid, seller: lease.owner!.address, sellerName:FIND.reverseLookup(lease.owner!.address), amount: soldFor, auctionReservePrice: lease.auctionReservePrice!, status: "sold", vaultType:Type<@FUSD.Vault>().identifier, buyer:newProfile.address, buyerName:FIND.reverseLookup(newProfile.address), buyerAvatar: avatar, endsAt: self.borrowAuction(name).endsAt, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
@@ -1200,7 +1204,7 @@ access(all) contract FIND {
                 let cutAmount= soldFor * self.networkCut
                 let networkWallet = self.networkWallet.borrow() ?? panic("The network wallet is not set up properly. Wallet address : ".concat(self.networkWallet.address.toString()))
                 networkWallet.deposit(from: <- vault.withdraw(amount: cutAmount))
-                emit RoyaltyPaid(name: name, uuid: lease.uuid, address: self.networkWallet.address, findName:FIND.reverseLookup(self.networkWallet.address), royaltyName:"Network", amount: cutAmount, vaultType:vault.getType().identifier, saleType: "EnglishAuction")
+                emit RoyaltyPaid(name: name, uuid: uuid, address: self.networkWallet.address, findName:FIND.reverseLookup(self.networkWallet.address), royaltyName:"Network", amount: cutAmount, vaultType:vault.getType().identifier, saleType: "EnglishAuction")
             }
 
             //why not use FIND to send money :P
@@ -1245,18 +1249,15 @@ access(all) contract FIND {
         }
 
         access(LeaseOwner) fun listForSale(name :String, directSellPrice:UFix64) {
-            Debug.log("list for sale")
             if !self.leases.containsKey(name) {
                 panic("Cannot list name for sale that is not registered to you name=".concat(name))
             }
 
-            Debug.log("list for sale2")
             let tokenRef = self.borrowAuth(name)
 
             if !tokenRef.validate() {
                 panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
             }
-            Debug.log("list for sale3")
 
             tokenRef.setSalePrice(directSellPrice)
             emit Sale(name: name, uuid: tokenRef.uuid, seller: self.owner!.address, sellerName: FIND.reverseLookup(self.owner!.address), amount: tokenRef.salePrice!, status: "active_listed", vaultType:Type<@FUSD.Vault>().identifier, buyer:nil, buyerName:nil, buyerAvatar: nil, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil())
@@ -1879,7 +1880,7 @@ access(all) contract FIND {
             let fromCap=getAccount(nameStatus.owner!).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
 
             let bid <- create Bid(from: fromCap, name:name, vault: <- vault)
-            let leaseCollection= fromCap!.borrow() ?? panic("Could not borrow lease bid from owner of name=".concat(name))
+            let leaseCollection= fromCap.borrow() ?? panic("Could not borrow lease bid from owner of name=".concat(name))
 
 
             let callbackCapability =self.owner!.capabilities.get<&{BidCollectionPublic}>(FIND.BidPublicPath)!
