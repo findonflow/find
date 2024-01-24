@@ -12,11 +12,11 @@ import FIND from "../contracts/FIND.cdc"
 transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
 
 	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
-	let walletReference : &FungibleToken.Vault
+	let walletReference : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
 	let bidsReference: &FindMarketDirectOfferEscrow.MarketBidCollection?
 	let pointer: FindViews.ViewReadPointer
 
-	prepare(account: auth(BorrowValue) &Account) {
+	prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		let resolveAddress = FIND.resolve(user)
@@ -30,12 +30,12 @@ transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIde
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
 
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
-		self.walletReference = account.storage.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		self.walletReference = account.storage.borrow<auth(FungibleToken.Withdrawable) &FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let tenant = tenantCapability.borrow()!
 
-		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let receiverCap=account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
 		let doeBidType= Type<@FindMarketDirectOfferEscrow.MarketBidCollection>()
 		let doeBidPublicPath=FindMarket.getPublicPath(doeBidType, name: tenant.name)
 		let doeBidStoragePath= FindMarket.getStoragePath(doeBidType, name:tenant.name)
@@ -71,7 +71,7 @@ transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIde
 
 	pre {
 		self.bidsReference != nil : "This account does not have a bid collection"
-		self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
+		self.walletReference.getBalance() > amount : "Your wallet does not have enough funds to pay for this item"
 	}
 
 	execute {

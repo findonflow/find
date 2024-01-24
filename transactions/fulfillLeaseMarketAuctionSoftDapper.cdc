@@ -6,13 +6,13 @@ import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(leaseName: String, amount:UFix64) {
 
-	let walletReference : &FungibleToken.Vault
+	let walletReference : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
 	let bidsReference: &FindLeaseMarketAuctionSoft.MarketBidCollection
 	let requiredAmount: UFix64
-	let mainDapperCoinVault: &FungibleToken.Vault
+	let mainDapperCoinVault: &{FungibleToken.Vault}
 	let balanceBeforeTransfer: UFix64
 
-	prepare(dapper: auth(BorrowValue) &Account, account: auth(BorrowValue) &Account) {
+	prepare(dapper: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account, account: auth(BorrowValue) &Account) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketAuctionSoft.MarketBidCollection>())
@@ -24,15 +24,15 @@ transaction(leaseName: String, amount:UFix64) {
 
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
 
-		self.mainDapperCoinVault = dapper.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("Cannot borrow Dapper Coin vault from account storage. Type : ".concat(ft.type.identifier))
-		self.balanceBeforeTransfer = self.mainDapperCoinVault.balance
+		self.mainDapperCoinVault = dapper.storage.borrow<&{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("Cannot borrow Dapper Coin vault from account storage. Type : ".concat(ft.type.identifier))
+		self.balanceBeforeTransfer = self.mainDapperCoinVault.getBalance()
 
-		self.walletReference = dapper.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		self.walletReference = dapper.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 		self.requiredAmount = self.bidsReference.getBalance(leaseName)
 	}
 
 	pre{
-		self.walletReference.balance > self.requiredAmount : "Your wallet does not have enough funds to pay for this item"
+		self.walletReference.getBalance() > self.requiredAmount : "Your wallet does not have enough funds to pay for this item"
 		self.requiredAmount == amount : "Amount needed to fulfill is ".concat(self.requiredAmount.toString()).concat(" you sent in ").concat(amount.toString())
 	}
 
@@ -43,7 +43,7 @@ transaction(leaseName: String, amount:UFix64) {
 
 	// Check that all dapper Coin was routed back to Dapper
 	post {
-		self.mainDapperCoinVault.balance == self.balanceBeforeTransfer: "Dapper Coin leakage"
+		self.mainDapperCoinVault.getBalance() == self.balanceBeforeTransfer: "Dapper Coin leakage"
 	}
 }
 

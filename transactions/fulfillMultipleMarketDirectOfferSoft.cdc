@@ -38,7 +38,7 @@ transaction(ids: [UInt64], amounts:[UFix64]) {
 			if vaultRefs[ft!.vaultPath] != nil {
 				self.walletReference.append(vaultRefs[ft!.vaultPath]!)
 			} else {
-				let walletReference = account.storage.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
+				let walletReference = account.storage.borrow<&{FungibleToken.Vault}>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
 				vaultRefs[ft!.vaultPath] = walletReference
 				self.walletReference.append(walletReference)
 			}

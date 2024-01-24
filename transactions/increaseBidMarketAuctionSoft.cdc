@@ -19,7 +19,7 @@ transaction(id: UInt64, amount: UFix64) {
 
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
 		if !ft.tag.contains("dapper") {
-			let walletReference = account.storage.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+			let walletReference = account.storage.borrow<&{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 		}
 	}
 

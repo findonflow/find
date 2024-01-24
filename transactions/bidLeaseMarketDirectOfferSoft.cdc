@@ -11,7 +11,7 @@ transaction(leaseName: String, ftAliasOrIdentifier:String, amount: UFix64, valid
 	let bidsReference: &FindLeaseMarketDirectOfferSoft.MarketBidCollection?
 	let ftVaultType: Type
 
-	prepare(account: auth(BorrowValue) &Account) {
+	prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
 
 
 		let resolveAddress = FIND.resolve(leaseName)
@@ -22,14 +22,14 @@ transaction(leaseName: String, ftAliasOrIdentifier:String, amount: UFix64, valid
 
 		self.ftVaultType = ft.type
 
-		let walletReference = account.storage.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		let walletReference = account.storage.borrow<&{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 		assert(walletReference.balance > amount , message: "Bidder has to have enough balance in wallet")
 
 		let leaseMarketplace = FindMarket.getFindTenantAddress()
 		let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
 		let leaseTenant = leaseTenantCapability.borrow()!
 
-		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let receiverCap=account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
 		let leaseDOSBidType= Type<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>()
 		let leaseDOSBidPublicPath=leaseTenant.getPublicPath(leaseDOSBidType)
 		let leaseDOSBidStoragePath= leaseTenant.getStoragePath(leaseDOSBidType)

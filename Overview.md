@@ -1,4 +1,5 @@
 # .find
+
 TODO: we need to go through this
 
 .find is a solution that aims to make it easier to .find people and their things on the flow blockchain. It is live on mainnet since Dec 13th 2021 at https://find.xyz
@@ -706,7 +707,7 @@ import FIND from "../contracts/FIND.cdc"
 transaction(user: String, id: UInt64, amount: UFix64) {
 
 	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
-	let walletReference : &FungibleToken.Vault
+	let walletReference : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
 
 	let saleItemsCap: Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}>
 
@@ -737,11 +738,11 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 
 		// get FT information from item
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
-		self.walletReference = account.storage.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		self.walletReference = account.storage.borrow<auth(FungibleToken.Withdrawable) &FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 	}
 
 	pre {
-		self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
+		self.walletReference.getBalance() > amount : "Your wallet does not have enough funds to pay for this item"
 	}
 
 	execute {

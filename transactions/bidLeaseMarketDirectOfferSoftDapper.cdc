@@ -11,7 +11,7 @@ transaction(leaseName: String, ftAliasOrIdentifier:String, amount: UFix64, valid
 	let bidsReference: &FindLeaseMarketDirectOfferSoft.MarketBidCollection?
 	let ftVaultType: Type
 
-	prepare(account: auth(BorrowValue) &Account) {
+	prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
 
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
 
@@ -21,7 +21,7 @@ transaction(leaseName: String, ftAliasOrIdentifier:String, amount: UFix64, valid
 		let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
 		let leaseTenant = leaseTenantCapability.borrow()!
 
-		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let receiverCap=account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
 		let leaseDOSBidType= Type<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>()
 		let leaseDOSBidPublicPath=leaseTenant.getPublicPath(leaseDOSBidType)
 		let leaseDOSBidStoragePath= leaseTenant.getStoragePath(leaseDOSBidType)

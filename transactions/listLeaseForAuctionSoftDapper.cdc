@@ -10,7 +10,7 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, price:UFix64, auctio
 	let pointer : FindLeaseMarket.AuthLeasePointer
 	let vaultType : Type
 
-	prepare(account: auth(BorrowValue) &Account) {
+	prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
 
 		// Get supported NFT and FT Information from Registries from input alias
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
@@ -22,16 +22,17 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, price:UFix64, auctio
 		let leaseASSaleItemType= Type<@FindLeaseMarketAuctionSoft.SaleItemCollection>()
 		let leaseASPublicPath=leaseTenant.getPublicPath(leaseASSaleItemType)
 		let leaseASStoragePath= leaseTenant.getStoragePath(leaseASSaleItemType)
-		let leaseASSaleItemCap= account.getCapability<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseASPublicPath)
-		if !leaseASSaleItemCap.check() {
+		let leaseASSaleItemCap= account.capabilities.get<&FindLeaseMarketAuctionSoft.SaleItemCollection>(leaseASPublicPath)
+		if leaseASSaleItemCap == nil {
 			//The link here has to be a capability not a tenant, because it can change.
 			account.storage.save<@FindLeaseMarketAuctionSoft.SaleItemCollection>(<- FindLeaseMarketAuctionSoft.createEmptySaleItemCollection(leaseTenantCapability), to: leaseASStoragePath)
-			account.link<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseASPublicPath, target: leaseASStoragePath)
+			let saleColCap = account.capabilities.storage.issue<&FindLeaseMarketAuctionSoft.SaleItemCollection>(leaseASStoragePath)
+			account.capabilities.publish(saleColCap, at: leaseASPublicPath)
 		}
 
 		self.saleItems= account.storage.borrow<&FindLeaseMarketAuctionSoft.SaleItemCollection>(from: leaseASStoragePath)
-		let ref= account.storage.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
-		self.pointer= FindLeaseMarket.AuthLeasePointer(ref: ref, name: leaseName)
+		let cap = account.capabilities.storage.issue<auth(FIND.Leasee) &FIND.LeaseCollection>(FIND.LeaseStoragePath)!
+		self.pointer= FindLeaseMarket.AuthLeasePointer(cap: cap, name: leaseName)
 		self.vaultType= ft.type
 	}
 

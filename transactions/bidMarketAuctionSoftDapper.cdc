@@ -17,7 +17,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 	let pointer: FindViews.ViewReadPointer
 	let ftVaultType: Type
 
-	prepare(account: auth(BorrowValue) &Account) {
+	prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		let resolveAddress = FIND.resolve(user)
@@ -26,7 +26,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let tenant = tenantCapability.borrow()!
-		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let receiverCap=account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
 
 		let asBidType= Type<@FindMarketAuctionSoft.MarketBidCollection>()
 		let asBidPublicPath=FindMarket.getPublicPath(asBidType, name: tenant.name)

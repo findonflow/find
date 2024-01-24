@@ -8,11 +8,11 @@ import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(leaseName: String, amount: UFix64) {
 
-	let saleItemsCap: Capability<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic}>
+	let saleItemsCap: Capability<&{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic}>
 	let bidsReference: &FindLeaseMarketAuctionSoft.MarketBidCollection?
 	let ftVaultType: Type
 
-	prepare(account: auth(BorrowValue) &Account) {
+	prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
 
 		let resolveAddress = FIND.resolve(leaseName)
 		if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(leaseName))}
@@ -22,14 +22,15 @@ transaction(leaseName: String, amount: UFix64) {
 		let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
 		let leaseTenant = leaseTenantCapability.borrow()!
 
-		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let receiverCap=account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
 		let leaseASBidType= Type<@FindLeaseMarketAuctionSoft.MarketBidCollection>()
 		let leaseASBidPublicPath=leaseTenant.getPublicPath(leaseASBidType)
 		let leaseASBidStoragePath= leaseTenant.getStoragePath(leaseASBidType)
-		let leaseASBidCap= account.getCapability<&FindLeaseMarketAuctionSoft.MarketBidCollection{FindLeaseMarketAuctionSoft.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseASBidPublicPath)
-		if !leaseASBidCap.check() {
+		let leaseASBidCap= account.capabilities.get<&FindLeaseMarketAuctionSoft.MarketBidCollection>(leaseASBidPublicPath)
+		if leaseASBidCap == nil {
 			account.storage.save<@FindLeaseMarketAuctionSoft.MarketBidCollection>(<- FindLeaseMarketAuctionSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:leaseTenantCapability), to: leaseASBidStoragePath)
-			account.link<&FindLeaseMarketAuctionSoft.MarketBidCollection{FindLeaseMarketAuctionSoft.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseASBidPublicPath, target: leaseASBidStoragePath)
+			let leaseBidCap = account.capabilities.storage.issue<&FindLeaseMarketAuctionSoft.MarketBidCollection>(leaseASBidStoragePath)
+			account.capabilities.publish(leaseBidCap, at: leaseASBidPublicPath)
 		}
 
 		self.saleItemsCap= FindLeaseMarketAuctionSoft.getSaleItemCapability(marketplace:leaseMarketplace, user:address) ?? panic("cannot find sale item cap")

@@ -10,7 +10,7 @@ transaction(ids: [UInt64], amounts:[UFix64]) {
 	let requiredAmount: [UFix64]
 	let balanceBeforeTransfer: {Type : UFix64}
 
-	prepare(dapper: auth(BorrowValue) &Account, account: auth(BorrowValue) &Account) {
+	prepare(dapper: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account, account: auth(BorrowValue) &Account) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
@@ -41,7 +41,7 @@ transaction(ids: [UInt64], amounts:[UFix64]) {
 				let vaultRef = vaultRefs[ft!.vaultPath]!
 				self.walletReference.append(vaultRef)
 			} else {
-				let walletReference = dapper.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("Cannot borrow Dapper Coin Vault. Type : ".concat(ft!.type.identifier))
+				let walletReference = dapper.storage.borrow<&{FungibleToken.Vault}>(from: ft!.vaultPath) ?? panic("Cannot borrow Dapper Coin Vault. Type : ".concat(ft!.type.identifier))
 				vaultRefs[ft!.vaultPath] = walletReference
 				self.walletReference.append(walletReference)
 				self.balanceBeforeTransfer[walletReference.getType()] = walletReference.balance

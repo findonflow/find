@@ -16,7 +16,7 @@ transaction(users: [Address], ids: [UInt64], amounts: [UFix64]) {
 	let saleItems: [&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}]
 	var totalPrice : UFix64
 	let prices : [UFix64]
-	prepare(dapper: auth(BorrowValue) &Account, account: auth(BorrowValue) &Account) {
+	prepare(dapper: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account, account: auth(BorrowValue) &Account) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		if users.length != ids.length {
@@ -94,7 +94,7 @@ transaction(users: [Address], ids: [UInt64], amounts: [UFix64]) {
 				fts[ftIdentifier] = ft
 			}
 
-			let dapperVault = dapper.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("Cannot borrow Dapper Coin Vault : ".concat(ft!.type.identifier))
+			let dapperVault = dapper.storage.borrow<&{FungibleToken.Vault}>(from: ft!.vaultPath) ?? panic("Cannot borrow Dapper Coin Vault : ".concat(ft!.type.identifier))
 
 			self.walletReference.append(
 				dapperVault

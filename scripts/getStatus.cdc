@@ -129,7 +129,7 @@ access(all) fun main(user: String) : Report? {
 			if let receiver =account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver).borrow() {
 			 	isDapper=receiver.isInstance(Type<@TokenForwarding.Forwarder>())
 			} else {
-				if let duc = aaccount.capabilites.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)!.borrow() {
+				if let duc = aaccount.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)!.borrow() {
 					isDapper = duc.isInstance(Type<@TokenForwarding.Forwarder>())
 				} else {
 					isDapper = false

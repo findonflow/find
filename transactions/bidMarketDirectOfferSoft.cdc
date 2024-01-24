@@ -12,13 +12,13 @@ import FIND from "../contracts/FIND.cdc"
 transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
 
 	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
-	let walletReference : &FungibleToken.Vault
+	let walletReference : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
 	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection?
 	let balanceBeforeBid: UFix64
 	let pointer: FindViews.ViewReadPointer
 	let ftVaultType: Type
 
-	prepare(account: auth(BorrowValue) &Account) {
+	prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		let resolveAddress = FIND.resolve(user)
@@ -34,12 +34,12 @@ transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIde
 		self.ftVaultType = ft.type
 
 		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
-		self.walletReference = account.storage.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		self.walletReference = account.storage.borrow<auth(FungibleToken.Withdrawable) &FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let tenant = tenantCapability.borrow()!
 
-		let receiverCap=account.getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
+		let receiverCap=account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
 		let dosBidType= Type<@FindMarketDirectOfferSoft.MarketBidCollection>()
 		let dosBidPublicPath=FindMarket.getPublicPath(dosBidType, name: tenant.name)
 		let dosBidStoragePath= FindMarket.getStoragePath(dosBidType, name:tenant.name)
@@ -50,7 +50,7 @@ transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIde
 		}
 
 		self.bidsReference= account.storage.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: dosBidStoragePath)
-		self.balanceBeforeBid=self.walletReference.balance
+		self.balanceBeforeBid=self.walletReference.getBalance()
 		self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: id)
 
 		/* Check for nftCapability */
@@ -76,7 +76,7 @@ transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIde
 
 	pre {
 		self.bidsReference != nil : "This account does not have a bid collection"
-		self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
+		self.walletReference.getBalance() > amount : "Your wallet does not have enough funds to pay for this item"
 	}
 
 	execute {

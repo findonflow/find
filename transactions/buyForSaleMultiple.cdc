@@ -115,7 +115,7 @@ transaction(users: [Address], ids: [AnyStruct], amounts: [UFix64]) {
 				}
 
 				self.walletReference.append(
-					account.storage.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
+					account.storage.borrow<&{FungibleToken.Vault}>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
 				)
 
 				var targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft!.publicPath)

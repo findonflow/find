@@ -5,7 +5,7 @@ import FindMarket from "../contracts/FindMarket.cdc"
 
 transaction(id: UInt64, amount: UFix64) {
 
-	let walletReference : &FungibleToken.Vault
+	let walletReference : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
 	let bidsReference: &FindMarketDirectOfferEscrow.MarketBidCollection
 	let balanceBeforeBid: UFix64
 
@@ -17,12 +17,12 @@ transaction(id: UInt64, amount: UFix64) {
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketDirectOfferEscrow.MarketBidCollection>())
 		let item = FindMarket.assertBidOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, id: id)
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
-		self.walletReference = account.storage.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
-		self.balanceBeforeBid=self.walletReference.balance
+		self.walletReference = account.storage.borrow<auth(FungibleToken.Withdrawable) &FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		self.balanceBeforeBid=self.walletReference.getBalance()
 	}
 
 	pre {
-		self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
+		self.walletReference.getBalance() > amount : "Your wallet does not have enough funds to pay for this item"
 	}
 
 	execute {

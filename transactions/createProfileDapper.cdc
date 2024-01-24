@@ -10,6 +10,8 @@ import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
 import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOfferSoft.cdc"
 import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
+import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
+import FindViews from "../contracts/FindViews.cdc"
 
 transaction(name: String) {
     prepare(account: auth(Profile.Owner, StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
@@ -42,15 +44,41 @@ transaction(name: String) {
 
         let profile=account.storage.borrow<auth(Profile.Owner) &Profile.User>(from: Profile.storagePath)!
 
+        let dapper=getAccount(FindViews.getDapperAddress())
+
         if !profile.hasWallet("DUC") {
-            let ducReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)!
-            profile.addWallet(Profile.Wallet( name:"DUC", receiver:ducReceiver, balance:account.capabilities.get<&{FungibleToken.Vault}>(/public/dapperUtilityCoinVault)!, accept: Type<@DapperUtilityCoin.Vault>(), tags: ["duc", "dapperUtilityCoin","dapper"]))
+            var ducReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+            var ducBalanceCap = account.capabilities.get<&{FungibleToken.Vault}>(/public/dapperUtilityCoinVault)
+            if ducReceiver == nil {
+                // Create a new Forwarder resource for DUC and store it in the new account's storage
+                let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)!)
+                account.storage.save(<-ducForwarder, to: /storage/dapperUtilityCoinVault)
+                ducReceiver = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/dapperUtilityCoinVault)
+                account.capabilities.publish(ducReceiver!, at: /public/dapperUtilityCoinReceiver)
+            }
+            if ducBalanceCap == nil {
+                ducBalanceCap = account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/dapperUtilityCoinVault)
+                account.capabilities.publish(ducBalanceCap!, at: /public/dapperUtilityCoinVault)
+            }
+            profile.addWallet(Profile.Wallet( name:"DUC", receiver:ducReceiver!, balance: ducBalanceCap!, accept: Type<@DapperUtilityCoin.Vault>(), tags: ["duc", "dapperUtilityCoin","dapper"]))
             updated=true
         }
 
         if !profile.hasWallet("FUT") {
-            let futReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)!
-            profile.addWallet(Profile.Wallet( name:"FUT", receiver:futReceiver, balance:account.capabilities.get<&{FungibleToken.Vault}>(/public/flowUtilityTokenVault)!, accept: Type<@FlowUtilityToken.Vault>(), tags: ["fut", "flowUtilityToken","dapper"]))
+            var futReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+            var futBalanceCap = account.capabilities.get<&{FungibleToken.Vault}>(/public/flowUtilityTokenVault)
+            if futReceiver == nil {
+                // Create a new Forwarder resource for FUT and store it in the new account's storage
+                let futForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.capabilities.get<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)!)
+                account.storage.save(<-futForwarder, to: /storage/flowUtilityTokenReceiver)
+                futReceiver = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/flowUtilityTokenReceiver)
+                account.capabilities.publish(futReceiver!, at: /public/flowUtilityTokenReceiver)
+            }
+            if futBalanceCap == nil {
+                futBalanceCap = account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/flowUtilityTokenReceiver)
+                account.capabilities.publish(futBalanceCap!, at: /public/flowUtilityTokenVault)
+            }
+            profile.addWallet(Profile.Wallet( name:"FUT", receiver:futReceiver!, balance:futBalanceCap!, accept: Type<@FlowUtilityToken.Vault>(), tags: ["fut", "flowUtilityToken","dapper"]))
             updated=true
         }
 
