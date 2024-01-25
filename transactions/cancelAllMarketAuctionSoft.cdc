@@ -3,7 +3,7 @@ import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
 
 transaction() {
 
-	let saleItems : &FindMarketAuctionSoft.SaleItemCollection?
+	let saleItems : &{FindMarketAuctionSoft.SaleItemCollectionPublic}?
 
 	prepare(account: auth(BorrowValue) &Account) {
 		let marketplace = FindMarket.getFindTenantAddress()

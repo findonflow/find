@@ -11,7 +11,7 @@ import Profile from "../contracts/Profile.cdc"
 
 transaction(user: String, id: UInt64, amount: UFix64) {
 
-	let saleItemsCap: Capability<&FindMarketAuctionSoft.SaleItemCollection{FindMarketAuctionSoft.SaleItemCollectionPublic}>
+	let saleItemsCap: Capability<&FindMarketAuctionSoft.SaleItemCollection>
 	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
 	let walletReference : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
 	let bidsReference: &FindMarketAuctionSoft.MarketBidCollection?
@@ -19,7 +19,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 	let pointer: FindViews.ViewReadPointer
 	let ftVaultType: Type
 
-	prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
+	prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue, UnpublishCapability) &Account) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		let resolveAddress = FIND.resolve(user)
@@ -33,10 +33,11 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 		let asBidType= Type<@FindMarketAuctionSoft.MarketBidCollection>()
 		let asBidPublicPath=FindMarket.getPublicPath(asBidType, name: tenant.name)
 		let asBidStoragePath= FindMarket.getStoragePath(asBidType, name:tenant.name)
-		let asBidCap= account.getCapability<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(asBidPublicPath)
-		if !asBidCap.check() {
+		let asBidCap= account.capabilities.get<&FindMarketAuctionSoft.MarketBidCollection>(asBidPublicPath)
+		if asBidCap == nil {
 			account.storage.save<@FindMarketAuctionSoft.MarketBidCollection>(<- FindMarketAuctionSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: asBidStoragePath)
-			account.link<&FindMarketAuctionSoft.MarketBidCollection{FindMarketAuctionSoft.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(asBidPublicPath, target: asBidStoragePath)
+			let cap = account.capabilities.storage.issue<&FindMarketAuctionSoft.MarketBidCollection>(asBidStoragePath)
+			account.capabilities.publish(cap, at: asBidPublicPath)
 		}
 
 		self.saleItemsCap= FindMarketAuctionSoft.getSaleItemCapability(marketplace:marketplace, user:address) ?? panic("cannot find sale item cap")
@@ -51,25 +52,25 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
 
-		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
-		/* Check for nftCapability */
-		if !self.targetCapability.check() {
-			let cd = item.getNFTCollectionData()
-			// should use account.type here instead
-			if account.type(at: cd.storagePath) != nil {
-				let pathIdentifier = nft.publicPath.toString()
-				let findPath = PublicPath(identifier: pathIdentifier.slice(from: "/public/".length , upTo: pathIdentifier.length).concat("_FIND"))!
-				account.link<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
-					findPath,
-					target: nft.storagePath
-				)
-				self.targetCapability = account.getCapability<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(findPath)
-			} else {
-				account.storage.save(<- cd.createEmptyCollection(), to: cd.storagePath)
-				account.link<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-				account.link<&{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
-			}
-
+		let col= account.storage.borrow<&AnyResource>(from: nft.storagePath) as? &{NonFungibleToken.Collection}?
+        if col == nil {
+            let cd = item.getNFTCollectionData()
+            account.storage.save(<- cd.createEmptyCollection(), to: cd.storagePath)
+            account.capabilities.unpublish(cd.publicPath)
+            let cap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(cd.storagePath)
+            account.capabilities.publish(cap, at: cd.publicPath)
+            self.targetCapability=cap
+        } else {
+            //TODO: I do not think this works as intended
+            var targetCapability= account.capabilities.get<&AnyResource>(nft.publicPath) as? Capability<&{NonFungibleToken.Collection}>
+            if targetCapability == nil || !targetCapability!.check() {
+                let cd = item.getNFTCollectionData()
+                let cap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(cd.storagePath)
+                account.capabilities.unpublish(cd.publicPath)
+                account.capabilities.publish(cap, at: cd.publicPath)
+                targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
+            }
+			self.targetCapability=targetCapability!
 		}
 
 		self.walletReference = account.storage.borrow<auth(FungibleToken.Withdrawable) &FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account. Account address : ".concat(account.address.toString()))

@@ -35,7 +35,7 @@ transaction(tenant: String, adminAddress: Address, tenantAddress: Address, findC
 		let tenantCap= adminClient.createFindMarket(name: tenant, address: tenantAddress, findCutSaleItem: saleItem)
 
 		let tenantAccount=getAccount(adminAddress)
-		let tenantClient=tenantAccount.getCapability<&{FindMarket.TenantClientPublic}>(FindMarket.TenantClientPublicPath).borrow()!
+		let tenantClient=tenantAccount.capabilities.get<&{FindMarket.TenantClientPublic}>(FindMarket.TenantClientPublicPath)!.borrow()!
 		tenantClient.addCapability(tenantCap)
 	}
 }

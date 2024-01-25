@@ -12,7 +12,7 @@ transaction(nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String,
 	let pointer : FindViews.AuthNFTPointer
 	let vaultType : Type
 
-	prepare(account: auth(BorrowValue) &Account) {
+	prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let tenant = tenantCapability.borrow()!
@@ -21,10 +21,11 @@ transaction(nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String,
 		let asSaleType= Type<@FindMarketAuctionSoft.SaleItemCollection>()
 		let asSalePublicPath=FindMarket.getPublicPath(asSaleType, name: tenant.name)
 		let asSaleStoragePath= FindMarket.getStoragePath(asSaleType, name:tenant.name)
-		let asSaleCap= account.getCapability<&FindMarketAuctionSoft.SaleItemCollection{FindMarketAuctionSoft.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(asSalePublicPath)
-		if !asSaleCap.check() {
+		let asSaleCap= account.capabilities.get<&FindMarketAuctionSoft.SaleItemCollection>(asSalePublicPath)
+		if asSaleCap == nil {
 			account.storage.save<@FindMarketAuctionSoft.SaleItemCollection>(<- FindMarketAuctionSoft.createEmptySaleItemCollection(tenantCapability), to: asSaleStoragePath)
-			account.link<&FindMarketAuctionSoft.SaleItemCollection{FindMarketAuctionSoft.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(asSalePublicPath, target: asSaleStoragePath)
+			let saleColCap = account.capabilities.storage.issue<&FindMarketAuctionSoft.SaleItemCollection>(asSaleStoragePath)
+			account.capabilities.publish(saleColCap, at: asSalePublicPath)
 		}
 
 		// Get supported NFT and FT Information from Registries from input alias
@@ -34,26 +35,7 @@ transaction(nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String,
 
 		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
 
-		var providerCap = account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.Collection}>(nft.privatePath)
-
-		/* Ben : Question -> Either client will have to provide the path here or agree that we set it up for the user */
-		if !providerCap.check() {
-			let newCap = account.link<&{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
-					nft.privatePath,
-					target: nft.storagePath
-			)
-			if newCap == nil {
-				// If linking is not successful, we link it using finds custom link
-				let pathIdentifier = nft.privatePath.toString()
-				let findPath = PrivatePath(identifier: pathIdentifier.slice(from: "/private/".length , upTo: pathIdentifier.length).concat("_FIND"))!
-				account.link<&{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
-					findPath,
-					target: nft.storagePath
-				)
-				providerCap = account.getCapability<&{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(findPath)
-			}
-		}
-
+		var providerCap = account.capabilities.storage.issue<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>(nft.storagePath)!
 
 		self.saleItems= account.storage.borrow<&FindMarketAuctionSoft.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionSoft.SaleItemCollection>()))
 		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
