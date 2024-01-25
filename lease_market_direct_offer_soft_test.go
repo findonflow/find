@@ -282,13 +282,12 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 	ot.Run(t, "Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
 		otu.directOfferLeaseMarketSoft("user6", "user5", price).
-			directOfferLeaseMarketSoft("user6", "name2", price).
 			acceptLeaseDirectOfferMarketSoft("user6", "user5", "user5", price).
 			leaseProfileBan("user5")
 
 		otu.O.Tx("bidLeaseMarketDirectOfferSoftDapper",
-			WithSigner("user6"),
-			WithArg("leaseName", "name3"),
+			WithSigner("user7"),
+			WithArg("leaseName", "user5"),
 			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("amount", price),
 			WithArg("validUntil", otu.currentTime()+100.0),
@@ -297,7 +296,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("acceptLeaseDirectOfferSoftDapper",
 			WithSigner("user5"),
-			WithArg("leaseName", "name2"),
+			WithArg("leaseName", "user5"),
 		).
 			AssertFailure(t, "Seller banned by Tenant")
 
@@ -311,7 +310,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.O.Tx("cancelLeaseMarketDirectOfferSoft",
 			WithSigner("user5"),
-			WithArg("leaseNames", `["name2"]`),
+			WithArg("leaseNames", `["user5"]`),
 		).
 			AssertSuccess(t)
 
@@ -321,22 +320,23 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 	ot.Run(t, "Should be able to ban user, user can only retract offer", func(t *testing.T) {
 		otu.directOfferLeaseMarketSoft("user6", "user5", price).
-			directOfferLeaseMarketSoft("user6", "name2", price).
 			acceptLeaseDirectOfferMarketSoft("user6", "user5", "user5", price).
 			leaseProfileBan("user6")
 
-		otu.O.Tx("bidLeaseMarketDirectOfferSoftDapper",
+		otu.retractOfferDirectOfferLeaseSoft("user6", "user5", "user5").O.Tx("bidLeaseMarketDirectOfferSoftDapper",
 			WithSigner("user6"),
-			WithArg("leaseName", "name3"),
+			WithArg("leaseName", "user5"),
 			WithArg("ftAliasOrIdentifier", "FUT"),
 			WithArg("amount", price),
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
 			AssertFailure(t, "Buyer banned by Tenant")
 
-		otu.O.Tx("acceptLeaseDirectOfferSoftDapper",
+		otu.removeLeaseProfileBan("user6").directOfferLeaseMarketSoft("user6", "user5", price).
+			acceptLeaseDirectOfferMarketSoft("user6", "user5", "user5", price).
+			leaseProfileBan("user6").O.Tx("acceptLeaseDirectOfferSoftDapper",
 			WithSigner("user5"),
-			WithArg("leaseName", "name2"),
+			WithArg("leaseName", "user5"),
 		).
 			AssertFailure(t, "Buyer banned by Tenant")
 
@@ -349,7 +349,7 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			AssertFailure(t, "Buyer banned by Tenant")
 
 		// Should be able to retract offer
-		otu.retractOfferDirectOfferLeaseSoft("user6", "user5", "name2")
+		otu.retractOfferDirectOfferLeaseSoft("user6", "user5", "user5")
 	})
 
 	ot.Run(t, "Should return money when outbid", func(t *testing.T) {
