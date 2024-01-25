@@ -408,6 +408,8 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("amount", 5.0),
 	)
 
+	createDapperUser(stx, "user7")
+
 	findleaseQI, _ := o.QualifiedIdentifier("FIND", "Lease")
 	stx("tenantsetLeaseOptionDapper",
 		WithSigner("find"),
