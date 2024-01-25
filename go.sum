@@ -613,6 +613,8 @@ github.com/bits-and-blooms/bitset v1.7.0 h1:YjAGVd3XmtK9ktAbX8Zg2g2PwLIMjGREZJHl
 github.com/bits-and-blooms/bitset v1.7.0/go.mod h1:gIdJ4wp64HaoK2YrL1Q5/N7Y16edYb8uY+O0FJTyyDA=
 github.com/bjartek/overflow v1.14.1-0.20231231144751-166808112fe3 h1:fG8X4umYpLdwl9vOtvEHI7tSDSl9HnZXFwhExD4Och4=
 github.com/bjartek/overflow v1.14.1-0.20231231144751-166808112fe3/go.mod h1:vjzRT9hhDF+m9DkWYwB2LLJSm8m2GsFBmsX00Qqk27w=
+github.com/bjartek/overflow v1.14.1-0.20240125135102-8314e8799bb6 h1:6GzVbdEzAl+mJBEv1fwgtbpyhbQ+nB7680WBzGTDsjk=
+github.com/bjartek/overflow v1.14.1-0.20240125135102-8314e8799bb6/go.mod h1:vjzRT9hhDF+m9DkWYwB2LLJSm8m2GsFBmsX00Qqk27w=
 github.com/boombuler/barcode v1.0.0/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/boombuler/barcode v1.0.1/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/btcsuite/btcd v0.0.0-20171128150713-2e60448ffcc6/go.mod h1:Dmm/EzmjnCiweXmzRIAiUWCInVmPgjkzgv5k4tVyXiQ=

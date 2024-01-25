@@ -9,23 +9,23 @@ import FIND from "../contracts/FIND.cdc"
 
 transaction(leaseName: String) {
 
-	let market : &FindLeaseMarketDirectOfferSoft.SaleItemCollection
-	let pointer : FindLeaseMarket.AuthLeasePointer
+    let market : &FindLeaseMarketDirectOfferSoft.SaleItemCollection
+    let pointer : FindLeaseMarket.AuthLeasePointer
 
-	prepare(account: auth(BorrowValue) &Account) {
+    prepare(account: auth(BorrowValue, IssueStorageCapabilityController) &Account) {
 
-		let marketplace = FindMarket.getFindTenantAddress()
-		let tenant=FindMarket.getTenant(marketplace)
-		let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>())
-		self.market = account.storage.borrow<&FindLeaseMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
+        let marketplace = FindMarket.getFindTenantAddress()
+        let tenant=FindMarket.getTenant(marketplace)
+        let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>())
+        self.market = account.storage.borrow<&FindLeaseMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
 
-		let ref = account.storage.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath) ?? panic("Cannot borrow reference to Find lease collection. Account : ".concat(account.address.toString()))
-		self.pointer= FindLeaseMarket.AuthLeasePointer(ref: ref, name: leaseName)
+        let cap = account.capabilities.storage.issue<auth(FIND.Leasee) &FIND.LeaseCollection>(FIND.LeaseStoragePath)
+        self.pointer= FindLeaseMarket.AuthLeasePointer(cap: cap, name: leaseName)
 
-	}
+    }
 
-	execute {
-		self.market.acceptOffer(self.pointer)
-	}
+    execute {
+        self.market.acceptOffer(self.pointer)
+    }
 
 }
