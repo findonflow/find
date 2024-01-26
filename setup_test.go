@@ -238,6 +238,12 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("nftTypes", []string{dandyIdentifier}),
 		WithArg("cut", 0.0),
 	)
+	stx("tenantsetMarketOptionDapper",
+		WithSigner("find"),
+		WithArg("nftName", "Dandy"),
+		WithArg("nftTypes", []string{dandyIdentifier}),
+		WithArg("cut", 0.0),
+	)
 
 	// add that we can sell dandies on the market
 	stx("tenantsetMarketOption",

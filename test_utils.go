@@ -2256,7 +2256,7 @@ func (otu *OverflowTestUtils) listNFTForSoftAuctionDUC(name string, id uint64, p
 	ftIden, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
 	assert.NoError(otu.T, err)
 
-	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
+	nftIden, err := otu.O.QualifiedIdentifier("Dandy", "NFT")
 	assert.NoError(otu.T, err)
 
 	eventIden, err := otu.O.QualifiedIdentifier("FindMarketAuctionSoft", "EnglishAuction")
