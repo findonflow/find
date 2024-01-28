@@ -148,7 +148,7 @@ transaction(name: String) {
         let doeSaleCap= account.capabilities.get<&{FindMarketDirectOfferEscrow.SaleItemCollectionPublic}>(doeSalePublicPath) 
         if doeSaleCap == nil {
             account.storage.save<@FindMarketDirectOfferEscrow.SaleItemCollection>(<- FindMarketDirectOfferEscrow.createEmptySaleItemCollection(tenantCapability), to: doeSaleStoragePath)
-            let cap = account.capabilities.storage.issue<&{FindMarketDirectOfferEscrow.SaleItemCollectionPublic}>(doeSaleStoragePath)
+            let cap = account.capabilities.storage.issue<&{FindMarketDirectOfferEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(doeSaleStoragePath)
             account.capabilities.publish(cap, at: doeSalePublicPath)
         }
     }

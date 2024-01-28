@@ -33,14 +33,14 @@ transaction(market: String, merchAddress: Address, tenantCut: UFix64){
 		]
 
         switch market {
-            // case "AuctionEscrow" :
-            //     marketType = [Type<@FindLeaseMarketAuctionEscrow.SaleItem>()]
+            case "AuctionEscrow" :
+                marketType = [Type<@FindLeaseMarketAuctionEscrow.SaleItem>()]
 
             case "AuctionSoft" :
                 marketType = [Type<@FindMarketAuctionSoft.SaleItem>()]
 
-            // case "DirectOfferEscrow" :
-            //     marketType = [Type<@FindLeaseMarketDirectOfferEscrow.SaleItem>()]
+            case "DirectOfferEscrow" :
+                marketType = [Type<@FindLeaseMarketDirectOfferEscrow.SaleItem>()]
 
             case "DirectOfferSoft" :
                 marketType = [Type<@FindMarketDirectOfferSoft.SaleItem>()]

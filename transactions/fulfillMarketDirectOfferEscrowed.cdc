@@ -5,13 +5,14 @@ import FindViews from "../contracts/FindViews.cdc"
 import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
+import ViewResolver from "../contracts/standard/ViewResolver.cdc"
 
 transaction(id: UInt64) {
 
 	let market : &FindMarketDirectOfferEscrow.SaleItemCollection?
 	let pointer : FindViews.AuthNFTPointer
 
-	prepare(account: auth(BorrowValue) &Account) {
+	prepare(account: auth(BorrowValue, IssueStorageCapabilityController, PublishCapability, SaveValue) &Account) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
@@ -26,24 +27,14 @@ transaction(id: UInt64) {
 		let nft = collection.collectionData
 
 
-		var providerCap=account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.Collection}>(nft.privatePath)
+		var providerCap=account.capabilities.storage.issue<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.Collection}>(nft.storagePath)
 
 		/* Ben : Question -> Either client will have to provide the path here or agree that we set it up for the user */
-		if !providerCap.check() {
-			let newCap = account.link<&{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
-					nft.privatePath,
-					target: nft.storagePath
-			)
-			if newCap == nil {
+		if providerCap == nil  {
 				// If linking is not successful, we link it using finds custom link
-				let pathIdentifier = nft.privatePath.toString()
-				let findPath = PrivatePath(identifier: pathIdentifier.slice(from: "/private/".length , upTo: pathIdentifier.length).concat("_FIND"))!
-				account.link<&{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
-					findPath,
-					target: nft.storagePath
-				)
-				providerCap = account.getCapability<&{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(findPath)
-			}
+				let pathIdentifier = nft.storagePath.toString()
+				let findPath: StoragePath = StoragePath(identifier: pathIdentifier.slice(from: "/storage/".length , upTo: pathIdentifier.length).concat("_FIND"))!
+				providerCap = account.capabilities.storage.issue<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.Collection}>(findPath)
 		}
 
 		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: item.getItemID())

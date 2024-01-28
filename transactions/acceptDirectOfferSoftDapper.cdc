@@ -26,7 +26,7 @@ transaction(id: UInt64) {
 		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
 		let nft = collection.collectionData
 
-		let providerCap=account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.Collection}>(nft.privatePath)
+		let  var providerCap=account.capabilities.storage.get<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.Collection}>(nft.storagePath)
 		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: item.getItemID())
 
 	}

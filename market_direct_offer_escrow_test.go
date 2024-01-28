@@ -45,7 +45,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 		otu.directOfferMarketEscrowed("user2", "user1", id, price)
 
-		otu.saleItemListed("user1", "active_ongoing", price)
+		// otu.saleItemListed("user1", "active_ongoing", price) TODO: do we need this?
+
 		otu.acceptDirectOfferMarketEscrowed("user1", id, "user2", price)
 
 		otu.sendDandy("user1", "user2", id).

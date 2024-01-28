@@ -25,8 +25,8 @@ transaction(nftName: String, nftTypes: [String], cut: UFix64){
             name: "Soft",
             types:[
             Type<@FindMarketSale.SaleItem>(),
-            Type<@FindMarketAuctionSoft.SaleItem>()
-            // Type<@FindMarketDirectOfferSoft.SaleItem>()
+            Type<@FindMarketAuctionSoft.SaleItem>(),
+            Type<@FindMarketDirectOfferSoft.SaleItem>()
             ],
             ruleType: "listing",
             allow:true
