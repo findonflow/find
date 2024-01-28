@@ -28,8 +28,6 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 
 	mintFund("devMintUsdc").AssertSuccess(t)
 
-	otu.setUUID(600)
-
 	eventIdentifier := otu.identifier("FindMarketDirectOfferEscrow", "DirectOffer")
 	royaltyIdentifier := otu.identifier("FindMarket", "RoyaltyPaid")
 

@@ -8,7 +8,7 @@ import FIND from "../contracts/FIND.cdc"
 import FindPack from "../contracts/FindPack.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FindMarket from "../contracts/FindMarket.cdc"
-//import "FindMarketDirectOfferEscrow"
+import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 //import "FindThoughts"
 
@@ -136,7 +136,7 @@ transaction(name: String) {
             profile.emitUpdatedEvent()
         }
 
-        /*
+
         let receiverCap=account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
         let tenantCapability= FindMarket.getTenantCapability(FindMarket.getFindTenantAddress())!
 
@@ -145,13 +145,11 @@ transaction(name: String) {
         let doeSaleType= Type<@FindMarketDirectOfferEscrow.SaleItemCollection>()
         let doeSalePublicPath=FindMarket.getPublicPath(doeSaleType, name: tenant.name)
         let doeSaleStoragePath= FindMarket.getStoragePath(doeSaleType, name:tenant.name)
-        let doeSaleCap= account.capabilities.get<&FindMarketDirectOfferEscrow.SaleItemCollection{FindMarketDirectOfferEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(doeSalePublicPath) 
-        if !doeSaleCap.check() {
+        let doeSaleCap= account.capabilities.get<&{FindMarketDirectOfferEscrow.SaleItemCollectionPublic}>(doeSalePublicPath) 
+        if doeSaleCap == nil {
             account.storage.save<@FindMarketDirectOfferEscrow.SaleItemCollection>(<- FindMarketDirectOfferEscrow.createEmptySaleItemCollection(tenantCapability), to: doeSaleStoragePath)
-            account.link<&FindMarketDirectOfferEscrow.SaleItemCollection{FindMarketDirectOfferEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(doeSalePublicPath, target: doeSaleStoragePath)
+            let cap = account.capabilities.storage.issue<&{FindMarketDirectOfferEscrow.SaleItemCollectionPublic}>(doeSaleStoragePath)
+            account.capabilities.publish(cap, at: doeSalePublicPath)
         }
-        //SYNC with register
-        */
-
     }
 }

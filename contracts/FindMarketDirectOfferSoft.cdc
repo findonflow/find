@@ -664,7 +664,7 @@ access(all) contract FindMarketDirectOfferSoft {
                 }
             }
 
-            let from=getAccount(item.owner()).capabilities.get<&SaleItemCollection>(tenant.getPublicPath(Type<@SaleItemCollection>()))!
+            let from=getAccount(item.owner()).capabilities.get<&{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))!
 
             let bid <- create Bid(from: from, itemUUID:uuid, nftCap: nftCap, vaultType: vaultType, nonEscrowedBalance:amount, bidExtraField: bidExtraField)
             let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(uuid.toString()))
@@ -748,12 +748,12 @@ access(all) contract FindMarketDirectOfferSoft {
         return <- create MarketBidCollection(receiver: receiver, tenantCapability:tenantCapability)
     }
 
-    access(all) fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&SaleItemCollection>? {
+    access(all) fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&{SaleItemCollectionPublic}>? {
         if FindMarket.getTenantCapability(marketplace) == nil {
             panic("Invalid tenant")
         }
         if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
-            return getAccount(user).capabilities.get<&SaleItemCollection>(tenant.getPublicPath(Type<@SaleItemCollection>()))
+            return getAccount(user).capabilities.get<&{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
         }
         return nil
     }
