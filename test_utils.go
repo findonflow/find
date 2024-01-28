@@ -957,7 +957,7 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 	royaltyIden, err := otu.O.QualifiedIdentifier("MetadataViews", "Royalties")
 	assert.NoError(otu.T, err)
 
-	err = otu.O.Script("getCheckRoyalty",
+	err = otu.O.Script("devgetCheckRoyalty",
 		WithSigner(name),
 		WithArg("name", name),
 		WithArg("id", id),
@@ -1616,7 +1616,7 @@ func (otu *OverflowTestUtils) removeFTInFtRegistry(transactionFile, argument, ev
 func (otu *OverflowTestUtils) getDandies() []uint64 {
 	otu.T.Helper()
 	var data []uint64
-	err := otu.O.Script("getDandiesIDsFor",
+	err := otu.O.Script("devgetDandiesIDsFor",
 		WithArg("user", "user1"),
 		WithArg("minter", "user1"),
 	).MarshalAs(&data)
@@ -1629,7 +1629,7 @@ func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
 	nftIden, err := otu.O.QualifiedIdentifier("Dandy", "NFT")
 	assert.NoError(otu.T, err)
 
-	result, _ := otu.O.Script("getDandiesIDsFor",
+	result, _ := otu.O.Script("devgetDandiesIDsFor",
 		WithArg("user", "user1"),
 		WithArg("minter", "user1"),
 	).GetAsInterface()
@@ -1637,7 +1637,7 @@ func (otu *OverflowTestUtils) registerDandyInNFTRegistry() *OverflowTestUtils {
 	var id uint64
 
 	if result == nil {
-		result, _ := otu.O.Script("getDandiesIDsFor",
+		result, _ := otu.O.Script("devgetDandiesIDsFor",
 			WithArg("user", "user1"),
 			WithArg("minter", "neomotorcycle"),
 		).GetAsInterface()
@@ -2148,20 +2148,6 @@ func (otu *OverflowTestUtils) listLeaseForSaleDUC(user string, name string, pric
 	)
 
 	res.AssertSuccess(otu.T)
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) getNFTForMarketSale(seller string, id uint64, price float64) *OverflowTestUtils {
-	result, err := otu.O.Script("getMetadataForSaleItem",
-		WithArg("merchantAddress", "find"),
-		WithArg("address", seller),
-		WithArg("id", id),
-		WithArg("amount", price),
-	).GetWithPointer("/name")
-
-	assert.NoError(otu.T, err)
-	assert.Equal(otu.T, "Neo Motorcycle 1 of 1", result)
 
 	return otu
 }

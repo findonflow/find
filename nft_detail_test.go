@@ -299,7 +299,7 @@ func TestNFTDetailScript(t *testing.T) {
 						directOfferMarketEscrowed("user2", "user1", ids[0], price).
 						alterMarketOption("stop")
 
-					actual, err := otu.O.Script("getMarketBlockedNFT").
+					actual, err := otu.O.Script("devgetMarketBlockedNFT").
 						GetAsJson()
 
 					if err != nil {
@@ -332,7 +332,7 @@ func TestNFTDetailScript(t *testing.T) {
 					otu.setProfile("user1").
 						blockDandy("devBlockItem")
 
-					actual, err := otu.O.Script("getMarketBlockedNFT").
+					actual, err := otu.O.Script("devgetMarketBlockedNFT").
 						GetAsJson()
 
 					if err != nil {
@@ -348,7 +348,7 @@ func TestNFTDetailScript(t *testing.T) {
 					otu.setProfile("user1").
 						blockDandy("devBlockItemByListingType")
 
-					actual, err := otu.O.Script("getMarketBlockedNFT").
+					actual, err := otu.O.Script("devgetMarketBlockedNFT").
 						GetAsJson()
 
 					if err != nil {

@@ -183,21 +183,6 @@ func TestFIND(t *testing.T) {
 			)
 	})
 
-	/*
-		* TODO: fix
-			ot.Run(t, "Should be able to getFindPaths of a user", func(t *testing.T) {
-				otu.O.Script("getFindPaths",
-					WithArg("user", "user1"),
-				).AssertWant(t,
-					autogold.Want("getFindPaths", map[string]interface{}{"address": "0xf669cb8d41ce0c74", "paths": []interface{}{
-						"findDandy",
-						"A_179b6b1cb6755e31_FindMarketDirectOfferEscrow_SaleItemCollection_find",
-						"FindPackCollection",
-					}}),
-				)
-			})
-	*/
-
 	ot.Run(t, "If a user holds an invalid find name, get status should not return it", func(t *testing.T) {
 		otu.moveNameTo("user2", "user1", "user2")
 		otu.O.Script("getFindStatus",

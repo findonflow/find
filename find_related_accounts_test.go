@@ -57,7 +57,7 @@ func TestRelatedAccounts(t *testing.T) {
 		otu.addRelatedAccount("user1", "Blocto", "Flow", "user3")
 		otu.addRelatedAccount("user1", "Find", "Flow", "find")
 
-		res := otu.O.Script("getAllRelatedAccounts",
+		res := otu.O.Script("devgetAllRelatedAccounts",
 			WithArg("user", "user1"),
 		).
 			AssertWant(t, autogold.Want("devgetAllRelatedFlowAccounts", map[string]interface{}{"ETH": map[string]interface{}{"ETH_Blocto": []interface{}{"0x1", "0x2", "0x4"}, "ETH_Find": []interface{}{"0x3", "0x5"}}, "Flow": map[string]interface{}{"Flow_Blocto": []interface{}{otu.O.Address("user2"), otu.O.Address("user3")}, "Flow_Find": []interface{}{otu.O.Address("find")}}}))

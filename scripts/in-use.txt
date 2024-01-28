@@ -31,6 +31,7 @@ mainnetgetSocksIDs.cdc
 mainnetgetSocksItems.cdc
 
 
+getNFTCatalogItems.cdc
 getAllFindPackSaleDetails.cdc
 getCatalog.cdc
 getCatalogCollectionDisplay.cdc

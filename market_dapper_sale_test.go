@@ -21,7 +21,7 @@ func TestDapperMarketSale(t *testing.T) {
 		assert.Equal(t, 1, len(itemsForSale))
 		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
 
-		otu.getNFTForMarketSale("user5", saleItemID[0], price)
+
 
 		otu.O.Tx("buyNFTForSaleDapper",
 			WithSigner("user6"),

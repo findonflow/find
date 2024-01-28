@@ -74,7 +74,7 @@ func TestDandy(t *testing.T) {
 
 	/* Test on dandy nft indexing {Mapping of minter} */
 	ot.Run(t, "Should be able to return the correct minter and dandies list", func(t *testing.T) {
-		result, err := otu.O.Script("getDandiesIDsFor",
+		result, err := otu.O.Script("devgetDandiesIDsFor",
 			WithArg("user", "user1"),
 			WithArg("minter", "user1"),
 		).GetAsInterface()
@@ -84,7 +84,7 @@ func TestDandy(t *testing.T) {
 
 		assert.ElementsMatch(t, result, dandyIds)
 
-		otu.O.Script("getDandiesMinters",
+		otu.O.Script("devgetDandiesMinters",
 			WithArg("user", "user1"),
 		).AssertWant(t,
 			autogold.Want("dandyMinters", `[]interface {}{
@@ -100,14 +100,14 @@ func TestDandy(t *testing.T) {
 			WithArg("ids", dandiesIDs),
 		).AssertSuccess(t)
 
-		otu.O.Script("getDandiesIDsFor",
+		otu.O.Script("devgetDandiesIDsFor",
 			WithArg("user", "user1"),
 			WithArg("minter", "user1"),
 		).AssertWant(t,
 			autogold.Want("noDandies", nil),
 		)
 
-		otu.O.Script("getDandiesMinters",
+		otu.O.Script("devgetDandiesMinters",
 			WithArg("user", "user1"),
 		).AssertWant(t,
 			autogold.Want("noDandyMinters", nil),

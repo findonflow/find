@@ -12,7 +12,7 @@ func TestFTRegistry(t *testing.T) {
 
 	o := otu.O
 	ot.Run(t, "Should be able to registry flow token and get it", func(t *testing.T) {
-		result, err := o.Script("getFTInfo",
+		result, err := o.Script("devgetFTInfo",
 			WithArg("aliasOrIdentifier", "Flow"),
 		).
 			GetAsJson()
@@ -22,7 +22,7 @@ func TestFTRegistry(t *testing.T) {
 
 		otu.AutoGoldRename("Should be able to registry flow token and get it by alias", result)
 
-		result, err = o.Script("getFTInfo",
+		result, err = o.Script("devgetFTInfo",
 			WithArg("aliasOrIdentifier", otu.identifier("FlowToken", "Vault")),
 		).
 			GetAsJson()
@@ -42,7 +42,7 @@ func TestFTRegistry(t *testing.T) {
 	})
 
 	ot.Run(t, "Should be able to registry flow token, fusd token and get list from it", func(t *testing.T) {
-		result, err := o.Script("getFTInfoAll").GetAsJson()
+		result, err := o.Script("devgetFTInfoAll").GetAsJson()
 		if err != nil {
 			panic(err)
 		}
@@ -51,7 +51,7 @@ func TestFTRegistry(t *testing.T) {
 	})
 
 	ot.Run(t, "Should be able to registry usdc token and get it", func(t *testing.T) {
-		result, err := o.Script("getFTInfo",
+		result, err := o.Script("devgetFTInfo",
 			WithArg("aliasOrIdentifier", otu.identifier("FiatToken", "Vault")),
 		).
 			GetAsJson()
@@ -161,12 +161,12 @@ func TestFTRegistry(t *testing.T) {
 					"typeIdentifier": otu.identifier("FlowToken", "Vault"),
 				})
 
-		o.Script("getFTInfo",
+		o.Script("devgetFTInfo",
 			WithArg("aliasOrIdentifier", otu.identifier("FUSD", "Vault")),
 		).
 			AssertWant(t, autogold.Want("aliasOrIdentifier", nil))
 
-		o.Script("getFTInfo",
+		o.Script("devgetFTInfo",
 			WithArg("aliasOrIdentifier", "Flow"),
 		).
 			AssertWant(t, autogold.Want("aliasOrIdentifier", nil))
