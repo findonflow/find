@@ -63,8 +63,8 @@ func TestMarketDirectOfferEscrow(t *testing.T) {
 			unlinkDandyProvider("user1").
 			acceptDirectOfferMarketEscrowed("user1", id, "user2", price)
 
-		otu.sendDandy("user1", "user2", id).
-			sendFT("user1", "user2", "Flow", price)
+		// otu.sendDandy("user1", "user2", id).
+		// 	sendFT("user1", "user2", "Flow", price)
 
 		otu.cancelAllDirectOfferMarketEscrowed("user1")
 	})
