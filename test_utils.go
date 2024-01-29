@@ -127,7 +127,6 @@ func (otu *OverflowTestUtils) setupMarketAndMintDandys() []uint64 {
 		createUser(100.0, "user3").
 		registerUser("user2").
 		registerUser("user3")
-	otu.setUUID(600)
 	ids := otu.mintThreeExampleDandies()
 	return ids
 }
@@ -2393,7 +2392,7 @@ func (otu *OverflowTestUtils) fulfillMarketAuctionSoftDUC(name string, id uint64
 }
 
 func (otu *OverflowTestUtils) directOfferMarketSoftDUC(name string, seller string, id uint64, price float64) []uint64 {
-	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
+	nftIden, err := otu.O.QualifiedIdentifier("Dandy", "NFT")
 	assert.NoError(otu.T, err)
 
 	DUC, err := otu.O.QualifiedIdentifier("DapperUtilityCoin", "Vault")
@@ -2428,28 +2427,6 @@ func (otu *OverflowTestUtils) directOfferLeaseMarketSoftDUC(buyer string, name s
 		AssertSuccess(otu.T)
 
 	return otu
-}
-
-func (otu *OverflowTestUtils) directOfferMarketSoftExampleNFT(name string, seller string, id uint64, price float64) []uint64 {
-	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
-	assert.NoError(otu.T, err)
-
-	eventIden, err := otu.O.QualifiedIdentifier("FindMarketDirectOfferSoft", "DirectOffer")
-	assert.NoError(otu.T, err)
-
-	res := otu.O.Tx("bidMarketDirectOfferSoftDapper",
-		WithSigner(name),
-		WithArg("user", seller),
-		WithArg("nftAliasOrIdentifier", nftIden),
-		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", "DUC"),
-		WithArg("amount", price),
-		WithArg("validUntil", otu.currentTime()+100.0),
-	).
-		AssertSuccess(otu.T).
-		GetIdsFromEvent(eventIden, "id")
-
-	return res
 }
 
 func (otu *OverflowTestUtils) acceptDirectOfferMarketSoftDUC(name string, id uint64, buyer string, price float64) *OverflowTestUtils {
@@ -2528,16 +2505,6 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketDirectOfferSoftDUC(user, name st
 			"amount": price,
 			"status": "sold",
 		})
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) setUUID(uuid uint64) *OverflowTestUtils {
-	otu.O.Tx("devSetUUID",
-		WithSigner("user1"),
-		WithArg("target", uuid),
-	).
-		AssertSuccess(otu.T)
 
 	return otu
 }
