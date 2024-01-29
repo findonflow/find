@@ -41,18 +41,6 @@ type FindMarket_TenantRule struct {
 	Allow    bool                `json:"allow"`
 }
 
-func NewOverflowTest(t *testing.T) *OverflowTestUtils {
-	o := Overflow(
-		WithNetwork("testing"),
-		WithFlowForNewUsers(100.0),
-	)
-	require.NoError(t, o.Error)
-	return &OverflowTestUtils{
-		T: t,
-		O: o,
-	}
-}
-
 const (
 	leaseDurationFloat   = 31536000.0
 	lockDurationFloat    = 7776000.0
