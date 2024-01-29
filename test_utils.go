@@ -36,8 +36,8 @@ type OverflowTestUtils struct {
 
 type FindMarket_TenantRule struct {
 	Name     string              `json:"name"`
-	Types    []cadence.TypeValue `json:"types"`
 	RuleType string              `json:"ruleType"`
+	Types    []cadence.TypeValue `json:"types"`
 	Allow    bool                `json:"allow"`
 }
 
@@ -47,206 +47,11 @@ const (
 	auctionDurationFloat = 86400.0
 )
 
-func (otu *OverflowTestUtils) AutoGold(classifier string, value interface{}) *OverflowTestUtils {
-	otu.T.Helper()
-	autogold.Equal(otu.T, value, autogold.Name(otu.T.Name()+"_"+classifier))
-	return otu
-}
-
 func (otu *OverflowTestUtils) AutoGoldRename(fullname string, value interface{}) *OverflowTestUtils {
 	otu.T.Helper()
-	fullname = strings.Replace(fullname, " ", "_", -1)
+	fullname = strings.ReplaceAll(fullname, " ", "_")
 	autogold.Equal(otu.T, value, autogold.Name(otu.T.Name()+"/"+fullname))
 	return otu
-}
-
-func (otu *OverflowTestUtils) setupMarketAndDandy() uint64 {
-	otu.setupFIND().
-		setupDandy("user1").
-		createUser(100.0, "user2").
-		createUser(100.0, "user3").
-		registerUser("user2").
-		registerUser("user3")
-
-	id := otu.mintThreeExampleDandies()[0]
-	return id
-}
-
-func (otu *OverflowTestUtils) setupMarketAndDandyDapper() uint64 {
-	t := otu.T
-
-	otu.setupFIND().
-		createDapperUser("user1").
-		registerDapperUser("user1")
-
-	// works as buyForge
-	otu.O.Tx("adminAddAddon",
-		WithSigner("find-admin"),
-		WithArg("name", "user1"),
-		WithArg("addon", "forge"),
-	).
-		AssertSuccess(t).
-		AssertEvent(t, "AddonActivated", map[string]interface{}{
-			"name":  "user1",
-			"addon": "forge",
-		})
-
-	forge, _ := otu.O.QualifiedIdentifier("Dandy", "Forge")
-
-	otu.O.Tx("adminAddForge",
-		WithSigner("find-admin"),
-		WithArg("type", forge),
-		WithArg("name", "user1"),
-	).AssertSuccess(t)
-
-	otu.createDapperUser("user2").
-		createDapperUser("user3").
-		registerDapperUser("user2").
-		registerDapperUser("user3")
-
-	id := otu.mintThreeExampleDandies()[0]
-	return id
-}
-
-func (otu *OverflowTestUtils) setupMarketAndMintDandys() []uint64 {
-	otu.setupFIND().
-		setupDandy("user1").
-		createUser(100.0, "user2").
-		createUser(100.0, "user3").
-		registerUser("user2").
-		registerUser("user3")
-	ids := otu.mintThreeExampleDandies()
-	return ids
-}
-
-func (otu *OverflowTestUtils) assertLookupAddress(user, expected interface{}) *OverflowTestUtils {
-	otu.O.Script(`import FIND from "../contracts/FIND.cdc"
-access(all) fun main(name: String) :  Address? {
-    return FIND.lookupAddress(name) } `,
-		WithArg("name", user),
-	).AssertWant(otu.T, autogold.Want(fmt.Sprintf("lookupAddress-%s", user), expected))
-	return otu
-}
-
-func (otu *OverflowTestUtils) setupFIND() *OverflowTestUtils {
-	// first step create the adminClient as the fin user
-
-	otu.O.Tx("setup_fin_1_create_client", findAdminSigner).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	// link in the server in the versus client
-	otu.O.Tx("setup_fin_2_register_client",
-		findSigner,
-		WithArg("ownerAddress", "find-admin"),
-	).AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	// set up fin network as the fin user
-	otu.O.Tx("setup_fin_3_create_network", findAdminSigner).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	otu.O.Tx("setup_find_market_1_dapper",
-		findSigner,
-		WithArg("dapperAddress", "dapper"),
-	).
-		AssertSuccess(otu.T)
-
-	// link in the server in the versus client
-	otu.O.Tx("setup_find_market_2",
-		findAdminSigner,
-		WithArg("tenant", "find"),
-		WithArg("tenantAddress", "find"),
-		WithArg("findCut", 0.025),
-	).AssertSuccess(otu.T)
-
-	otu.setupInfrastructureCut()
-
-	otu.createUser(100.0, "find")
-
-	// link in the server in the versus client
-	otu.O.Tx("devSetResidualAddress",
-		findAdminSigner,
-		WithArg("address", "residual"),
-	).AssertSuccess(otu.T)
-
-	otu.O.Tx(
-		"initSwitchboard",
-		WithSigner("residual"),
-		WithArg("dapperAddress", "dapper"),
-	).
-		AssertSuccess(otu.T)
-
-	// setup find forge
-	otu.O.Tx("setup_find_forge_1", WithSigner("find-forge")).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	// link in the server in the versus client
-	otu.O.Tx("setup_find_forge_2",
-		findSigner,
-		WithArg("ownerAddress", "find-forge"),
-	).AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	return otu.tickClock(1.0)
-}
-
-func (otu *OverflowTestUtils) setupOneFootball() *OverflowTestUtils {
-	// first step create the adminClient as the fin user
-
-	otu.O.Tx("setup_fin_1_create_client", findAdminSigner).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	// link in the server in the versus client
-	otu.O.Tx("setup_fin_2_register_client",
-		findSigner,
-		WithArg("ownerAddress", "find-admin"),
-	).AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	// set up fin network as the fin user
-	otu.O.Tx("setup_fin_3_create_network", findAdminSigner).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	otu.O.Tx("setup_find_market_1_dapper",
-		findSigner,
-		WithArg("dapperAddress", "dapper"),
-	).
-		AssertSuccess(otu.T)
-
-	// link in the server in the versus client
-	otu.O.Tx("setup_find_dapper_market",
-		findAdminSigner,
-		WithArg("adminAddress", "find"),
-		WithArg("tenantAddress", "find"),
-		WithArg("tenant", "onefootball"),
-		WithArg("findCut", 0.025),
-	).AssertSuccess(otu.T)
-
-	otu.setupInfrastructureCut()
-
-	otu.createDapperUser("find")
-
-	// link in the server in the versus client
-	otu.O.Tx("devSetResidualAddress",
-		findAdminSigner,
-		WithArg("address", "residual"),
-	).AssertSuccess(otu.T)
-
-	otu.O.Tx(
-		"initSwitchboard",
-		WithSigner("residual"),
-		WithArg("dapperAddress", "dapper"),
-	).
-		AssertSuccess(otu.T)
-
-	// setup find forge
-	otu.O.Tx("setup_find_forge_1", WithSigner("find-forge")).
-		AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	// link in the server in the versus client
-	otu.O.Tx("setup_find_forge_2",
-		findSigner,
-		WithArg("ownerAddress", "find-forge"),
-	).AssertSuccess(otu.T).AssertNoEvents(otu.T)
-
-	return otu.tickClock(1.0)
 }
 
 func (otu *OverflowTestUtils) tickClock(time float64) *OverflowTestUtils {
@@ -257,106 +62,8 @@ func (otu *OverflowTestUtils) tickClock(time float64) *OverflowTestUtils {
 	return otu
 }
 
-func (otu *OverflowTestUtils) createUser(fusd float64, name string) *OverflowTestUtils {
-	nameSigner := WithSigner(name)
-	nameArg := WithArg("name", name)
-
-	nameAddress := otu.O.Address(name)
-
-	otu.O.Tx("createProfile", nameSigner, nameArg).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "Profile.Created", map[string]interface{}{
-			"userName":  name,
-			"createdAt": "find",
-		})
-
-	mintFn := otu.O.TxFN(WithSigner("account"),
-		WithArg("recipient", name),
-		WithArg("amount", fusd),
-	)
-
-	for _, mintName := range []string{
-		"devMintFusd",
-		"devMintUsdc",
-	} {
-		mintFn(mintName).AssertSuccess(otu.T).
-			AssertEvent(otu.T, "TokensDeposited", map[string]interface{}{
-				"amount": fusd,
-				"to":     nameAddress,
-			})
-	}
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) createDapperUser(name string) *OverflowTestUtils {
-	nameSigner := WithSigner(name)
-	nameArg := WithArg("name", name)
-
-	otu.O.Tx("initDapperAccount", nameSigner, WithArg("dapperAddress", "dapper")).
-		AssertSuccess(otu.T)
-
-	otu.O.Tx("createProfileDapper",
-		nameSigner,
-		nameArg).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "Profile.Created", map[string]interface{}{
-			"userName":  name,
-			"createdAt": "find",
-		})
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) createWearableUser(name string) *OverflowTestUtils {
-	nameSigner := WithSigner(name)
-
-	otu.O.Tx("initWearables",
-		nameSigner,
-	).
-		AssertSuccess(otu.T)
-	return otu
-}
-
-func (otu *OverflowTestUtils) mintWearables(name string) uint64 {
-	nameSigner := WithSigner(name)
-
-	id, err := otu.O.Tx("devmintWearables",
-		nameSigner,
-		WithArg("receiver", name),
-	).
-		AssertSuccess(otu.T).
-		GetIdFromEvent("Minted", "id")
-
-	require.NoError(otu.T, err)
-	return id
-}
-
 func (otu *OverflowTestUtils) registerUser(name string) *OverflowTestUtils {
 	otu.registerUserTransaction(name)
-	return otu
-}
-
-func (otu *OverflowTestUtils) registerFIND() *OverflowTestUtils {
-	nameAddress := otu.O.Address("find-admin")
-	expireTime := otu.currentTime() + leaseDurationFloat
-
-	lockedTime := otu.currentTime() + leaseDurationFloat + lockDurationFloat
-
-	otu.createUser(1000.0, "find-admin")
-
-	otu.O.Tx("register",
-		WithSigner("find-admin"),
-		WithArg("name", "find"),
-		WithArg("amount", 100.0),
-	).AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
-			"validUntil":  expireTime,
-			"lockedUntil": lockedTime,
-			"owner":       nameAddress,
-			"name":        "find",
-		})
-
 	return otu
 }
 
@@ -387,89 +94,8 @@ func (otu *OverflowTestUtils) registerUserTransaction(name string) OverflowResul
 		})
 }
 
-func (otu *OverflowTestUtils) registerDapperUser(name string) *OverflowTestUtils {
-	nameAddress := otu.O.Address(name)
-	expireTime := otu.currentTime() + leaseDurationFloat
-
-	lockedTime := otu.currentTime() + leaseDurationFloat + lockDurationFloat
-
-	otu.O.Tx("devRegisterDapper",
-		WithSigner(name),
-		WithPayloadSigner("dapper"),
-		WithArg("merchAccount", "dapper"),
-		WithArg("name", name),
-		WithArg("amount", 5.0),
-	).AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
-			"validUntil":  expireTime,
-			"lockedUntil": lockedTime,
-			"owner":       nameAddress,
-			"name":        name,
-		}).
-		AssertEvent(otu.T, "TokensDeposited", map[string]interface{}{
-			"amount": 5.0,
-			"to":     otu.O.Address("dapper"),
-		})
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) registerDapperUserWithName(buyer, name string) *OverflowTestUtils {
-	nameAddress := otu.O.Address(buyer)
-	expireTime := otu.currentTime() + leaseDurationFloat
-
-	lockedTime := otu.currentTime() + leaseDurationFloat + lockDurationFloat
-
-	otu.O.Tx("devRegisterDapper",
-		WithSigner(buyer),
-		WithPayloadSigner("dapper"),
-		WithArg("merchAccount", "dapper"),
-		WithArg("name", name),
-		WithArg("amount", 5.0),
-	).AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
-			"validUntil":  expireTime,
-			"lockedUntil": lockedTime,
-			"owner":       nameAddress,
-			"name":        name,
-		}).
-		AssertEvent(otu.T, "TokensDeposited", map[string]interface{}{
-			"amount": 5.0,
-			"to":     otu.O.Address("dapper"),
-		})
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) renewUserWithName(user, name string) *OverflowTestUtils {
-	otu.O.Tx("renewName",
-		WithSigner(user),
-		WithArg("name", name),
-		WithArg("amount", 5.0),
-	)
-	return otu
-}
-
-func (otu *OverflowTestUtils) renewDapperUserWithName(user, name string) *OverflowTestUtils {
-	otu.O.Tx("devRenewNameDapper",
-		WithSigner(user),
-		WithPayloadSigner("dapper"),
-		WithArg("merchAccount", "dapper"),
-		WithArg("name", name),
-		WithArg("amount", 5.0),
-	).
-		AssertSuccess(otu.T)
-	return otu
-}
-
 func (otu *OverflowTestUtils) registerUserWithName(buyer, name string) *OverflowTestUtils {
 	otu.registerUserWithNameTransaction(buyer, name)
-	return otu
-}
-
-func (otu *OverflowTestUtils) registerUserWithNameAndForge(buyer, name string) *OverflowTestUtils {
-	otu.registerUserWithNameTransaction(buyer, name)
-	otu.buyForgeForName(buyer, name)
 	return otu
 }
 
@@ -488,9 +114,7 @@ func (otu *OverflowTestUtils) registerUserWithNameTransaction(buyer, name string
 			"lockedUntil": lockedTime,
 			"owner":       nameAddress,
 			"name":        name,
-		})
-	//TODO: fix these once we have propper standard
-	/*
+		}).
 		AssertEvent(otu.T, "FUSD.TokensDeposited", map[string]interface{}{
 			"amount": 5.0,
 			"to":     otu.O.Address("find-admin"),
@@ -499,7 +123,6 @@ func (otu *OverflowTestUtils) registerUserWithNameTransaction(buyer, name string
 			"amount": 5.0,
 			"from":   nameAddress,
 		})
-	*/
 }
 
 func (out *OverflowTestUtils) currentTime() float64 {
@@ -513,18 +136,7 @@ access(all) fun main() :  UFix64 {
 }
 
 func (otu *OverflowTestUtils) listForSale(name string) *OverflowTestUtils {
-	otu.O.Tx("listNameForSale",
-		WithSigner(name),
-		WithArg("name", name),
-		WithArg("directSellPrice", 10.0),
-	).AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.Sale", map[string]interface{}{
-			"amount": 10.0,
-			"status": "active_listed",
-			"name":   name,
-			"seller": otu.O.Address(name),
-		})
-	return otu
+	return otu.listNameForSale(name, name)
 }
 
 func (otu *OverflowTestUtils) listNameForSale(seller, name string) *OverflowTestUtils {
@@ -624,31 +236,6 @@ func (otu *OverflowTestUtils) expireLock() *OverflowTestUtils {
 	return otu.tickClock(lockDurationFloat)
 }
 
-func (otu *OverflowTestUtils) mintThreeExampleDandies() []uint64 {
-	result := otu.O.Tx("mintDandy",
-		user1Signer,
-		WithArg("name", "user1"),
-		WithArg("maxEdition", 3),
-		WithArg("artist", "Neo"),
-		WithArg("nftName", "Neo Motorcycle"),
-		WithArg("nftDescription", `Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK`),
-
-		WithArg("nftUrl", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
-		WithArg("collectionDescription", "Neo Collectibles FIND"),
-		WithArg("collectionExternalURL", "https://neomotorcycles.co.uk/index.html"),
-		WithArg("collectionSquareImage", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
-		WithArg("collectionBannerImage", "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1"),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "Dandy.Minted", map[string]interface{}{
-			"description": "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
-			"minter":      "user1",
-			"name":        "Neo Motorcycle 3 of 3",
-		})
-
-	return result.GetIdsFromEvent("Dandy.Deposit", "id")
-}
-
 func (otu *OverflowTestUtils) buyForge(user string) *OverflowTestUtils {
 	otu.O.Tx("buyAddon",
 		WithSigner(user),
@@ -663,46 +250,6 @@ func (otu *OverflowTestUtils) buyForge(user string) *OverflowTestUtils {
 		})
 
 	return otu
-}
-
-func (otu *OverflowTestUtils) buyForgeDapper(user string) *OverflowTestUtils {
-	otu.O.Tx("buyAddonDapper",
-		WithSigner(user),
-		WithPayloadSigner("dapper"),
-		WithArg("merchAccount", "dapper"),
-		WithArg("name", user),
-		WithArg("addon", "forge"),
-		WithArg("amount", 50.0),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.AddonActivated", map[string]interface{}{
-			"name":  user,
-			"addon": "forge",
-		})
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) buyForgeForName(user, name string) *OverflowTestUtils {
-	otu.O.Tx("buyAddon",
-		WithSigner(user),
-		WithArg("name", name),
-		WithArg("addon", "forge"),
-		WithArg("amount", 50.0),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.AddonActivated", map[string]interface{}{
-			"name":  name,
-			"addon": "forge",
-		})
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) setupDandy(user string) *OverflowTestUtils {
-	return otu.createUser(100.0, user).
-		registerUser(user).
-		buyForge(user)
 }
 
 func (otu *OverflowTestUtils) cancelNFTForSale(name string, id uint64) *OverflowTestUtils {
@@ -730,24 +277,6 @@ func (otu *OverflowTestUtils) cancelLeaseForSale(user, name string) *OverflowTes
 			"status": "cancel",
 			"seller": otu.O.Address(user),
 		})
-	return otu
-}
-
-func (otu *OverflowTestUtils) cancelAllNFTForSale(name string) *OverflowTestUtils {
-	otu.O.Tx("delistAllNFTSale",
-		WithSigner(name),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) cancelAllLeaseForSale(name string) *OverflowTestUtils {
-	otu.O.Tx("delistAllLeaseSale",
-		WithSigner(name),
-	).
-		AssertSuccess(otu.T)
-
 	return otu
 }
 
@@ -824,41 +353,6 @@ func (otu *OverflowTestUtils) listNFTForEscrowedAuction(name string, id uint64, 
 	return otu
 }
 
-func (otu *OverflowTestUtils) listExampleNFTForEscrowedAuction(name string, id uint64, price float64) []uint64 {
-	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
-	assert.NoError(otu.T, err)
-
-	eventIden, err := otu.O.QualifiedIdentifier("FindMarketAuctionEscrow", "EnglishAuction")
-	assert.NoError(otu.T, err)
-
-	res := otu.O.Tx("listNFTForAuctionEscrowed",
-		WithSigner(name),
-		WithArg("nftAliasOrIdentifier", nftIden),
-		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", "Flow"),
-		WithArg("price", price),
-		WithArg("auctionReservePrice", price+5.0),
-		WithArg("auctionDuration", 300.0),
-		WithArg("auctionExtensionOnLateBid", 60.0),
-		WithArg("minimumBidIncrement", 1.0),
-		WithArg("auctionStartTime", nil),
-		WithArg("auctionValidUntil", otu.currentTime()+100.0),
-	).
-		AssertSuccess(otu.T).
-		GetIdsFromEvent(eventIden, "id")
-
-	return res
-}
-
-func (otu *OverflowTestUtils) delistAllNFTForEscrowedAuction(name string) *OverflowTestUtils {
-	otu.O.Tx("cancelAllMarketAuctionEscrowed",
-		WithSigner(name),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
 func (otu *OverflowTestUtils) listNFTForSoftAuction(name string, id uint64, price float64) *OverflowTestUtils {
 	nftIden, err := otu.O.QualifiedIdentifier("Dandy", "NFT")
 	assert.NoError(otu.T, err)
@@ -910,35 +404,7 @@ func (otu *OverflowTestUtils) listLeaseForSoftAuction(user string, name string, 
 	return otu
 }
 
-func (otu *OverflowTestUtils) delistAllNFT(name string) *OverflowTestUtils {
-	otu.O.Tx("cancelAllMarketListings",
-		WithSigner(name),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) delistAllNFTForSoftAuction(name string) *OverflowTestUtils {
-	otu.O.Tx("cancelAllMarketAuctionSoft",
-		WithSigner(name),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) delistAllLeaseForSoftAuction(name string) *OverflowTestUtils {
-	otu.O.Tx("cancelAllLeaseMarketAuctionSoft",
-		WithSigner(name),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
 func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName string, nftAlias string, expectedPlatformRoyalty float64) *OverflowTestUtils {
-	/* Ben : Should we rename the check royalty script name? */
 	var royalty Royalty
 
 	royaltyIden, err := otu.O.QualifiedIdentifier("MetadataViews", "Royalties")
@@ -1180,41 +646,6 @@ func (otu *OverflowTestUtils) directOfferMarketEscrowed(name string, seller stri
 	return otu
 }
 
-func (otu *OverflowTestUtils) directOfferMarketEscrowedExampleNFT(name string, seller string, id uint64, price float64) []uint64 {
-	nftIden, err := otu.O.QualifiedIdentifier("ExampleNFT", "NFT")
-	assert.NoError(otu.T, err)
-
-	eventIden, err := otu.O.QualifiedIdentifier("FindMarketDirectOfferEscrow", "DirectOffer")
-	assert.NoError(otu.T, err)
-
-	res := otu.O.Tx("bidMarketDirectOfferEscrowed",
-		WithSigner(name),
-		WithArg("user", seller),
-		WithArg("nftAliasOrIdentifier", nftIden),
-		WithArg("id", id),
-		WithArg("ftAliasOrIdentifier", "Flow"),
-		WithArg("amount", price),
-		WithArg("validUntil", otu.currentTime()+100.0),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FindMarketDirectOfferEscrow.DirectOffer", map[string]interface{}{
-			"amount": price,
-			"buyer":  otu.O.Address(name),
-		}).
-		GetIdsFromEvent(eventIden, "id")
-
-	return res
-}
-
-func (otu *OverflowTestUtils) cancelAllDirectOfferMarketEscrowed(signer string) *OverflowTestUtils {
-	otu.O.Tx("cancelAllMarketDirectOfferEscrowed",
-		WithSigner(signer),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
 func (otu *OverflowTestUtils) directOfferMarketSoft(name string, seller string, id uint64, price float64) *OverflowTestUtils {
 	nftIden, err := otu.O.QualifiedIdentifier("Dandy", "NFT")
 	assert.NoError(otu.T, err)
@@ -1251,24 +682,6 @@ func (otu *OverflowTestUtils) directOfferLeaseMarketSoft(user string, name strin
 			"amount": price,
 			"buyer":  otu.O.Address(user),
 		})
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) cancelAllDirectOfferMarketSoft(signer string) *OverflowTestUtils {
-	otu.O.Tx("cancelAllMarketDirectOfferSoft",
-		WithSigner(signer),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) cancelAllDirectOfferLeaseMarketSoft(signer string) *OverflowTestUtils {
-	otu.O.Tx("cancelAllLeaseMarketDirectOfferSoft",
-		WithSigner(signer),
-	).
-		AssertSuccess(otu.T)
 
 	return otu
 }
@@ -1520,9 +933,9 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketDirectOfferSoft(user, name strin
 
 type Royalty struct {
 	Items []struct {
-		Cut         float64 `json:"cut"`
 		Description string  `json:"description"`
 		Receiver    string  `json:"receiver"`
+		Cut         float64 `json:"cut"`
 	} `json:"cutInfos"`
 }
 
@@ -1998,15 +1411,6 @@ func (otu *OverflowTestUtils) removeLeaseProfileBan(user string) *OverflowTestUt
 		AssertSuccess(otu.T)
 
 	return otu
-}
-
-func (otu *OverflowTestUtils) replaceID(result string, dandyIds []uint64) string {
-	counter := 0
-	for _, id := range dandyIds {
-		result = strings.Replace(result, fmt.Sprint(id)+`"`, "ID"+fmt.Sprint(counter)+`"`, -1)
-		counter = counter + 1
-	}
-	return result
 }
 
 func (otu *OverflowTestUtils) moveNameTo(owner, receiver, name string) *OverflowTestUtils {
@@ -3107,18 +2511,18 @@ func (otu *OverflowTestUtils) setupInfrastructureCut() *OverflowTestUtils {
 }
 
 type SaleItem struct {
-	Amount              float64 `json:"amount"`
-	AuctionReservePrice float64 `json:"auctionReservePrice"`
 	Bidder              string  `json:"bidder"`
 	ExtensionOnLateBid  string  `json:"extensionOnLateBid"`
 	FtType              string  `json:"ftType"`
 	FtTypeIdentifier    string  `json:"ftTypeIdentifier"`
-	ID                  uint64  `json:"id"`
 	ListingValidUntil   string  `json:"listingValidUntil"`
 	Owner               string  `json:"owner"`
 	SaleType            string  `json:"saleType"`
 	Type                string  `json:"type"`
 	TypeID              string  `json:"typeId"`
+	Amount              float64 `json:"amount"`
+	AuctionReservePrice float64 `json:"auctionReservePrice"`
+	ID                  uint64  `json:"id"`
 }
 
 type Report struct {
@@ -3133,28 +2537,28 @@ type NameReport struct {
 
 type FINDReport struct {
 	Profile         interface{}                          `json:"profile"`
-	Bids            []interface{}                        `json:"bids"`
 	RelatedAccounts map[string]interface{}               `json:"relatedAccounts"`
-	Leases          []LeaseInformation                   `json:"leases"`
-	PrivateMode     string                               `json:"privateMode"`
 	LeasesForSale   map[string]SaleItemCollectionReport  `json:"leasesForSale"`
 	LeasesBids      map[string]MarketBidCollectionPublic `json:"leasesBids"`
 	ItemsForSale    map[string]SaleItemCollectionReport  `json:"itemsForSale"`
 	MarketBids      map[string]MarketBidCollectionPublic `json:"marketBids"`
+	PrivateMode     string                               `json:"privateMode"`
+	Bids            []interface{}                        `json:"bids"`
+	Leases          []LeaseInformation                   `json:"leases"`
 }
 
 type LeaseInformation struct {
-	Addons             []string `json:"addons"`
 	Address            string   `json:"address"`
+	LatestBidBy        string   `json:"latestBidBy"`
+	Name               string   `json:"name"`
+	Status             string   `json:"status"`
+	Addons             []string `json:"addons"`
 	Cost               int      `json:"cost"`
 	CurrentTime        int      `json:"currentTime"`
 	ExtensionOnLateBid int      `json:"extensionOnLateBid"`
 	LatestBid          int      `json:"latestBid"`
-	LatestBidBy        string   `json:"latestBidBy"`
 	LockedUntil        int      `json:"lockedUntil"`
-	Name               string   `json:"name"`
 	SalePrice          int      `json:"salePrice"`
-	Status             string   `json:"status"`
 	ValidUntil         int      `json:"validUntil"`
 }
 
@@ -3169,48 +2573,31 @@ type MarketBidCollectionPublic struct {
 }
 
 type BidInfo struct {
-	Id                uint64 `json:"id"`
-	BidAmount         string `json:"bidAmount"`
-	BidTypeIdentifier string `json:"bidTypeIdentifier"`
-	// Timestamp         string              `json:"timestamp"`
-	Item SaleItemInformation `json:"item"`
-
-	// For Names
-	Name string `json:"name"`
+	BidAmount         string              `json:"bidAmount"`
+	BidTypeIdentifier string              `json:"bidTypeIdentifier"`
+	Name              string              `json:"name"`
+	Item              SaleItemInformation `json:"item"`
+	Id                uint64              `json:"id"`
 }
 
 type SaleItemInformation struct {
-	NftIdentifier         string       `json:"nftIdentifier"`
-	NftId                 uint64       `json:"nftId"`
+	Auction               *AuctionItem `json:"auction,omitempty"`
+	BidderName            string       `json:"bidderName"`
 	Seller                string       `json:"seller"`
 	SellerName            string       `json:"sellerName"`
-	Amount                float64      `json:"amount"`
+	NftIdentifier         string       `json:"nftIdentifier"`
 	Bidder                string       `json:"bidder"`
-	BidderName            string       `json:"bidderName"`
-	ListingId             uint64       `json:"listingId"`
+	LeaseName             string       `json:"leaseName"`
+	LeaseIdentifier       string       `json:"leaseIdentifier"`
 	SaleType              string       `json:"saleType"`
 	ListingTypeIdentifier string       `json:"listingTypeIdentifier"`
 	FtAlias               string       `json:"ftAlias"`
 	FtTypeIdentifier      string       `json:"ftTypeIdentifier"`
-	ListingValidUntil     float64      `json:"listingValidUntil"`
-	Auction               *AuctionItem `json:"auction,omitempty"`
 	ListingStatus         string       `json:"listingStatus"`
-
-	// For Names
-	LeaseIdentifier string `json:"leaseIdentifier"`
-	LeaseName       string `json:"leaseName"`
-}
-
-type NFTInfo struct {
-	Id                    uint64 `json:"id"`
-	Name                  string `json:"name"`
-	Thumbnail             string `json:"thumbnail"`
-	Nfttype               string `json:"type"`
-	Rarity                string `json:"rarity"`
-	EditionNumber         uint64 `json:"editionNumber"`
-	TotalInEdition        uint64 `json:"totalInEdition"`
-	CollectionName        string `json:"collectionName"`
-	CollectionDescription string `json:"collectionDescription"`
+	Amount                float64      `json:"amount"`
+	ListingValidUntil     float64      `json:"listingValidUntil"`
+	ListingId             uint64       `json:"listingId"`
+	NftId                 uint64       `json:"nftId"`
 }
 
 type AuctionItem struct {
@@ -3227,14 +2614,6 @@ type GhostListing struct {
 	ListingType           string `json:"listingType"`
 	ListingTypeIdentifier string `json:"listingTypeIdentifier"`
 	Id                    uint64 `json:"id"`
-}
-
-func OptionalString(input string) cadence.Optional {
-	s, err := cadence.NewString(input)
-	if err != nil {
-		panic(err)
-	}
-	return cadence.NewOptional(s)
 }
 
 type CollectionData struct {

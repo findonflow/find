@@ -9,8 +9,8 @@ import (
 func TestMarketDirectOfferSoft(t *testing.T) {
 	otu := &OverflowTestUtils{T: t, O: ot.O}
 
-  price := 10.0
-  id := dapperDandyId
+	price := 10.0
+	id := dapperDandyId
 	eventIdentifier := otu.identifier("FindMarketDirectOfferSoft", "DirectOffer")
 	royaltyIdentifier := otu.identifier("FindMarket", "RoyaltyPaid")
 
@@ -25,8 +25,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		WithArg("validUntil", otu.currentTime()+10.0),
 	)
 
-	ot.Run(t,"Should be able to add direct offer and then sell", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to add direct offer and then sell", func(t *testing.T) {
 		otu.directOfferMarketSoft("user6", "user5", id, price).
 			saleItemListed("user5", "active_ongoing", price).
 			acceptDirectOfferMarketSoft("user5", id, "user6", price).
@@ -34,8 +33,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			fulfillMarketDirectOfferSoft("user6", id, price)
 	})
 
-	ot.Run(t,"Should be able to add direct offer and then sell even the buyer is without collection", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to add direct offer and then sell even the buyer is without collection", func(t *testing.T) {
 		otu.destroyDandyCollection("user6").
 			directOfferMarketSoft("user6", "user5", id, price).
 			saleItemListed("user5", "active_ongoing", price).
@@ -44,31 +42,25 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			fulfillMarketDirectOfferSoft("user6", id, price)
 	})
 
-	ot.Run(t,"Should not be able to offer with price 0", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to offer with price 0", func(t *testing.T) {
 		bidTx("bidMarketDirectOfferSoftDapper",
 			WithArg("amount", 0.0),
 		).
 			AssertFailure(t, "Offer price should be greater than 0")
-
 	})
 
-	ot.Run(t,"Should not be able to offer with invalid time", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to offer with invalid time", func(t *testing.T) {
 		bidTx("bidMarketDirectOfferSoftDapper",
 			WithArg("amount", price),
 			WithArg("validUntil", 0.0),
 		).
 			AssertFailure(t, "Valid until is before current time")
-
 	})
 
-	ot.Run(t,"Should be able to reject offer if the pointer is no longer valid", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to reject offer if the pointer is no longer valid", func(t *testing.T) {
 		otu.directOfferMarketSoft("user6", "user5", id, price).
 			saleItemListed("user5", "active_ongoing", price).
 			sendDandy("user6", "user5", id)
-
 
 		otu.O.Tx("cancelMarketDirectOfferSoft",
 			WithSigner("user5"),
@@ -77,8 +69,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			AssertSuccess(t)
 	})
 
-	ot.Run(t,"Should be able to retract offer if the pointer is no longer valid", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to retract offer if the pointer is no longer valid", func(t *testing.T) {
 		otu.directOfferMarketSoft("user6", "user5", id, price).
 			saleItemListed("user5", "active_ongoing", price).
 			sendDandy("user6", "user5", id)
@@ -90,42 +81,34 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			AssertSuccess(t)
 	})
 
-	ot.Run(t,"Should be able to increase offer", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to increase offer", func(t *testing.T) {
 		otu.directOfferMarketSoft("user6", "user5", id, price).
 			saleItemListed("user5", "active_ongoing", price).
 			increaseDirectOfferMarketSoft("user6", id, 5.0, 15.0).
 			saleItemListed("user5", "active_ongoing", 15.0)
-
-		otu.cancelAllDirectOfferMarketSoft("user5")
 	})
 
-	ot.Run(t,"Should be able to reject offer", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to reject offer", func(t *testing.T) {
 		otu.directOfferMarketSoft("user6", "user5", id, price).
 			saleItemListed("user5", "active_ongoing", price).
 			rejectDirectOfferSoft("user5", id, 10.0)
 	})
 
-	ot.Run(t,"Should be able to retract offer", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to retract offer", func(t *testing.T) {
 		otu.directOfferMarketSoft("user6", "user5", id, price).
 			saleItemListed("user5", "active_ongoing", price).
 			retractOfferDirectOfferSoft("user6", "user5", id)
 	})
 
-	ot.Run(t,"Should not be able to offer your own NFT", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to offer your own NFT", func(t *testing.T) {
 		bidTx("bidMarketDirectOfferSoftDapper",
 			WithSigner("user5"),
 			WithArg("validUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "You cannot bid on your own resource")
-
 	})
 
-	ot.Run(t,"Should not be able to accept expired offer", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to accept expired offer", func(t *testing.T) {
 		otu.directOfferMarketSoft("user6", "user5", id, price).
 			saleItemListed("user5", "active_ongoing", price).
 			tickClock(200.0)
@@ -135,13 +118,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			WithArg("id", id),
 		).
 			AssertFailure(t, "This direct offer is already expired")
-
-		otu.cancelAllDirectOfferMarketSoft("user5")
-
 	})
 
-	ot.Run(t,"Should not be able to add direct offer when deprecated", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to add direct offer when deprecated", func(t *testing.T) {
 		otu.alterMarketOptionDapper("deprecate")
 
 		bidTx("bidMarketDirectOfferSoftDapper",
@@ -153,8 +132,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.alterMarketOptionDapper("enable")
 	})
 
-	ot.Run(t,"Should not be able to increase bid but able to fulfill offer when deprecated", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to increase bid but able to fulfill offer when deprecated", func(t *testing.T) {
 		otu.directOfferMarketSoft("user6", "user5", id, price).
 			saleItemListed("user5", "active_ongoing", price).
 			alterMarketOptionDapper("deprecate")
@@ -172,11 +150,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.alterMarketOptionDapper("enable").
 			sendDandy("user5", "user6", id)
-
 	})
 
-	ot.Run(t,"Should be able to reject offer when deprecated", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to reject offer when deprecated", func(t *testing.T) {
 		otu.directOfferMarketSoft("user6", "user5", id, price).
 			saleItemListed("user5", "active_ongoing", price).
 			alterMarketOptionDapper("deprecate").
@@ -185,8 +161,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.alterMarketOptionDapper("enable")
 	})
 
-	ot.Run(t,"Should not be able to add direct offer after stopped", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to add direct offer after stopped", func(t *testing.T) {
 		otu.alterMarketOptionDapper("stop")
 
 		otu.O.Tx("bidMarketDirectOfferSoftDapper",
@@ -203,8 +178,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.alterMarketOptionDapper("enable")
 	})
 
-	ot.Run(t,"Should not be able to increase bid nor accept offer after stopped", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to increase bid nor accept offer after stopped", func(t *testing.T) {
 		otu.directOfferMarketSoft("user6", "user5", id, price).
 			saleItemListed("user5", "active_ongoing", price).
 			alterMarketOptionDapper("stop")
@@ -221,13 +195,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			WithArg("id", id),
 		).
 			AssertFailure(t, "Tenant has stopped this item")
-
-		otu.alterMarketOptionDapper("enable").
-			cancelAllDirectOfferMarketSoft("user5")
 	})
 
-	ot.Run(t,"Should not be able to fulfill offer after stopped", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to fulfill offer after stopped", func(t *testing.T) {
 		otu.directOfferMarketSoft("user6", "user5", id, price).
 			saleItemListed("user5", "active_ongoing", price).
 			acceptDirectOfferMarketSoft("user5", id, "user6", price).
@@ -252,11 +222,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		).
 			AssertSuccess(t)
 		otu.sendDandy("user5", "user6", id)
-
 	})
 
-	ot.Run(t,"Should be able to direct offer, increase offer and fulfill offer after enabled", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to direct offer, increase offer and fulfill offer after enabled", func(t *testing.T) {
 		otu.alterMarketOptionDapper("stop").
 			alterMarketOptionDapper("enable").
 			directOfferMarketSoft("user6", "user5", id, price).
@@ -268,8 +236,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 		otu.sendDandy("user5", "user6", id)
 	})
 
-	ot.Run(t,"Should be able to reject offer after enabled", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to reject offer after enabled", func(t *testing.T) {
 		otu.alterMarketOptionDapper("stop").
 			alterMarketOptionDapper("enable").
 			directOfferMarketSoft("user6", "user5", id, price).
@@ -277,8 +244,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			rejectDirectOfferSoft("user5", id, 10.0)
 	})
 
-	ot.Run(t,"Should not be able to make offer by user3 when deprecated or stopped", func(t *testing.T) {
-
+	ot.Run(t, "Should not be able to make offer by user3 when deprecated or stopped", func(t *testing.T) {
 		otu.directOfferMarketSoft("user6", "user5", id, price).
 			saleItemListed("user5", "active_ongoing", price).
 			alterMarketOptionDapper("deprecate")
@@ -306,13 +272,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
 			AssertFailure(t, "Tenant has stopped this item")
-
-		otu.alterMarketOptionDapper("enable").
-			cancelAllDirectOfferMarketSoft("user5")
 	})
 
-	ot.Run(t,"Should be able to retract offer when deprecated or stopped", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to retract offer when deprecated or stopped", func(t *testing.T) {
 		otu.directOfferMarketSoft("user6", "user5", id, price).
 			saleItemListed("user5", "active_ongoing", price)
 
@@ -320,9 +282,6 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 
 		otu.alterMarketOptionDapper("deprecate").
 			retractOfferDirectOfferSoft("user6", "user5", id)
-
-		otu.alterMarketOptionDapper("enable").
-			cancelAllDirectOfferMarketSoft("user5")
 	})
 
 	/* Testing on Royalties */
@@ -331,8 +290,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 	// artist 0.05
 	// find 0.025
 	// tenant nil
-	ot.Run(t,"Royalties should be sent to correspondence upon accept offer action", func(t *testing.T) {
-
+	ot.Run(t, "Royalties should be sent to correspondence upon accept offer action", func(t *testing.T) {
 		price = 10.0
 
 		otu.directOfferMarketSoft("user6", "user5", id, price).
@@ -353,7 +311,7 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"royaltyName": "find",
 				"tenant":      "find",
 			}).
-      /*TODO dont know why this does not work here, is this an error
+			/*TODO dont know why this does not work here, is this an error
 			AssertEvent(t, royaltyIdentifier, map[string]interface{}{
 				"address":     otu.O.Address("user5"),
 				"amount":      0.5,
@@ -371,11 +329,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			})
 
 		otu.sendDandy("user5", "user6", id)
-
 	})
 
-	ot.Run(t,"Should return money when outbid", func(t *testing.T) {
-
+	ot.Run(t, "Should return money when outbid", func(t *testing.T) {
 		otu.directOfferMarketSoft("user6", "user5", id, price)
 
 		otu.saleItemListed("user5", "active_ongoing", price)
@@ -398,11 +354,9 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 				"previousBuyer": otu.O.Address("user6"),
 				"status":        "active_offered",
 			})
-
-		otu.cancelAllDirectOfferMarketSoft("user5")
 	})
 
-	ot.Run(t,"Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {
+	ot.Run(t, "Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {
 		saleItemID := otu.directOfferMarketSoftDUC("user6", "user5", id, price)
 
 		otu.saleItemListed("user5", "active_ongoing", price).
@@ -410,5 +364,4 @@ func TestMarketDirectOfferSoft(t *testing.T) {
 			saleItemListed("user5", "active_finished", price).
 			fulfillMarketDirectOfferSoftDUC("user6", saleItemID[0], price)
 	})
-
 }

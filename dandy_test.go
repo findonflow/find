@@ -92,12 +92,9 @@ func TestDandy(t *testing.T) {
 }`),
 		)
 
-		/* mint new dandies and withdraw all of them */
-		dandiesIDs := append(dandyIds, otu.mintThreeExampleDandies()...)
-
 		otu.O.Tx("devDestroyDandies",
 			WithSigner("user1"),
-			WithArg("ids", dandiesIDs),
+			WithArg("ids", dandyIds),
 		).AssertSuccess(t)
 
 		otu.O.Script("devgetDandiesIDsFor",

@@ -74,7 +74,11 @@ func TestFIND(t *testing.T) {
 	})
 
 	ot.Run(t, "Should be able to lookup address", func(t *testing.T) {
-		otu.assertLookupAddress("user1", user1Address)
+		ot.O.Script(`import FIND from "../contracts/FIND.cdc"
+access(all) fun main(name: String) :  Address? {
+    return FIND.lookupAddress(name) } `,
+			WithArg("name", "user1"),
+		).AssertWant(otu.T, autogold.Want("lookupAddress-user1", user1Address))
 	})
 
 	ot.Run(t, "Should not be able to lookup lease after expired", func(t *testing.T) {

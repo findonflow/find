@@ -151,9 +151,6 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			WithArg("leaseName", "user5"),
 		).
 			AssertFailure(t, "Tenant has stopped this item")
-
-		otu.alterLeaseMarketOption("enable").
-			cancelAllDirectOfferLeaseMarketSoft("user5")
 	})
 
 	ot.Run(t, "Should not be able to fulfill offer after stopped", func(t *testing.T) {
@@ -182,9 +179,6 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			WithArg("leaseNames", `["user5"]`),
 		).
 			AssertFailure(t, "Tenant has stopped this item")
-
-		otu.alterLeaseMarketOption("enable").
-			cancelAllDirectOfferLeaseMarketSoft("user5")
 	})
 
 	ot.Run(t, "Should be able to direct offer, increase offer and fulfill offer after enabled", func(t *testing.T) {
@@ -231,9 +225,6 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			WithArg("validUntil", otu.currentTime()+100.0),
 		).
 			AssertFailure(t, "Tenant has stopped this item")
-
-		otu.alterLeaseMarketOption("enable").
-			cancelAllDirectOfferLeaseMarketSoft("user5")
 	})
 
 	ot.Run(t, "Should be able to retract offer when deprecated , but not when stopped", func(t *testing.T) {
@@ -250,9 +241,6 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 
 		otu.alterLeaseMarketOption("deprecate").
 			retractOfferDirectOfferLeaseSoft("user6", "user5", "user5")
-
-		otu.alterLeaseMarketOption("enable").
-			cancelAllDirectOfferLeaseMarketSoft("user5")
 	})
 
 	// platform 0.15
@@ -313,9 +301,6 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 			WithArg("leaseNames", `["user5"]`),
 		).
 			AssertSuccess(t)
-
-		otu.removeLeaseProfileBan("user5").
-			cancelAllDirectOfferLeaseMarketSoft("user5")
 	})
 
 	ot.Run(t, "Should be able to ban user, user can only retract offer", func(t *testing.T) {
@@ -373,8 +358,6 @@ func TestLeaseMarketDirectOfferSoft(t *testing.T) {
 				"previousBuyer": otu.O.Address("user6"),
 				"status":        "active_offered",
 			})
-
-		otu.cancelAllDirectOfferLeaseMarketSoft("user5")
 	})
 
 	ot.Run(t, "Should be able to list an NFT for sale and buy it with DUC", func(t *testing.T) {

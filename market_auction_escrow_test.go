@@ -374,9 +374,6 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			WithArg("id", id),
 		).
 			AssertSuccess(t)
-
-		otu.delistAllNFTForEscrowedAuction("user1").
-			sendDandy("user1", "user2", id)
 	})
 
 	ot.Run(t, "Should not be able to bid below listing price", func(t *testing.T) {

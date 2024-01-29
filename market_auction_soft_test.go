@@ -228,8 +228,6 @@ func TestMarketAuctionSoft(t *testing.T) {
 			WithArg("amount", 0.1),
 		).
 			AssertFailure(t, "must be larger then previous bid+bidIncrement")
-
-		otu.delistAllNFTForSoftAuction("user5")
 	})
 
 	ot.Run(t, "Should not be able to list after deprecated", func(t *testing.T) {

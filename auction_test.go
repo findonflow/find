@@ -9,6 +9,7 @@ import (
 
 /*
 Tests must be in the same folder as flow.json with contracts and transactions/scripts in subdirectories in order for the path resolver to work correctly
+this tests must be split up or rename, it could be called TestFindNativeMarket
 */
 func TestAuction(t *testing.T) {
 	otu := &OverflowTestUtils{T: t, O: ot.O}
@@ -19,13 +20,7 @@ func TestAuction(t *testing.T) {
 	FUSDDepositEvent, err := otu.O.QualifiedIdentifier("FUSD", "TokensDeposited")
 	assert.NoError(t, err)
 
-	/*
-		findAuctionEvent, err := otu.O.QualifiedIdentifier("FIND", "EnglishAuction")
-		assert.NoError(t, err)
-
-
-	*/
-
+	// TODO: Why is this test in auction test?
 	ot.Run(t, "Should list a name for sale", func(t *testing.T) {
 		otu.listForSale("user1")
 	})
