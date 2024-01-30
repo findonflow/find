@@ -3,7 +3,7 @@ module github.com/findonflow/find
 go 1.20
 
 require (
-	github.com/bjartek/overflow v1.14.1-0.20240125142131-2d37aa04e49d
+	github.com/bjartek/overflow v1.14.1-0.20240130155549-46800d5eee35
 	github.com/hexops/autogold v1.3.1
 	github.com/onflow/cadence v1.0.0-preview.1.0.20231213191345-0ff20e15e7e1
 	github.com/recursionpharma/go-csv-map v0.0.0-20160524001940-792523c65ae9

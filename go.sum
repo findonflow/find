@@ -617,6 +617,8 @@ github.com/bjartek/overflow v1.14.1-0.20240125135102-8314e8799bb6 h1:6GzVbdEzAl+
 github.com/bjartek/overflow v1.14.1-0.20240125135102-8314e8799bb6/go.mod h1:vjzRT9hhDF+m9DkWYwB2LLJSm8m2GsFBmsX00Qqk27w=
 github.com/bjartek/overflow v1.14.1-0.20240125142131-2d37aa04e49d h1:lwkFAHqs+bAOPELw/ZTweFgByMhcWGkdBRYLqvsOaxo=
 github.com/bjartek/overflow v1.14.1-0.20240125142131-2d37aa04e49d/go.mod h1:vjzRT9hhDF+m9DkWYwB2LLJSm8m2GsFBmsX00Qqk27w=
+github.com/bjartek/overflow v1.14.1-0.20240130155549-46800d5eee35 h1:fiOkGuAOh7peAjnd+GJoX6hC4tspvhxZZhuzK1BLIA8=
+github.com/bjartek/overflow v1.14.1-0.20240130155549-46800d5eee35/go.mod h1:vjzRT9hhDF+m9DkWYwB2LLJSm8m2GsFBmsX00Qqk27w=
 github.com/boombuler/barcode v1.0.0/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/boombuler/barcode v1.0.1/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/btcsuite/btcd v0.0.0-20171128150713-2e60448ffcc6/go.mod h1:Dmm/EzmjnCiweXmzRIAiUWCInVmPgjkzgv5k4tVyXiQ=

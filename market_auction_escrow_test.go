@@ -16,6 +16,17 @@ func TestMarketAuctionEscrow(t *testing.T) {
 	eventIdentifier := otu.identifier("FindMarketAuctionEscrow", "EnglishAuction")
 	royaltyIdentifier := otu.identifier("FindMarket", "RoyaltyPaid")
 
+	increaseAuctionBidTx := otu.O.TxFileNameFN("increaseBidMarketAuctionEscrowed",
+		WithSigner("user2"),
+		WithArg("id", id),
+		WithArg("amount", preIncrement),
+		WithAssertEvent(otu.T, "FindMarketAuctionEscrow.EnglishAuction", map[string]interface{}{
+			"amount": price + preIncrement,
+			"id":     id,
+			"buyer":  otu.O.Address("user2"),
+			"status": "active_ongoing",
+		}))
+
 	listingTx := otu.O.TxFN(
 		WithSigner("user1"),
 		WithArg("nftAliasOrIdentifier", dandyNFTType(otu)),
@@ -245,10 +256,12 @@ func TestMarketAuctionEscrow(t *testing.T) {
 	ot.Run(t, "Should be able to bid and increase bid by same user", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price).
-			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
-			saleItemListed("user1", "active_ongoing", 15.0).
-			increaseAuctioBidMarketEscrow("user2", id, 5.0, 20.0).
-			saleItemListed("user1", "active_ongoing", 20.0)
+			auctionBidMarketEscrow("user2", "user1", id, price).
+			saleItemListed("user1", "active_ongoing", price)
+
+		increaseAuctionBidTx()
+		// increaseAuctioBidMarketEscrow("user2", id, 5.0, 20.0).
+		otu.saleItemListed("user1", "active_ongoing", 15.0)
 	})
 
 	ot.Run(t, "Should not be able to add bid that is not above minimumBidIncrement", func(t *testing.T) {
@@ -257,12 +270,10 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			auctionBidMarketEscrow("user2", "user1", id, price+preIncrement).
 			saleItemListed("user1", "active_ongoing", price+preIncrement)
 
-		otu.O.Tx("increaseBidMarketAuctionEscrowed",
-			WithSigner("user2"),
-			WithArg("id", id),
+		increaseAuctionBidTx(
 			WithArg("amount", 0.1),
-		).
-			AssertFailure(t, "must be larger then previous bid+bidIncrement")
+			WithRequireFailure(t, "must be larger then previous bid+bidIncrement"),
+		)
 	})
 
 	ot.Run(t, "Should not be able to list after deprecated", func(t *testing.T) {
@@ -289,12 +300,7 @@ func TestMarketAuctionEscrow(t *testing.T) {
 		).
 			AssertSuccess(t)
 
-		otu.O.Tx("increaseBidMarketAuctionEscrowed",
-			WithSigner("user2"),
-			WithArg("id", id),
-			WithArg("amount", price+10.0),
-		).
-			AssertSuccess(t)
+		increaseAuctionBidTx()
 
 		otu.tickClock(500.0)
 
@@ -347,15 +353,10 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			AssertFailure(t, "Tenant has stopped this item")
 
 		otu.alterMarketOption("enable").
-			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
+			auctionBidMarketEscrow("user2", "user1", id, price).
 			alterMarketOption("stop")
 
-		otu.O.Tx("increaseBidMarketAuctionEscrowed",
-			WithSigner("user2"),
-			WithArg("id", id),
-			WithArg("amount", price+10.0),
-		).
-			AssertFailure(t, "Tenant has stopped this item")
+		increaseAuctionBidTx(WithRequireFailure(t, "Tenant has stopped this item"))
 
 		otu.alterMarketOption("stop")
 
