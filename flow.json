@@ -145,6 +145,13 @@
         "mainnet": "0xe467b9dd11fa00df"
       }
     },
+    "SwapRouter": {
+      "source": "./contracts/community/SwapRouter.cdc",
+      "aliases": {
+        "mainnet": "0xa6850776a94e6551",
+        "testnet": "0x2f8af5ed05bbde0d"
+      }
+    },
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
     "ProfileCache": "./contracts/ProfileCache.cdc",
     "FIND": "./contracts/FIND.cdc",
@@ -291,7 +298,10 @@
         "LostAndFoundHelper",
         "FeeEstimator"
       ],
-      "emulator-dapper": ["DapperUtilityCoin", "FlowUtilityToken"],
+      "emulator-dapper": [
+        "DapperUtilityCoin",
+        "FlowUtilityToken"
+      ],
       "emulator-find": [
         "Profile",
         "FindThoughts",
@@ -344,7 +354,9 @@
         "FindMarketDirectOfferEscrow"
       ],
       "emulator-find-admin": [],
-      "emulator-find-forge": ["GeneratedExperiences"],
+      "emulator-find-forge": [
+        "GeneratedExperiences"
+      ],
       "emulator-find-lease": [],
       "emulator-user1": [],
       "emulator-user2": [],

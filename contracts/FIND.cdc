@@ -1,6 +1,7 @@
 import FungibleToken from "./standard/FungibleToken.cdc"
 import FUSD from "./standard/FUSD.cdc"
 import FlowToken from "./standard/FlowToken.cdc"
+import FiatToken from "./standard/FiatToken.cdc"
 import DapperUtilityCoin from "./standard/DapperUtilityCoin.cdc"
 import Profile from "./Profile.cdc"
 import Debug from "./Debug.cdc"
@@ -1352,6 +1353,21 @@ access(all) contract FIND {
         }
 
 
+        //TODO test
+        access(LeaseOwner) fun registerUSDC(name: String, vault: @FiatToken.Vault){
+            let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)!
+            let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
+
+            let network=FIND.account.storage.borrow<&Network>(from: FIND.NetworkStoragePath)!
+
+            if !network.publicEnabled {
+                panic("Public registration is not enabled yet")
+            }
+
+            network.registerUSDC(name:name, vault: <- vault, profile: profileCap, leases: leases)
+        }
+
+
         //This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
         access(LeaseOwner) fun register(name: String, vault: @FUSD.Vault){
             let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)!
@@ -1589,6 +1605,37 @@ access(all) contract FIND {
             panic("Could not find profile with name=".concat(name))
         }
 
+        //TODO test
+        access(all) fun registerUSDC(name: String, vault: @FiatToken.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
+
+            if name.length < 3 {
+                panic( "A FIND name has to be minimum 3 letters long")
+            }
+
+            let nameStatus=self.readStatus(name)
+            if nameStatus.status == LeaseStatus.TAKEN {
+                panic("Name already registered")
+            }
+
+            //if we have a locked profile that is not owned by the same identity then panic
+            if nameStatus.status == LeaseStatus.LOCKED {
+                panic("Name is locked")
+            }
+
+            let cost= self.calculateCost(name)
+            if vault.balance != cost {
+                panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
+            }
+
+            let address=self.wallet.address
+            let account=getAccount(address)
+            let usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)!
+            let usdcReceiver = usdcCap.borrow() ?? panic("cound not find usdc vault receiver for address".concat(self.wallet.address.toString()))
+            usdcReceiver.deposit(from: <- vault)
+
+            self.internal_register(name: name, profile: profile, leases: leases)
+        }
+
         //everybody can call register, normally done through the convenience method in the contract
         access(all) fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
 
@@ -1610,7 +1657,7 @@ access(all) contract FIND {
             if vault.balance != cost {
                 panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
             }
-            self.wallet!.borrow()!.deposit(from: <- vault)
+            self.wallet.borrow()!.deposit(from: <- vault)
 
             self.internal_register(name: name, profile: profile, leases: leases)
         }

@@ -646,4 +646,19 @@ access(all) fun main(name: String) :  Address? {
 			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
 	})
+
+	ot.Run(t, "Should be able to register a name with usdc", func(t *testing.T) {
+		otu.O.Tx("registerUSDC",
+			WithSigner("user1"),
+			WithArg("name", "fooobar"),
+			WithArg("amount", 5.0),
+		).AssertSuccess(t).
+			AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
+				"name": "fooobar",
+			}).
+			AssertEvent(otu.T, "FiatToken.TokensDeposited", map[string]interface{}{
+				"amount": 5.0,
+				"to":     otu.O.Address("find-admin"),
+			})
+	})
 }
