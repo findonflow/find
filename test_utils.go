@@ -102,7 +102,6 @@ func (otu *OverflowTestUtils) registerUserWithName(buyer, name string) *Overflow
 func (otu *OverflowTestUtils) registerUserWithNameTransaction(buyer, name string) OverflowResult {
 	nameAddress := otu.O.Address(buyer)
 	expireTime := otu.currentTime() + leaseDurationFloat
-
 	lockedTime := otu.currentTime() + leaseDurationFloat + lockDurationFloat
 	return otu.O.Tx("register",
 		WithSigner(buyer),
