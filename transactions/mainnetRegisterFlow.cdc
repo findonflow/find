@@ -22,9 +22,8 @@ transaction(
 
         let deadline = getCurrentBlock().timestamp + 1000.0
         let tokenInVaultPath = /storage/flowTokenVault
-        let tokenOutReceiverPath = /public/USDCVaultReceiver
 
-        let inVaultRef = userAccount.storage.borrow<&{FungibleToken.Vault}>(from: tokenInVaultPath) ?? panic("Could not borrow reference to the owner's in FT.Vault")
+        let inVaultRef = userAccount.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: tokenInVaultPath) ?? panic("Could not borrow reference to the owner's in FT.Vault")
 
         let path = [ "A.1654653399040a61.FlowToken", "A.b19436aae4d94622.FiatToken" ]
 
