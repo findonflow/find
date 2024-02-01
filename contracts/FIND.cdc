@@ -229,7 +229,7 @@ access(all) contract FIND {
         let cap = account.capabilities.get<&{Profile.Public}>(Profile.publicPath)
         if cap != nil {
             let profile= cap!.borrow()!
-            emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.getAddress(), message:message, tag:tag, amount:vault.getBalance(), ftType:vault.getType().identifier)
+            emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.getAddress(), message:message, tag:tag, amount:vault.balance, ftType:vault.getType().identifier)
             profile.deposit(from: <- vault)
             return
         }
@@ -1349,7 +1349,7 @@ access(all) contract FIND {
 
         //borrow the auction
         access(all) fun borrowAuction(_ name: String): &FIND.Auction {
-            return (&self.auctions[name] as &FIND.Auction?)!
+            return (&self.auctions[name])!
         }
 
 

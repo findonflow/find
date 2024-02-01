@@ -246,7 +246,7 @@ access(all) contract FindViews {
                 panic("The capability is not valid.")
             }
 
-            let viewResolver=self.cap.borrow()!.borrowViewResolver(id: self.id)!
+            let viewResolver=self.cap.borrow()!.borrowNFT(self.id)!
             let display = MetadataViews.getDisplay(viewResolver) ?? panic("MetadataViews Display View is not implemented on this NFT.")
             let nftCollectionData = MetadataViews.getNFTCollectionData(viewResolver) ?? panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
             self.nounce=FindViews.getNounce(viewResolver)
@@ -256,7 +256,7 @@ access(all) contract FindViews {
 
         access(all) fun getViewResolver() : &{ViewResolver.Resolver} {
             let cap = self.cap.borrow()!
-            let viewResolver = cap.borrowViewResolver(id: self.id) ?? panic("The capability of view pointer is not linked.")
+            let viewResolver = cap.borrowNFT(self.id) ?? panic("The capability of view pointer is not linked.")
             return viewResolver 
         }
 
