@@ -11,7 +11,7 @@ transaction(types: [String] , ids: [UInt64], messages: [String]) {
 
     let authPointers : [FindViews.AuthNFTPointer]
 
-    prepare(account : auth(NonFungibleToken.Withdrawable, IssueStorageCapabilityController) &Account) {
+    prepare(account : auth(NonFungibleToken.Withdraw, IssueStorageCapabilityController) &Account) {
 
         self.authPointers = []
 
@@ -29,7 +29,7 @@ transaction(types: [String] , ids: [UInt64], messages: [String]) {
 
             let path = data!.collectionData
 
-            var providerCap = account.capabilities.storage.issue<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>(path.storagePath)
+            var providerCap = account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(path.storagePath)
             let pointer = FindViews.AuthNFTPointer(cap: providerCap, id: ids[i])
             self.authPointers.append(pointer)
         }

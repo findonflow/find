@@ -131,7 +131,7 @@ access(all) contract NFGv3: ViewResolver {
                     providerPath: /private/NFGv3Collection,
                     publicCollection: Type<&NFGv3.Collection>(),
                     publicLinkedType: Type<&NFGv3.Collection>(),
-                    providerLinkedType: Type<auth(NonFungibleToken.Withdrawable) &NFGv3.Collection>(),
+                    providerLinkedType: Type<auth(NonFungibleToken.Withdraw) &NFGv3.Collection>(),
                     createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {return <- NFGv3.createEmptyCollection()})
                 )
             case Type<MetadataViews.NFTCollectionDisplay>():
@@ -182,7 +182,7 @@ access(all) contract NFGv3: ViewResolver {
         }
 
         // withdraw removes an NFT from the collection and moves it to the caller
-        access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+        access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
             emit Withdraw(id: token.id, from: self.owner?.address)

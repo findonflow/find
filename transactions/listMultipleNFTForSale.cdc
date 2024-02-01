@@ -13,7 +13,7 @@ transaction(nftAliasOrIdentifiers: [String], ids: [UInt64], ftAliasOrIdentifiers
     let pointers : [FindViews.AuthNFTPointer]
     let vaultTypes : [Type]
 
-    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, NonFungibleToken.Withdrawable) &Account) {
+    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, NonFungibleToken.Withdraw) &Account) {
 
         if nftAliasOrIdentifiers.length != ids.length {
             panic("The length of arrays passed in has to be the same")
@@ -66,7 +66,7 @@ transaction(nftAliasOrIdentifiers: [String], ids: [UInt64], ftAliasOrIdentifiers
                 fts[ftAliasOrIdentifiers[counter]] = ft
             }
 
-            var providerCap=account.capabilities.storage.issue<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>(nft!.storagePath)
+            var providerCap=account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(nft!.storagePath)
             // Get the salesItemRef from tenant
             self.pointers.append(FindViews.AuthNFTPointer(cap: providerCap, id: ids[counter]))
             self.vaultTypes.append(ft!.type)

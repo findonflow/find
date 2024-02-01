@@ -6,13 +6,13 @@ transaction(user: String, id: UInt64) {
 
     let address : Address
     let cap : Capability<&{NonFungibleToken.Collection}>
-    let senderRef : auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}
+    let senderRef : auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}
 
-    prepare(account: auth(BorrowValue, NonFungibleToken.Withdrawable) &Account) {
+    prepare(account: auth(BorrowValue, NonFungibleToken.Withdraw) &Account) {
         self.address = FIND.resolve(user) ?? panic("Cannot find user with this name / address")
         self.cap = getAccount(self.address).capabilities.get<&{NonFungibleToken.Collection}>(Dandy.CollectionPublicPath)!
 
-        self.senderRef=account.storage.borrow<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>(from: Dandy.CollectionStoragePath) ?? panic("Cannot borrow reference to sender Collection from path ".concat(Dandy.CollectionStoragePath.toString()))
+        self.senderRef=account.storage.borrow<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(from: Dandy.CollectionStoragePath) ?? panic("Cannot borrow reference to sender Collection from path ".concat(Dandy.CollectionStoragePath.toString()))
 
 
 

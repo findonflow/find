@@ -224,7 +224,7 @@ access(all) contract GeneratedExperiences: ViewResolver {
         }
 
         /// withdraw removes an NFT from the collection and moves it to the caller
-        access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+        access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID)
             ?? panic("Could not withdraw an NFT with the provided ID from the collection")
 
@@ -306,7 +306,7 @@ access(all) contract GeneratedExperiences: ViewResolver {
             providerPath: GeneratedExperiences.CollectionPrivatePath,
             publicCollection: Type<&GeneratedExperiences.Collection>(),
             publicLinkedType: Type<&GeneratedExperiences.Collection>(),
-            providerLinkedType: Type<auth(NonFungibleToken.Withdrawable) &GeneratedExperiences.Collection>(),
+            providerLinkedType: Type<auth(NonFungibleToken.Withdraw) &GeneratedExperiences.Collection>(),
             createEmptyCollectionFunction: (fun (): @{NonFungibleToken.Collection} {
                 return <-GeneratedExperiences.createEmptyCollection()
             })

@@ -63,14 +63,14 @@ access(all) contract Bl0xPack: ViewResolver {
 
         access(all) let storageRequirement: UInt64
 
-        access(contract) let providerCap: Capability<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection}> 
+        access(contract) let providerCap: Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection}> 
 
         access(contract) let royaltyCap: Capability<&{FungibleToken.Receiver}>?
         access(contract) let royaltyCut: UFix64
 
         access(all) let requiresReservation: Bool
 
-        init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, price: UFix64, buyTime:UFix64, openTime:UFix64, walletType:Type, providerCap: Capability<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>, requiresReservation:Bool, royaltyCut: UFix64, royaltyWallet: Capability<&{FungibleToken.Receiver}>, floatEventId:UInt64?, whiteListTime: UFix64?, storageRequirement: UInt64) {
+        init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, price: UFix64, buyTime:UFix64, openTime:UFix64, walletType:Type, providerCap: Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>, requiresReservation:Bool, royaltyCut: UFix64, royaltyWallet: Capability<&{FungibleToken.Receiver}>, floatEventId:UInt64?, whiteListTime: UFix64?, storageRequirement: UInt64) {
             self.name = name
             self.description = description
             self.thumbnailUrl = thumbnailUrl
@@ -221,7 +221,7 @@ access(all) contract Bl0xPack: ViewResolver {
                     providerPath: /private/bl0xPackCollection,
                     publicCollection: Type<&Bl0xPack.Collection>(),
                     publicLinkedType: Type<&Bl0xPack.Collection>(),
-                    providerLinkedType: Type<auth(NonFungibleToken.Withdrawable) &Bl0xPack.Collection>(),
+                    providerLinkedType: Type<auth(NonFungibleToken.Withdraw) &Bl0xPack.Collection>(),
                     createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {return <- Bl0xPack.createEmptyCollection()}))
 
                     case Type<MetadataViews.NFTCollectionDisplay>(): 
@@ -445,7 +445,7 @@ access(all) contract Bl0xPack: ViewResolver {
             // withdraw
             // Removes an NFT from the collection and moves it to the caller
             //
-            access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+            access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
                 let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("Could not withdraw nft")
 
                 let nft <- token as! @NFT
@@ -577,7 +577,7 @@ access(all) contract Bl0xPack: ViewResolver {
 
         access(account) fun fulfill(packId: UInt64, rewardIds:[UInt64], salt:String) {
 
-            let openedPacksCollection = Bl0xPack.account.storage.borrow<auth(NonFungibleToken.Withdrawable) &Bl0xPack.Collection>(from: Bl0xPack.OpenedCollectionStoragePath)!
+            let openedPacksCollection = Bl0xPack.account.storage.borrow<auth(NonFungibleToken.Withdraw) &Bl0xPack.Collection>(from: Bl0xPack.OpenedCollectionStoragePath)!
             let pack <- openedPacksCollection.withdraw(withdrawID: packId) as! @Bl0xPack.NFT
 
             let receiver= pack.getOpenedBy()

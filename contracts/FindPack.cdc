@@ -343,14 +343,14 @@ access(all) contract FindPack {
         access(all) let extraData : {String : AnyStruct}
 
         access(all) let itemTypes: [Type]
-        access(contract) let providerCaps: {Type : Capability<auth (NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>}
+        access(contract) let providerCaps: {Type : Capability<auth (NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>}
 
         access(contract) let primarySaleRoyalties : MetadataViews.Royalties
         access(contract) let royalties : MetadataViews.Royalties
 
         access(all) let requiresReservation: Bool
 
-        init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, openTime:UFix64, walletType:Type, itemTypes: [Type],  providerCaps: {Type : Capability<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>} , requiresReservation:Bool, storageRequirement: UInt64, saleInfos: [SaleInfo], primarySaleRoyalties : MetadataViews.Royalties, royalties : MetadataViews.Royalties, collectionDisplay: MetadataViews.NFTCollectionDisplay, packFields: {String : String} , extraData : {String : AnyStruct}) {
+        init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, openTime:UFix64, walletType:Type, itemTypes: [Type],  providerCaps: {Type : Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>} , requiresReservation:Bool, storageRequirement: UInt64, saleInfos: [SaleInfo], primarySaleRoyalties : MetadataViews.Royalties, royalties : MetadataViews.Royalties, collectionDisplay: MetadataViews.NFTCollectionDisplay, packFields: {String : String} , extraData : {String : AnyStruct}) {
             self.name = name
             self.description = description
             self.thumbnailUrl = thumbnailUrl
@@ -547,7 +547,7 @@ access(all) contract FindPack {
                     providerPath: FindPack.CollectionPrivatePath,
                     publicCollection: Type<&FindPack.Collection>(),
                     publicLinkedType: Type<&FindPack.Collection>(),
-                    providerLinkedType: Type<auth (NonFungibleToken.Withdrawable) &FindPack.Collection>(),
+                    providerLinkedType: Type<auth (NonFungibleToken.Withdraw) &FindPack.Collection>(),
                     createEmptyCollectionFunction: fun () : @{NonFungibleToken.Collection} {
                         return <- FindPack.createEmptyCollection()
                     }
@@ -815,7 +815,7 @@ access(all) contract FindPack {
         // withdraw
         // Removes an NFT from the collection and moves it to the caller
         //
-        access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+        access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("Could not withdraw nft")
 
             let nft <- token as! @NFT
@@ -940,7 +940,7 @@ access(all) contract FindPack {
 
     access(account) fun fulfill(packId: UInt64, types:[Type], rewardIds: [UInt64], salt:String) {
 
-        let openedPacksCollection = FindPack.account.storage.borrow<auth (NonFungibleToken.Withdrawable) &FindPack.Collection>(from: FindPack.OpenedCollectionStoragePath)!
+        let openedPacksCollection = FindPack.account.storage.borrow<auth (NonFungibleToken.Withdraw) &FindPack.Collection>(from: FindPack.OpenedCollectionStoragePath)!
         let pack <- openedPacksCollection.withdraw(withdrawID: packId) as! @FindPack.NFT
         let packTypeName = pack.packTypeName
         let packTypeId = pack.getTypeID()

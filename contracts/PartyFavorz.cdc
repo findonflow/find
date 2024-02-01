@@ -132,7 +132,7 @@ access(all) contract PartyFavorz: ViewResolver {
 					providerPath: /private/PartyFavorzCollection,
 					publicCollection: Type<&PartyFavorz.Collection>(),
 					publicLinkedType: Type<&PartyFavorz.Collection>(),
-					providerLinkedType: Type<auth (NonFungibleToken.Withdrawable) &PartyFavorz.Collection>(),
+					providerLinkedType: Type<auth (NonFungibleToken.Withdraw) &PartyFavorz.Collection>(),
 					createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {return <- PartyFavorz.createEmptyCollection()})
 				)
 			case Type<MetadataViews.NFTCollectionDisplay>():
@@ -238,7 +238,7 @@ access(all) contract PartyFavorz: ViewResolver {
 		}
 
 		// withdraw removes an NFT from the collection and moves it to the caller
-		access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+		access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
 			emit Withdraw(id: token.id, from: self.owner?.address)

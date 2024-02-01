@@ -101,10 +101,10 @@ access(all) contract FungibleTokenSwitchboard {
                     // If the vault was borrowed successfully...
                     if let vaultRef = capability.borrow() {
                         // ...and if there is no previous capability added for that token
-                        if (self.receiverCapabilities[vaultRef.getType()] == nil) {
+                        if (self.receiverCapabilities[vaultRef!.getType()] == nil) {
                             // Use the vault reference type as key for storing the
                             // capability
-                            self.receiverCapabilities[vaultRef.getType()] = capability
+                            self.receiverCapabilities[vaultRef!.getType()] = capability
                             // and emit the event that indicates that a new
                             // capability has been added
                             emit VaultCapabilityAdded(type: vaultRef.getType(),
@@ -241,14 +241,14 @@ access(all) contract FungibleTokenSwitchboard {
             // If we can borrow a reference to the vault...
             if let vaultRef = depositedVaultCapability.borrow() {
                 // We deposit the funds on said vault
-                vaultRef.deposit(from: <-from.withdraw(amount: from.getBalance()))
+                vaultRef.deposit(from: <-from.withdraw(amount: from.balance))
             }
         }
         // if deposit failed for some reason
-        if from.getBalance() > 0.0 {
+        if from.balance > 0.0 {
             emit NotCompletedDeposit(
                 type: from.getType(),
-                amount: from.getBalance(),
+                amount: from.balance,
                 switchboardOwner: self.owner?.address,
             )
             return <-from

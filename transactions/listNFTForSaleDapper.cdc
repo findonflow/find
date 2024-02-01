@@ -54,7 +54,7 @@ transaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: Strin
             account.capabilities.publish(vaultCap, at: /public/flowUtilityTokenVault)
         }
 
-        var providerCap=account.capabilities.storage.issue<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>(nft.storagePath)
+        var providerCap=account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(nft.storagePath)
         // Get the salesItemRef from tenant
         self.saleItems= account.storage.borrow<auth(FindMarketSale.Seller) &FindMarketSale.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketSale.SaleItemCollection>()))
         self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)

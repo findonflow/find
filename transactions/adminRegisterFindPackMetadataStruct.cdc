@@ -15,10 +15,10 @@ transaction(info: FindPack.PackRegisterInfo) {
 
     let admin: auth(Admin.Owner) &Admin.AdminProxy
     let wallet: Capability<&{FungibleToken.Receiver}>
-    let providerCaps : {Type : Capability<auth (NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>}
+    let providerCaps : {Type : Capability<auth (NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>}
     let types : [Type]
 
-    prepare(account: auth(BorrowValue, IssueStorageCapabilityController, NonFungibleToken.Withdrawable) &Account) {
+    prepare(account: auth(BorrowValue, IssueStorageCapabilityController, NonFungibleToken.Withdraw) &Account) {
         self.admin =account.storage.borrow<auth(Admin.Owner) &Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
         self.wallet = getAccount(info.paymentAddress).capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
 
@@ -32,7 +32,7 @@ transaction(info: FindPack.PackRegisterInfo) {
             }
             let collectionInfo = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collection!.keys[0])!.collectionData
 
-            let providerCap = account.capabilities.storage.issue<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>(collectionInfo.storagePath)
+            let providerCap = account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(collectionInfo.storagePath)
             if !providerCap.check() {
                 panic("provider cap for user ".concat(account.address.toString()).concat(" and path ").concat(collectionInfo.storagePath.toString()).concat(" is not setup correctly"))
             }

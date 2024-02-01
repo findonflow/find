@@ -86,7 +86,7 @@ access(all) contract CharityNFT: ViewResolver {
                     providerPath: /private/findCharityCollection,
                     publicCollection: Type<&CharityNFT.Collection>(),
                     publicLinkedType: Type<&CharityNFT.Collection>(),
-                    providerLinkedType: Type<auth(NonFungibleToken.Withdrawable) &CharityNFT.Collection>(),
+                    providerLinkedType: Type<auth(NonFungibleToken.Withdraw) &CharityNFT.Collection>(),
                     createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {return <- CharityNFT.createEmptyCollection()}))
 
                 case Type<MetadataViews.Edition>() : 
@@ -168,7 +168,7 @@ access(all) contract CharityNFT: ViewResolver {
         }
 
         // withdraw removes an NFT from the collection and moves it to the caller
-        access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+        access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT. WithdrawID : ".concat(withdrawID.toString()))
 
             emit Withdraw(id: token.id, from: self.owner?.address)

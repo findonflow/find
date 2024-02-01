@@ -188,7 +188,7 @@ access(all) contract Dandy :ViewResolver{
                     providerPath: Dandy.CollectionPrivatePath,
                     publicCollection: Type<&Dandy.Collection>(),
                     publicLinkedType: Type<&Dandy.Collection>(),
-                    providerLinkedType: Type<auth (NonFungibleToken.Withdrawable) &Dandy.Collection>(),
+                    providerLinkedType: Type<auth (NonFungibleToken.Withdraw) &Dandy.Collection>(),
                     createEmptyCollectionFunction: fun(): @{NonFungibleToken.Collection} {
                         return <- Dandy.createEmptyCollection()
                     }
@@ -225,7 +225,7 @@ access(all) contract Dandy :ViewResolver{
         }
 
 
-        access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+        access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT. withdrawID : ".concat(withdrawID.toString()))
 
             let dandyToken <- token as! @NFT

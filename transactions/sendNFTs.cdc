@@ -26,7 +26,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
     var token : &Sender.Token
 
 
-    prepare(account: auth (BorrowValue, SaveValue, StorageCapabilities, NonFungibleToken.Withdrawable, IssueStorageCapabilityController, FungibleToken.Withdrawable) &Account) {
+    prepare(account: auth (BorrowValue, SaveValue, StorageCapabilities, NonFungibleToken.Withdraw, IssueStorageCapabilityController, FungibleToken.Withdrawable) &Account) {
 
         self.authPointers = []
         self.paths = []
@@ -50,7 +50,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
             let path = data!.collectionData
 
             let storage = account.capabilities.storage
-            var providerCap=storage.issue<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>(path.storagePath)
+            var providerCap=storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(path.storagePath)
             let pointer = FindViews.AuthNFTPointer(cap: providerCap, id: ids[i])
 
             if let dt = donationTypes[i] {

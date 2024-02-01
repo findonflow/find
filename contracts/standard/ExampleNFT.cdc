@@ -212,7 +212,7 @@ access(all) contract ExampleNFT: ViewResolver {
         }
 
         /// withdraw removes an NFT from the collection and moves it to the caller
-        access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+        access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID)
             ?? panic("Could not withdraw an NFT with the provided ID from the collection")
 
@@ -330,7 +330,7 @@ access(all) contract ExampleNFT: ViewResolver {
                 providerPath: /private/cadenceExampleNFTCollection,
                 publicCollection: Type<&ExampleNFT.Collection>(),
                 publicLinkedType: Type<&ExampleNFT.Collection>(),
-                providerLinkedType: Type<auth(NonFungibleToken.Withdrawable) &ExampleNFT.Collection>(),
+                providerLinkedType: Type<auth(NonFungibleToken.Withdraw) &ExampleNFT.Collection>(),
                 createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
                     return <-collectionRef.createEmptyCollection()
                 })

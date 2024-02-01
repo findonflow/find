@@ -189,7 +189,7 @@ access(all) contract Bl0x: ViewResolver {
                 providerPath: /private/bl0xNFTCollection,
                 publicCollection: Type<&Collection>(),
                 publicLinkedType: Type<&Collection>(),
-                providerLinkedType: Type<auth(NonFungibleToken.Withdrawable) &Collection>(),
+                providerLinkedType: Type<auth(NonFungibleToken.Withdraw) &Collection>(),
                 createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {return <- Bl0x.createEmptyCollection()}))
 
                 case Type<MetadataViews.Rarity>(): 
@@ -290,7 +290,7 @@ access(all) contract Bl0x: ViewResolver {
             self.publicPath = PublicPath(identifier: identifier)!
         }
         // withdraw removes an NFT from the collection and moves it to the caller
-        access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+        access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
             emit Withdraw(id: token.id, from: self.owner?.address)

@@ -18,7 +18,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
     let balanceBeforeBid: UFix64
     let pointer: FindViews.ViewReadPointer
 
-    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, NonFungibleToken.Withdrawable) &Account) {
+    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, NonFungibleToken.Withdraw) &Account) {
 
         let marketplace = FindMarket.getFindTenantAddress()
         let resolveAddress = FIND.resolve(user)

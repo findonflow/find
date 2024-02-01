@@ -121,7 +121,7 @@ access(all) contract Profile {
 
         init(_ wallet: Wallet) {
             self.name=wallet.name
-            self.balance=wallet.balance.borrow()?.getBalance() ?? 0.0
+            self.balance=wallet.balance.borrow()?.balance ?? 0.0
             self.accept=wallet.accept.identifier
             self.tags=wallet.tags
         }
@@ -433,7 +433,7 @@ access(all) contract Profile {
             let walletIndexCache = ProfileCache.getWalletIndex(address: self.owner!.address, walletType: from.getType())
 
             if walletIndexCache != nil {
-                let ref = self.wallets[walletIndexCache!].receiver.borrow() ?? panic("This vault is not set up. ".concat(from.getType().identifier).concat(self.owner!.address.toString()).concat("  .  ").concat(from.getBalance().toString()))
+                let ref = self.wallets[walletIndexCache!].receiver.borrow() ?? panic("This vault is not set up. ".concat(from.getType().identifier).concat(self.owner!.address.toString()).concat("  .  ").concat(from.balance.toString()))
                 ref.deposit(from: <- from)
                 return
             }
@@ -441,7 +441,7 @@ access(all) contract Profile {
             for i , w in self.wallets {
                 if from.isInstance(w.accept) {
                     ProfileCache.setWalletIndexCache(address: self.owner!.address, walletType: from.getType(), index: i)
-                    let ref = w.receiver.borrow() ?? panic("This vault is not set up. ".concat(from.getType().identifier).concat(self.owner!.address.toString()).concat("  .  ").concat(from.getBalance().toString()))
+                    let ref = w.receiver.borrow() ?? panic("This vault is not set up. ".concat(from.getType().identifier).concat(self.owner!.address.toString()).concat("  .  ").concat(from.balance.toString()))
                     ref.deposit(from: <- from)
                     return
                 }

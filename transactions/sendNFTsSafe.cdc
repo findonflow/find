@@ -20,7 +20,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
     var token : &Sender.Token
 
 
-    prepare(account: auth (BorrowValue, SaveValue, StorageCapabilities, NonFungibleToken.Withdrawable, IssueStorageCapabilityController, FungibleToken.Withdrawable) &Account) {
+    prepare(account: auth (BorrowValue, SaveValue, StorageCapabilities, NonFungibleToken.Withdraw, IssueStorageCapabilityController, FungibleToken.Withdrawable) &Account) {
 
         self.authPointers = []
         self.paths = []
@@ -46,11 +46,11 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
             //TODO: should we issue a new cap here everytime?
 
             /*
-            var providerCap : Capability<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>? = nil
+            var providerCap : Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>? = nil
             for p in storage.getControllers(forPath: path.storagePath) {
-                let ref = p.capability.borrow<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>() 
+                let ref = p.capability.borrow<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>() 
                 if ref != nil{
-                    providerCap=p.capability as! auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}
+                    providerCap=p.capability as! auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}
                     break
                 }
 
@@ -58,7 +58,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
             if providerCap == nil{
 
                 */
-                var providerCap=storage.issue<auth(NonFungibleToken.Withdrawable) &{NonFungibleToken.Collection}>(path.storagePath)
+                var providerCap=storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(path.storagePath)
 
 
                 let capcon = storage.getController(byCapabilityID:providerCap.id)!

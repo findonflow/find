@@ -148,7 +148,7 @@ access(all) contract Flomies: ViewResolver{
 				providerPath: /private/FlomiesCollection,
 				publicCollection: Type<&Collection>(),
 				publicLinkedType: Type<&Collection>(),
-				providerLinkedType: Type<auth(NonFungibleToken.Withdrawable) &Collection>(),
+				providerLinkedType: Type<auth(NonFungibleToken.Withdraw) &Collection>(),
 				createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {return <- Flomies.createEmptyCollection()}))
 
 			case Type<MetadataViews.Traits>():
@@ -214,7 +214,7 @@ access(all) contract Flomies: ViewResolver{
 		}
 
 		// withdraw removes an NFT from the collection and moves it to the caller
-		access(NonFungibleToken.Withdrawable) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+		access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
 			emit Withdraw(id: token.id, from: self.owner?.address)
