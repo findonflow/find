@@ -4,7 +4,7 @@ import FIND from "../contracts/FIND.cdc"
 
 transaction(name: String, amount: UFix64) {
 
-    let vaultRef : auth(FungibleToken.Withdrawable) &FiatToken.Vault?
+    let vaultRef : auth(FungibleToken.Withdraw) &FiatToken.Vault?
     let leases : auth(FIND.LeaseOwner) &FIND.LeaseCollection?
     let price : UFix64
 
@@ -12,7 +12,7 @@ transaction(name: String, amount: UFix64) {
 
         self.price=FIND.calculateCost(name)
         log("The cost for registering this name is ".concat(self.price.toString()))
-        self.vaultRef = account.storage.borrow<auth(FungibleToken.Withdrawable) &FiatToken.Vault>(from: FiatToken.VaultStoragePath)
+        self.vaultRef = account.storage.borrow<auth(FungibleToken.Withdraw) &FiatToken.Vault>(from: FiatToken.VaultStoragePath)
         self.leases=account.storage.borrow<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(from: FIND.LeaseStoragePath)
     }
 

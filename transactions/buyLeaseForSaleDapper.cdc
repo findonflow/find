@@ -10,7 +10,7 @@ import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 transaction(sellerAccount: Address, leaseName: String, amount: UFix64) {
 
     let to : Address
-    let walletReference : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+    let walletReference : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
 
     let saleItemCollection: &{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}
     let balanceBeforeTransfer: UFix64
@@ -59,7 +59,7 @@ transaction(sellerAccount: Address, leaseName: String, amount: UFix64) {
         }
 
 
-        self.walletReference = dapper.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: ftVaultPath!) ?? panic("No suitable wallet linked for this account")
+        self.walletReference = dapper.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ftVaultPath!) ?? panic("No suitable wallet linked for this account")
         self.balanceBeforeTransfer = self.walletReference.getBalance()
     }
 

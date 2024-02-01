@@ -5,7 +5,7 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 transaction(merchAccount: Address, name: String, amount: UFix64) {
 
 	let finLeases : auth(FIND.LeaseOwner) &FIND.LeaseCollection
-	let mainDapperUtilityCoinVault: auth(FungibleToken.Withdrawable) &DapperUtilityCoin.Vault
+	let mainDapperUtilityCoinVault: auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault
 	let balanceBeforeTransfer: UFix64
 	let price : UFix64
 
@@ -13,7 +13,7 @@ transaction(merchAccount: Address, name: String, amount: UFix64) {
 
 		self.price=FIND.calculateCost(name)
 		log("The cost for registering this name is ".concat(self.price.toString()))
-		self.mainDapperUtilityCoinVault = dapper.storage.borrow<auth(FungibleToken.Withdrawable) &DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault) ?? panic("Cannot borrow DapperUtilityCoin vault from account storage".concat(dapper.address.toString()))
+		self.mainDapperUtilityCoinVault = dapper.storage.borrow<auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault) ?? panic("Cannot borrow DapperUtilityCoin vault from account storage".concat(dapper.address.toString()))
 		self.balanceBeforeTransfer = self.mainDapperUtilityCoinVault.getBalance()
 		self.finLeases= account.storage.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath) ?? panic("Could not borrow reference to find lease collection")
 	}

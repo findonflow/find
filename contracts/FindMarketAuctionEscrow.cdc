@@ -772,7 +772,7 @@ access(all) contract FindMarketAuctionEscrow {
         access(contract) fun accept(_ nft: @{NonFungibleToken.NFT}, path:PublicPath) : @{FungibleToken.Vault} {
             let id= nft.getID()
             let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
-            let vaultRef = &bid.vault as auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+            let vaultRef = &bid.vault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
             let nftCap = bid.nftCap
             if !nftCap.check() {
                 let cpCap =getAccount(nftCap.address).capabilities.get<&{NonFungibleToken.Collection}>(path)!
@@ -856,7 +856,7 @@ access(all) contract FindMarketAuctionEscrow {
         //if the bid is canceled from seller then we move the vault tokens back into your vault
         access(contract) fun cancelBidFromSaleItem(_ id: UInt64) {
             let bid <- self.bids.remove(key: id) ?? panic("missing bid")
-            let vaultRef = &bid.vault as auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+            let vaultRef = &bid.vault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
             if !self.receiver.check() {
                 panic("Seller unlinked the SaleItem collection capability. seller address : ".concat(self.receiver.address.toString()))
             }

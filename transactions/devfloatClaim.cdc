@@ -10,7 +10,7 @@ transaction(eventId: UInt64, host: Address) {
 
     let FLOATEvent: &FLOAT.FLOATEvent
     let Collection: &FLOAT.Collection
-    let FlowTokenVault: auth (FungibleToken.Withdrawable) &FlowToken.Vault
+    let FlowTokenVault: auth (FungibleToken.Withdraw) &FlowToken.Vault
 
     prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
 
@@ -38,7 +38,7 @@ transaction(eventId: UInt64, host: Address) {
 
         self.Collection = account.storage.borrow<&FLOAT.Collection>(from: FLOAT.FLOATCollectionStoragePath) ?? panic("Could not get the Collection from the signer.")
 
-        self.FlowTokenVault = account.storage.borrow<auth(FungibleToken.Withdrawable) &FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Could not borrow the FlowToken.Vault from the signer.")
+        self.FlowTokenVault = account.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Could not borrow the FlowToken.Vault from the signer.")
     }
 
     execute {

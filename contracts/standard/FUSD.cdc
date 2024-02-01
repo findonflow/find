@@ -176,7 +176,7 @@ access(all) contract FUSD: ViewResolver {
         /// created Vault to the context that called so it can be deposited
         /// elsewhere.
         ///
-        access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @FUSD.Vault {
+        access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @FUSD.Vault {
             self.balance = self.balance - amount
             emit TokensWithdrawn(amount: amount, from: self.owner?.address)
             return <-create Vault(balance: amount)
@@ -200,7 +200,7 @@ access(all) contract FUSD: ViewResolver {
         }
 
 
-        access(FungibleToken.Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
+        access(FungibleToken.Withdraw) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
             let transferVault <- self.withdraw(amount: amount)
 
             // Get a reference to the recipient's Receiver

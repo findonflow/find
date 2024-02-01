@@ -358,8 +358,8 @@ access(all) contract LostAndFound {
         }
     }
 
-    access(contract) fun getFlowProvider(): auth(FungibleToken.Withdrawable) &{FungibleToken.Provider} {
-        return self.account.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Provider}>(from: /storage/flowTokenVault)!
+    access(contract) fun getFlowProvider(): auth(FungibleToken.Withdraw) &{FungibleToken.Provider} {
+        return self.account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Provider}>(from: /storage/flowTokenVault)!
     }
 
     // ShelfManager is a light-weight wrapper to get our shelves into storage.
@@ -389,7 +389,7 @@ access(all) contract LostAndFound {
             item: @AnyResource,
             memo: String?,
             display: MetadataViews.Display?,
-            storagePayment: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault},
+            storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault},
             flowTokenRepayment: Capability<&{FungibleToken.Receiver}>?
         ) : UInt64 {
             pre {
@@ -665,7 +665,7 @@ access(all) contract LostAndFound {
         item: @AnyResource,
         memo: String?,
         display: MetadataViews.Display?,
-        storagePayment: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault},
+        storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault},
         flowTokenRepayment: Capability<&{FungibleToken.Receiver}>?
     ) : UInt64 {
         pre {
@@ -682,7 +682,7 @@ access(all) contract LostAndFound {
         cap: Capability,
         memo: String?,
         display: MetadataViews.Display?,
-        storagePayment: auth (FungibleToken.Withdrawable) &{FungibleToken.Vault},
+        storagePayment: auth (FungibleToken.Withdraw) &{FungibleToken.Vault},
         flowTokenRepayment: Capability<&{FungibleToken.Receiver}>
     ) {
         if cap.check<&{NonFungibleToken.Collection}>() {

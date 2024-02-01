@@ -520,7 +520,7 @@ access(all) contract FindMarketDirectOfferEscrow {
         access(contract) fun accept(_ nft: @{NonFungibleToken.NFT}, path:PublicPath) : @{FungibleToken.Vault} {
             let id= nft.getID()
             let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
-            let vaultRef = &bid.vault as auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+            let vaultRef = &bid.vault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
 
             let nftCap = bid.nftCap
             if !nftCap.check() {
@@ -623,7 +623,7 @@ access(all) contract FindMarketDirectOfferEscrow {
             }
             Debug.log("cancel bid")
             let bid <- self.bids.remove(key: id) ?? panic("missing bid")
-            let vaultRef = &bid.vault as auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+            let vaultRef = &bid.vault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
             self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.getBalance()))
             destroy bid
         }

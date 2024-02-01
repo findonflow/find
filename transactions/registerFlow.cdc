@@ -23,7 +23,7 @@ transaction(
         let deadline = getCurrentBlock().timestamp + 1000.0
         let tokenInVaultPath = /storage/flowTokenVault
 
-        let inVaultRef = userAccount.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: tokenInVaultPath) ?? panic("Could not borrow reference to the owner's in FT.Vault")
+        let inVaultRef = userAccount.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: tokenInVaultPath) ?? panic("Could not borrow reference to the owner's in FT.Vault")
 
 
         let vaultInMax <- inVaultRef.withdraw(amount: amountInMax)

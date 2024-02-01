@@ -35,7 +35,7 @@ access(all) contract FindLostAndFoundWrapper {
         collectionPublicPath: PublicPath,
         item: FindViews.AuthNFTPointer,
         memo: String?,
-        storagePayment: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault},
+        storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault},
         flowTokenRepayment: Capability<&{FungibleToken.Receiver}> ,
         subsidizeReceiverStorage: Bool
     ) : UInt64? {
@@ -236,7 +236,7 @@ access(all) contract FindLostAndFoundWrapper {
     }
 
     // Helper function
-    access(contract) fun depositVault(_ vault: @{FungibleToken.Vault}) : auth (FungibleToken.Withdrawable) &{FungibleToken.Vault} {
+    access(contract) fun depositVault(_ vault: @{FungibleToken.Vault}) : auth (FungibleToken.Withdraw) &{FungibleToken.Vault} {
         let uuid = vault.uuid
         self.storagePaymentVaults[uuid] <-! vault
         return (&self.storagePaymentVaults[uuid])!
@@ -252,7 +252,7 @@ access(all) contract FindLostAndFoundWrapper {
         destroy vault
     }
 
-    access(contract) fun subsidizeUserStorage(requiredStorage: UInt64, receiverAvailableStorage: UInt64, receiver: Address, vault: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}, sender: Address, uuid: UInt64) : Bool {
+    access(contract) fun subsidizeUserStorage(requiredStorage: UInt64, receiverAvailableStorage: UInt64, receiver: Address, vault: auth(FungibleToken.Withdraw) &{FungibleToken.Vault}, sender: Address, uuid: UInt64) : Bool {
         let subsidizeCapacity = requiredStorage - receiverAvailableStorage
         let subsidizeAmount = FlowStorageFees.storageCapacityToFlow(FlowStorageFees.convertUInt64StorageBytesToUFix64Megabytes(subsidizeCapacity))
         let flowReceiverCap = getAccount(receiver).capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)

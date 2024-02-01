@@ -12,7 +12,7 @@ import FIND from "../contracts/FIND.cdc"
 transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
 
 	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
-	let walletReference : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+	let walletReference : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
 	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection?
 	let balanceBeforeBid: UFix64
 	let pointer: FindViews.ViewReadPointer
@@ -33,7 +33,7 @@ transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIde
 
 		self.ftVaultType = ft.type
 
-		self.walletReference = account.storage.borrow<auth(FungibleToken.Withdrawable) &FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		self.walletReference = account.storage.borrow<auth(FungibleToken.Withdraw) &FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 
 		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
 		let tenant = tenantCapability.borrow()!

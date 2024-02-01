@@ -9,7 +9,7 @@ import FIND from "../contracts/FIND.cdc"
 transaction(user: String, id: UInt64, amount: UFix64) {
 
     var targetCapability : Capability<&{NonFungibleToken.Receiver}>
-    let walletReference : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+    let walletReference : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
 
     //TODO: should we use concrete implementation here or not?
     let saleItemsCap: Capability<&{FindMarketSale.SaleItemCollectionPublic}>
@@ -74,7 +74,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
             self.targetCapability=targetCapability!
         }
 
-        self.walletReference = account.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+        self.walletReference = account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
     }
 
     pre {

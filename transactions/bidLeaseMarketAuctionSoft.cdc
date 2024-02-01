@@ -9,7 +9,7 @@ import FindLeaseMarketAuctionSoft from "../contracts/FindLeaseMarketAuctionSoft.
 transaction(leaseName: String, amount: UFix64) {
 
 	let saleItemsCap: Capability<&{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic}>
-	let walletReference : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+	let walletReference : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
 	let bidsReference: &FindLeaseMarketAuctionSoft.MarketBidCollection?
 	let balanceBeforeBid: UFix64
 	let ftVaultType: Type
@@ -42,7 +42,7 @@ transaction(leaseName: String, amount: UFix64) {
 
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
 
-		self.walletReference = account.storage.borrow<auth(FungibleToken.Withdrawable) &FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account. Account address : ".concat(account.address.toString()))
+		self.walletReference = account.storage.borrow<auth(FungibleToken.Withdraw) &FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account. Account address : ".concat(account.address.toString()))
 		self.ftVaultType = ft.type
 
 		let bidStoragePath=leaseTenant.getStoragePath(Type<@FindLeaseMarketAuctionSoft.MarketBidCollection>())

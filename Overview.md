@@ -707,7 +707,7 @@ import FIND from "../contracts/FIND.cdc"
 transaction(user: String, id: UInt64, amount: UFix64) {
 
 	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
-	let walletReference : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+	let walletReference : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
 
 	let saleItemsCap: Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}>
 
@@ -738,7 +738,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 
 		// get FT information from item
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
-		self.walletReference = account.storage.borrow<auth(FungibleToken.Withdrawable) &FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+		self.walletReference = account.storage.borrow<auth(FungibleToken.Withdraw) &FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 	}
 
 	pre {

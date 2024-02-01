@@ -16,11 +16,11 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
     let paths : [PublicPath]
     let royalties: [MetadataViews.Royalties?]
     let totalRoyalties: [UFix64]
-    let vaultRefs: {String : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}}
+    let vaultRefs: {String : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}}
     var token : &Sender.Token
 
 
-    prepare(account: auth (BorrowValue, SaveValue, StorageCapabilities, NonFungibleToken.Withdraw, IssueStorageCapabilityController, FungibleToken.Withdrawable) &Account) {
+    prepare(account: auth (BorrowValue, SaveValue, StorageCapabilities, NonFungibleToken.Withdraw, IssueStorageCapabilityController, FungibleToken.Withdraw) &Account) {
 
         self.authPointers = []
         self.paths = []
@@ -74,7 +74,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
                     if self.vaultRefs[dt] == nil {
                         let info = FTRegistry.getFTInfo(dt) ?? panic("This token type is not supported at the moment : ".concat(dt))
                         let ftPath = info.vaultPath
-                        let ref = account.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: ftPath) ?? panic("Cannot borrow vault reference for type : ".concat(dt))
+                        let ref = account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ftPath) ?? panic("Cannot borrow vault reference for type : ".concat(dt))
                         self.vaultRefs[dt] = ref
                     }
 
@@ -93,7 +93,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
                 if self.vaultRefs[dt] == nil {
                     let info = FTRegistry.getFTInfo(dt) ?? panic("This token type is not supported at the moment : ".concat(dt))
                     let ftPath = info.vaultPath
-                    let ref = account.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: ftPath) ?? panic("Cannot borrow vault reference for type : ".concat(dt))
+                    let ref = account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ftPath) ?? panic("Cannot borrow vault reference for type : ".concat(dt))
                     self.vaultRefs[dt] = ref
                 }
             }

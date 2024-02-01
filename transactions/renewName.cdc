@@ -5,12 +5,12 @@ import FIND from "../contracts/FIND.cdc"
 transaction(name: String, amount: UFix64) {
 
     let price : UFix64
-    let vaultRef : auth (FungibleToken.Withdrawable) &FUSD.Vault? 
+    let vaultRef : auth (FungibleToken.Withdraw) &FUSD.Vault? 
     let finLeases : auth(FIND.LeaseOwner) &FIND.LeaseCollection? 
 
     prepare(acct: auth(BorrowValue) &Account) {
         self.price=FIND.calculateCost(name)
-        self.vaultRef = acct.storage.borrow<auth (FungibleToken.Withdrawable) &FUSD.Vault>(from: /storage/fusdVault)
+        self.vaultRef = acct.storage.borrow<auth (FungibleToken.Withdraw) &FUSD.Vault>(from: /storage/fusdVault)
         self.finLeases= acct.storage.borrow<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
     }
 

@@ -15,7 +15,7 @@ import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
 transaction(address: Address, id: UInt64, amount: UFix64) {
 
     let targetCapability : Capability<&{NonFungibleToken.Receiver}>
-    let walletReference : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+    let walletReference : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
     let receiver : Address
 
 
@@ -84,7 +84,7 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 
         //TODO: handle topshot
 
-        self.walletReference = dapper.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: ftVaultPath!) ?? panic("No suitable wallet linked for this account")
+        self.walletReference = dapper.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ftVaultPath!) ?? panic("No suitable wallet linked for this account")
         self.balanceBeforeTransfer = self.walletReference.getBalance()
     }
 

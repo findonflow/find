@@ -13,7 +13,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 
     let saleItemsCap: Capability<&{FindMarketAuctionEscrow.SaleItemCollectionPublic}>
     var targetCapability : Capability<&{NonFungibleToken.Receiver}>
-    let walletReference : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+    let walletReference : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
     let bidsReference: &FindMarketAuctionEscrow.MarketBidCollection?
     let balanceBeforeBid: UFix64
     let pointer: FindViews.ViewReadPointer
@@ -73,7 +73,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
             self.targetCapability=targetCapability!
         }
 
-        self.walletReference = account.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+        self.walletReference = account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
         let bidSstoragePath=tenant.getStoragePath(Type<@FindMarketAuctionEscrow.MarketBidCollection>())
 
         self.bidsReference= account.storage.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: bidSstoragePath)

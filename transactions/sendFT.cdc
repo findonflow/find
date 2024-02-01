@@ -7,12 +7,12 @@ import FTRegistry from "../contracts/FTRegistry.cdc"
 transaction(name: String, amount: UFix64, ftAliasOrIdentifier: String, tag: String, message:String) {
 
     var token : &Sender.Token
-    let walletReference : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}? 
+    let walletReference : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}? 
 
     prepare(account: auth(BorrowValue, SaveValue) &Account) {
 
         let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
-        self.walletReference = account.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: ft.vaultPath)
+        self.walletReference = account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ft.vaultPath)
 
         if account.storage.borrow<&Sender.Token>(from: Sender.storagePath) == nil {
             account.storage.save(<- Sender.createToken(), to: Sender.storagePath)

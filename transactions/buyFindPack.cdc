@@ -13,12 +13,12 @@ transaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, total
     let salePrice: UFix64
     let packsLeft: UInt64
 
-    let userFlowTokenVault: auth(FungibleToken.Withdrawable) &FlowToken.Vault
+    let userFlowTokenVault: auth(FungibleToken.Withdraw) &FlowToken.Vault
 
     let paymentVault: @{FungibleToken.Vault}
     let balanceBeforeTransfer:UFix64
 
-    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, FungibleToken.Withdrawable) &Account) {
+    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, FungibleToken.Withdraw) &Account) {
 
 
         let col = account.storage.borrow<&FindPack.Collection>(from: FindPack.CollectionStoragePath)
@@ -76,7 +76,7 @@ transaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, total
         self.packsLeft= UInt64(self.packs.getPacksLeft())
 
 
-        self.userFlowTokenVault = account.storage.borrow<auth(FungibleToken.Withdrawable) &FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Cannot borrow FlowToken vault from account storage")
+        self.userFlowTokenVault = account.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Cannot borrow FlowToken vault from account storage")
         self.balanceBeforeTransfer = self.userFlowTokenVault.balance
 
         if self.balanceBeforeTransfer < totalAmount {

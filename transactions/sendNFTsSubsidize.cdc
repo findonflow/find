@@ -16,17 +16,17 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
 
     let authPointers : [FindViews.AuthNFTPointer]
     let paths : [PublicPath]
-    let flowVault : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+    let flowVault : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
     let flowTokenRepayment : Capability<&{FungibleToken.Receiver}>
     let defaultTokenAvailableBalance : UFix64
 
     let royalties: [MetadataViews.Royalties?]
     let totalRoyalties: [UFix64]
-    let vaultRefs: {String : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}}
+    let vaultRefs: {String : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}}
     var token : &Sender.Token
 
 
-    prepare(account: auth (BorrowValue, SaveValue, StorageCapabilities, NonFungibleToken.Withdraw, IssueStorageCapabilityController, FungibleToken.Withdrawable) &Account) {
+    prepare(account: auth (BorrowValue, SaveValue, StorageCapabilities, NonFungibleToken.Withdraw, IssueStorageCapabilityController, FungibleToken.Withdraw) &Account) {
 
         self.authPointers = []
         self.paths = []
@@ -61,7 +61,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
                 if self.vaultRefs[dt] == nil {
                     let info = FTRegistry.getFTInfo(dt) ?? panic("This token type is not supported at the moment : ".concat(dt))
                     let ftPath = info.vaultPath
-                    let ref = account.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: ftPath) ?? panic("Cannot borrow vault reference for type : ".concat(dt))
+                    let ref = account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ftPath) ?? panic("Cannot borrow vault reference for type : ".concat(dt))
                     self.vaultRefs[dt] = ref
                 }
 
@@ -74,7 +74,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
             self.paths.append(path.publicPath)
         }
 
-        self.flowVault = account.storage.borrow<auth(FungibleToken.Withdrawable) &FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Cannot borrow reference to sender's flow vault")
+        self.flowVault = account.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Cannot borrow reference to sender's flow vault")
         self.flowTokenRepayment = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
         self.defaultTokenAvailableBalance = FlowStorageFees.defaultTokenAvailableBalance(account.address)
 
@@ -83,7 +83,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
             if self.vaultRefs[dt] == nil {
                 let info = FTRegistry.getFTInfo(dt) ?? panic("This token type is not supported at the moment : ".concat(dt))
                 let ftPath = info.vaultPath
-                let ref = account.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: ftPath) ?? panic("Cannot borrow vault reference for type : ".concat(dt))
+                let ref = account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ftPath) ?? panic("Cannot borrow vault reference for type : ".concat(dt))
                 self.vaultRefs[dt] = ref
             }
         }
@@ -101,7 +101,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
         let estimatedStorageFee = 0.0002 * UFix64(self.authPointers.length)
         // we pass in the least amount as possible for storage fee here
         let tempVault <- self.flowVault.withdraw(amount: 0.0)
-        var vaultRef = &tempVault as auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+        var vaultRef = &tempVault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
         if self.defaultTokenAvailableBalance <= estimatedStorageFee {
             vaultRef = self.flowVault 
         } else {

@@ -257,16 +257,16 @@ error: cannot deploy invalid contract
 4 | 			signer.contracts.add(name: name, code: code.utf8 )
   | 			^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.FUSD:179:15
     |
-179 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @FUSD.Vault {
+179 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @FUSD.Vault {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.FUSD:203:15
     |
-203 |         access(FungibleToken.Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
+203 |         access(FungibleToken.Withdraw) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: contract `FUSD` does not conform to contract interface `ViewResolver`
@@ -325,13 +325,13 @@ error: incorrect argument label
 error: missing access modifier for function
    --> f8d6e0586b0a20c7.FUSD:179:8
     |
-179 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @FUSD.Vault {
+179 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @FUSD.Vault {
     |         ^
 
 error: missing access modifier for function
    --> f8d6e0586b0a20c7.FUSD:203:8
     |
-203 |         access(FungibleToken.Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
+203 |         access(FungibleToken.Withdraw) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
     |         ^
 
 error: resource `FUSD.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -341,7 +341,7 @@ error: resource `FUSD.Vault` does not conform to resource interface `FungibleTok
    |                          ^ `FUSD.Vault` is missing definitions for members: `burnCallback`
    ... 
     |
-179 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @FUSD.Vault {
+179 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @FUSD.Vault {
     |                                                -------- mismatch here
 
 error: resource `FUSD.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -351,7 +351,7 @@ error: resource `FUSD.Vault` does not conform to resource interface `FungibleTok
    |                          ^ `FUSD.Vault` is missing definitions for members: `isAvailableToWithdraw`
    ... 
     |
-179 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @FUSD.Vault {
+179 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @FUSD.Vault {
     |                                                -------- mismatch here
 
 error: resource `FUSD.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -501,10 +501,10 @@ error: value of type `{NonFungibleToken.NFT}` has no member `getID`
 773 |             let id= nft.getID()
     |                         ^^^^^ unknown member
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 179b6b1cb6755e31.FindMarketAuctionEscrow:775:46
     |
-775 |             let vaultRef = &bid.vault as auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+775 |             let vaultRef = &bid.vault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
     |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot access `withdraw`: function requires `Withdraw` authorization, but reference only has `not specified` authorization
@@ -525,10 +525,10 @@ error: value of type `&{FungibleToken.Vault}` has no member `getBalance`
 845 |             let oldBalance=bid.vault.getBalance()
     |                                      ^^^^^^^^^^ unknown member
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 179b6b1cb6755e31.FindMarketAuctionEscrow:859:46
     |
-859 |             let vaultRef = &bid.vault as auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+859 |             let vaultRef = &bid.vault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
     |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot access `withdraw`: function requires `Withdraw` authorization, but reference only has `not specified` authorization
@@ -691,16 +691,16 @@ error: cannot deploy invalid contract
 4 | 			signer.contracts.add(name: name, code: code.utf8 )
   | 			^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
   --> f8d6e0586b0a20c7.FiatToken:97:15
    |
-97 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
+97 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: missing access modifier for function
   --> f8d6e0586b0a20c7.FiatToken:97:8
    |
-97 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
+97 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
    |         ^
 
 error: resource `FiatToken.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -710,7 +710,7 @@ error: resource `FiatToken.Vault` does not conform to resource interface `Fungib
    |                          ^ `FiatToken.Vault` is missing definitions for members: `burnCallback`
   ... 
    |
-97 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
+97 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
    |                                                -------- mismatch here
 
 error: resource `FiatToken.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -720,7 +720,7 @@ error: resource `FiatToken.Vault` does not conform to resource interface `Fungib
    |                          ^ `FiatToken.Vault` is missing definitions for members: `isAvailableToWithdraw`
   ... 
    |
-97 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
+97 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
    |                                                -------- mismatch here
 
 error: resource `FiatToken.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -1305,22 +1305,22 @@ error: cannot find declaration `FindViews` in `179b6b1cb6755e31.FindViews`
    |        ^^^^^^^^^ available exported declarations are:
 
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
   --> 179b6b1cb6755e31.FindLostAndFoundWrapper:38:29
    |
-38 |         storagePayment: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault},
+38 |         storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault},
    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 179b6b1cb6755e31.FindLostAndFoundWrapper:239:79
     |
-239 |     access(contract) fun depositVault(_ vault: @{FungibleToken.Vault}) : auth (FungibleToken.Withdrawable) &{FungibleToken.Vault} {
+239 |     access(contract) fun depositVault(_ vault: @{FungibleToken.Vault}) : auth (FungibleToken.Withdraw) &{FungibleToken.Vault} {
     |                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 179b6b1cb6755e31.FindLostAndFoundWrapper:255:136
     |
-255 |     access(contract) fun subsidizeUserStorage(requiredStorage: UInt64, receiverAvailableStorage: UInt64, receiver: Address, vault: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}, sender: Address, uuid: UInt64) : Bool {
+255 |     access(contract) fun subsidizeUserStorage(requiredStorage: UInt64, receiverAvailableStorage: UInt64, receiver: Address, vault: auth(FungibleToken.Withdraw) &{FungibleToken.Vault}, sender: Address, uuid: UInt64) : Bool {
     |                                                                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot access `withdraw`: function requires `Withdraw` authorization, but reference only has `not specified` authorization
@@ -1911,10 +1911,10 @@ error: value of type `{NonFungibleToken.NFT}` has no member `getID`
 521 |             let id= nft.getID()
     |                         ^^^^^ unknown member
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 179b6b1cb6755e31.FindMarketDirectOfferEscrow:523:46
     |
-523 |             let vaultRef = &bid.vault as auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+523 |             let vaultRef = &bid.vault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
     |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot access `withdraw`: function requires `Withdraw` authorization, but reference only has `not specified` authorization
@@ -1941,10 +1941,10 @@ error: value of type `{FungibleToken.Vault}` has no member `getBalance`
 589 |                 if vault.getBalance() <= 0.65 {
     |                          ^^^^^^^^^^ unknown member
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 179b6b1cb6755e31.FindMarketDirectOfferEscrow:626:46
     |
-626 |             let vaultRef = &bid.vault as auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+626 |             let vaultRef = &bid.vault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
     |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot access `withdraw`: function requires `Withdraw` authorization, but reference only has `not specified` authorization
@@ -2557,34 +2557,34 @@ error: cannot deploy invalid contract
 4 | 			signer.contracts.add(name: name, code: code.utf8 )
   | 			^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.LostAndFound:392:33
     |
-392 |             storagePayment: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault},
+392 |             storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault},
     |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.LostAndFound:361:49
     |
-361 |     access(contract) fun getFlowProvider(): auth(FungibleToken.Withdrawable) &{FungibleToken.Provider} {
+361 |     access(contract) fun getFlowProvider(): auth(FungibleToken.Withdraw) &{FungibleToken.Provider} {
     |                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.LostAndFound:668:29
     |
-668 |         storagePayment: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault},
+668 |         storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault},
     |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.LostAndFound:685:30
     |
-685 |         storagePayment: auth (FungibleToken.Withdrawable) &{FungibleToken.Vault},
+685 |         storagePayment: auth (FungibleToken.Withdraw) &{FungibleToken.Vault},
     |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.LostAndFound:362:48
     |
-362 |         return self.account.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Provider}>(from: /storage/flowTokenVault)!
+362 |         return self.account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Provider}>(from: /storage/flowTokenVault)!
     |                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: value of type `&{NonFungibleToken.NFT}` has no member `getID`
@@ -2650,16 +2650,16 @@ error: cannot deploy invalid contract
 4 | 			signer.contracts.add(name: name, code: code.utf8 )
   | 			^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 01cf0e2f2f715450.DapperUtilityCoin:172:15
     |
-172 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @DapperUtilityCoin.Vault {
+172 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @DapperUtilityCoin.Vault {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 01cf0e2f2f715450.DapperUtilityCoin:194:15
     |
-194 |         access(FungibleToken.Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
+194 |         access(FungibleToken.Withdraw) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: contract `DapperUtilityCoin` does not conform to contract interface `ViewResolver`
@@ -2718,13 +2718,13 @@ error: incorrect argument label
 error: missing access modifier for function
    --> 01cf0e2f2f715450.DapperUtilityCoin:172:8
     |
-172 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @DapperUtilityCoin.Vault {
+172 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @DapperUtilityCoin.Vault {
     |         ^
 
 error: missing access modifier for function
    --> 01cf0e2f2f715450.DapperUtilityCoin:194:8
     |
-194 |         access(FungibleToken.Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
+194 |         access(FungibleToken.Withdraw) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
     |         ^
 
 error: resource `DapperUtilityCoin.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -2734,7 +2734,7 @@ error: resource `DapperUtilityCoin.Vault` does not conform to resource interface
    |                          ^ `DapperUtilityCoin.Vault` is missing definitions for members: `burnCallback`
    ... 
     |
-172 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @DapperUtilityCoin.Vault {
+172 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @DapperUtilityCoin.Vault {
     |                                                -------- mismatch here
 
 error: resource `DapperUtilityCoin.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -2744,7 +2744,7 @@ error: resource `DapperUtilityCoin.Vault` does not conform to resource interface
    |                          ^ `DapperUtilityCoin.Vault` is missing definitions for members: `isAvailableToWithdraw`
    ... 
     |
-172 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @DapperUtilityCoin.Vault {
+172 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @DapperUtilityCoin.Vault {
     |                                                -------- mismatch here
 
 error: resource `DapperUtilityCoin.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -3272,10 +3272,10 @@ error: cannot infer type parameter: `T`
 1388 |             let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)!
      |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
     --> 179b6b1cb6755e31.FIND:1883:47
      |
-1883 |             let vaultRef = &bid.vault as auth (FungibleToken.Withdrawable) &{FungibleToken.Vault}
+1883 |             let vaultRef = &bid.vault as auth (FungibleToken.Withdraw) &{FungibleToken.Vault}
      |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot access `withdraw`: function requires `Withdraw` authorization, but reference only has `not specified` authorization
@@ -3290,10 +3290,10 @@ error: value of type `auth(not specified) &{FungibleToken.Vault}` has no member 
 1889 |             let vault  <- vaultRef.withdraw(amount: vaultRef.getBalance())
      |                                                              ^^^^^^^^^^ unknown member
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
     --> 179b6b1cb6755e31.FIND:1901:47
      |
-1901 |             let vaultRef = &bid.vault as auth (FungibleToken.Withdrawable) &{FungibleToken.Vault}
+1901 |             let vaultRef = &bid.vault as auth (FungibleToken.Withdraw) &{FungibleToken.Vault}
      |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot access `withdraw`: function requires `Withdraw` authorization, but reference only has `not specified` authorization
@@ -3689,16 +3689,16 @@ error: cannot deploy invalid contract
 4 | 			signer.contracts.add(name: name, code: code.utf8 )
   | 			^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 01cf0e2f2f715450.FlowUtilityToken:172:15
     |
-172 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @FlowUtilityToken.Vault {
+172 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @FlowUtilityToken.Vault {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 01cf0e2f2f715450.FlowUtilityToken:194:15
     |
-194 |         access(FungibleToken.Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
+194 |         access(FungibleToken.Withdraw) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: contract `FlowUtilityToken` does not conform to contract interface `ViewResolver`
@@ -3757,13 +3757,13 @@ error: incorrect argument label
 error: missing access modifier for function
    --> 01cf0e2f2f715450.FlowUtilityToken:172:8
     |
-172 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @FlowUtilityToken.Vault {
+172 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @FlowUtilityToken.Vault {
     |         ^
 
 error: missing access modifier for function
    --> 01cf0e2f2f715450.FlowUtilityToken:194:8
     |
-194 |         access(FungibleToken.Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
+194 |         access(FungibleToken.Withdraw) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
     |         ^
 
 error: resource `FlowUtilityToken.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -3773,7 +3773,7 @@ error: resource `FlowUtilityToken.Vault` does not conform to resource interface 
    |                          ^ `FlowUtilityToken.Vault` is missing definitions for members: `burnCallback`
    ... 
     |
-172 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @FlowUtilityToken.Vault {
+172 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @FlowUtilityToken.Vault {
     |                                                -------- mismatch here
 
 error: resource `FlowUtilityToken.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -3783,7 +3783,7 @@ error: resource `FlowUtilityToken.Vault` does not conform to resource interface 
    |                          ^ `FlowUtilityToken.Vault` is missing definitions for members: `isAvailableToWithdraw`
    ... 
     |
-172 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @FlowUtilityToken.Vault {
+172 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @FlowUtilityToken.Vault {
     |                                                -------- mismatch here
 
 error: resource `FlowUtilityToken.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -4308,16 +4308,16 @@ error: cannot find declaration `FindLostAndFoundWrapper` in `179b6b1cb6755e31.Fi
   |        ^^^^^^^^^^^^^^^^^^^^^^^ available exported declarations are:
 
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
   --> 179b6b1cb6755e31.FindAirdropper:66:155
    |
-66 |     access(all) fun forcedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}, flowTokenRepayment: Capability<&{FungibleToken.Receiver}>, deepValidation: Bool) {
+66 |     access(all) fun forcedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault}, flowTokenRepayment: Capability<&{FungibleToken.Receiver}>, deepValidation: Bool) {
    |                                                                                                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
   --> 179b6b1cb6755e31.FindAirdropper:98:159
    |
-98 |     access(all) fun subsidizedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}, flowTokenRepayment: Capability<&{FungibleToken.Receiver}>, deepValidation: Bool) {
+98 |     access(all) fun subsidizedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault}, flowTokenRepayment: Capability<&{FungibleToken.Receiver}>, deepValidation: Bool) {
    |                                                                                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 
@@ -4810,16 +4810,16 @@ error: cannot deploy invalid contract
 4 | 			signer.contracts.add(name: name, code: code.utf8 )
   | 			^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.FUSD:179:15
     |
-179 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @FUSD.Vault {
+179 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @FUSD.Vault {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.FUSD:203:15
     |
-203 |         access(FungibleToken.Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
+203 |         access(FungibleToken.Withdraw) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: contract `FUSD` does not conform to contract interface `ViewResolver`
@@ -4878,13 +4878,13 @@ error: incorrect argument label
 error: missing access modifier for function
    --> f8d6e0586b0a20c7.FUSD:179:8
     |
-179 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @FUSD.Vault {
+179 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @FUSD.Vault {
     |         ^
 
 error: missing access modifier for function
    --> f8d6e0586b0a20c7.FUSD:203:8
     |
-203 |         access(FungibleToken.Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
+203 |         access(FungibleToken.Withdraw) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
     |         ^
 
 error: resource `FUSD.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -4894,7 +4894,7 @@ error: resource `FUSD.Vault` does not conform to resource interface `FungibleTok
    |                          ^ `FUSD.Vault` is missing definitions for members: `burnCallback`
    ... 
     |
-179 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @FUSD.Vault {
+179 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @FUSD.Vault {
     |                                                -------- mismatch here
 
 error: resource `FUSD.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -4904,7 +4904,7 @@ error: resource `FUSD.Vault` does not conform to resource interface `FungibleTok
    |                          ^ `FUSD.Vault` is missing definitions for members: `isAvailableToWithdraw`
    ... 
     |
-179 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @FUSD.Vault {
+179 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @FUSD.Vault {
     |                                                -------- mismatch here
 
 error: resource `FUSD.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -5054,10 +5054,10 @@ error: value of type `{NonFungibleToken.NFT}` has no member `getID`
 773 |             let id= nft.getID()
     |                         ^^^^^ unknown member
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 179b6b1cb6755e31.FindMarketAuctionEscrow:775:46
     |
-775 |             let vaultRef = &bid.vault as auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+775 |             let vaultRef = &bid.vault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
     |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot access `withdraw`: function requires `Withdraw` authorization, but reference only has `not specified` authorization
@@ -5078,10 +5078,10 @@ error: value of type `&{FungibleToken.Vault}` has no member `getBalance`
 845 |             let oldBalance=bid.vault.getBalance()
     |                                      ^^^^^^^^^^ unknown member
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 179b6b1cb6755e31.FindMarketAuctionEscrow:859:46
     |
-859 |             let vaultRef = &bid.vault as auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+859 |             let vaultRef = &bid.vault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
     |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot access `withdraw`: function requires `Withdraw` authorization, but reference only has `not specified` authorization
@@ -5244,16 +5244,16 @@ error: cannot deploy invalid contract
 4 | 			signer.contracts.add(name: name, code: code.utf8 )
   | 			^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
   --> f8d6e0586b0a20c7.FiatToken:97:15
    |
-97 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
+97 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: missing access modifier for function
   --> f8d6e0586b0a20c7.FiatToken:97:8
    |
-97 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
+97 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
    |         ^
 
 error: resource `FiatToken.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -5263,7 +5263,7 @@ error: resource `FiatToken.Vault` does not conform to resource interface `Fungib
    |                          ^ `FiatToken.Vault` is missing definitions for members: `burnCallback`
   ... 
    |
-97 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
+97 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
    |                                                -------- mismatch here
 
 error: resource `FiatToken.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -5273,7 +5273,7 @@ error: resource `FiatToken.Vault` does not conform to resource interface `Fungib
    |                          ^ `FiatToken.Vault` is missing definitions for members: `isAvailableToWithdraw`
   ... 
    |
-97 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
+97 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @{FungibleToken.Vault} {
    |                                                -------- mismatch here
 
 error: resource `FiatToken.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -5858,22 +5858,22 @@ error: cannot find declaration `FindViews` in `179b6b1cb6755e31.FindViews`
    |        ^^^^^^^^^ available exported declarations are:
 
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
   --> 179b6b1cb6755e31.FindLostAndFoundWrapper:38:29
    |
-38 |         storagePayment: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault},
+38 |         storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault},
    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 179b6b1cb6755e31.FindLostAndFoundWrapper:239:79
     |
-239 |     access(contract) fun depositVault(_ vault: @{FungibleToken.Vault}) : auth (FungibleToken.Withdrawable) &{FungibleToken.Vault} {
+239 |     access(contract) fun depositVault(_ vault: @{FungibleToken.Vault}) : auth (FungibleToken.Withdraw) &{FungibleToken.Vault} {
     |                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 179b6b1cb6755e31.FindLostAndFoundWrapper:255:136
     |
-255 |     access(contract) fun subsidizeUserStorage(requiredStorage: UInt64, receiverAvailableStorage: UInt64, receiver: Address, vault: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}, sender: Address, uuid: UInt64) : Bool {
+255 |     access(contract) fun subsidizeUserStorage(requiredStorage: UInt64, receiverAvailableStorage: UInt64, receiver: Address, vault: auth(FungibleToken.Withdraw) &{FungibleToken.Vault}, sender: Address, uuid: UInt64) : Bool {
     |                                                                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot access `withdraw`: function requires `Withdraw` authorization, but reference only has `not specified` authorization
@@ -6464,10 +6464,10 @@ error: value of type `{NonFungibleToken.NFT}` has no member `getID`
 521 |             let id= nft.getID()
     |                         ^^^^^ unknown member
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 179b6b1cb6755e31.FindMarketDirectOfferEscrow:523:46
     |
-523 |             let vaultRef = &bid.vault as auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+523 |             let vaultRef = &bid.vault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
     |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot access `withdraw`: function requires `Withdraw` authorization, but reference only has `not specified` authorization
@@ -6494,10 +6494,10 @@ error: value of type `{FungibleToken.Vault}` has no member `getBalance`
 589 |                 if vault.getBalance() <= 0.65 {
     |                          ^^^^^^^^^^ unknown member
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 179b6b1cb6755e31.FindMarketDirectOfferEscrow:626:46
     |
-626 |             let vaultRef = &bid.vault as auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+626 |             let vaultRef = &bid.vault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
     |                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot access `withdraw`: function requires `Withdraw` authorization, but reference only has `not specified` authorization
@@ -7110,34 +7110,34 @@ error: cannot deploy invalid contract
 4 | 			signer.contracts.add(name: name, code: code.utf8 )
   | 			^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.LostAndFound:392:33
     |
-392 |             storagePayment: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault},
+392 |             storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault},
     |                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.LostAndFound:361:49
     |
-361 |     access(contract) fun getFlowProvider(): auth(FungibleToken.Withdrawable) &{FungibleToken.Provider} {
+361 |     access(contract) fun getFlowProvider(): auth(FungibleToken.Withdraw) &{FungibleToken.Provider} {
     |                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.LostAndFound:668:29
     |
-668 |         storagePayment: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault},
+668 |         storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault},
     |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.LostAndFound:685:30
     |
-685 |         storagePayment: auth (FungibleToken.Withdrawable) &{FungibleToken.Vault},
+685 |         storagePayment: auth (FungibleToken.Withdraw) &{FungibleToken.Vault},
     |                               ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.LostAndFound:362:48
     |
-362 |         return self.account.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Provider}>(from: /storage/flowTokenVault)!
+362 |         return self.account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Provider}>(from: /storage/flowTokenVault)!
     |                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: value of type `&{NonFungibleToken.NFT}` has no member `getID`
@@ -7203,16 +7203,16 @@ error: cannot deploy invalid contract
 4 | 			signer.contracts.add(name: name, code: code.utf8 )
   | 			^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 01cf0e2f2f715450.DapperUtilityCoin:172:15
     |
-172 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @DapperUtilityCoin.Vault {
+172 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @DapperUtilityCoin.Vault {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 01cf0e2f2f715450.DapperUtilityCoin:194:15
     |
-194 |         access(FungibleToken.Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
+194 |         access(FungibleToken.Withdraw) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: contract `DapperUtilityCoin` does not conform to contract interface `ViewResolver`
@@ -7271,13 +7271,13 @@ error: incorrect argument label
 error: missing access modifier for function
    --> 01cf0e2f2f715450.DapperUtilityCoin:172:8
     |
-172 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @DapperUtilityCoin.Vault {
+172 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @DapperUtilityCoin.Vault {
     |         ^
 
 error: missing access modifier for function
    --> 01cf0e2f2f715450.DapperUtilityCoin:194:8
     |
-194 |         access(FungibleToken.Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
+194 |         access(FungibleToken.Withdraw) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
     |         ^
 
 error: resource `DapperUtilityCoin.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -7287,7 +7287,7 @@ error: resource `DapperUtilityCoin.Vault` does not conform to resource interface
    |                          ^ `DapperUtilityCoin.Vault` is missing definitions for members: `burnCallback`
    ... 
     |
-172 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @DapperUtilityCoin.Vault {
+172 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @DapperUtilityCoin.Vault {
     |                                                -------- mismatch here
 
 error: resource `DapperUtilityCoin.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -7297,7 +7297,7 @@ error: resource `DapperUtilityCoin.Vault` does not conform to resource interface
    |                          ^ `DapperUtilityCoin.Vault` is missing definitions for members: `isAvailableToWithdraw`
    ... 
     |
-172 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @DapperUtilityCoin.Vault {
+172 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @DapperUtilityCoin.Vault {
     |                                                -------- mismatch here
 
 error: resource `DapperUtilityCoin.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -7825,10 +7825,10 @@ error: cannot infer type parameter: `T`
 1388 |             let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)!
      |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
     --> 179b6b1cb6755e31.FIND:1883:47
      |
-1883 |             let vaultRef = &bid.vault as auth (FungibleToken.Withdrawable) &{FungibleToken.Vault}
+1883 |             let vaultRef = &bid.vault as auth (FungibleToken.Withdraw) &{FungibleToken.Vault}
      |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot access `withdraw`: function requires `Withdraw` authorization, but reference only has `not specified` authorization
@@ -7843,10 +7843,10 @@ error: value of type `auth(not specified) &{FungibleToken.Vault}` has no member 
 1889 |             let vault  <- vaultRef.withdraw(amount: vaultRef.getBalance())
      |                                                              ^^^^^^^^^^ unknown member
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
     --> 179b6b1cb6755e31.FIND:1901:47
      |
-1901 |             let vaultRef = &bid.vault as auth (FungibleToken.Withdrawable) &{FungibleToken.Vault}
+1901 |             let vaultRef = &bid.vault as auth (FungibleToken.Withdraw) &{FungibleToken.Vault}
      |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot access `withdraw`: function requires `Withdraw` authorization, but reference only has `not specified` authorization
@@ -8242,16 +8242,16 @@ error: cannot deploy invalid contract
 4 | 			signer.contracts.add(name: name, code: code.utf8 )
   | 			^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 01cf0e2f2f715450.FlowUtilityToken:172:15
     |
-172 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @FlowUtilityToken.Vault {
+172 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @FlowUtilityToken.Vault {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
    --> 01cf0e2f2f715450.FlowUtilityToken:194:15
     |
-194 |         access(FungibleToken.Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
+194 |         access(FungibleToken.Withdraw) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: contract `FlowUtilityToken` does not conform to contract interface `ViewResolver`
@@ -8310,13 +8310,13 @@ error: incorrect argument label
 error: missing access modifier for function
    --> 01cf0e2f2f715450.FlowUtilityToken:172:8
     |
-172 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @FlowUtilityToken.Vault {
+172 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @FlowUtilityToken.Vault {
     |         ^
 
 error: missing access modifier for function
    --> 01cf0e2f2f715450.FlowUtilityToken:194:8
     |
-194 |         access(FungibleToken.Withdrawable) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
+194 |         access(FungibleToken.Withdraw) fun transfer(amount: UFix64, receiver: Capability<&{FungibleToken.Receiver}>) {
     |         ^
 
 error: resource `FlowUtilityToken.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -8326,7 +8326,7 @@ error: resource `FlowUtilityToken.Vault` does not conform to resource interface 
    |                          ^ `FlowUtilityToken.Vault` is missing definitions for members: `burnCallback`
    ... 
     |
-172 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @FlowUtilityToken.Vault {
+172 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @FlowUtilityToken.Vault {
     |                                                -------- mismatch here
 
 error: resource `FlowUtilityToken.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -8336,7 +8336,7 @@ error: resource `FlowUtilityToken.Vault` does not conform to resource interface 
    |                          ^ `FlowUtilityToken.Vault` is missing definitions for members: `isAvailableToWithdraw`
    ... 
     |
-172 |         access(FungibleToken.Withdrawable) fun withdraw(amount: UFix64): @FlowUtilityToken.Vault {
+172 |         access(FungibleToken.Withdraw) fun withdraw(amount: UFix64): @FlowUtilityToken.Vault {
     |                                                -------- mismatch here
 
 error: resource `FlowUtilityToken.Vault` does not conform to resource interface `FungibleToken.Vault`
@@ -8861,16 +8861,16 @@ error: cannot find declaration `FindLostAndFoundWrapper` in `179b6b1cb6755e31.Fi
   |        ^^^^^^^^^^^^^^^^^^^^^^^ available exported declarations are:
 
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
   --> 179b6b1cb6755e31.FindAirdropper:66:155
    |
-66 |     access(all) fun forcedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}, flowTokenRepayment: Capability<&{FungibleToken.Receiver}>, deepValidation: Bool) {
+66 |     access(all) fun forcedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault}, flowTokenRepayment: Capability<&{FungibleToken.Receiver}>, deepValidation: Bool) {
    |                                                                                                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
-error: cannot find type in this scope: `FungibleToken.Withdrawable`
+error: cannot find type in this scope: `FungibleToken.Withdraw`
   --> 179b6b1cb6755e31.FindAirdropper:98:159
    |
-98 |     access(all) fun subsidizedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}, flowTokenRepayment: Capability<&{FungibleToken.Receiver}>, deepValidation: Bool) {
+98 |     access(all) fun subsidizedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault}, flowTokenRepayment: Capability<&{FungibleToken.Receiver}>, deepValidation: Bool) {
    |                                                                                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 

@@ -1880,7 +1880,7 @@ access(all) contract FIND {
             }
             let bid <- self.bids.remove(key: token.name) ?? panic("missing bid")
 
-            let vaultRef = &bid.vault as auth (FungibleToken.Withdrawable) &{FungibleToken.Vault}
+            let vaultRef = &bid.vault as auth (FungibleToken.Withdraw) &{FungibleToken.Vault}
             token.setSalePrice(nil)
             token.setCallback(nil)
             token.setReservePrice(nil)
@@ -1898,7 +1898,7 @@ access(all) contract FIND {
                 panic("This user does not have receiving vault set up. User: ".concat(self.owner!.address.toString()))
             }
             let bid <- self.bids.remove(key: name) ?? panic("missing bid")
-            let vaultRef = &bid.vault as auth (FungibleToken.Withdrawable) &{FungibleToken.Vault}
+            let vaultRef = &bid.vault as auth (FungibleToken.Withdraw) &{FungibleToken.Vault}
             self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.getBalance()))
             destroy bid
         }

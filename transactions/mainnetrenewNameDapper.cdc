@@ -6,12 +6,12 @@ transaction(merchAccount: Address, name: String, amount: UFix64) {
 
 	let price : UFix64
 	let finLeases : auth(FIND.LeaseOwner) &FIND.LeaseCollection
-	let mainDapperUtilityCoinVault: auth(FungibleToken.Withdrawable) &DapperUtilityCoin.Vault
+	let mainDapperUtilityCoinVault: auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault
 	let balanceBeforeTransfer: UFix64
 
 	prepare(dapper: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account, acct: auth(BorrowValue, FIND.LeaseOwner) &Account) {
 		self.price=FIND.calculateCost(name)
-		self.mainDapperUtilityCoinVault = dapper.storage.borrow<auth(FungibleToken.Withdrawable) &DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault) ?? panic("Cannot borrow DapperUtilityCoin vault from account storage".concat(dapper.address.toString()))
+		self.mainDapperUtilityCoinVault = dapper.storage.borrow<auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault) ?? panic("Cannot borrow DapperUtilityCoin vault from account storage".concat(dapper.address.toString()))
 		self.balanceBeforeTransfer = self.mainDapperUtilityCoinVault.getBalance()
 		self.finLeases= acct.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath) ?? panic("Could not borrow reference to find lease collection")
 	}

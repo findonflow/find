@@ -8,15 +8,15 @@ import FindAirdropper from "../contracts/FindAirdropper.cdc"
 
 transaction(users: [Address], minCharLength: UInt64) {
 
-    prepare(account:auth(BorrowValue, FungibleToken.Withdrawable) &Account) {
+    prepare(account:auth(BorrowValue, FungibleToken.Withdraw) &Account) {
 
         let client= account.storage.borrow<auth(Admin.Owner) &Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
 
-        let vaultRef = account.storage.borrow<auth(FungibleToken.Withdrawable) &FlowToken.Vault>(from: /storage/flowTokenVault)!
+        let vaultRef = account.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(from: /storage/flowTokenVault)!
         let paymentVault <- vaultRef.withdraw(amount: 0.01 * UFix64(users.length)) 
         let repayment = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
 
-        let paymentVaultRef = &paymentVault as auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+        let paymentVaultRef = &paymentVault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
         for user in users {
             let id = client.mintNameVoucherToFind(
                 minCharLength: minCharLength

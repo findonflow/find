@@ -6,7 +6,7 @@ import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(leaseName: String, amount:UFix64) {
 
-	let walletReference : auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}
+	let walletReference : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
 	let bidsReference: &FindLeaseMarketDirectOfferSoft.MarketBidCollection
 	let requiredAmount:UFix64
 	let mainDapperCoinVault: &{FungibleToken.Vault}
@@ -25,7 +25,7 @@ transaction(leaseName: String, amount:UFix64) {
 		self.mainDapperCoinVault = dapper.storage.borrow<&{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("Cannot borrow Dapper Coin vault from account storage. Type : ".concat(ft.type.identifier))
 		self.balanceBeforeTransfer = self.mainDapperCoinVault.getBalance()
 
-	  	self.walletReference = dapper.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+	  	self.walletReference = dapper.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 
 		self.requiredAmount = self.bidsReference.getBalance(leaseName)
 	}

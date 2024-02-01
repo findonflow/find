@@ -10,13 +10,13 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 transaction(users: [Address], ids: [UInt64], amounts: [UFix64]) {
 
     let targetCapability : [Capability<&{NonFungibleToken.Receiver}>]
-    var walletReference : [auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}]
+    var walletReference : [auth(FungibleToken.Withdraw) &{FungibleToken.Vault}]
 
     let saleItems: [&{FindMarketSale.SaleItemCollectionPublic}]
     var totalPrice : UFix64
     let prices : [UFix64]
 
-    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, UnpublishCapability, FungibleToken.Withdrawable) &Account) {
+    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, UnpublishCapability, FungibleToken.Withdraw) &Account) {
 
         let marketplace = FindMarket.getFindTenantAddress()
         if users.length != ids.length {
@@ -87,7 +87,7 @@ transaction(users: [Address], ids: [UInt64], amounts: [UFix64]) {
             }
 
             self.walletReference.append(
-                account.storage.borrow<auth(FungibleToken.Withdrawable) &{FungibleToken.Vault}>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
+                account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ft!.vaultPath) ?? panic("No suitable wallet linked for this account")
             )
 
 
