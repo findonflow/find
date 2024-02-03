@@ -182,17 +182,7 @@ access(all) contract Dandy :ViewResolver{
 
 
             if type == Type<MetadataViews.NFTCollectionData>() {
-                return MetadataViews.NFTCollectionData(
-                    storagePath: Dandy.CollectionStoragePath,
-                    publicPath: Dandy.CollectionPublicPath,
-                    providerPath: Dandy.CollectionPrivatePath,
-                    publicCollection: Type<&Dandy.Collection>(),
-                    publicLinkedType: Type<&Dandy.Collection>(),
-                    providerLinkedType: Type<auth (NonFungibleToken.Withdraw) &Dandy.Collection>(),
-                    createEmptyCollectionFunction: fun(): @{NonFungibleToken.Collection} {
-                        return <- Dandy.createEmptyCollection()
-                    }
-                )
+                return Dandy.resolveContractView(resourceType: Type<@NFT>(), viewType: Type<MetadataViews.NFTCollectionData>())
             }
 
             if self.schemas.keys.contains(type.identifier) {
@@ -204,6 +194,32 @@ access(all) contract Dandy :ViewResolver{
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
             return <-Dandy.createEmptyCollection()
         }
+    }
+
+    access(all) view fun getContractViews(resourceType: Type?): [Type] {
+        return [
+            Type<MetadataViews.NFTCollectionData>()
+        ]
+    }
+
+    access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
+        switch viewType {
+            case Type<MetadataViews.NFTCollectionData>():
+                let collectionRef = self.account.storage.borrow<&Dandy.Collection>(
+                        from: Dandy.CollectionStoragePath
+                    ) ?? panic("Could not borrow a reference to the stored collection")
+                let collectionData = MetadataViews.NFTCollectionData(
+                    storagePath: Dandy.CollectionStoragePath,
+                    publicPath: Dandy.CollectionPublicPath,
+                    publicCollection: Type<&Dandy.Collection>(),
+                    publicLinkedType: Type<&Dandy.Collection>(),
+                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                        return <-Dandy.createEmptyCollection()
+                    })
+                )
+                return collectionData
+        }
+        return nil
     }
 
 

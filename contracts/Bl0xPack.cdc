@@ -193,7 +193,7 @@ access(all) contract Bl0xPack: ViewResolver {
             return self.getMetadata().getThumbnail()
         }
 
-        access(all) view fun resolveView(_ view: Type): AnyStruct? {
+        access(all) fun resolveView(_ view: Type): AnyStruct? {
             let metadata = self.getMetadata()
             switch view {
             case Type<MetadataViews.Display>():
@@ -215,16 +215,9 @@ access(all) contract Bl0xPack: ViewResolver {
                 return Bl0x.royalties
 
                 case Type<MetadataViews.NFTCollectionData>(): 
-                return MetadataViews.NFTCollectionData(
-                    storagePath: Bl0xPack.CollectionStoragePath,
-                    publicPath: Bl0xPack.CollectionPublicPath,
-                    providerPath: /private/bl0xPackCollection,
-                    publicCollection: Type<&Bl0xPack.Collection>(),
-                    publicLinkedType: Type<&Bl0xPack.Collection>(),
-                    providerLinkedType: Type<auth(NonFungibleToken.Withdraw) &Bl0xPack.Collection>(),
-                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {return <- Bl0xPack.createEmptyCollection()}))
+                return Bl0xPack.resolveContractView(resourceType: Type<@Bl0xPack.Collection>(), viewType: Type<MetadataViews.NFTCollectionData>()) as! MetadataViews.NFTCollectionData
 
-                    case Type<MetadataViews.NFTCollectionDisplay>(): 
+                case Type<MetadataViews.NFTCollectionDisplay>(): 
                     let externalURL = MetadataViews.ExternalURL("https://find.xyz/mp/bl0xPack")
                     let squareImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: "https://bl0x.xyz/assets/home/Bl0xlogo.webp"), mediaType: "image")
                     let bannerImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: "https://pbs.twimg.com/profile_banners/1535883931777892352/1661105339/1500x500"), mediaType: "image")
@@ -233,6 +226,9 @@ access(all) contract Bl0xPack: ViewResolver {
                 return nil
             }
 
+            access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+                return <-Bl0xPack.createEmptyCollection()
+            }
         }
 
         access(all) resource interface CollectionPublic {
@@ -244,6 +240,32 @@ access(all) contract Bl0xPack: ViewResolver {
             access(all) fun buy(typeId: UInt64, vault: @{FungibleToken.Vault}, collectionCapability: Capability<&Collection>) 
             access(all) fun buyWithSignature(packId: UInt64, signature:String,  vault: @{FungibleToken.Vault}, collectionCapability: Capability<&Collection>) 
         }
+
+           access(all) view fun getContractViews(resourceType: Type?): [Type] {
+        return [
+            Type<MetadataViews.NFTCollectionData>()
+        ]
+    }
+
+    access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
+        switch viewType {
+            case Type<MetadataViews.NFTCollectionData>():
+                let collectionRef = self.account.storage.borrow<&Bl0xPack.Collection>(
+                        from: Bl0xPack.CollectionStoragePath
+                    ) ?? panic("Could not borrow a reference to the stored collection")
+                let collectionData = MetadataViews.NFTCollectionData(
+                    storagePath: Bl0xPack.CollectionStoragePath,
+                    publicPath: Bl0xPack.CollectionPublicPath,
+                    publicCollection: Type<&Bl0xPack.Collection>(),
+                    publicLinkedType: Type<&Bl0xPack.Collection>(),
+                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                        return <-Bl0xPack.createEmptyCollection()
+                    })
+                )
+                return collectionData
+        }
+        return nil
+    }
 
         access(all) entitlement Owner
 
@@ -448,7 +470,7 @@ access(all) contract Bl0xPack: ViewResolver {
             access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
                 let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("Could not withdraw nft")
 
-                let nft <- token as! @NFT
+                let nft <- token
 
                 let oldNumber= self.nftsPerType[nft.getTypeID()]!
                 self.nftsPerType[nft.getTypeID()]=oldNumber-1
@@ -500,7 +522,7 @@ access(all) contract Bl0xPack: ViewResolver {
             // so that the caller can read its metadata and call its methods
             //
             access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
-                return &self.ownedNFTs[id] as &{NonFungibleToken.NFT}?
+                return &self.ownedNFTs[id]
             }
 
             /// getSupportedNFTTypes returns a list of NFT types that this receiver accepts

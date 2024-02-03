@@ -128,28 +128,10 @@ access(all) contract Flomies: ViewResolver{
 					traits:self.traits
 				)
 			case Type<MetadataViews.NFTCollectionDisplay>():
-				let externalURL = MetadataViews.ExternalURL("https://flomiesnft.com")
-				let squareImage = MetadataViews.Media(file: MetadataViews.IPFSFile(cid: "QmYtowktCz6GbP6MqMd6SXqJEYazCpGTcFm4HrWX89nUvo", path: nil), mediaType: "image/png")
-				let bannerImage = MetadataViews.Media(file: MetadataViews.IPFSFile(cid: "QmPeZUjsfrFvkB1bvKBpAsxfoQ6jSoezqwWz9grkmNYdz1", path: nil), mediaType: "image/png")
-				return MetadataViews.NFTCollectionDisplay(name: "flomies", 
-														  description: "Flomies is a collection of 3333 homies living on the flow blockchain. Flomies are about art, mental health and innovating in this ecosystem. Our adventure is unique, as is our community.", 
-														  externalURL: externalURL, 
-														  squareImage: squareImage, 
-														  bannerImage: bannerImage, 
-														  socials: { 
-														  	"discord": MetadataViews.ExternalURL("https://discord.gg/tVavHtPD"), 
-															"twitter" : MetadataViews.ExternalURL("https://twitter.com/flomiesnft"),
-															"instagram" : MetadataViews.ExternalURL("https://www.instagram.com/flomies_nft/")
-														  })
+				return Flomies.resolveContractView(resourceType: Type<@Flomies.NFT>(), viewType: Type<MetadataViews.NFTCollectionDisplay>()) as! MetadataViews.NFTCollectionDisplay
 
 			case Type<MetadataViews.NFTCollectionData>():
-				return MetadataViews.NFTCollectionData(storagePath: Flomies.CollectionStoragePath,
-				publicPath: Flomies.CollectionPublicPath,
-				providerPath: /private/FlomiesCollection,
-				publicCollection: Type<&Collection>(),
-				publicLinkedType: Type<&Collection>(),
-				providerLinkedType: Type<auth(NonFungibleToken.Withdraw) &Collection>(),
-				createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {return <- Flomies.createEmptyCollection()}))
+				return Flomies.resolveContractView(resourceType: Type<@Flomies.NFT>(), viewType: Type<MetadataViews.NFTCollectionData>()) as! MetadataViews.NFTCollectionData
 
 			case Type<MetadataViews.Traits>():
 				return MetadataViews.Traits(self.getAllTraitsMetadataAsArray())
@@ -197,7 +179,52 @@ access(all) contract Flomies: ViewResolver{
 			}
 			return traitMetadata
 		}
+
+		access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <-Flomies.createEmptyCollection()
+        }
 	}
+
+	access(all) view fun getContractViews(resourceType: Type?): [Type] {
+        return [
+            Type<MetadataViews.NFTCollectionData>(),
+            Type<MetadataViews.NFTCollectionDisplay>()
+        ]
+    }
+
+    access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
+        switch viewType {
+            case Type<MetadataViews.NFTCollectionData>():
+                let collectionRef = self.account.storage.borrow<&Flomies.Collection>(
+                        from: Flomies.CollectionStoragePath
+                    ) ?? panic("Could not borrow a reference to the stored collection")
+                let collectionData = MetadataViews.NFTCollectionData(
+                    storagePath: Flomies.CollectionStoragePath,
+                    publicPath: Flomies.CollectionPublicPath,
+                    publicCollection: Type<&Flomies.Collection>(),
+                    publicLinkedType: Type<&Flomies.Collection>(),
+                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                        return <-Flomies.createEmptyCollection()
+                    })
+                )
+                return collectionData
+			case Type<MetadataViews.NFTCollectionDisplay>():
+				let externalURL = MetadataViews.ExternalURL("https://flomiesnft.com")
+				let squareImage = MetadataViews.Media(file: MetadataViews.IPFSFile(cid: "QmYtowktCz6GbP6MqMd6SXqJEYazCpGTcFm4HrWX89nUvo", path: nil), mediaType: "image/png")
+				let bannerImage = MetadataViews.Media(file: MetadataViews.IPFSFile(cid: "QmPeZUjsfrFvkB1bvKBpAsxfoQ6jSoezqwWz9grkmNYdz1", path: nil), mediaType: "image/png")
+				return MetadataViews.NFTCollectionDisplay(name: "flomies", 
+														  description: "Flomies is a collection of 3333 homies living on the flow blockchain. Flomies are about art, mental health and innovating in this ecosystem. Our adventure is unique, as is our community.", 
+														  externalURL: externalURL, 
+														  squareImage: squareImage, 
+														  bannerImage: bannerImage, 
+														  socials: { 
+														  	"discord": MetadataViews.ExternalURL("https://discord.gg/tVavHtPD"), 
+															"twitter" : MetadataViews.ExternalURL("https://twitter.com/flomiesnft"),
+															"instagram" : MetadataViews.ExternalURL("https://www.instagram.com/flomies_nft/")
+														  })
+        }
+        return nil
+    }
 
 	access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
 		// dictionary of NFT conforming tokens
