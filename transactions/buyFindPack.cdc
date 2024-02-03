@@ -98,7 +98,7 @@ transaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, total
             self.packs.buy(packTypeName: packTypeName, typeId:packTypeId, vault: <- purchasingVault, collectionCapability: self.userPacks)
             counter = counter - 1
         }
-        if self.paymentVault.getBalance() != 0.0 {
+        if self.paymentvault.balance != 0.0 {
             panic("paymentVault balance is non-zero after paying")
         }
         destroy self.paymentVault

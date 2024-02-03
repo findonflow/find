@@ -241,7 +241,7 @@ access(all) contract FIND {
             path="fusdReceiver"
         }
         if path != "" {
-            emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: "", toAddress: address, message:message, tag:tag, amount:vault.getBalance(), ftType:vault.getType().identifier)
+            emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: "", toAddress: address, message:message, tag:tag, amount:vault.balance, ftType:vault.getType().identifier)
             account.capabilities.get<&{FungibleToken.Receiver}>(PublicPath(identifier: path)!)!.borrow()!.deposit(from: <- vault)
             return
         }
@@ -1886,7 +1886,7 @@ access(all) contract FIND {
             token.setReservePrice(nil)
             token.setStartAuctionPrice(nil)
             self.leases.borrow()!.deposit(token: <- token)
-            let vault  <- vaultRef.withdraw(amount: vaultRef.getBalance())
+            let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
             destroy bid
             return <- vault
         }
@@ -1899,7 +1899,7 @@ access(all) contract FIND {
             }
             let bid <- self.bids.remove(key: name) ?? panic("missing bid")
             let vaultRef = &bid.vault as auth (FungibleToken.Withdraw) &{FungibleToken.Vault}
-            self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.getBalance()))
+            self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.balance))
             destroy bid
         }
 
@@ -1908,7 +1908,7 @@ access(all) contract FIND {
             for id in self.bids.keys {
                 let bid = self.borrowBid(id)
                 let leaseCollection= bid.from.borrow() ?? panic("Could not borrow lease bid from owner of name=".concat(bid.name))
-                bidInfo.append(BidInfo(name: bid.name, amount: bid.vault.getBalance(), timestamp: bid.bidAt, type: bid.type, lease: leaseCollection.getLease(bid.name)))
+                bidInfo.append(BidInfo(name: bid.name, amount: bid.vault.balance, timestamp: bid.bidAt, type: bid.type, lease: leaseCollection.getLease(bid.name)))
             }
             return bidInfo
         }
@@ -1944,7 +1944,7 @@ access(all) contract FIND {
                 panic("cannot increaseBid on name that is free")
             }
             let seller=getAccount(nameStatus.owner!).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-            let balance = vault.getBalance()
+            let balance = vault.balance
             let bid =self.borrowBid(name)
             bid.setBidAt(Clock.time())
             bid.vault.deposit(from: <- vault)

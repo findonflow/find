@@ -227,13 +227,13 @@ error: ambiguous intersection type
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketAuctionSoft:509:21
     |
-509 |             if vault.getBalance() < saleItem.auctionReservePrice {
+509 |             if valut.balance < saleItem.auctionReservePrice {
     |                      ^^^^^^^^^^ unknown member
 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketAuctionSoft:510:114
     |
-510 |                 panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(vault.getBalance().toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
+510 |                 panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(valut.balance.toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
     |                                                                                                                   ^^^^^^^^^^ unknown member
 
 error: ambiguous intersection type
@@ -492,7 +492,7 @@ error: ambiguous intersection type
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketAuctionEscrow:731:30
     |
-731 |             return self.vault.getBalance()
+731 |             return self.valut.balance
     |                               ^^^^^^^^^^ unknown member
 
 error: value of type `{NonFungibleToken.NFT}` has no member `getID`
@@ -522,7 +522,7 @@ error: value of type `auth(not specified) &{FungibleToken.Vault}` has no member 
 error: value of type `&{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketAuctionEscrow:845:37
     |
-845 |             let oldBalance=bid.vault.getBalance()
+845 |             let oldBalance=bid.valut.balance
     |                                      ^^^^^^^^^^ unknown member
 
 error: cannot find type in this scope: `FungibleToken.Withdraw`
@@ -546,7 +546,7 @@ error: value of type `auth(not specified) &{FungibleToken.Vault}` has no member 
 error: value of type `&{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketAuctionEscrow:883:29
     |
-883 |             return bid.vault.getBalance()
+883 |             return bid.valut.balance
     |                              ^^^^^^^^^^ unknown member
 
 
@@ -575,7 +575,7 @@ error: cannot find declaration `FindPack` in `179b6b1cb6755e31.FindPack`
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> e03daebed8ca0615.GeneratedExperiences:227:15
     |
-227 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+227 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: too many arguments
@@ -657,7 +657,7 @@ error: resource `GeneratedExperiences.NFT` does not conform to resource interfac
 error: missing access modifier for function
    --> e03daebed8ca0615.GeneratedExperiences:227:8
     |
-227 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+227 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: resource `GeneratedExperiences.Collection` does not conform to resource interface `NonFungibleToken.Collection`
@@ -667,7 +667,7 @@ error: resource `GeneratedExperiences.Collection` does not conform to resource i
     |                          ^
    ... 
     |
-227 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+227 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 error: missing access modifier for function
@@ -777,7 +777,7 @@ error: cannot find declaration `FindForge` in `179b6b1cb6755e31.FindForge`
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.Dandy:228:15
     |
-228 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+228 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: ambiguous intersection type
@@ -865,7 +865,7 @@ error: resource `Dandy.NFT` does not conform to resource interface `NonFungibleT
 error: missing access modifier for function
    --> 179b6b1cb6755e31.Dandy:228:8
     |
-228 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+228 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: resource `Dandy.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -875,7 +875,7 @@ error: resource `Dandy.Collection` does not conform to resource interface `NonFu
     |                          ^
    ... 
     |
-228 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+228 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 error: missing access modifier for function
@@ -928,7 +928,7 @@ error: cannot find type in this scope: `NonFungibleToken.Withdraw`
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.Bl0xPack:448:19
     |
-448 |             access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+448 |             access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
@@ -1025,7 +1025,7 @@ error: resource `Bl0xPack.NFT` does not conform to resource interface `NonFungib
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.Bl0xPack:341:43
     |
-341 |                 if metadata.price != vault.getBalance() {
+341 |                 if metadata.price != valut.balance {
     |                                            ^^^^^^^^^^ unknown member
 
 error: too few arguments
@@ -1037,25 +1037,25 @@ error: too few arguments
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.Bl0xPack:374:97
     |
-374 |                     metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: vault.getBalance() * metadata.royaltyCut))
+374 |                     metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: valut.balance * metadata.royaltyCut))
     |                                                                                                  ^^^^^^^^^^ unknown member
 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.Bl0xPack:430:43
     |
-430 |                 if metadata.price != vault.getBalance() {
+430 |                 if metadata.price != valut.balance {
     |                                            ^^^^^^^^^^ unknown member
 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.Bl0xPack:435:97
     |
-435 |                     metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: vault.getBalance() * metadata.royaltyCut))
+435 |                     metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: valut.balance * metadata.royaltyCut))
     |                                                                                                  ^^^^^^^^^^ unknown member
 
 error: missing access modifier for function
    --> 179b6b1cb6755e31.Bl0xPack:448:12
     |
-448 |             access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+448 |             access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |             ^
 
 error: resource `Bl0xPack.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -1065,7 +1065,7 @@ error: resource `Bl0xPack.Collection` does not conform to resource interface `No
     |                              ^
    ... 
     |
-448 |             access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+448 |             access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                       -------- mismatch here
 
 
@@ -1174,7 +1174,7 @@ error: ambiguous intersection type
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindLeaseMarket:446:26
     |
-446 |         let soldFor=vault.getBalance()
+446 |         let soldFor=valut.balance
     |                           ^^^^^^^^^^ unknown member
 
 error: cannot infer type parameter: `T`
@@ -1344,7 +1344,7 @@ error: value of type `&{NonFungibleToken.Collection}` has no member `borrowViewR
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindLostAndFoundWrapper:247:17
     |
-247 |         if vault.getBalance() != nil {
+247 |         if valut.balance != nil {
     |                  ^^^^^^^^^^ unknown member
 
 error: cannot access `withdraw`: function requires `Withdraw` authorization, but reference only has `not specified` authorization
@@ -1415,7 +1415,7 @@ error: cannot find type in this scope: `NonFungibleToken.Withdraw`
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.FindPack:818:15
     |
-818 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+818 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: ambiguous intersection type
@@ -1515,7 +1515,7 @@ error: resource `FindPack.NFT` does not conform to resource interface `NonFungib
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindPack:680:40
     |
-680 |             if saleInfo!.price != vault.getBalance() {
+680 |             if saleInfo!.price != valut.balance {
     |                                         ^^^^^^^^^^ unknown member
 
 error: too few arguments
@@ -1527,13 +1527,13 @@ error: too few arguments
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindPack:780:40
     |
-780 |             if saleInfo!.price != vault.getBalance() {
+780 |             if saleInfo!.price != valut.balance {
     |                                         ^^^^^^^^^^ unknown member
 
 error: missing access modifier for function
    --> 179b6b1cb6755e31.FindPack:818:8
     |
-818 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+818 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: resource `FindPack.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -1543,7 +1543,7 @@ error: resource `FindPack.Collection` does not conform to resource interface `No
     |                          ^
    ... 
     |
-818 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+818 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 error: missing access modifier for function
@@ -1585,31 +1585,31 @@ error: cannot deploy invalid contract
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.FLOAT:249:15
     |
-249 |         access(NonFungibleToken.Withdraw) fun withdrawWithUUID(_ uuid: UInt64): @{NonFungibleToken.NFT} {
+249 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdrawWithUUID(_ uuid: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.FLOAT:262:15
     |
-262 |         access(NonFungibleToken.Withdraw) fun withdrawWithType(type: Type, withdrawID: UInt64): @{NonFungibleToken.NFT} {
+262 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdrawWithType(type: Type, withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.FLOAT:275:15
     |
-275 |         access(NonFungibleToken.Withdraw) fun withdrawWithTypeAndUUID(type: Type, uuid: UInt64): @{NonFungibleToken.NFT} {
+275 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdrawWithTypeAndUUID(type: Type, uuid: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.FLOAT:286:15
     |
-286 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+286 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.FLOAT:316:15
     |
-316 |         access(NonFungibleToken.Withdraw) fun transfer(id: UInt64, receiver: Capability<&{NonFungibleToken.Receiver}>): Bool {
+316 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun transfer(id: UInt64, receiver: Capability<&{NonFungibleToken.Receiver}>): Bool {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: resource `FLOAT.NFT` does not conform to resource interface `NonFungibleToken.NFT`
@@ -1621,31 +1621,31 @@ error: resource `FLOAT.NFT` does not conform to resource interface `NonFungibleT
 error: missing access modifier for function
    --> f8d6e0586b0a20c7.FLOAT:249:8
     |
-249 |         access(NonFungibleToken.Withdraw) fun withdrawWithUUID(_ uuid: UInt64): @{NonFungibleToken.NFT} {
+249 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdrawWithUUID(_ uuid: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: missing access modifier for function
    --> f8d6e0586b0a20c7.FLOAT:262:8
     |
-262 |         access(NonFungibleToken.Withdraw) fun withdrawWithType(type: Type, withdrawID: UInt64): @{NonFungibleToken.NFT} {
+262 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdrawWithType(type: Type, withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: missing access modifier for function
    --> f8d6e0586b0a20c7.FLOAT:275:8
     |
-275 |         access(NonFungibleToken.Withdraw) fun withdrawWithTypeAndUUID(type: Type, uuid: UInt64): @{NonFungibleToken.NFT} {
+275 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdrawWithTypeAndUUID(type: Type, uuid: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: missing access modifier for function
    --> f8d6e0586b0a20c7.FLOAT:286:8
     |
-286 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+286 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: missing access modifier for function
    --> f8d6e0586b0a20c7.FLOAT:316:8
     |
-316 |         access(NonFungibleToken.Withdraw) fun transfer(id: UInt64, receiver: Capability<&{NonFungibleToken.Receiver}>): Bool {
+316 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun transfer(id: UInt64, receiver: Capability<&{NonFungibleToken.Receiver}>): Bool {
     |         ^
 
 error: resource `FLOAT.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -1655,7 +1655,7 @@ error: resource `FLOAT.Collection` does not conform to resource interface `NonFu
     |                          ^
    ... 
     |
-286 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+286 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
@@ -1902,7 +1902,7 @@ error: ambiguous intersection type
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketDirectOfferEscrow:479:30
     |
-479 |             return self.vault.getBalance()
+479 |             return self.valut.balance
     |                               ^^^^^^^^^^ unknown member
 
 error: value of type `{NonFungibleToken.NFT}` has no member `getID`
@@ -1932,13 +1932,13 @@ error: value of type `auth(not specified) &{FungibleToken.Vault}` has no member 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketDirectOfferEscrow:561:21
     |
-561 |             if vault.getBalance() <= 0.0 {
+561 |             if valut.balance <= 0.0 {
     |                      ^^^^^^^^^^ unknown member
 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketDirectOfferEscrow:589:25
     |
-589 |                 if vault.getBalance() <= 0.65 {
+589 |                 if valut.balance <= 0.65 {
     |                          ^^^^^^^^^^ unknown member
 
 error: cannot find type in this scope: `FungibleToken.Withdraw`
@@ -1968,7 +1968,7 @@ error: ambiguous intersection type
 error: value of type `&{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketDirectOfferEscrow:647:29
     |
-647 |             return bid.vault.getBalance()
+647 |             return bid.valut.balance
     |                              ^^^^^^^^^^ unknown member
 
 
@@ -2047,13 +2047,13 @@ error: ambiguous intersection type
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketSale:195:43
     |
-195 |             if saleItem.salePrice != vault.getBalance() {
+195 |             if saleItem.salePrice != valut.balance {
     |                                            ^^^^^^^^^^ unknown member
 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketSale:196:134
     |
-196 |                 panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(vault.getBalance().toString()))
+196 |                 panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(valut.balance.toString()))
     |                                                                                                                                       ^^^^^^^^^^ unknown member
 
 error: ambiguous intersection type
@@ -2139,7 +2139,7 @@ error: cannot deploy invalid contract
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.CharityNFT:171:15
     |
-171 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+171 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: contract `CharityNFT` does not conform to contract interface `ViewResolver`
@@ -2206,7 +2206,7 @@ error: resource `CharityNFT.NFT` does not conform to resource interface `NonFung
 error: missing access modifier for function
    --> 179b6b1cb6755e31.CharityNFT:171:8
     |
-171 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+171 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: resource `CharityNFT.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -2216,7 +2216,7 @@ error: resource `CharityNFT.Collection` does not conform to resource interface `
     |                          ^
    ... 
     |
-171 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+171 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 
@@ -2354,7 +2354,7 @@ error: cannot find declaration `FindAirdropper` in `179b6b1cb6755e31.FindAirdrop
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.NameVoucher:148:15
     |
-148 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+148 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: too many arguments
@@ -2408,7 +2408,7 @@ error: resource `NameVoucher.NFT` does not conform to resource interface `NonFun
 error: missing access modifier for function
    --> 179b6b1cb6755e31.NameVoucher:148:8
     |
-148 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+148 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: value of type `{NonFungibleToken.NFT}` has no member `getID`
@@ -2454,7 +2454,7 @@ error: resource `NameVoucher.Collection` does not conform to resource interface 
     |                          ^
    ... 
     |
-148 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+148 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 
@@ -2539,13 +2539,13 @@ error: cannot infer type parameter: `T`
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindLeaseMarketSale:163:43
     |
-163 |             if saleItem.salePrice != vault.getBalance() {
+163 |             if saleItem.salePrice != valut.balance {
     |                                            ^^^^^^^^^^ unknown member
 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindLeaseMarketSale:164:134
     |
-164 |                 panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(vault.getBalance().toString()))
+164 |                 panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(valut.balance.toString()))
     |                                                                                                                                       ^^^^^^^^^^ unknown member
 
 
@@ -2933,7 +2933,7 @@ error: cannot infer type parameter: `T`
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FIND:232:179
     |
-232 |             emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.getAddress(), message:message, tag:tag, amount:vault.getBalance(), ftType:vault.getType().identifier)
+232 |             emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.getAddress(), message:message, tag:tag, amount:valut.balance, ftType:vault.getType().identifier)
     |                                                                                                                                                                                    ^^^^^^^^^^ unknown member
 
 error: cannot infer type parameter: `T`
@@ -2945,7 +2945,7 @@ error: cannot infer type parameter: `T`
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FIND:244:166
     |
-244 |             emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: "", toAddress: address, message:message, tag:tag, amount:vault.getBalance(), ftType:vault.getType().identifier)
+244 |             emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: "", toAddress: address, message:message, tag:tag, amount:valut.balance, ftType:vault.getType().identifier)
     |                                                                                                                                                                       ^^^^^^^^^^ unknown member
 
 error: ambiguous intersection type
@@ -3311,7 +3311,7 @@ error: value of type `auth(not specified) &{FungibleToken.Vault}` has no member 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
     --> 179b6b1cb6755e31.FIND:1947:32
      |
-1947 |             let balance = vault.getBalance()
+1947 |             let balance = valut.balance
      |                                 ^^^^^^^^^^ unknown member
 
 
@@ -3420,13 +3420,13 @@ error: cannot infer type parameter: `T`
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindLeaseMarketAuctionSoft:438:21
     |
-438 |             if vault.getBalance() < saleItem.auctionReservePrice {
+438 |             if valut.balance < saleItem.auctionReservePrice {
     |                      ^^^^^^^^^^ unknown member
 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindLeaseMarketAuctionSoft:439:114
     |
-439 |                 panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(vault.getBalance().toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
+439 |                 panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(valut.balance.toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
     |                                                                                                                   ^^^^^^^^^^ unknown member
 
 error: ambiguous intersection type
@@ -3587,7 +3587,7 @@ error: cannot find declaration `FindForge` in `179b6b1cb6755e31.FindForge`
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.NFGv3:185:15
     |
-185 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+185 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: contract `NFGv3` does not conform to contract interface `ViewResolver`
@@ -3655,7 +3655,7 @@ error: resource `NFGv3.NFT` does not conform to resource interface `NonFungibleT
 error: missing access modifier for function
    --> 179b6b1cb6755e31.NFGv3:185:8
     |
-185 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+185 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: resource `NFGv3.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -3665,7 +3665,7 @@ error: resource `NFGv3.Collection` does not conform to resource interface `NonFu
     |                          ^
    ... 
     |
-185 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+185 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 error: missing access modifier for function
@@ -3845,7 +3845,7 @@ error: cannot find declaration `TokenForwarding` in `f8d6e0586b0a20c7.TokenForwa
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
     --> 179b6b1cb6755e31.FindMarket:1334:22
      |
-1334 |     let soldFor=vault.getBalance()
+1334 |     let soldFor=valut.balance
      |                       ^^^^^^^^^^ unknown member
 
 error: cannot infer type parameter: `T`
@@ -3910,7 +3910,7 @@ error: cannot find declaration `FindPack` in `179b6b1cb6755e31.FindPack`
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.Flomies:217:9
     |
-217 | 		access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+217 | 		access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     | 		       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: ambiguous intersection type
@@ -3994,7 +3994,7 @@ error: resource `Flomies.NFT` does not conform to resource interface `NonFungibl
 error: missing access modifier for function
    --> 179b6b1cb6755e31.Flomies:217:2
     |
-217 | 		access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+217 | 		access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     | 		^
 
 error: resource `Flomies.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -4004,7 +4004,7 @@ error: resource `Flomies.Collection` does not conform to resource interface `Non
     | 	                     ^
    ... 
     |
-217 | 		access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+217 | 		access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     | 		                                          -------- mismatch here
 
 error: missing access modifier for function
@@ -4045,7 +4045,7 @@ error: cannot find declaration `FindPack` in `179b6b1cb6755e31.FindPack`
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.PartyFavorz:241:9
     |
-241 | 		access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+241 | 		access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     | 		       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: contract `PartyFavorz` does not conform to contract interface `ViewResolver`
@@ -4125,7 +4125,7 @@ error: resource `PartyFavorz.NFT` does not conform to resource interface `NonFun
 error: missing access modifier for function
    --> 179b6b1cb6755e31.PartyFavorz:241:2
     |
-241 | 		access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+241 | 		access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     | 		^
 
 error: resource `PartyFavorz.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -4135,7 +4135,7 @@ error: resource `PartyFavorz.Collection` does not conform to resource interface 
     | 	                     ^
    ... 
     |
-241 | 		access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+241 | 		access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     | 		                                          -------- mismatch here
 
 error: missing access modifier for function
@@ -4353,7 +4353,7 @@ error: cannot find declaration `DapperUtilityCoin` in `01cf0e2f2f715450.DapperUt
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.ExampleNFT:215:15
     |
-215 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+215 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: ambiguous intersection type
@@ -4441,7 +4441,7 @@ error: resource `ExampleNFT.NFT` does not conform to resource interface `NonFung
 error: missing access modifier for function
    --> 179b6b1cb6755e31.ExampleNFT:215:8
     |
-215 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+215 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: resource `ExampleNFT.Collection` does not conform to resource interface `NonFungibleToken.Collection`
@@ -4451,7 +4451,7 @@ error: resource `ExampleNFT.Collection` does not conform to resource interface `
     |                          ^
    ... 
     |
-215 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+215 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 error: missing access modifier for function
@@ -4478,7 +4478,7 @@ error: cannot deploy invalid contract
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.Bl0x:293:15
     |
-293 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+293 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: contract `Bl0x` does not conform to contract interface `ViewResolver`
@@ -4544,7 +4544,7 @@ error: resource `Bl0x.NFT` does not conform to resource interface `NonFungibleTo
 error: missing access modifier for function
    --> 179b6b1cb6755e31.Bl0x:293:8
     |
-293 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+293 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: resource `Bl0x.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -4554,7 +4554,7 @@ error: resource `Bl0x.Collection` does not conform to resource interface `NonFun
     |                          ^
    ... 
     |
-293 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+293 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 
@@ -4780,13 +4780,13 @@ error: ambiguous intersection type
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketAuctionSoft:509:21
     |
-509 |             if vault.getBalance() < saleItem.auctionReservePrice {
+509 |             if valut.balance < saleItem.auctionReservePrice {
     |                      ^^^^^^^^^^ unknown member
 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketAuctionSoft:510:114
     |
-510 |                 panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(vault.getBalance().toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
+510 |                 panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(valut.balance.toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
     |                                                                                                                   ^^^^^^^^^^ unknown member
 
 error: ambiguous intersection type
@@ -5045,7 +5045,7 @@ error: ambiguous intersection type
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketAuctionEscrow:731:30
     |
-731 |             return self.vault.getBalance()
+731 |             return self.valut.balance
     |                               ^^^^^^^^^^ unknown member
 
 error: value of type `{NonFungibleToken.NFT}` has no member `getID`
@@ -5075,7 +5075,7 @@ error: value of type `auth(not specified) &{FungibleToken.Vault}` has no member 
 error: value of type `&{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketAuctionEscrow:845:37
     |
-845 |             let oldBalance=bid.vault.getBalance()
+845 |             let oldBalance=bid.valut.balance
     |                                      ^^^^^^^^^^ unknown member
 
 error: cannot find type in this scope: `FungibleToken.Withdraw`
@@ -5099,7 +5099,7 @@ error: value of type `auth(not specified) &{FungibleToken.Vault}` has no member 
 error: value of type `&{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketAuctionEscrow:883:29
     |
-883 |             return bid.vault.getBalance()
+883 |             return bid.valut.balance
     |                              ^^^^^^^^^^ unknown member
 
 
@@ -5128,7 +5128,7 @@ error: cannot find declaration `FindPack` in `179b6b1cb6755e31.FindPack`
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> e03daebed8ca0615.GeneratedExperiences:227:15
     |
-227 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+227 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: too many arguments
@@ -5210,7 +5210,7 @@ error: resource `GeneratedExperiences.NFT` does not conform to resource interfac
 error: missing access modifier for function
    --> e03daebed8ca0615.GeneratedExperiences:227:8
     |
-227 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+227 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: resource `GeneratedExperiences.Collection` does not conform to resource interface `NonFungibleToken.Collection`
@@ -5220,7 +5220,7 @@ error: resource `GeneratedExperiences.Collection` does not conform to resource i
     |                          ^
    ... 
     |
-227 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+227 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 error: missing access modifier for function
@@ -5330,7 +5330,7 @@ error: cannot find declaration `FindForge` in `179b6b1cb6755e31.FindForge`
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.Dandy:228:15
     |
-228 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+228 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: ambiguous intersection type
@@ -5418,7 +5418,7 @@ error: resource `Dandy.NFT` does not conform to resource interface `NonFungibleT
 error: missing access modifier for function
    --> 179b6b1cb6755e31.Dandy:228:8
     |
-228 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+228 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: resource `Dandy.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -5428,7 +5428,7 @@ error: resource `Dandy.Collection` does not conform to resource interface `NonFu
     |                          ^
    ... 
     |
-228 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+228 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 error: missing access modifier for function
@@ -5481,7 +5481,7 @@ error: cannot find type in this scope: `NonFungibleToken.Withdraw`
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.Bl0xPack:448:19
     |
-448 |             access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+448 |             access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
@@ -5578,7 +5578,7 @@ error: resource `Bl0xPack.NFT` does not conform to resource interface `NonFungib
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.Bl0xPack:341:43
     |
-341 |                 if metadata.price != vault.getBalance() {
+341 |                 if metadata.price != valut.balance {
     |                                            ^^^^^^^^^^ unknown member
 
 error: too few arguments
@@ -5590,25 +5590,25 @@ error: too few arguments
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.Bl0xPack:374:97
     |
-374 |                     metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: vault.getBalance() * metadata.royaltyCut))
+374 |                     metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: valut.balance * metadata.royaltyCut))
     |                                                                                                  ^^^^^^^^^^ unknown member
 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.Bl0xPack:430:43
     |
-430 |                 if metadata.price != vault.getBalance() {
+430 |                 if metadata.price != valut.balance {
     |                                            ^^^^^^^^^^ unknown member
 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.Bl0xPack:435:97
     |
-435 |                     metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: vault.getBalance() * metadata.royaltyCut))
+435 |                     metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: valut.balance * metadata.royaltyCut))
     |                                                                                                  ^^^^^^^^^^ unknown member
 
 error: missing access modifier for function
    --> 179b6b1cb6755e31.Bl0xPack:448:12
     |
-448 |             access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+448 |             access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |             ^
 
 error: resource `Bl0xPack.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -5618,7 +5618,7 @@ error: resource `Bl0xPack.Collection` does not conform to resource interface `No
     |                              ^
    ... 
     |
-448 |             access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+448 |             access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                       -------- mismatch here
 
 
@@ -5727,7 +5727,7 @@ error: ambiguous intersection type
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindLeaseMarket:446:26
     |
-446 |         let soldFor=vault.getBalance()
+446 |         let soldFor=valut.balance
     |                           ^^^^^^^^^^ unknown member
 
 error: cannot infer type parameter: `T`
@@ -5897,7 +5897,7 @@ error: value of type `&{NonFungibleToken.Collection}` has no member `borrowViewR
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindLostAndFoundWrapper:247:17
     |
-247 |         if vault.getBalance() != nil {
+247 |         if valut.balance != nil {
     |                  ^^^^^^^^^^ unknown member
 
 error: cannot access `withdraw`: function requires `Withdraw` authorization, but reference only has `not specified` authorization
@@ -5968,7 +5968,7 @@ error: cannot find type in this scope: `NonFungibleToken.Withdraw`
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.FindPack:818:15
     |
-818 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+818 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: ambiguous intersection type
@@ -6068,7 +6068,7 @@ error: resource `FindPack.NFT` does not conform to resource interface `NonFungib
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindPack:680:40
     |
-680 |             if saleInfo!.price != vault.getBalance() {
+680 |             if saleInfo!.price != valut.balance {
     |                                         ^^^^^^^^^^ unknown member
 
 error: too few arguments
@@ -6080,13 +6080,13 @@ error: too few arguments
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindPack:780:40
     |
-780 |             if saleInfo!.price != vault.getBalance() {
+780 |             if saleInfo!.price != valut.balance {
     |                                         ^^^^^^^^^^ unknown member
 
 error: missing access modifier for function
    --> 179b6b1cb6755e31.FindPack:818:8
     |
-818 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+818 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: resource `FindPack.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -6096,7 +6096,7 @@ error: resource `FindPack.Collection` does not conform to resource interface `No
     |                          ^
    ... 
     |
-818 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+818 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 error: missing access modifier for function
@@ -6138,31 +6138,31 @@ error: cannot deploy invalid contract
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.FLOAT:249:15
     |
-249 |         access(NonFungibleToken.Withdraw) fun withdrawWithUUID(_ uuid: UInt64): @{NonFungibleToken.NFT} {
+249 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdrawWithUUID(_ uuid: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.FLOAT:262:15
     |
-262 |         access(NonFungibleToken.Withdraw) fun withdrawWithType(type: Type, withdrawID: UInt64): @{NonFungibleToken.NFT} {
+262 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdrawWithType(type: Type, withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.FLOAT:275:15
     |
-275 |         access(NonFungibleToken.Withdraw) fun withdrawWithTypeAndUUID(type: Type, uuid: UInt64): @{NonFungibleToken.NFT} {
+275 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdrawWithTypeAndUUID(type: Type, uuid: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.FLOAT:286:15
     |
-286 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+286 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> f8d6e0586b0a20c7.FLOAT:316:15
     |
-316 |         access(NonFungibleToken.Withdraw) fun transfer(id: UInt64, receiver: Capability<&{NonFungibleToken.Receiver}>): Bool {
+316 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun transfer(id: UInt64, receiver: Capability<&{NonFungibleToken.Receiver}>): Bool {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: resource `FLOAT.NFT` does not conform to resource interface `NonFungibleToken.NFT`
@@ -6174,31 +6174,31 @@ error: resource `FLOAT.NFT` does not conform to resource interface `NonFungibleT
 error: missing access modifier for function
    --> f8d6e0586b0a20c7.FLOAT:249:8
     |
-249 |         access(NonFungibleToken.Withdraw) fun withdrawWithUUID(_ uuid: UInt64): @{NonFungibleToken.NFT} {
+249 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdrawWithUUID(_ uuid: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: missing access modifier for function
    --> f8d6e0586b0a20c7.FLOAT:262:8
     |
-262 |         access(NonFungibleToken.Withdraw) fun withdrawWithType(type: Type, withdrawID: UInt64): @{NonFungibleToken.NFT} {
+262 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdrawWithType(type: Type, withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: missing access modifier for function
    --> f8d6e0586b0a20c7.FLOAT:275:8
     |
-275 |         access(NonFungibleToken.Withdraw) fun withdrawWithTypeAndUUID(type: Type, uuid: UInt64): @{NonFungibleToken.NFT} {
+275 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdrawWithTypeAndUUID(type: Type, uuid: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: missing access modifier for function
    --> f8d6e0586b0a20c7.FLOAT:286:8
     |
-286 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+286 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: missing access modifier for function
    --> f8d6e0586b0a20c7.FLOAT:316:8
     |
-316 |         access(NonFungibleToken.Withdraw) fun transfer(id: UInt64, receiver: Capability<&{NonFungibleToken.Receiver}>): Bool {
+316 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun transfer(id: UInt64, receiver: Capability<&{NonFungibleToken.Receiver}>): Bool {
     |         ^
 
 error: resource `FLOAT.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -6208,7 +6208,7 @@ error: resource `FLOAT.Collection` does not conform to resource interface `NonFu
     |                          ^
    ... 
     |
-286 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+286 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
@@ -6455,7 +6455,7 @@ error: ambiguous intersection type
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketDirectOfferEscrow:479:30
     |
-479 |             return self.vault.getBalance()
+479 |             return self.valut.balance
     |                               ^^^^^^^^^^ unknown member
 
 error: value of type `{NonFungibleToken.NFT}` has no member `getID`
@@ -6485,13 +6485,13 @@ error: value of type `auth(not specified) &{FungibleToken.Vault}` has no member 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketDirectOfferEscrow:561:21
     |
-561 |             if vault.getBalance() <= 0.0 {
+561 |             if valut.balance <= 0.0 {
     |                      ^^^^^^^^^^ unknown member
 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketDirectOfferEscrow:589:25
     |
-589 |                 if vault.getBalance() <= 0.65 {
+589 |                 if valut.balance <= 0.65 {
     |                          ^^^^^^^^^^ unknown member
 
 error: cannot find type in this scope: `FungibleToken.Withdraw`
@@ -6521,7 +6521,7 @@ error: ambiguous intersection type
 error: value of type `&{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketDirectOfferEscrow:647:29
     |
-647 |             return bid.vault.getBalance()
+647 |             return bid.valut.balance
     |                              ^^^^^^^^^^ unknown member
 
 
@@ -6600,13 +6600,13 @@ error: ambiguous intersection type
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketSale:195:43
     |
-195 |             if saleItem.salePrice != vault.getBalance() {
+195 |             if saleItem.salePrice != valut.balance {
     |                                            ^^^^^^^^^^ unknown member
 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindMarketSale:196:134
     |
-196 |                 panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(vault.getBalance().toString()))
+196 |                 panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(valut.balance.toString()))
     |                                                                                                                                       ^^^^^^^^^^ unknown member
 
 error: ambiguous intersection type
@@ -6692,7 +6692,7 @@ error: cannot deploy invalid contract
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.CharityNFT:171:15
     |
-171 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+171 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: contract `CharityNFT` does not conform to contract interface `ViewResolver`
@@ -6759,7 +6759,7 @@ error: resource `CharityNFT.NFT` does not conform to resource interface `NonFung
 error: missing access modifier for function
    --> 179b6b1cb6755e31.CharityNFT:171:8
     |
-171 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+171 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: resource `CharityNFT.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -6769,7 +6769,7 @@ error: resource `CharityNFT.Collection` does not conform to resource interface `
     |                          ^
    ... 
     |
-171 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+171 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 
@@ -6907,7 +6907,7 @@ error: cannot find declaration `FindAirdropper` in `179b6b1cb6755e31.FindAirdrop
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.NameVoucher:148:15
     |
-148 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+148 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: too many arguments
@@ -6961,7 +6961,7 @@ error: resource `NameVoucher.NFT` does not conform to resource interface `NonFun
 error: missing access modifier for function
    --> 179b6b1cb6755e31.NameVoucher:148:8
     |
-148 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+148 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: value of type `{NonFungibleToken.NFT}` has no member `getID`
@@ -7007,7 +7007,7 @@ error: resource `NameVoucher.Collection` does not conform to resource interface 
     |                          ^
    ... 
     |
-148 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+148 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 
@@ -7092,13 +7092,13 @@ error: cannot infer type parameter: `T`
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindLeaseMarketSale:163:43
     |
-163 |             if saleItem.salePrice != vault.getBalance() {
+163 |             if saleItem.salePrice != valut.balance {
     |                                            ^^^^^^^^^^ unknown member
 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindLeaseMarketSale:164:134
     |
-164 |                 panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(vault.getBalance().toString()))
+164 |                 panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(valut.balance.toString()))
     |                                                                                                                                       ^^^^^^^^^^ unknown member
 
 
@@ -7486,7 +7486,7 @@ error: cannot infer type parameter: `T`
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FIND:232:179
     |
-232 |             emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.getAddress(), message:message, tag:tag, amount:vault.getBalance(), ftType:vault.getType().identifier)
+232 |             emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: to, toAddress: profile.getAddress(), message:message, tag:tag, amount:valut.balance, ftType:vault.getType().identifier)
     |                                                                                                                                                                                    ^^^^^^^^^^ unknown member
 
 error: cannot infer type parameter: `T`
@@ -7498,7 +7498,7 @@ error: cannot infer type parameter: `T`
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FIND:244:166
     |
-244 |             emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: "", toAddress: address, message:message, tag:tag, amount:vault.getBalance(), ftType:vault.getType().identifier)
+244 |             emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: "", toAddress: address, message:message, tag:tag, amount:valut.balance, ftType:vault.getType().identifier)
     |                                                                                                                                                                       ^^^^^^^^^^ unknown member
 
 error: ambiguous intersection type
@@ -7864,7 +7864,7 @@ error: value of type `auth(not specified) &{FungibleToken.Vault}` has no member 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
     --> 179b6b1cb6755e31.FIND:1947:32
      |
-1947 |             let balance = vault.getBalance()
+1947 |             let balance = valut.balance
      |                                 ^^^^^^^^^^ unknown member
 
 
@@ -7973,13 +7973,13 @@ error: cannot infer type parameter: `T`
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindLeaseMarketAuctionSoft:438:21
     |
-438 |             if vault.getBalance() < saleItem.auctionReservePrice {
+438 |             if valut.balance < saleItem.auctionReservePrice {
     |                      ^^^^^^^^^^ unknown member
 
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
    --> 179b6b1cb6755e31.FindLeaseMarketAuctionSoft:439:114
     |
-439 |                 panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(vault.getBalance().toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
+439 |                 panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(valut.balance.toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
     |                                                                                                                   ^^^^^^^^^^ unknown member
 
 error: ambiguous intersection type
@@ -8140,7 +8140,7 @@ error: cannot find declaration `FindForge` in `179b6b1cb6755e31.FindForge`
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.NFGv3:185:15
     |
-185 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+185 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: contract `NFGv3` does not conform to contract interface `ViewResolver`
@@ -8208,7 +8208,7 @@ error: resource `NFGv3.NFT` does not conform to resource interface `NonFungibleT
 error: missing access modifier for function
    --> 179b6b1cb6755e31.NFGv3:185:8
     |
-185 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+185 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: resource `NFGv3.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -8218,7 +8218,7 @@ error: resource `NFGv3.Collection` does not conform to resource interface `NonFu
     |                          ^
    ... 
     |
-185 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+185 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 error: missing access modifier for function
@@ -8398,7 +8398,7 @@ error: cannot find declaration `TokenForwarding` in `f8d6e0586b0a20c7.TokenForwa
 error: value of type `{FungibleToken.Vault}` has no member `getBalance`
     --> 179b6b1cb6755e31.FindMarket:1334:22
      |
-1334 |     let soldFor=vault.getBalance()
+1334 |     let soldFor=valut.balance
      |                       ^^^^^^^^^^ unknown member
 
 error: cannot infer type parameter: `T`
@@ -8463,7 +8463,7 @@ error: cannot find declaration `FindPack` in `179b6b1cb6755e31.FindPack`
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.Flomies:217:9
     |
-217 | 		access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+217 | 		access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     | 		       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: ambiguous intersection type
@@ -8547,7 +8547,7 @@ error: resource `Flomies.NFT` does not conform to resource interface `NonFungibl
 error: missing access modifier for function
    --> 179b6b1cb6755e31.Flomies:217:2
     |
-217 | 		access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+217 | 		access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     | 		^
 
 error: resource `Flomies.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -8557,7 +8557,7 @@ error: resource `Flomies.Collection` does not conform to resource interface `Non
     | 	                     ^
    ... 
     |
-217 | 		access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+217 | 		access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     | 		                                          -------- mismatch here
 
 error: missing access modifier for function
@@ -8598,7 +8598,7 @@ error: cannot find declaration `FindPack` in `179b6b1cb6755e31.FindPack`
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.PartyFavorz:241:9
     |
-241 | 		access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+241 | 		access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     | 		       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: contract `PartyFavorz` does not conform to contract interface `ViewResolver`
@@ -8678,7 +8678,7 @@ error: resource `PartyFavorz.NFT` does not conform to resource interface `NonFun
 error: missing access modifier for function
    --> 179b6b1cb6755e31.PartyFavorz:241:2
     |
-241 | 		access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+241 | 		access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     | 		^
 
 error: resource `PartyFavorz.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -8688,7 +8688,7 @@ error: resource `PartyFavorz.Collection` does not conform to resource interface 
     | 	                     ^
    ... 
     |
-241 | 		access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+241 | 		access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     | 		                                          -------- mismatch here
 
 error: missing access modifier for function
@@ -8906,7 +8906,7 @@ error: cannot find declaration `DapperUtilityCoin` in `01cf0e2f2f715450.DapperUt
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.ExampleNFT:215:15
     |
-215 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+215 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: ambiguous intersection type
@@ -8994,7 +8994,7 @@ error: resource `ExampleNFT.NFT` does not conform to resource interface `NonFung
 error: missing access modifier for function
    --> 179b6b1cb6755e31.ExampleNFT:215:8
     |
-215 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+215 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: resource `ExampleNFT.Collection` does not conform to resource interface `NonFungibleToken.Collection`
@@ -9004,7 +9004,7 @@ error: resource `ExampleNFT.Collection` does not conform to resource interface `
     |                          ^
    ... 
     |
-215 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+215 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 error: missing access modifier for function
@@ -9031,7 +9031,7 @@ error: cannot deploy invalid contract
 error: cannot find type in this scope: `NonFungibleToken.Withdraw`
    --> 179b6b1cb6755e31.Bl0x:293:15
     |
-293 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+293 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
 
 error: contract `Bl0x` does not conform to contract interface `ViewResolver`
@@ -9097,7 +9097,7 @@ error: resource `Bl0x.NFT` does not conform to resource interface `NonFungibleTo
 error: missing access modifier for function
    --> 179b6b1cb6755e31.Bl0x:293:8
     |
-293 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+293 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |         ^
 
 error: resource `Bl0x.Collection` does not conform to resource interface `NonFungibleToken.Provider`
@@ -9107,7 +9107,7 @@ error: resource `Bl0x.Collection` does not conform to resource interface `NonFun
     |                          ^
    ... 
     |
-293 |         access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+293 |         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
     |                                                   -------- mismatch here
 
 

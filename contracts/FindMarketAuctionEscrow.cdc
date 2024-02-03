@@ -728,7 +728,7 @@ access(all) contract FindMarketAuctionEscrow {
         }
 
         access(all) fun getBalance() : UFix64 {
-            return self.vault.getBalance()
+            return self.vault.balance
         }
 
         access(all) fun getSellerAddress() : Address {
@@ -770,7 +770,7 @@ access(all) contract FindMarketAuctionEscrow {
 
         //called from lease when auction is ended
         access(contract) fun accept(_ nft: @{NonFungibleToken.NFT}, path:PublicPath) : @{FungibleToken.Vault} {
-            let id= nft.getID()
+            let id= nft.id
             let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
             let vaultRef = &bid.vault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
             let nftCap = bid.nftCap
@@ -784,7 +784,7 @@ access(all) contract FindMarketAuctionEscrow {
             } else {
                 bid.nftCap.borrow()!.deposit(token: <- nft)
             }
-            let vault  <- vaultRef.withdraw(amount: vaultRef.getBalance())
+            let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
             destroy bid
             return <- vault
         }
@@ -842,7 +842,7 @@ access(all) contract FindMarketAuctionEscrow {
             }
             let bid =self.borrowBid(id)
 
-            let oldBalance=bid.vault.getBalance()
+            let oldBalance=bid.vault.balance
 
             bid.setBidAt(Clock.time())
             bid.vault.deposit(from: <- vault)
@@ -860,7 +860,7 @@ access(all) contract FindMarketAuctionEscrow {
             if !self.receiver.check() {
                 panic("Seller unlinked the SaleItem collection capability. seller address : ".concat(self.receiver.address.toString()))
             }
-            self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.getBalance()))
+            self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.balance))
             destroy bid
         }
 
@@ -880,7 +880,7 @@ access(all) contract FindMarketAuctionEscrow {
 
         access(all) fun getBalance(_ id: UInt64) : UFix64 {
             let bid= self.borrowBid(id)
-            return bid.vault.getBalance()
+            return bid.vault.balance
         }
     }
 

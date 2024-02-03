@@ -338,7 +338,7 @@ access(all) contract Bl0xPack: ViewResolver {
                 }
 
 
-                if metadata.price != vault.getBalance() {
+                if metadata.price != vault.balance {
                     panic("Vault does not contain required amount of FT ".concat(metadata.price.toString()))
                 }
 
@@ -371,7 +371,7 @@ access(all) contract Bl0xPack: ViewResolver {
                 }
 
                 if metadata.royaltyCut != 0.0 && metadata.royaltyCap != nil && metadata.royaltyCap!.check() {
-                    metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: vault.getBalance() * metadata.royaltyCut))
+                    metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * metadata.royaltyCut))
                 } 
 
                 metadata.wallet.borrow()!.deposit(from: <- vault)
@@ -427,12 +427,12 @@ access(all) contract Bl0xPack: ViewResolver {
                     panic("The vault sent in is not of the desired type ".concat(metadata.walletType.identifier))
                 }
 
-                if metadata.price != vault.getBalance() {
+                if metadata.price != vault.balance {
                     panic("Vault does not contain required amount of FT ".concat(metadata.price.toString()))
                 }
 
                 if metadata.royaltyCut != 0.0 && metadata.royaltyCap != nil && metadata.royaltyCap!.check() {
-                    metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: vault.getBalance() * metadata.royaltyCut))
+                    metadata.royaltyCap!.borrow()!.deposit(from: <- vault.withdraw(amount: vault.balance * metadata.royaltyCut))
                 } 
 
                 metadata.wallet.borrow()!.deposit(from: <- vault)
@@ -445,7 +445,7 @@ access(all) contract Bl0xPack: ViewResolver {
             // withdraw
             // Removes an NFT from the collection and moves it to the caller
             //
-            access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+            access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
                 let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("Could not withdraw nft")
 
                 let nft <- token as! @NFT

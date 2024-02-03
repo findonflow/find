@@ -114,7 +114,7 @@ access(all) contract FindLostAndFoundWrapper {
 
         let vaultRef = FindLostAndFoundWrapper.depositVault(<- vault)
 
-        let flowStorageFee = vaultRef.getBalance()
+        let flowStorageFee = vaultRef.balance
         let ticketID = LostAndFound.deposit(
             redeemer: receiverAddress,
             item: <- estimate.withdraw(),
@@ -244,7 +244,7 @@ access(all) contract FindLostAndFoundWrapper {
 
     access(contract) fun destroyVault(_ uuid: UInt64, cap: Capability<&{FungibleToken.Receiver}>) {
         let vault <- self.storagePaymentVaults.remove(key: uuid) ?? panic("Invalid vault UUID. UUID: ".concat(uuid.toString()))
-        if vault.getBalance() != nil {
+        if vault.balance != nil {
             let ref = cap.borrow() ?? panic("The flow repayment capability is not valid")
             ref.deposit(from: <- vault)
             return

@@ -25,7 +25,7 @@ transaction(leaseName: String, amount:UFix64) {
 		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
 
 		self.mainDapperCoinVault = dapper.storage.borrow<&{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("Cannot borrow Dapper Coin vault from account storage. Type : ".concat(ft.type.identifier))
-		self.balanceBeforeTransfer = self.mainDapperCoinVault.getBalance()
+		self.balanceBeforeTransfer = self.mainDapperCoinvault.balance
 
 		self.walletReference = dapper.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 		self.requiredAmount = self.bidsReference.getBalance(leaseName)
@@ -43,7 +43,7 @@ transaction(leaseName: String, amount:UFix64) {
 
 	// Check that all dapper Coin was routed back to Dapper
 	post {
-		self.mainDapperCoinVault.getBalance() == self.balanceBeforeTransfer: "Dapper Coin leakage"
+		self.mainDapperCoinvault.balance == self.balanceBeforeTransfer: "Dapper Coin leakage"
 	}
 }
 

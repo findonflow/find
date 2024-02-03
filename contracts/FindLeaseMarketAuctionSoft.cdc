@@ -435,8 +435,8 @@ access(all) contract FindLeaseMarketAuctionSoft {
                 panic("The FT vault sent in to fulfill does not match the required type. Required Type : ".concat(saleItem.vaultType.identifier).concat(" . Sent-in vault type : ".concat(vault.getType().identifier)))
             }
 
-            if vault.getBalance() < saleItem.auctionReservePrice {
-                panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(vault.getBalance().toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
+            if vault.balance < saleItem.auctionReservePrice {
+                panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(vault.balance.toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
             }
 
             let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"buy item for soft-auction"), seller: self.owner!.address,buyer: saleItem.offerCallback!.address)

@@ -476,7 +476,7 @@ access(all) contract FindMarketDirectOfferEscrow {
         }
 
         access(all) fun getBalance() : UFix64 {
-            return self.vault.getBalance()
+            return self.vault.balance
         }
 
         access(all) fun getSellerAddress() : Address {
@@ -518,7 +518,7 @@ access(all) contract FindMarketDirectOfferEscrow {
         }
 
         access(contract) fun accept(_ nft: @{NonFungibleToken.NFT}, path:PublicPath) : @{FungibleToken.Vault} {
-            let id= nft.getID()
+            let id= nft.id
             let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
             let vaultRef = &bid.vault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
 
@@ -534,7 +534,7 @@ access(all) contract FindMarketDirectOfferEscrow {
                 bid.nftCap.borrow()!.deposit(token: <- nft)
             }
 
-            let vault  <- vaultRef.withdraw(amount: vaultRef.getBalance())
+            let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
             destroy bid
             return <- vault
         }
@@ -558,7 +558,7 @@ access(all) contract FindMarketDirectOfferEscrow {
         access(all) fun bid(item: FindViews.ViewReadPointer, vault: @{FungibleToken.Vault}, nftCap: Capability<&{NonFungibleToken.Receiver}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}, bidExtraField: {String : AnyStruct}) {
 
             // ensure it is not a 0 dollar listing
-            if vault.getBalance() <= 0.0 {
+            if vault.balance <= 0.0 {
                 panic("Offer price should be greater than 0")
             }
 
@@ -586,7 +586,7 @@ access(all) contract FindMarketDirectOfferEscrow {
             // Check if it is onefootball. If so, listing has to be at least $0.65 (DUC)
             if tenant.name == "onefootball" {
                 // ensure it is not a 0 dollar listing
-                if vault.getBalance() <= 0.65 {
+                if vault.balance <= 0.65 {
                     panic("Offer price should be greater than 0.65")
                 }
             }
@@ -624,7 +624,7 @@ access(all) contract FindMarketDirectOfferEscrow {
             Debug.log("cancel bid")
             let bid <- self.bids.remove(key: id) ?? panic("missing bid")
             let vaultRef = &bid.vault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
-            self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.getBalance()))
+            self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.balance))
             destroy bid
         }
 
@@ -644,7 +644,7 @@ access(all) contract FindMarketDirectOfferEscrow {
 
         access(all) fun getBalance(_ id: UInt64) : UFix64 {
             let bid= self.borrowBid(id)
-            return bid.vault.getBalance()
+            return bid.vault.balance
         }
     }
     //Create an empty lease collection that store your leases to a name

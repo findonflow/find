@@ -192,8 +192,8 @@ access(all) contract FindMarketSale {
 
             let saleItem=self.borrow(id)
 
-            if saleItem.salePrice != vault.getBalance() {
-                panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(vault.getBalance().toString()))
+            if saleItem.salePrice != vault.balance {
+                panic("Incorrect balance sent in vault. Expected ".concat(saleItem.salePrice.toString()).concat(" got ").concat(vault.balance.toString()))
             }
 
             if saleItem.validUntil != nil && saleItem.validUntil! < Clock.time() {

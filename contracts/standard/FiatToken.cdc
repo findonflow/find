@@ -120,6 +120,22 @@ access(all) contract FiatToken {
             return <-create Vault(balance: 0.0)
         }
 
+    
+        access(contract) fun burnCallback() {
+            // Placeholder for a burn callback
+        }
+    
+        access(all) view fun isAvailableToWithdraw(amount: UFix64): Bool {
+           return true
+        }
+    
+        access(all) view fun getViews(): [Type] {
+            panic("TODO")
+        }
+
+        access(all) fun resolveView(_ view: Type): AnyStruct? {
+            panic("TODO")
+        }
     }
 
     // createEmptyVault

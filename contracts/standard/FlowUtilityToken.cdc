@@ -213,6 +213,14 @@ access(all) contract FlowUtilityToken: ViewResolver  {
         access(all) fun createEmptyVault(): @FlowUtilityToken.Vault {
             return <-create Vault(balance: 0.0)
         }
+
+        access(contract) fun burnCallback() {
+            // Placeholder for a burn callback
+        }
+    
+        access(all) view fun isAvailableToWithdraw(amount: UFix64): Bool {
+           return true
+        }
     }
 
 

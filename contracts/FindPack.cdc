@@ -677,7 +677,7 @@ access(all) contract FindPack {
                 panic("The vault sent in is not of the desired type ".concat(metadata.walletType.identifier))
             }
 
-            if saleInfo!.price != vault.getBalance() {
+            if saleInfo!.price != vault.balance {
                 panic("Vault does not contain required amount of FT ".concat(saleInfo!.price.toString()))
             }
             let keyList = Crypto.KeyList()
@@ -777,7 +777,7 @@ access(all) contract FindPack {
                 panic("The vault sent in is not of the desired type ".concat(metadata.walletType.identifier))
             }
 
-            if saleInfo!.price != vault.getBalance() {
+            if saleInfo!.price != vault.balance {
                 panic("Vault does not contain required amount of FT ".concat(saleInfo!.price.toString()))
             }
 
@@ -815,7 +815,7 @@ access(all) contract FindPack {
         // withdraw
         // Removes an NFT from the collection and moves it to the caller
         //
-        access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+        access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("Could not withdraw nft")
 
             let nft <- token as! @NFT

@@ -127,7 +127,7 @@ access(all) contract LostAndFound {
             if self.type.isSubtype(of: Type<@{FungibleToken.Vault}>()) {
                 let ref = (&self.item as &AnyResource?)!
                 let ft = ref as! &{FungibleToken.Vault}
-                return ft.getBalance()
+                return ft.balance
             }
             return nil
         }
@@ -556,7 +556,7 @@ access(all) contract LostAndFound {
         init(_ flowTokenRepayment: Capability<&{FungibleToken.Receiver}>, lowBalanceThreshold: UFix64?) {
             self.flowTokenRepayment = flowTokenRepayment
 
-            let vault <- FlowToken.createEmptyVault()
+            let vault <- FlowToken.createEmptyVault(Type: Type<FlowToken.Vault>())
             self.flowTokenVault <- vault
             self.lowBalanceThreshold = lowBalanceThreshold 
         }

@@ -443,7 +443,7 @@ access(all) contract FindLeaseMarket {
     access(account) fun pay(tenant: String, leaseName: String, saleItem: &{SaleItem}, vault: @{FungibleToken.Vault}, leaseInfo: LeaseInfo, cuts:{String : FindMarketCutStruct.Cuts}) {
         let buyer=saleItem.getBuyer()
         let seller=saleItem.getSeller()
-        let soldFor=vault.getBalance()
+        let soldFor=vault.balance
         let ftType=vault.getType()
         let ftInfo = FTRegistry.getFTInfoByTypeIdentifier(ftType.identifier)! // If this panic, there is sth wrong in FT set up
         let oldProfileCap= getAccount(seller).capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!

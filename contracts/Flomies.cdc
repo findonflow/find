@@ -214,7 +214,7 @@ access(all) contract Flomies: ViewResolver{
 		}
 
 		// withdraw removes an NFT from the collection and moves it to the caller
-		access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+		access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
 			emit Withdraw(id: token.id, from: self.owner?.address)

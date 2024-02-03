@@ -106,12 +106,9 @@ access(all) contract NFGv3: ViewResolver {
                 )
             case Type<MetadataViews.Royalties>():
                 return self.royalties
-
             case Type<MetadataViews.ExternalURL>():
                 return MetadataViews.ExternalURL(self.info.externalURL)
-
             case Type<MetadataViews.Medias>() :
-
                 let mediaList : [MetadataViews.Media]=[]
                 for hash in self.info.medias.keys {
                     let mediaType=self.info.medias[hash]!
@@ -123,19 +120,43 @@ access(all) contract NFGv3: ViewResolver {
                     mediaList.append(m)
                 }
                 return MetadataViews.Medias(mediaList)
-
             case Type<MetadataViews.NFTCollectionData>():
-                return MetadataViews.NFTCollectionData(
+                return NFGv3.resolveContractView(resourceType: Type<@NFGv3.NFT>(), viewType: Type<MetadataViews.NFTCollectionData>())
+            case Type<MetadataViews.NFTCollectionDisplay>():
+                return NFGv3.resolveContractView(resourceType: Type<@NFGv3.NFT>(), viewType: Type<MetadataViews.NFTCollectionDisplay>())
+            }
+            return nil
+        }
+
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <-NFGv3.createEmptyCollection()
+        }
+    }
+
+    access(all) view fun getContractViews(resourceType: Type?): [Type] {
+        return [
+            Type<MetadataViews.NFTCollectionData>(),
+            Type<MetadataViews.NFTCollectionDisplay>()
+        ]
+    }
+
+    access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
+        switch viewType {
+            case Type<MetadataViews.NFTCollectionData>():
+                let collectionRef = self.account.storage.borrow<&NFGv3.Collection>(
+                        from: NFGv3.CollectionStoragePath
+                    ) ?? panic("Could not borrow a reference to the stored collection")
+                let collectionData = MetadataViews.NFTCollectionData(
                     storagePath: NFGv3.CollectionStoragePath,
                     publicPath: NFGv3.CollectionPublicPath,
-                    providerPath: /private/NFGv3Collection,
                     publicCollection: Type<&NFGv3.Collection>(),
                     publicLinkedType: Type<&NFGv3.Collection>(),
-                    providerLinkedType: Type<auth(NonFungibleToken.Withdraw) &NFGv3.Collection>(),
-                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {return <- NFGv3.createEmptyCollection()})
+                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                        return <-NFGv3.createEmptyCollection()
+                    })
                 )
+                return collectionData
             case Type<MetadataViews.NFTCollectionDisplay>():
-
                 let square = MetadataViews.Media(
                     file: MetadataViews.IPFSFile(
                         cid: "QmeG1rPaLWmn4uUSjQ2Wbs7QnjxdQDyeadCGWyGwvHTB7c",
@@ -143,7 +164,6 @@ access(all) contract NFGv3: ViewResolver {
                     ),
                     mediaType: "image/png"
                 )
-
                 let banner = MetadataViews.Media(
                     file: MetadataViews.IPFSFile(
                         cid: "QmWmDRnSrv8HK5QsiHwUNR4akK95WC8veydq6dnnFbMja1",
@@ -151,7 +171,6 @@ access(all) contract NFGv3: ViewResolver {
                     ),
                     mediaType: "image/png"
                 )
-
                 return MetadataViews.NFTCollectionDisplay(
                     name: "NonFunGerbils",
                     description: "The NonFunGerbils are a collaboration between the NonFunGerbils Podcast, their audience and sometimes fabolous artists. Harnessing the power of MEMEs with creative writing and collaboration they create the most dankest, cutest gerbils in the NFT space.",
@@ -162,9 +181,8 @@ access(all) contract NFGv3: ViewResolver {
                         "twitter": MetadataViews.ExternalURL("https://twitter.com/NonFunGerbils")
                     }
                 )
-            }
-            return nil
         }
+        return nil
     }
 
     access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
@@ -182,7 +200,7 @@ access(all) contract NFGv3: ViewResolver {
         }
 
         // withdraw removes an NFT from the collection and moves it to the caller
-        access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+        access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
             emit Withdraw(id: token.id, from: self.owner?.address)

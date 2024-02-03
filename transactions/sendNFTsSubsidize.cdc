@@ -145,7 +145,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
                 continue
             }
 
-            let balance = vaultRef.getBalance()
+            let balance = vaultRef.balance
             var totalPaid = 0.0
 
 

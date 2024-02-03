@@ -506,8 +506,8 @@ access(all) contract FindMarketAuctionSoft {
                 panic("The FT vault sent in to fulfill does not match the required type. Required Type : ".concat(saleItem.vaultType.identifier).concat(" . Sent-in vault type : ".concat(vault.getType().identifier)))
             }
 
-            if vault.getBalance() < saleItem.auctionReservePrice {
-                panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(vault.getBalance().toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
+            if vault.balance < saleItem.auctionReservePrice {
+                panic("cannot fulfill auction reserve price was not met, cancel it without a vault ".concat(vault.balance.toString()).concat(" < ").concat(saleItem.auctionReservePrice.toString()))
             }
 
             let ftType=saleItem.getFtType()

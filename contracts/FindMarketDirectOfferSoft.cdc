@@ -602,7 +602,7 @@ access(all) contract FindMarketDirectOfferSoft {
 
         //called from lease when auction is ended
         access(contract) fun acceptNonEscrowed(_ nft: @{NonFungibleToken.NFT}) {
-            let id= nft.getID()
+            let id= nft.id
             let bid <- self.bids.remove(key: nft.uuid) ?? panic("missing bid")
             if !bid.nftCap.check() {
                 panic("Bidder unlinked the nft receiver capability. bidder address : ".concat(bid.nftCap.address.toString()))

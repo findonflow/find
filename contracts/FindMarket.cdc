@@ -1331,7 +1331,7 @@ access(account) fun pay(tenant: String, id: UInt64, saleItem: &{SaleItem}, vault
 
     let buyer=saleItem.getBuyer()
     let seller=saleItem.getSeller()
-    let soldFor=vault.getBalance()
+    let soldFor=vault.balance
     let ftType=vault.getType()
 
     /* Residual Royalty */
