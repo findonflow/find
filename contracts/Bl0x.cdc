@@ -184,15 +184,8 @@ access(all) contract Bl0x: ViewResolver {
                 return MetadataViews.NFTCollectionDisplay(name: "bl0x", description: "Minting a Bl0x triggers the catalyst moment of a big bang scenario. Generating a treasure that is designed to relate specifically to its holder.", externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: { "discord": MetadataViews.ExternalURL("https://t.co/iY7AhEumR9"), "twitter" : MetadataViews.ExternalURL("https://twitter.com/Bl0xNFT")})
 
             case Type<MetadataViews.NFTCollectionData>():
-                return MetadataViews.NFTCollectionData(storagePath: Bl0x.CollectionStoragePath,
-                publicPath: Bl0x.CollectionPublicPath,
-                providerPath: /private/bl0xNFTCollection,
-                publicCollection: Type<&Collection>(),
-                publicLinkedType: Type<&Collection>(),
-                providerLinkedType: Type<auth(NonFungibleToken.Withdraw) &Collection>(),
-                createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {return <- Bl0x.createEmptyCollection()}))
-
-                case Type<MetadataViews.Rarity>(): 
+                return Bl0x.resolveContractView(resourceType: Type<@Bl0x.Collection>(), viewType: Type<MetadataViews.NFTCollectionData>()) as! MetadataViews.NFTCollectionData
+            case Type<MetadataViews.Rarity>(): 
                 return MetadataViews.Rarity(score:nil, max:nil, description: self.getRarity()) 
 
             case Type<MetadataViews.Traits>():
@@ -273,6 +266,37 @@ access(all) contract Bl0x: ViewResolver {
             }
             return traitMetadata
         }
+
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <-Bl0x.createEmptyCollection()
+        }
+    }
+
+    access(all) view fun getContractViews(resourceType: Type?): [Type] {
+        return [
+            Type<MetadataViews.NFTCollectionData>(),
+            Type<MetadataViews.NFTCollectionDisplay>()
+        ]
+    }
+
+    access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
+        switch viewType {
+            case Type<MetadataViews.NFTCollectionData>():
+                let collectionRef = self.account.storage.borrow<&Bl0x.Collection>(
+                        from: Bl0x.CollectionStoragePath
+                    ) ?? panic("Could not borrow a reference to the stored collection")
+                let collectionData = MetadataViews.NFTCollectionData(
+                    storagePath: Bl0x.CollectionStoragePath,
+                    publicPath: Bl0x.CollectionPublicPath,
+                    publicCollection: Type<&Bl0x.Collection>(),
+                    publicLinkedType: Type<&Bl0x.Collection>(),
+                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                        return <-Bl0x.createEmptyCollection()
+                    })
+                )
+                return collectionData
+        }
+        return nil
     }
 
     access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {

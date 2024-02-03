@@ -64,12 +64,12 @@ access(all) contract FlowStorageFees {
         let balanceRef = getAccount(accountAddress).capabilities.borrow<&{FungibleToken.Vault}>(/public/flowTokenBalance) ?? panic("Could not borrow FLOW balance capability")
 
         // get address token balance
-        if balanceRef.getBalance() < self.minimumStorageReservation {
+        if balanceRef.balance < self.minimumStorageReservation {
             // if < then minimum return 0
             return 0.0
         } else {
             // return balance multiplied with megabytes per flow 
-            return balanceRef.getBalance() * self.storageMegaBytesPerReservedFLOW
+            return balanceRef.balance * self.storageMegaBytesPerReservedFLOW
         }
     }
 
@@ -90,9 +90,9 @@ access(all) contract FlowStorageFees {
     // converts storage used from UInt64 Bytes to UFix64 Megabytes.
     access(all) fun convertUInt64StorageBytesToUFix64Megabytes(_ storage: UInt64): UFix64 {
         // safe convert UInt64 to UFix64 (without overflow)
-        let f = UFix64(storage % 100000000 as UInt64) * 0.00000001 as UFix64 + UFix64(storage / 100000000 as UInt64)
+        let f = UFix64(storage % 100000000) * 0.00000001 + UFix64(storage / 100000000)
         // decimal point correction. Megabytes to bytes have a conversion of 10^-6 while UFix64 minimum value is 10^-8
-        let storageMb = f * 100.0 as UFix64
+        let storageMb = f * 100.0 
         return storageMb
     }
 
@@ -103,7 +103,7 @@ access(all) contract FlowStorageFees {
         let acct = getAccount(accountAddress)
         let balanceRef = acct
         .capabilities.borrow<&{FungibleToken.Vault}>(/public/flowTokenBalance)!
-        let balance = balanceRef.getBalance()
+        let balance = balanceRef.balance
 
         // get how much should be reserved for storage
         var reserved = self.storageCapacityToFlow(self.convertUInt64StorageBytesToUFix64Megabytes(acct.storage.used))

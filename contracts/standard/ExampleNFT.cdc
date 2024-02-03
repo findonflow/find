@@ -166,8 +166,38 @@ access(all) contract ExampleNFT: ViewResolver {
             }
             return nil
         }
+
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <-ExampleNFT.createEmptyCollection()
+        }
     }
 
+    access(all) view fun getContractViews(resourceType: Type?): [Type] {
+        return [
+            Type<MetadataViews.NFTCollectionData>(),
+            Type<MetadataViews.NFTCollectionDisplay>()
+        ]
+    }
+
+    access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
+        switch viewType {
+            case Type<MetadataViews.NFTCollectionData>():
+                let collectionRef = self.account.storage.borrow<&ExampleNFT.Collection>(
+                        from: ExampleNFT.CollectionStoragePath
+                    ) ?? panic("Could not borrow a reference to the stored collection")
+                let collectionData = MetadataViews.NFTCollectionData(
+                    storagePath: ExampleNFT.CollectionStoragePath,
+                    publicPath: ExampleNFT.CollectionPublicPath,
+                    publicCollection: Type<&ExampleNFT.Collection>(),
+                    publicLinkedType: Type<&ExampleNFT.Collection>(),
+                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                        return <-ExampleNFT.createEmptyCollection()
+                    })
+                )
+                return collectionData
+        }
+        return nil
+    }
 
     access(all) resource Collection: NonFungibleToken.Collection {
         /// dictionary of NFT conforming tokens
@@ -325,12 +355,12 @@ access(all) contract ExampleNFT: ViewResolver {
                         from: /storage/cadenceExampleNFTCollection
                     ) ?? panic("Could not borrow a reference to the stored collection")
                let collectionData = MetadataViews.NFTCollectionData(
-                    storagePath: collectionRef.storagePath,
-                    publicPath: collectionRef.publicPath,
+                    storagePath: ExampleNFT.CollectionStoragePath,
+                    publicPath: ExampleNFT.CollectionPublicPath,
                     publicCollection: Type<&ExampleNFT.Collection>(),
                     publicLinkedType: Type<&ExampleNFT.Collection>(),
                     createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
-                        return <-ExampleNFT.createEmptyCollection(nftType: Type<@ExampleNFT.NFT>())
+                        return <-ExampleNFT.createEmptyCollection()
                     })
             )
             return collectionData

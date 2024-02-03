@@ -157,7 +157,7 @@ access(all) contract GeneratedExperiences: ViewResolver {
                 return MetadataViews.ExternalURL("https://find.xyz/")
 
             case Type<MetadataViews.NFTCollectionData>():
-                return GeneratedExperiences.getCollectionData()
+                return GeneratedExperiences.resolveContractView(resourceType: nil, viewType: Type<MetadataViews.NFTCollectionData>())
 
             case Type<MetadataViews.NFTCollectionDisplay>():
                 return GeneratedExperiences.getCollectionDisplay(self.info.season)
@@ -185,6 +185,37 @@ access(all) contract GeneratedExperiences: ViewResolver {
             }
             return nil
         }
+
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <-GeneratedExperiences.createEmptyCollection()
+        }
+    }
+
+    access(all) view fun getContractViews(resourceType: Type?): [Type] {
+        return [
+            Type<MetadataViews.NFTCollectionData>(),
+            Type<MetadataViews.NFTCollectionDisplay>()
+        ]
+    }
+
+    access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
+        switch viewType {
+            case Type<MetadataViews.NFTCollectionData>():
+                let collectionRef = self.account.storage.borrow<&GeneratedExperiences.Collection>(
+                        from: GeneratedExperiences.CollectionStoragePath
+                    ) ?? panic("Could not borrow a reference to the stored collection")
+                let collectionData = MetadataViews.NFTCollectionData(
+                    storagePath: GeneratedExperiences.CollectionStoragePath,
+                    publicPath: GeneratedExperiences.CollectionPublicPath,
+                    publicCollection: Type<&GeneratedExperiences.Collection>(),
+                    publicLinkedType: Type<&GeneratedExperiences.Collection>(),
+                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                        return <-GeneratedExperiences.createEmptyCollection()
+                    })
+                )
+                return collectionData
+        }
+        return nil
     }
 
     access(all) resource Collection: NonFungibleToken.Collection {
@@ -281,37 +312,6 @@ access(all) contract GeneratedExperiences: ViewResolver {
         return  [ Type<MetadataViews.NFTCollectionData>(), Type<MetadataViews.NFTCollectionDisplay>() ]
     }
 
-    /// Function that resolves a metadata view for this contract.
-    ///
-    /// @param view: The Type of the desired view.
-    /// @return A structure representing the requested view.
-    ///
-    access(all) fun resolveView(_ view: Type): AnyStruct? {
-        switch view {
-        case Type<MetadataViews.NFTCollectionData>():
-            return GeneratedExperiences.getCollectionData()
-        case Type<MetadataViews.NFTCollectionDisplay>():
-            return GeneratedExperiences.getCollectionDisplay(0)
-        }
-        return nil
-    }
-
-    /// resolve a type to its CollectionData so you know where to store it
-    /// Returns `nil` if no collection type exists for the specified NFT type
-    access(all) view fun getCollectionData(): MetadataViews.NFTCollectionData? {
-
-        return MetadataViews.NFTCollectionData(
-            storagePath: GeneratedExperiences.CollectionStoragePath,
-            publicPath: GeneratedExperiences.CollectionPublicPath,
-            providerPath: GeneratedExperiences.CollectionPrivatePath,
-            publicCollection: Type<&GeneratedExperiences.Collection>(),
-            publicLinkedType: Type<&GeneratedExperiences.Collection>(),
-            providerLinkedType: Type<auth(NonFungibleToken.Withdraw) &GeneratedExperiences.Collection>(),
-            createEmptyCollectionFunction: (fun (): @{NonFungibleToken.Collection} {
-                return <-GeneratedExperiences.createEmptyCollection()
-            })
-        )
-    }
 
     access(all) view fun getCollectionDisplay(_ season: UInt64): MetadataViews.NFTCollectionDisplay? {
         let collection = GeneratedExperiences.collectionInfo[season]!

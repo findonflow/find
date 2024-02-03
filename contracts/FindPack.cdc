@@ -541,22 +541,10 @@ access(all) contract FindPack {
                 return MetadataViews.Royalties(self.royalties)
 
             case Type<MetadataViews.NFTCollectionData>():
-                return MetadataViews.NFTCollectionData(
-                    storagePath: FindPack.CollectionStoragePath,
-                    publicPath: FindPack.CollectionPublicPath,
-                    providerPath: FindPack.CollectionPrivatePath,
-                    publicCollection: Type<&FindPack.Collection>(),
-                    publicLinkedType: Type<&FindPack.Collection>(),
-                    providerLinkedType: Type<auth (NonFungibleToken.Withdraw) &FindPack.Collection>(),
-                    createEmptyCollectionFunction: fun () : @{NonFungibleToken.Collection} {
-                        return <- FindPack.createEmptyCollection()
-                    }
-                )
-
+                return FindPack.resolveContractView(resourceType: nil, viewType: Type<MetadataViews.NFTCollectionData>())
             case Type<MetadataViews.NFTCollectionDisplay>():
 
                 return self.getMetadata().collectionDisplay
-
                 /* to be determined
                 //let externalURL = MetadataViews.ExternalURL("https://find.xyz/mp/findPack")
                 let externalURL = MetadataViews.ExternalURL("https://find.xyz/")
@@ -576,6 +564,36 @@ access(all) contract FindPack {
             return nil
         }
 
+	    access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <-FindPack.createEmptyCollection()
+        }
+    }
+
+    access(all) view fun getContractViews(resourceType: Type?): [Type] {
+        return [
+            Type<MetadataViews.NFTCollectionData>(),
+            Type<MetadataViews.NFTCollectionDisplay>()
+        ]
+    }
+
+    access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
+        switch viewType {
+            case Type<MetadataViews.NFTCollectionData>():
+                let collectionRef = self.account.storage.borrow<&FindPack.Collection>(
+                        from: FindPack.CollectionStoragePath
+                    ) ?? panic("Could not borrow a reference to the stored collection")
+                let collectionData = MetadataViews.NFTCollectionData(
+                    storagePath: FindPack.CollectionStoragePath,
+                    publicPath: FindPack.CollectionPublicPath,
+                    publicCollection: Type<&FindPack.Collection>(),
+                    publicLinkedType: Type<&FindPack.Collection>(),
+                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                        return <-FindPack.createEmptyCollection()
+                    })
+                )
+                return collectionData
+        }
+        return nil
     }
 
     access(all) resource interface CollectionPublic {

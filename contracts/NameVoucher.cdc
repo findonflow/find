@@ -106,14 +106,7 @@ access(all) contract NameVoucher {
                 )
 
             case Type<MetadataViews.NFTCollectionData>():
-                return MetadataViews.NFTCollectionData(storagePath: NameVoucher.CollectionStoragePath,
-                publicPath: NameVoucher.CollectionPublicPath,
-                providerPath: NameVoucher.CollectionPrivatePath,
-                publicCollection: Type<&Collection>(),
-                publicLinkedType: Type<&Collection>(),
-                providerLinkedType: Type<&Collection>(),
-                createEmptyCollectionFunction: fun(): @{NonFungibleToken.Collection} {return <- NameVoucher.createEmptyCollection()})
-
+               return NameVoucher.resolveContractView(resourceType: Type<@NameVoucher.NFT>(), viewType: Type<MetadataViews.NFTCollectionData>()) as! MetadataViews.NFTCollectionData
             case Type<MetadataViews.Traits>():
                 return MetadataViews.Traits([
                 MetadataViews.Trait(
@@ -131,6 +124,36 @@ access(all) contract NameVoucher {
             self.nounce=self.nounce+1
         }
 
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <-NameVoucher.createEmptyCollection()
+        }
+    }
+
+    access(all) view fun getContractViews(resourceType: Type?): [Type] {
+        return [
+            Type<MetadataViews.NFTCollectionData>(),
+            Type<MetadataViews.NFTCollectionDisplay>()
+        ]
+    }
+
+    access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
+        switch viewType {
+            case Type<MetadataViews.NFTCollectionData>():
+                let collectionRef = self.account.storage.borrow<&NameVoucher.Collection>(
+                        from: NameVoucher.CollectionStoragePath
+                    ) ?? panic("Could not borrow a reference to the stored collection")
+                let collectionData = MetadataViews.NFTCollectionData(
+                    storagePath: NameVoucher.CollectionStoragePath,
+                    publicPath: NameVoucher.CollectionPublicPath,
+                    publicCollection: Type<&NameVoucher.Collection>(),
+                    publicLinkedType: Type<&NameVoucher.Collection>(),
+                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                        return <-NameVoucher.createEmptyCollection()
+                    })
+                )
+                return collectionData
+        }
+        return nil
     }
 
     access(all) entitlement Owner
@@ -148,7 +171,7 @@ access(all) contract NameVoucher {
         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
-            emit Withdraw(id: token.getID(), from: self.owner?.address)
+            emit Withdraw(id: token.id, from: self.owner?.address)
 
             return <-token
         }

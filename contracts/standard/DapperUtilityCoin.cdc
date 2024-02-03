@@ -112,20 +112,7 @@ access(all) contract DapperUtilityCoin: ViewResolver  {
                     }
                 )
             case Type<FungibleTokenMetadataViews.FTVaultData>():
-                let vaultRef = DapperUtilityCoin.account.storage.borrow<&DapperUtilityCoin.Vault>(from: self.storagePath)
-                ?? panic("Could not borrow a reference to the stored vault")
-                return FungibleTokenMetadataViews.FTVaultData(
-                    storagePath: self.storagePath,
-                    receiverPath: self.receiverPath,
-                    metadataPath: self.publicPath,
-                    providerPath: /private/exampleTokenVault,
-                    receiverLinkedType: Type<&{FungibleToken.Receiver}>(),
-                    metadataLinkedType: Type<&DapperUtilityCoin.Vault>(),
-                    providerLinkedType: Type<&DapperUtilityCoin.Vault>(),
-                    createEmptyVaultFunction: (fun(): @{FungibleToken.Vault} {
-                        return <-vaultRef.createEmptyVault()
-                    })
-                )
+                return DapperUtilityCoin.resolveContractView(resourceType: nil, viewType: Type<FungibleTokenMetadataViews.FTVaultData>()) as! FungibleTokenMetadataViews.FTVaultData?
             case Type<FungibleTokenMetadataViews.TotalSupply>():
                 return FungibleTokenMetadataViews.TotalSupply(
                     totalSupply: DapperUtilityCoin.totalSupply

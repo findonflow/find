@@ -128,8 +128,54 @@ access(all) contract PartyFavorz: ViewResolver {
 			 case Type<MetadataViews.NFTCollectionData>():
                 return PartyFavorz.resolveContractView(resourceType: Type<@PartyFavorz.NFT>(), viewType: Type<MetadataViews.NFTCollectionData>())
             case Type<MetadataViews.NFTCollectionDisplay>():
-                return PartyFavorz.resolveContractView(resourceType: Type<@PartyFavorz.NFT>(), viewType: Type<MetadataViews.NFTCollectionDisplay>())
+                      			var square = MetadataViews.Media(
+					file: MetadataViews.IPFSFile(
+						cid: "QmNkJGEzNYzXsKFqCMweFZBZ9cMQsfMUzV2ZDh2Nn8a1Xc",
+						path: nil
+					),
+					mediaType: "image/png"
+				)
 
+				var banner = MetadataViews.Media(
+					file: MetadataViews.IPFSFile(
+						cid: "QmVuMpDyJXHMCK9LnFboemWfPYabcwPNEmXgQMWbtxtGWD",
+						path: nil
+					),
+					mediaType: "image/png"
+				)
+
+				let nftCollectionDisplayData = PartyFavorzExtraData.getData(id: self.id, field: "nftCollectionDisplay")
+				if nftCollectionDisplayData != nil {
+					let nftCollectionDisplay = nftCollectionDisplayData! as! {String : String}
+
+					square = MetadataViews.Media(
+						file: MetadataViews.IPFSFile(
+							cid: nftCollectionDisplay["squareImage"]!,
+							path: nil
+						),
+						mediaType: "image/png"
+					)
+
+					banner = MetadataViews.Media(
+						file: MetadataViews.IPFSFile(
+							cid: nftCollectionDisplay["bannerImage"]!,
+							path: nil
+						),
+						mediaType: "image/png"
+					)
+				}
+
+				return MetadataViews.NFTCollectionDisplay(
+					name: "PartyFavorz",
+					description: "By owning a Party Favorz NFT, you are granted access to the VIP sections of our virtual parties which include, but are not limited to major giveaways, 1 on 1s with artists/project leaders, and some IRL utility that involves partying, down the line. By owning Party Favorz, you are supporting the idea of community coming together for a few goals that include having fun, being positive, learning, and most importantly SUPPORTING ARTISTS.",
+					externalURL: MetadataViews.ExternalURL("https://find.xyz/partyfavorz"),
+					squareImage: square,
+					bannerImage: banner,
+					socials: {
+						"twitter": MetadataViews.ExternalURL("https://twitter.com/FlowPartyFavorz"), 
+						"discord" : MetadataViews.ExternalURL("https://discord.gg/bM76F34EnN")
+					}
+				)
 			case Type<MetadataViews.Traits>() : 
 				let seasonData = PartyFavorzExtraData.getData(id: self.id, field: "season")
 				var season = 1 as UInt64
@@ -170,7 +216,7 @@ access(all) contract PartyFavorz: ViewResolver {
         }
 	}
 
-	    access(all) view fun getContractViews(resourceType: Type?): [Type] {
+	access(all) view fun getContractViews(resourceType: Type?): [Type] {
         return [
             Type<MetadataViews.NFTCollectionData>(),
             Type<MetadataViews.NFTCollectionDisplay>()
@@ -193,31 +239,6 @@ access(all) contract PartyFavorz: ViewResolver {
                     })
                 )
                 return collectionData
-            case Type<MetadataViews.NFTCollectionDisplay>():
-                let square = MetadataViews.Media(
-                    file: MetadataViews.IPFSFile(
-                        cid: "QmeG1rPaLWmn4uUSjQ2Wbs7QnjxdQDyeadCGWyGwvHTB7c",
-                        path: nil
-                    ),
-                    mediaType: "image/png"
-                )
-                let banner = MetadataViews.Media(
-                    file: MetadataViews.IPFSFile(
-                        cid: "QmWmDRnSrv8HK5QsiHwUNR4akK95WC8veydq6dnnFbMja1",
-                        path: nil
-                    ),
-                    mediaType: "image/png"
-                )
-                return MetadataViews.NFTCollectionDisplay(
-                    name: "NonFunGerbils",
-                    description: "The NonFunGerbils are a collaboration between the NonFunGerbils Podcast, their audience and sometimes fabolous artists. Harnessing the power of MEMEs with creative writing and collaboration they create the most dankest, cutest gerbils in the NFT space.",
-                    externalURL: MetadataViews.ExternalURL("https://nonfungerbils.com"),
-                    squareImage: square,
-                    bannerImage: banner,
-                    socials: {
-                        "twitter": MetadataViews.ExternalURL("https://twitter.com/NonFunGerbils")
-                    }
-                )
         }
         return nil
     }

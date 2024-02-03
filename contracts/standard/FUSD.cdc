@@ -119,20 +119,7 @@ access(all) contract FUSD: ViewResolver {
                     }
                 )
             case Type<FungibleTokenMetadataViews.FTVaultData>():
-                let vaultRef = FUSD.account.storage.borrow<&FUSD.Vault>(from: self.storagePath)
-                ?? panic("Could not borrow a reference to the stored vault")
-                return FungibleTokenMetadataViews.FTVaultData(
-                    storagePath: self.storagePath,
-                    receiverPath: self.receiverPath,
-                    metadataPath: self.publicPath,
-                    providerPath: /private/fusdVault,
-                    receiverLinkedType: Type<&{FungibleToken.Receiver}>(),
-                    metadataLinkedType: Type<&FUSD.Vault>(),
-                    providerLinkedType: Type<&FUSD.Vault>(),
-                    createEmptyVaultFunction: (fun(): @{FungibleToken.Vault} {
-                        return <-vaultRef.createEmptyVault()
-                    })
-                )
+                return FUSD.resolveContractView(resourceType: nil, viewType: Type<FungibleTokenMetadataViews.FTVaultData>()) as! FungibleTokenMetadataViews.FTVaultData?
             case Type<FungibleTokenMetadataViews.TotalSupply>():
                 return FungibleTokenMetadataViews.TotalSupply(
                     totalSupply: FUSD.totalSupply
@@ -222,6 +209,71 @@ access(all) contract FUSD: ViewResolver {
         access(all) fun createEmptyVault(): @FUSD.Vault {
             return <-create Vault(balance: 0.0)
         }
+
+        access(contract) fun burnCallback() {
+            // Placeholder for a burn callback
+        }
+    
+        access(all) view fun isAvailableToWithdraw(amount: UFix64): Bool {
+           return true
+        }
+    }
+
+        /// Gets a list of the metadata views that this contract supports
+    access(all) view fun getContractViews(resourceType: Type?): [Type] {
+        return [Type<FungibleTokenMetadataViews.FTView>(),
+        Type<FungibleTokenMetadataViews.FTDisplay>(),
+        Type<FungibleTokenMetadataViews.FTVaultData>(),
+        Type<FungibleTokenMetadataViews.TotalSupply>()]
+    }
+
+    /// Get a Metadata View from FUSD
+    ///
+    /// @param view: The Type of the desired view.
+    /// @return A structure representing the requested view.
+    ///
+    access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
+        switch viewType {
+        case Type<FungibleTokenMetadataViews.FTView>():
+            return FungibleTokenMetadataViews.FTView(
+                ftDisplay: self.resolveContractView(resourceType: nil, viewType: Type<FungibleTokenMetadataViews.FTDisplay>()) as! FungibleTokenMetadataViews.FTDisplay?,
+                ftVaultData: self.resolveContractView(resourceType: nil, viewType: Type<FungibleTokenMetadataViews.FTVaultData>()) as! FungibleTokenMetadataViews.FTVaultData?
+            )
+        case Type<FungibleTokenMetadataViews.FTDisplay>():
+            let media = MetadataViews.Media(
+                file: MetadataViews.HTTPFile(
+                    url: ""
+                ),
+                mediaType: "image/svg+xml"
+            )
+            let medias = MetadataViews.Medias([media])
+            return FungibleTokenMetadataViews.FTDisplay(
+                name: "FLOW Network Token",
+                symbol: "FLOW",
+                description: "FLOW is the native token for the Flow blockchain. It is required for securing the network, transaction fees, storage fees, staking, FLIP voting and may be used by applications built on the Flow Blockchain",
+                externalURL: MetadataViews.ExternalURL("https://flow.com"),
+                logos: medias,
+                socials: {
+                    "twitter": MetadataViews.ExternalURL("https://twitter.com/flow_blockchain")
+                }
+            )
+        case Type<FungibleTokenMetadataViews.FTVaultData>():
+            let vaultRef = FUSD.account.storage.borrow<auth(FungibleToken.Withdraw) &FUSD.Vault>(from: /storage/FUSDVault)
+            ?? panic("Could not borrow reference to the contract's Vault!")
+            return FungibleTokenMetadataViews.FTVaultData(
+                storagePath: /storage/FUSDVault,
+                receiverPath: /public/FUSDReceiver,
+                metadataPath: /public/FUSDBalance,
+                receiverLinkedType: Type<&FUSD.Vault>(),
+                metadataLinkedType: Type<&FUSD.Vault>(),
+                createEmptyVaultFunction: (fun (): @{FungibleToken.Vault} {
+                    return <-vaultRef.createEmptyVault()
+                })
+            )
+        case Type<FungibleTokenMetadataViews.TotalSupply>():
+            return FungibleTokenMetadataViews.TotalSupply(totalSupply: FUSD.totalSupply)
+        }
+        return nil
     }
 
     /// Minter

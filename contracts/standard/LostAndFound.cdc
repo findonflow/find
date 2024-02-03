@@ -117,7 +117,7 @@ access(all) contract LostAndFound {
 
                 let ref = (&self.item as &AnyResource?)!
                 let nft = ref as! &{NonFungibleToken.NFT}
-                return nft.getID()
+                return nft.id
             }
             return nil
         }
