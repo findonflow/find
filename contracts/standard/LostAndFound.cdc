@@ -556,7 +556,7 @@ access(all) contract LostAndFound {
         init(_ flowTokenRepayment: Capability<&{FungibleToken.Receiver}>, lowBalanceThreshold: UFix64?) {
             self.flowTokenRepayment = flowTokenRepayment
 
-            let vault <- FlowToken.createEmptyVault(Type: Type<FlowToken.Vault>())
+            let vault <- FlowToken.createEmptyVault(vaultType: Type<@FlowToken.Vault>())
             self.flowTokenVault <- vault
             self.lowBalanceThreshold = lowBalanceThreshold 
         }

@@ -195,13 +195,15 @@ access(all) contract Dandy :ViewResolver{
                 )
             }
 
-
             if self.schemas.keys.contains(type.identifier) {
                 return self.schemas[type.identifier]!.result
             }
             return nil
         }
 
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <-Dandy.createEmptyCollection()
+        }
     }
 
 

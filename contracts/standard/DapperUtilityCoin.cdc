@@ -223,6 +223,63 @@ access(all) contract DapperUtilityCoin: ViewResolver  {
         }
     }
 
+    /// Gets a list of the metadata views that this contract supports
+    access(all) view fun getContractViews(resourceType: Type?): [Type] {
+        return [Type<FungibleTokenMetadataViews.FTView>(),
+        Type<FungibleTokenMetadataViews.FTDisplay>(),
+        Type<FungibleTokenMetadataViews.FTVaultData>(),
+        Type<FungibleTokenMetadataViews.TotalSupply>()]
+    }
+
+    /// Get a Metadata View from DapperUtilityCoin
+    ///
+    /// @param view: The Type of the desired view.
+    /// @return A structure representing the requested view.
+    ///
+    access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
+        switch viewType {
+        case Type<FungibleTokenMetadataViews.FTView>():
+            return FungibleTokenMetadataViews.FTView(
+                ftDisplay: self.resolveContractView(resourceType: nil, viewType: Type<FungibleTokenMetadataViews.FTDisplay>()) as! FungibleTokenMetadataViews.FTDisplay?,
+                ftVaultData: self.resolveContractView(resourceType: nil, viewType: Type<FungibleTokenMetadataViews.FTVaultData>()) as! FungibleTokenMetadataViews.FTVaultData?
+            )
+        case Type<FungibleTokenMetadataViews.FTDisplay>():
+            let media = MetadataViews.Media(
+                file: MetadataViews.HTTPFile(
+                    url: ""
+                ),
+                mediaType: "image/svg+xml"
+            )
+            let medias = MetadataViews.Medias([media])
+            return FungibleTokenMetadataViews.FTDisplay(
+                name: "FLOW Network Token",
+                symbol: "FLOW",
+                description: "FLOW is the native token for the Flow blockchain. It is required for securing the network, transaction fees, storage fees, staking, FLIP voting and may be used by applications built on the Flow Blockchain",
+                externalURL: MetadataViews.ExternalURL("https://flow.com"),
+                logos: medias,
+                socials: {
+                    "twitter": MetadataViews.ExternalURL("https://twitter.com/flow_blockchain")
+                }
+            )
+        case Type<FungibleTokenMetadataViews.FTVaultData>():
+            let vaultRef = DapperUtilityCoin.account.storage.borrow<auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault>(from: /storage/DapperUtilityCoinVault)
+            ?? panic("Could not borrow reference to the contract's Vault!")
+            return FungibleTokenMetadataViews.FTVaultData(
+                storagePath: /storage/DapperUtilityCoinVault,
+                receiverPath: /public/DapperUtilityCoinReceiver,
+                metadataPath: /public/DapperUtilityCoinBalance,
+                receiverLinkedType: Type<&DapperUtilityCoin.Vault>(),
+                metadataLinkedType: Type<&DapperUtilityCoin.Vault>(),
+                createEmptyVaultFunction: (fun (): @{FungibleToken.Vault} {
+                    return <-vaultRef.createEmptyVault()
+                })
+            )
+        case Type<FungibleTokenMetadataViews.TotalSupply>():
+            return FungibleTokenMetadataViews.TotalSupply(totalSupply: DapperUtilityCoin.totalSupply)
+        }
+        return nil
+    }
+
 
     // createEmptyVault
     //

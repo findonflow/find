@@ -206,7 +206,7 @@ access(all) contract FindForge {
 
         let nft <- forge.mint(platform: minterPlatform, data: data, verifier: verifier) 
 
-        let id =  nft.id
+        let id = nft.id
         let uuid = nft.uuid 
         let nftType = nft.getType().identifier
         receiver.deposit(token: <- nft)
@@ -289,7 +289,7 @@ access(all) contract FindForge {
 
         let nft <- forge.mint(platform: minterPlatform, data: data, verifier: verifier) 
 
-        let id =  nft.id
+        let id = nft.id
         let uuid = nft.uuid 
         let nftType = nft.getType().identifier
         receiver.deposit(token: <- nft)
@@ -402,7 +402,7 @@ access(all) contract FindForge {
     }
 
     access(account) fun borrowVerifier() : &Verifier {
-        return &self.verifier as &Verifier
+        return &self.verifier
     }
 
     access(all) fun createForgeAdminProxyClient() : @ForgeAdminProxy {

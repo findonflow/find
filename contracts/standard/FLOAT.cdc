@@ -167,6 +167,10 @@ access(all) contract FLOAT {
             return nil
         }
 
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <-FLOAT.createEmptyCollection()
+        }
+
         init(_eventDescription: String, _eventHost: Address, _eventId: UInt64, _eventImage: String, _eventName: String, _originalRecipient: Address, _serial: UInt64) {
             self.id = self.uuid
             self.dateReceived = getCurrentBlock().timestamp
@@ -760,7 +764,7 @@ access(all) contract FLOAT {
             if (self.getPrices()![payment.getType().identifier] == nil) {
                 panic("This FLOAT does not support purchasing in the passed in token.")
             }       
-            if (payment.getBalance() != self.getPrices()![payment.getType().identifier]!.price) {
+            if (payment.balance != self.getPrices()![payment.getType().identifier]!.price) {
                 panic("You did not pass in the correct amount of tokens.")
             }
             let royalty: UFix64 = 0.05
@@ -784,7 +788,7 @@ access(all) contract FLOAT {
                 message: "Emerald City's path is not associated with the intended token."
             )
 
-            let emeraldCityCut <- payment.withdraw(amount: payment.getBalance() * royalty)
+            let emeraldCityCut <- payment.withdraw(amount: payment.balance * royalty)
 
             EmeraldCityVault.deposit(from: <- emeraldCityCut)
             EventHostVault.deposit(from: <- payment)
