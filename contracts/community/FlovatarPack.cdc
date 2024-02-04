@@ -267,7 +267,7 @@ access(all) contract FlovatarPack {
 
             // Verifies that the signature is valid and that it was generated from the
             // owner of the collection
-            if(!keyList.verify(signatureSet: signatureSet, signedData: self.getRandomString(id: tokenId).utf8)){
+            if(!keyList.verify(signatureSet: signatureSet, signedData: self.getRandomString(id: tokenId).utf8,  domainSeparationTag: "FLOW-V0.0-user")){
                 panic("Unable to validate the signature for the pack!")
             }
 
@@ -331,7 +331,7 @@ access(all) contract FlovatarPack {
 
             // Verifies that the signature is valid and that it was generated from the
             // owner of the collection
-            if(!keyList.verify(signatureSet: signatureSet, signedData: self.getRandomString(id: tokenId).utf8)){
+            if(!keyList.verify(signatureSet: signatureSet, signedData: self.getRandomString(id: tokenId).utf8,  domainSeparationTag: "FLOW-V0.0-user")){
                 panic("Unable to validate the signature for the pack!")
             }
 

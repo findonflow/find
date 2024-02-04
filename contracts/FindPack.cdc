@@ -722,7 +722,7 @@ access(all) contract FindPack {
 
             // Verifies that the signature is valid and that it was generated from the
             // owner of the collection
-            if(!keyList.verify(signatureSet: signatureSet, signedData: nft.hash.utf8)){
+            if(!keyList.verify(signatureSet: signatureSet, signedData: nft.hash.utf8, domainSeparationTag: "FLOW-V0.0-user")){
                 panic("Unable to validate the signature for the pack!")
             }
 
