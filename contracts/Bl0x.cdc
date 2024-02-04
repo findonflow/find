@@ -379,7 +379,7 @@ access(all) contract Bl0x: ViewResolver {
         // borrowNFT gets a reference to an NFT in the collection
         // so that the caller can read its metadata and call its methods
         access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
-            return &self.ownedNFTs[id] as &{NonFungibleToken.NFT}?
+            return &self.ownedNFTs[id]
         }
 
         access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}? {
@@ -426,7 +426,7 @@ access(all) contract Bl0x: ViewResolver {
             //TODO: discuss that fields we want in this event. Or do we prefer to use the richer deposit event, since this is really done in the backend
             //emit Minted(id:newNFT.id, address:recipient.owner!.address)
             // deposit it in the recipient's account using their reference
-            recipient.deposit(token: <- (newNFT as! @{NonFungibleToken.NFT}))
+            recipient.deposit(token: <- (newNFT))
 
         }
 

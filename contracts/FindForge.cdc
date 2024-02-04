@@ -212,7 +212,7 @@ access(all) contract FindForge {
         receiver.deposit(token: <- nft)
 
         /*
-        let vr = receiver.borrowViewResolver(id: id)
+        let vr = receiver.borrowNFT(id)
         let view = vr.resolveView(Type<MetadataViews.Display>())  ?? panic("The minting nft should implement MetadataViews Display view.") 
         let display = view as! MetadataViews.Display
         let nftName = display.name 

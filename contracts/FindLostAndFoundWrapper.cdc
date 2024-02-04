@@ -153,7 +153,7 @@ access(all) contract FindLostAndFoundWrapper {
         // if receiverCap is valid, pass that in, otherwise pass collectionPublicCap
         shelf.redeem(type: type, ticketID: ticketID, receiver: cap!)
 
-        let viewResolver=cap!.borrow()!.borrowViewResolver(id: nftID)!
+        let viewResolver=cap!.borrow()!.borrowNFT(nftID)!
         let display = MetadataViews.getDisplay(viewResolver)
         let collectionDisplay= MetadataViews.getNFTCollectionDisplay(viewResolver)
 

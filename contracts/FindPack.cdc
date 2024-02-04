@@ -1025,7 +1025,7 @@ access(all) contract FindPack {
             let source=rewards[type]!.borrow()!
 
             let viewType= Type<PackRevealData>()
-            let nft=source.borrowViewResolver(id: id)!
+            let nft=source.borrowNFT(id)!
 
             var fields : {String: String}= {}
             if nft.getViews().contains(viewType) {
@@ -1084,7 +1084,7 @@ access(all) contract FindPack {
             panic("Provider capability of pack is not valid Name and ID".concat(type.identifier))
         }
         let ref = cap.borrow()!
-        let resolver = ref.borrowViewResolver(id : ref.getIDs()[0])!  // if the ID length is 0, there must be some problem
+        let resolver = ref.borrowNFT(ref.getIDs()[0])!  // if the ID length is 0, there must be some problem
         let collectionData = MetadataViews.getNFTCollectionData(resolver) ?? panic("Collection Data for this NFT Type is missing. Type : ".concat(resolver.getType().identifier))
         return <- collectionData.createEmptyCollection()
     }

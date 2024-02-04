@@ -63,14 +63,14 @@ access(all) contract Bl0xPack: ViewResolver {
 
         access(all) let storageRequirement: UInt64
 
-        access(contract) let providerCap: Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection}> 
+        access(contract) let providerCap: Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.Collection}> 
 
         access(contract) let royaltyCap: Capability<&{FungibleToken.Receiver}>?
         access(contract) let royaltyCut: UFix64
 
         access(all) let requiresReservation: Bool
 
-        init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, price: UFix64, buyTime:UFix64, openTime:UFix64, walletType:Type, providerCap: Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>, requiresReservation:Bool, royaltyCut: UFix64, royaltyWallet: Capability<&{FungibleToken.Receiver}>, floatEventId:UInt64?, whiteListTime: UFix64?, storageRequirement: UInt64) {
+        init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, price: UFix64, buyTime:UFix64, openTime:UFix64, walletType:Type, providerCap: Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection,  NonFungibleToken.Collection}>, requiresReservation:Bool, royaltyCut: UFix64, royaltyWallet: Capability<&{FungibleToken.Receiver}>, floatEventId:UInt64?, whiteListTime: UFix64?, storageRequirement: UInt64) {
             self.name = name
             self.description = description
             self.thumbnailUrl = thumbnailUrl
