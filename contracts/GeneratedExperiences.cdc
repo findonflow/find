@@ -193,32 +193,32 @@ access(all) contract GeneratedExperiences: ViewResolver {
 
     access(all) view fun getContractViews(resourceType: Type?): [Type] {
         return [
-            Type<MetadataViews.NFTCollectionData>(),
-            Type<MetadataViews.NFTCollectionDisplay>()
+        Type<MetadataViews.NFTCollectionData>(),
+        Type<MetadataViews.NFTCollectionDisplay>()
         ]
     }
 
     access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
         switch viewType {
-            case Type<MetadataViews.NFTCollectionData>():
-                let collectionRef = self.account.storage.borrow<&GeneratedExperiences.Collection>(
-                        from: GeneratedExperiences.CollectionStoragePath
-                    ) ?? panic("Could not borrow a reference to the stored collection")
-                let collectionData = MetadataViews.NFTCollectionData(
-                    storagePath: GeneratedExperiences.CollectionStoragePath,
-                    publicPath: GeneratedExperiences.CollectionPublicPath,
-                    publicCollection: Type<&GeneratedExperiences.Collection>(),
-                    publicLinkedType: Type<&GeneratedExperiences.Collection>(),
-                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
-                        return <-GeneratedExperiences.createEmptyCollection()
-                    })
-                )
-                return collectionData
+        case Type<MetadataViews.NFTCollectionData>():
+            let collectionRef = self.account.storage.borrow<&GeneratedExperiences.Collection>(
+                from: GeneratedExperiences.CollectionStoragePath
+            ) ?? panic("Could not borrow a reference to the stored collection")
+            let collectionData = MetadataViews.NFTCollectionData(
+                storagePath: GeneratedExperiences.CollectionStoragePath,
+                publicPath: GeneratedExperiences.CollectionPublicPath,
+                publicCollection: Type<&GeneratedExperiences.Collection>(),
+                publicLinkedType: Type<&GeneratedExperiences.Collection>(),
+                createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                    return <-GeneratedExperiences.createEmptyCollection()
+                })
+            )
+            return collectionData
         }
         return nil
     }
 
-    access(all) resource Collection: NonFungibleToken.Collection {
+    access(all) resource Collection: NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         /// dictionary of NFT conforming tokens
         /// NFT is a resource type with an `UInt64` ID field
         access(contract) var ownedNFTs: @{UInt64: GeneratedExperiences.NFT}

@@ -219,7 +219,7 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("collectionBannerImage", "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1"),
 	)
 
-	dandyIds = result.GetIdsFromEvent("Dandy.Deposit", "id")
+	dandyIds = result.GetIdsFromEvent("NonFungibleToken.Deposited", "id")
 
 	dandyIdentifier, _ = o.QualifiedIdentifier("Dandy", "NFT")
 	stx("devaddNFTCatalog",
@@ -310,7 +310,7 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("collectionExternalURL", "https://neomotorcycles.co.uk/index.html"),
 		WithArg("collectionSquareImage", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
 		WithArg("collectionBannerImage", "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1"),
-	).GetIdFromEvent("Dandy.Deposit", "id")
+	).GetIdFromEvent("NonFungibleToken.Deposited", "id")
 
 	stx("sendNFTs",
 		WithSigner("user1"),
@@ -390,7 +390,7 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("collectionExternalURL", "https://neomotorcycles.co.uk/index.html"),
 		WithArg("collectionSquareImage", "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp"),
 		WithArg("collectionBannerImage", "https://neomotorcycles.co.uk/assets/img/neo-logo-web-dark.png?h=5a4d226197291f5f6370e79a1ee656a1"),
-	).GetIdFromEvent("Dandy.Deposit", "id")
+	).GetIdFromEvent("NonFungibleToken.Deposited", "id")
 
 	stx("sendNFTs",
 		WithSigner("user1"),

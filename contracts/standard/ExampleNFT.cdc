@@ -23,8 +23,6 @@ access(all) contract ExampleNFT: ViewResolver {
     access(all) var totalSupply: UInt64
 
     access(all) event ContractInitialized()
-    access(all) event Withdraw(id: UInt64, from: Address?)
-    access(all) event Deposit(id: UInt64, to: Address?)
 
     access(all) let CollectionStoragePath: StoragePath
     access(all) let CollectionPublicPath: PublicPath

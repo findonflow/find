@@ -21,8 +21,6 @@ access(all) contract Dandy :ViewResolver{
     access(account) var viewConverters: {String: [{ViewConverter}]}
 
     access(all) event ContractInitialized()
-    access(all) event Withdraw(id: UInt64, from: Address?)
-    access(all) event Deposit(id: UInt64, to: Address?)
     access(all) event Minted(id:UInt64, minter:String, name:String, description:String)
 
     access(all) struct ViewInfo {
@@ -198,26 +196,26 @@ access(all) contract Dandy :ViewResolver{
 
     access(all) view fun getContractViews(resourceType: Type?): [Type] {
         return [
-            Type<MetadataViews.NFTCollectionData>()
+        Type<MetadataViews.NFTCollectionData>()
         ]
     }
 
     access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
         switch viewType {
-            case Type<MetadataViews.NFTCollectionData>():
-                let collectionRef = self.account.storage.borrow<&Dandy.Collection>(
-                        from: Dandy.CollectionStoragePath
-                    ) ?? panic("Could not borrow a reference to the stored collection")
-                let collectionData = MetadataViews.NFTCollectionData(
-                    storagePath: Dandy.CollectionStoragePath,
-                    publicPath: Dandy.CollectionPublicPath,
-                    publicCollection: Type<&Dandy.Collection>(),
-                    publicLinkedType: Type<&Dandy.Collection>(),
-                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
-                        return <-Dandy.createEmptyCollection()
-                    })
-                )
-                return collectionData
+        case Type<MetadataViews.NFTCollectionData>():
+            let collectionRef = self.account.storage.borrow<&Dandy.Collection>(
+                from: Dandy.CollectionStoragePath
+            ) ?? panic("Could not borrow a reference to the stored collection")
+            let collectionData = MetadataViews.NFTCollectionData(
+                storagePath: Dandy.CollectionStoragePath,
+                publicPath: Dandy.CollectionPublicPath,
+                publicCollection: Type<&Dandy.Collection>(),
+                publicLinkedType: Type<&Dandy.Collection>(),
+                createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                    return <-Dandy.createEmptyCollection()
+                })
+            )
+            return collectionData
         }
         return nil
     }
@@ -256,9 +254,6 @@ access(all) contract Dandy :ViewResolver{
                 }
             }
 
-            emit Withdraw(id: dandyToken.id, from: self.owner?.address)
-
-
             return <- dandyToken
         }
 
@@ -283,9 +278,6 @@ access(all) contract Dandy :ViewResolver{
 
             // add the new token to the dictionary which removes the old one
             let oldToken <- self.ownedNFTs[id] <- token
-
-            emit Deposit(id: id, to: self.owner?.address)
-
 
             destroy oldToken
         }
