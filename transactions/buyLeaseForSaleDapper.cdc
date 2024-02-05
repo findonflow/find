@@ -60,7 +60,7 @@ transaction(sellerAccount: Address, leaseName: String, amount: UFix64) {
 
 
         self.walletReference = dapper.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ftVaultPath!) ?? panic("No suitable wallet linked for this account")
-        self.balanceBeforeTransfer = self.walletReference.getBalance()
+        self.balanceBeforeTransfer = self.walletReference.balance
     }
 
     execute {
@@ -70,6 +70,6 @@ transaction(sellerAccount: Address, leaseName: String, amount: UFix64) {
 
     // Check that all dapper Coin was routed back to Dapper
     post {
-        self.walletReference.getBalance() == self.balanceBeforeTransfer: "Dapper Coin leakage"
+        self.walletReference.balance == self.balanceBeforeTransfer: "Dapper Coin leakage"
     }
 }

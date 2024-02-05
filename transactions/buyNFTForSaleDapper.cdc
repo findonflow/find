@@ -85,11 +85,11 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
         //TODO: handle topshot
 
         self.walletReference = dapper.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ftVaultPath!) ?? panic("No suitable wallet linked for this account")
-        self.balanceBeforeTransfer = self.walletReference.getBalance()
+        self.balanceBeforeTransfer = self.walletReference.balance
     }
 
     pre {
-        self.walletReference.getBalance() > amount : "Your wallet does not have enough funds to pay for this item"
+        self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
     }
 
     execute {
@@ -100,6 +100,6 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
 
     // Check that all dapper Coin was routed back to Dapper
     post {
-        self.walletReference.getBalance() == self.balanceBeforeTransfer: "Dapper Coin leakage"
+        self.walletReference.balance == self.balanceBeforeTransfer: "Dapper Coin leakage"
     }
 }

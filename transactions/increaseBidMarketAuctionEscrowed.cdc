@@ -22,11 +22,11 @@ transaction(id: UInt64, amount: UFix64) {
         let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
 
         self.walletReference = account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
-        self.balanceBeforeBid = self.walletReference.getBalance()
+        self.balanceBeforeBid = self.walletReference.balance
     }
 
     pre {
-        self.walletReference.getBalance() > amount : "Your wallet does not have enough funds to pay for this item"
+        self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
     }
 
     execute {

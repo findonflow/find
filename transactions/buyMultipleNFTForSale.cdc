@@ -124,7 +124,7 @@ transaction(users: [Address], ids: [UInt64], amounts: [UFix64]) {
             if self.prices[counter] != amounts[counter] {
                 panic("Please pass in the correct price of the buy items. Required : ".concat(self.prices[counter].toString()).concat(" . saleItem ID : ".concat(ids[counter].toString())))
             }
-            if self.walletReference[counter].getBalance() < amounts[counter] {
+            if self.walletReference[counter].balance < amounts[counter] {
                 panic("Your wallet does not have enough funds to pay for this item. Required : ".concat(self.prices[counter].toString()).concat(" . saleItem ID : ".concat(ids[counter].toString())))
             }
 

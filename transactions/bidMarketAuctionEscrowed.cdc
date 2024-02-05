@@ -77,13 +77,13 @@ transaction(user: String, id: UInt64, amount: UFix64) {
         let bidSstoragePath=tenant.getStoragePath(Type<@FindMarketAuctionEscrow.MarketBidCollection>())
 
         self.bidsReference= account.storage.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: bidSstoragePath)
-        self.balanceBeforeBid=self.walletReference.getBalance()
+        self.balanceBeforeBid=self.walletReference.balance
         self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: item.getItemID())
     }
 
     pre {
         self.bidsReference != nil : "This account does not have a bid collection"
-        self.walletReference.getBalance() > amount : "Your wallet does not have enough funds to pay for this item"
+        self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
     }
 
     execute {

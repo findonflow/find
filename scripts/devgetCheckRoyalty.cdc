@@ -1,5 +1,5 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import ViewResolver from "../contracts/standard/ViewResolver.cdc"
+import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FIND from "../contracts/FIND.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 
@@ -9,9 +9,9 @@ access(all) fun main(name: String, id: UInt64, nftAliasOrIdentifier: String, vie
 
     // Get collection public path from NFT Registry
     let collectionPublicPath = getPublicPath(nftAliasOrIdentifier)
-    let collection= getAccount(address).capabilities.borrow<&{ViewResolver.ResolverCollection}>(collectionPublicPath)!
+    let collection= getAccount(address).capabilities.borrow<&{NonFungibleToken.Collection}>(collectionPublicPath)!
 
-    let nft=collection.borrowViewResolver(id: id)!
+    let nft=collection.borrowNFT(id)!
     return nft.resolveView(CompositeType(viewIdentifier)!)
 }
 
