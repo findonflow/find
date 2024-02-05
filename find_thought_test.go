@@ -117,6 +117,7 @@ func TestFindThought(t *testing.T) {
 		nftInfo, err := otu.O.Script(`
 			import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 			import ViewResolver from "../contracts/standard/ViewResolver.cdc"
+			import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 			import FindMarket from "../contracts/FindMarket.cdc"
 			import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 			import FindViews from "../contracts/FindViews.cdc"
@@ -126,7 +127,7 @@ func TestFindThought(t *testing.T) {
 				var nftPointer : FindViews.ViewReadPointer? = nil
 				if quoteNFTOwner != nil {
 						let path = FINDNFTCatalog.getCollectionDataForType(nftTypeIdentifier: quoteNFTType!)?.publicPath ?? panic("This nft type is not supported by NFT Catalog. Type : ".concat(quoteNFTType!))
-						let cap = getAccount(quoteNFTOwner!).capabilities.get<&{ViewResolver.ResolverCollection}>(path)!
+						let cap = getAccount(quoteNFTOwner!).capabilities.get<&{NonFungibleToken.Collection}>(path)!
 						nftPointer = FindViews.ViewReadPointer(cap: cap, id: quoteNFTId!)
 						let rv = nftPointer!.getViewResolver()
 						return FindMarket.NFTInfo(rv, id: nftPointer!.id, detail: true)

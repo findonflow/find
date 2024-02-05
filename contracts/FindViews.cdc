@@ -136,19 +136,19 @@ access(all) contract FindViews {
     }
 
     access(all) struct ViewReadPointer : Pointer {
-        access(self) let cap: Capability<&{ViewResolver.ResolverCollection}>
+        access(self) let cap: Capability<&{NonFungibleToken.Collection}>
         access(all) let id: UInt64
         access(all) let uuid: UInt64
         access(all) let itemType: Type
 
-        init(cap: Capability<&{ViewResolver.ResolverCollection}>, id: UInt64) {
+        init(cap: Capability<&{NonFungibleToken.Collection}>, id: UInt64) {
             self.cap=cap
             self.id=id
 
             if !self.cap.check() {
                 panic("The capability is not valid.")
             }
-            let viewResolver=self.cap.borrow()!.borrowViewResolver(id: self.id)!
+            let viewResolver=self.cap.borrow()!.borrowNFT(self.id)!
             let display = MetadataViews.getDisplay(viewResolver) ?? panic("MetadataViews Display View is not implemented on this NFT.")
             let nftCollectionData = MetadataViews.getNFTCollectionData(viewResolver) ?? panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
             self.uuid=viewResolver.uuid
@@ -187,7 +187,7 @@ access(all) contract FindViews {
         }
 
         access(all) fun valid() : Bool {
-            if !self.cap.check() || !self.cap.borrow()!.getIDs().contains(self.id) {
+            if !self.cap.check() || self.cap.borrow()!.borrowNFT(self.id) == nil {
                 return false
             }
             return true
@@ -198,7 +198,9 @@ access(all) contract FindViews {
         }
 
         access(all) fun getViewResolver() : &{ViewResolver.Resolver} {
-            return self.cap.borrow()!.borrowViewResolver(id: self.id) ?? panic("The capability of view pointer is not linked.")
+            let nft=self.cap.borrow()!.borrowNFT(self.id) ?? panic("The capability of view pointer is not linked.")
+            return nft
+
         }
 
         access(all) fun getDisplay() : MetadataViews.Display {
@@ -348,7 +350,7 @@ access(all) contract FindViews {
     }
 
     access(all) fun createViewReadPointer(address:Address, path:PublicPath, id:UInt64) : ViewReadPointer {
-        let cap=	getAccount(address).capabilities.get<&{ViewResolver.ResolverCollection}>(path)!
+        let cap=	getAccount(address).capabilities.get<&{NonFungibleToken.Collection}>(path)!
         let pointer= FindViews.ViewReadPointer(cap: cap, id: id)
         return pointer
     }

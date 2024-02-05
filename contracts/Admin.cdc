@@ -268,7 +268,7 @@ access(all) contract Admin {
             }
 
             let storagePath = StoragePath(identifier: pathIdentifier)!
-            var cap = Admin.account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{ViewResolver.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.Collection}>(storagePath)
+            var cap = Admin.account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(storagePath)
             return FindViews.AuthNFTPointer(cap: cap, id: id)
         }
 

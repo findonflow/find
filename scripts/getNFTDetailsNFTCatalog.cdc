@@ -4,6 +4,7 @@ import FindUtils from "../contracts/FindUtils.cdc"
 import FIND from "../contracts/FIND.cdc"
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
 import ViewResolver from "../contracts/standard/ViewResolver.cdc"
+import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import FTRegistry from "../contracts/FTRegistry.cdc"
 
@@ -259,10 +260,10 @@ access(all) fun main(user: String, project:String, id: UInt64, views: [String]) 
 
     if account.balance > 0.0 {
         // check link for market
-        let linkedForMarket = account.capabilities.get<&{ViewResolver.ResolverCollection}>(getPublicPath(project))?.check()
+        let linkedForMarket = account.capabilities.get<&{NonFungibleToken.Collection}>(getPublicPath(project))?.check()
 
         let storagePath = getStoragePath(project)
-        let cap= account.capabilities.storage.issue<&{ViewResolver.ResolverCollection}>(storagePath)
+        let cap= account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(storagePath)
         let pointer = FindViews.ViewReadPointer(cap: cap, id: id)
 
         let nftDetail = getNFTDetail(pointer:pointer, views: views)

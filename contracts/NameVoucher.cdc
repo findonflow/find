@@ -106,7 +106,7 @@ access(all) contract NameVoucher {
                 )
 
             case Type<MetadataViews.NFTCollectionData>():
-               return NameVoucher.resolveContractView(resourceType: Type<@NameVoucher.NFT>(), viewType: Type<MetadataViews.NFTCollectionData>()) as! MetadataViews.NFTCollectionData
+                return NameVoucher.resolveContractView(resourceType: Type<@NameVoucher.NFT>(), viewType: Type<MetadataViews.NFTCollectionData>())
             case Type<MetadataViews.Traits>():
                 return MetadataViews.Traits([
                 MetadataViews.Trait(
@@ -131,34 +131,34 @@ access(all) contract NameVoucher {
 
     access(all) view fun getContractViews(resourceType: Type?): [Type] {
         return [
-            Type<MetadataViews.NFTCollectionData>(),
-            Type<MetadataViews.NFTCollectionDisplay>()
+        Type<MetadataViews.NFTCollectionData>(),
+        Type<MetadataViews.NFTCollectionDisplay>()
         ]
     }
 
     access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
         switch viewType {
-            case Type<MetadataViews.NFTCollectionData>():
-                let collectionRef = self.account.storage.borrow<&NameVoucher.Collection>(
-                        from: NameVoucher.CollectionStoragePath
-                    ) ?? panic("Could not borrow a reference to the stored collection")
-                let collectionData = MetadataViews.NFTCollectionData(
-                    storagePath: NameVoucher.CollectionStoragePath,
-                    publicPath: NameVoucher.CollectionPublicPath,
-                    publicCollection: Type<&NameVoucher.Collection>(),
-                    publicLinkedType: Type<&NameVoucher.Collection>(),
-                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
-                        return <-NameVoucher.createEmptyCollection()
-                    })
-                )
-                return collectionData
+        case Type<MetadataViews.NFTCollectionData>():
+            let collectionRef = self.account.storage.borrow<&NameVoucher.Collection>(
+                from: NameVoucher.CollectionStoragePath
+            ) ?? panic("Could not borrow a reference to the stored collection")
+            let collectionData = MetadataViews.NFTCollectionData(
+                storagePath: NameVoucher.CollectionStoragePath,
+                publicPath: NameVoucher.CollectionPublicPath,
+                publicCollection: Type<&NameVoucher.Collection>(),
+                publicLinkedType: Type<&NameVoucher.Collection>(),
+                createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                    return <-NameVoucher.createEmptyCollection()
+                })
+            )
+            return collectionData
         }
         return nil
     }
 
     access(all) entitlement Owner
 
-    access(all) resource Collection: NonFungibleToken.Collection {
+    access(all) resource Collection: NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
