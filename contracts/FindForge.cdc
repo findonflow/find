@@ -189,7 +189,7 @@ access(all) contract FindForge {
         FindForge.minterPlatforms[forgeType]!.remove(key: name)
     }
 
-    access(account) fun mintAdmin(leaseName: String, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}) {
+    access(account) fun mintAdmin(leaseName: String, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver}) {
         if !FindForge.minterPlatforms.containsKey(forgeType) {
             panic("The minter platform is not set. Please set up properly before mint.")
         }

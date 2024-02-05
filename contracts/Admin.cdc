@@ -193,7 +193,7 @@ access(all) contract Admin {
             FindForge.adminSetMinterPlatform(leaseName: name, forgeType: forgeType, minterCut: minterCut, description: description, externalURL: externalURL, squareImage: squareImage, bannerImage: bannerImage, socials: socials)
         }
 
-        access(Owner) fun mintForge(name: String, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}) {
+        access(Owner) fun mintForge(name: String, forgeType: Type , data: AnyStruct, receiver: &{NonFungibleToken.Receiver}) {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }

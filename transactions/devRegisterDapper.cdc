@@ -15,7 +15,7 @@ transaction(merchAccount: Address, name: String, amount: UFix64) {
         self.price=FIND.calculateCost(name)
         log("The cost for registering this name is ".concat(self.price.toString()))
         self.mainDapperUtilityCoinVault = dapper.storage.borrow<auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault) ?? panic("Cannot borrow DapperUtilityCoin vault from account storage".concat(dapper.address.toString()))
-        self.balanceBeforeTransfer = self.mainDapperUtilityCoinvault.balance
+        self.balanceBeforeTransfer = self.mainDapperUtilityCoinVault.balance
         var finLeasesRef = account.storage.borrow<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
         if finLeasesRef == nil {
             account.storage.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
@@ -37,6 +37,6 @@ transaction(merchAccount: Address, name: String, amount: UFix64) {
     }
 
     post {
-        self.mainDapperUtilityCoinvault.balance == self.balanceBeforeTransfer: "DapperUtilityCoin leakage"
+        self.mainDapperUtilityCoinVault.balance == self.balanceBeforeTransfer: "DapperUtilityCoin leakage"
     }
 }

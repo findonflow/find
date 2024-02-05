@@ -1,4 +1,5 @@
 import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
 import ViewResolver from "../contracts/standard/ViewResolver.cdc"
 import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
 import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
@@ -23,10 +24,10 @@ transaction(
 
         let nftAccount = getAccount(addressWithNFT)
         let pubPath = PublicPath(identifier: publicPathIdentifier)!
-        let collectionCap = nftAccount.capabilities.get<&{ViewResolver.ResolverCollection}>(pubPath) ?? panic("MetadataViews Collection is not set up properly, ensure the Capability was created/linked correctly.")
+        let collectionCap = nftAccount.capabilities.get<&{NonFungibleToken.Collection}>(pubPath) ?? panic("MetadataViews Collection is not set up properly, ensure the Capability was created/linked correctly.")
         let collectionRef = collectionCap.borrow()!
         assert(collectionRef.getIDs().length > 0, message: "No NFTs exist in this collection.")
-        let nftResolver = collectionRef.borrowViewResolver(id: nftID) ?? panic("could not find item with id")
+        let nftResolver = collectionRef.borrowNFT(nftID) ?? panic("could not find item with id")
 
         // return early if already in catalog
         if FINDNFTCatalog.getCollectionDataForType(nftTypeIdentifier: nftResolver.getType().identifier) != nil {
@@ -39,9 +40,7 @@ transaction(
         let collectionData = NFTCatalog.NFTCollectionData(
             storagePath: metadataCollectionData.storagePath,
             publicPath: metadataCollectionData.publicPath,
-            privatePath: metadataCollectionData.providerPath,
             publicLinkedType : metadataCollectionData.publicLinkedType,
-            privateLinkedType : metadataCollectionData.providerLinkedType
         )
 
         let collectionDisplay = MetadataViews.getNFTCollectionDisplay(nftResolver)!

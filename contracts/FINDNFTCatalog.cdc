@@ -21,9 +21,7 @@ access(all) contract FINDNFTCatalog {
         nftType : Type,
         storagePath: StoragePath,
         publicPath: PublicPath,
-        privatePath: PrivatePath,
         publicLinkedType : Type,
-        privateLinkedType : Type,
         displayName : String,
         description: String,
         externalURL : String
@@ -38,9 +36,7 @@ access(all) contract FINDNFTCatalog {
         nftType : Type,
         storagePath: StoragePath,
         publicPath: PublicPath,
-        privatePath: PrivatePath,
         publicLinkedType : Type,
-        privateLinkedType : Type,
         displayName : String,
         description: String,
         externalURL : String
@@ -102,7 +98,7 @@ access(all) contract FINDNFTCatalog {
             // If there's only dapper input, return it
             return dapper
         }
-            // Else return what's on find
+        // Else return what's on find
         return self.catalogTypeData[nftTypeIdentifier]
     }
 
@@ -224,9 +220,7 @@ access(all) contract FINDNFTCatalog {
             nftType: metadata.nftType,
             storagePath: metadata.collectionData.storagePath,
             publicPath: metadata.collectionData.publicPath,
-            privatePath: metadata.collectionData.privatePath,
             publicLinkedType : metadata.collectionData.publicLinkedType,
-            privateLinkedType : metadata.collectionData.privateLinkedType,
             displayName : metadata.collectionDisplay.name,
             description: metadata.collectionDisplay.description,
             externalURL : metadata.collectionDisplay.externalURL.url
@@ -253,9 +247,7 @@ access(all) contract FINDNFTCatalog {
             nftType: metadata.nftType,
             storagePath: metadata.collectionData.storagePath,
             publicPath: metadata.collectionData.publicPath,
-            privatePath: metadata.collectionData.privatePath,
             publicLinkedType : metadata.collectionData.publicLinkedType,
-            privateLinkedType : metadata.collectionData.privateLinkedType,
             displayName : metadata.collectionDisplay.name,
             description: metadata.collectionDisplay.description,
             externalURL : metadata.collectionDisplay.externalURL.url

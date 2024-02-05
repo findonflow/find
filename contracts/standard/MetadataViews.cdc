@@ -1,6 +1,6 @@
-import FungibleToken from "./FungibleToken.cdc"
-import NonFungibleToken from "./NonFungibleToken.cdc"
-import ViewResolver from "./ViewResolver.cdc"
+import FungibleToken from 0xee82856bf20e2aa6
+import NonFungibleToken from 0xf8d6e0586b0a20c7
+import ViewResolver from 0xf8d6e0586b0a20c7
 
 /// This contract implements the metadata standard proposed
 /// in FLIP-0636.
@@ -624,7 +624,8 @@ access(all) contract MetadataViews {
             createEmptyCollectionFunction: fun(): @{NonFungibleToken.Collection}
         ) {
             pre {
-                publicLinkedType.isSubtype(of: Type<&{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>()): "Public type must include NonFungibleToken.Receiver and ViewResolver.ResolverCollection interfaces."
+                //TODO: 
+                publicLinkedType.isSubtype(of: Type<&{NonFungibleToken.Receiver}>()): "Public type must include NonFungibleToken.Receiver and ViewResolver.ResolverCollection interfaces."
             }
             self.storagePath=storagePath
             self.publicPath=publicPath

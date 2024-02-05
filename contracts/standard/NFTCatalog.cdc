@@ -20,9 +20,7 @@ access(all) contract NFTCatalog {
         nftType : Type,
         storagePath: StoragePath,
         publicPath: PublicPath,
-        privatePath: PrivatePath,
         publicLinkedType : Type,
-        privateLinkedType : Type,
         displayName : String,
         description: String,
         externalURL : String
@@ -37,9 +35,7 @@ access(all) contract NFTCatalog {
         nftType : Type,
         storagePath: StoragePath,
         publicPath: PublicPath,
-        privatePath: PrivatePath,
         publicLinkedType : Type,
-        privateLinkedType : Type,
         displayName : String,
         description: String,
         externalURL : String
@@ -102,22 +98,16 @@ access(all) contract NFTCatalog {
 
         access(all) let storagePath : StoragePath
         access(all) let publicPath : PublicPath
-        access(all) let privatePath: PrivatePath
         access(all) let publicLinkedType: Type
-        access(all) let privateLinkedType: Type
 
         init(
             storagePath : StoragePath,
             publicPath : PublicPath,
-            privatePath : PrivatePath,
             publicLinkedType : Type,
-            privateLinkedType : Type
         ) {
             self.storagePath = storagePath
             self.publicPath = publicPath
-            self.privatePath = privatePath
             self.publicLinkedType = publicLinkedType
-            self.privateLinkedType = privateLinkedType
         }
     }
 
@@ -246,9 +236,7 @@ access(all) contract NFTCatalog {
             nftType: metadata.nftType,
             storagePath: metadata.collectionData.storagePath,
             publicPath: metadata.collectionData.publicPath,
-            privatePath: metadata.collectionData.privatePath,
             publicLinkedType : metadata.collectionData.publicLinkedType,
-            privateLinkedType : metadata.collectionData.privateLinkedType,
             displayName : metadata.collectionDisplay.name,
             description: metadata.collectionDisplay.description,
             externalURL : metadata.collectionDisplay.externalURL.url
@@ -275,9 +263,7 @@ access(all) contract NFTCatalog {
             nftType: metadata.nftType,
             storagePath: metadata.collectionData.storagePath,
             publicPath: metadata.collectionData.publicPath,
-            privatePath: metadata.collectionData.privatePath,
             publicLinkedType : metadata.collectionData.publicLinkedType,
-            privateLinkedType : metadata.collectionData.privateLinkedType,
             displayName : metadata.collectionDisplay.name,
             description: metadata.collectionDisplay.description,
             externalURL : metadata.collectionDisplay.externalURL.url

@@ -189,7 +189,7 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("soulBound", false),
 	)
 
-	exampleIds = er.GetIdsFromEvent("NonFungibleToken.Deposit", "id")
+	exampleIds = er.GetIdsFromEvent("NonFungibleToken.Deposited", "id")
 
 	// we register example NFT in the catalog
 	exampleNFTIdentifier, _ := o.QualifiedIdentifier("ExampleNFT", "NFT")

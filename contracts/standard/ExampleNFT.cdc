@@ -174,32 +174,29 @@ access(all) contract ExampleNFT: ViewResolver {
 
     access(all) view fun getContractViews(resourceType: Type?): [Type] {
         return [
-            Type<MetadataViews.NFTCollectionData>(),
-            Type<MetadataViews.NFTCollectionDisplay>()
+        Type<MetadataViews.NFTCollectionData>(),
+        Type<MetadataViews.NFTCollectionDisplay>()
         ]
     }
 
     access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
         switch viewType {
-            case Type<MetadataViews.NFTCollectionData>():
-                let collectionRef = self.account.storage.borrow<&ExampleNFT.Collection>(
-                        from: ExampleNFT.CollectionStoragePath
-                    ) ?? panic("Could not borrow a reference to the stored collection")
-                let collectionData = MetadataViews.NFTCollectionData(
-                    storagePath: ExampleNFT.CollectionStoragePath,
-                    publicPath: ExampleNFT.CollectionPublicPath,
-                    publicCollection: Type<&ExampleNFT.Collection>(),
-                    publicLinkedType: Type<&ExampleNFT.Collection>(),
-                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
-                        return <-ExampleNFT.createEmptyCollection()
-                    })
-                )
-                return collectionData
+        case Type<MetadataViews.NFTCollectionData>():
+            let collectionData = MetadataViews.NFTCollectionData(
+                storagePath: ExampleNFT.CollectionStoragePath,
+                publicPath: ExampleNFT.CollectionPublicPath,
+                publicCollection: Type<&ExampleNFT.Collection>(),
+                publicLinkedType: Type<&ExampleNFT.Collection>(),
+                createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                    return <-ExampleNFT.createEmptyCollection()
+                })
+            )
+            return collectionData
         }
         return nil
     }
 
-    access(all) resource Collection: NonFungibleToken.Collection {
+    access(all) resource Collection: NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         /// dictionary of NFT conforming tokens
         /// NFT is a resource type with an `UInt64` ID field
         access(contract) var ownedNFTs: @{UInt64: ExampleNFT.NFT}
@@ -351,17 +348,14 @@ access(all) contract ExampleNFT: ViewResolver {
     access(all) view fun getCollectionData(nftType: Type): MetadataViews.NFTCollectionData? {
         switch nftType {
         case Type<@ExampleNFT.NFT>():
-                let collectionRef = self.account.storage.borrow<&ExampleNFT.Collection>(
-                        from: /storage/cadenceExampleNFTCollection
-                    ) ?? panic("Could not borrow a reference to the stored collection")
-               let collectionData = MetadataViews.NFTCollectionData(
-                    storagePath: ExampleNFT.CollectionStoragePath,
-                    publicPath: ExampleNFT.CollectionPublicPath,
-                    publicCollection: Type<&ExampleNFT.Collection>(),
-                    publicLinkedType: Type<&ExampleNFT.Collection>(),
-                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
-                        return <-ExampleNFT.createEmptyCollection()
-                    })
+            let collectionData = MetadataViews.NFTCollectionData(
+                storagePath: ExampleNFT.CollectionStoragePath,
+                publicPath: ExampleNFT.CollectionPublicPath,
+                publicCollection: Type<&ExampleNFT.Collection>(),
+                publicLinkedType: Type<&ExampleNFT.Collection>(),
+                createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                    return <-ExampleNFT.createEmptyCollection()
+                })
             )
             return collectionData
         default:
