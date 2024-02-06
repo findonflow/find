@@ -1,6 +1,6 @@
-import FungibleToken from 0xee82856bf20e2aa6
-import NonFungibleToken from 0xf8d6e0586b0a20c7
-import ViewResolver from 0xf8d6e0586b0a20c7
+import "FungibleToken" 
+import "NonFungibleToken"
+import "ViewResolver"
 
 /// This contract implements the metadata standard proposed
 /// in FLIP-0636.
