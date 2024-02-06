@@ -1,11 +1,11 @@
-import FIND from "../contracts/FIND.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
-import Profile from "../contracts/Profile.cdc"
-import FindRelatedAccounts from "../contracts/FindRelatedAccounts.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import "FIND"
+import "FindMarket"
+import "FindLeaseMarket"
+import "Profile"
+import "FindRelatedAccounts"
+import "FUSD"
+import "TokenForwarding"
+import "FungibleToken"
 
 access(all) struct FINDReport {
 	access(all) let profile:Profile.UserReport?

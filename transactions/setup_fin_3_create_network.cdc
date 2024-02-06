@@ -1,7 +1,7 @@
-import Admin from "../contracts/Admin.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
+import "Admin"
+import "FUSD"
+import "FungibleToken"
+import "FiatToken"
 
 transaction() {
     prepare(account: auth (BorrowValue, SaveValue, StorageCapabilities, IssueStorageCapabilityController, PublishCapability) &Account) {

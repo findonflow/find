@@ -1,6 +1,6 @@
-import FIND from "../contracts/FIND.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import Dandy from "../contracts/Dandy.cdc"
+import "FIND"
+import "NonFungibleToken"
+import "Dandy"
 
 transaction(user: String, id: UInt64) {
 

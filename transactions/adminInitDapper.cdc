@@ -1,6 +1,6 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
+import "FungibleToken"
+import "DapperUtilityCoin"
+import "TokenForwarding"
 
 
 transaction(dapperAddress:Address) {

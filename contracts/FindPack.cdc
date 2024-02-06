@@ -1,13 +1,13 @@
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import FungibleToken from "./standard/FungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "NonFungibleToken"
+import "FungibleToken"
+import "MetadataViews"
 import Crypto
-import Clock from "../contracts/Clock.cdc"
-import Debug from "./Debug.cdc"
-import FindForge from "../contracts/FindForge.cdc"
-import FindVerifier from "./FindVerifier.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import ViewResolver from "../contracts/standard/ViewResolver.cdc"
+import "Clock"
+import "Debug"
+import "FindForge"
+import "FindVerifier"
+import "FINDNFTCatalog"
+import "ViewResolver"
 
 access(all) contract FindPack {
     // Events

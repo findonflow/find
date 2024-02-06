@@ -1,8 +1,8 @@
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindThoughts from "../contracts/FindThoughts.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FindUtils from "../contracts/FindUtils.cdc"
+import "MetadataViews"
+import "FindThoughts"
+import "FINDNFTCatalog"
+import "FindViews"
+import "FindUtils"
 
 transaction(header: String , body: String , tags: [String], mediaHash: String?, mediaType: String?, quoteNFTOwner: Address?, quoteNFTType: String?, quoteNFTId: UInt64?, quoteCreator: Address?, quoteId: UInt64?) {
 

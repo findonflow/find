@@ -1,12 +1,12 @@
-import FungibleToken from "./standard/FungibleToken.cdc"
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import Clock from "./Clock.cdc"
-import Debug from "./Debug.cdc"
-import FIND from "./FIND.cdc"
-import FindMarket from "./FindMarket.cdc"
-import Profile from "./Profile.cdc"
+import "FungibleToken"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FindViews"
+import "Clock"
+import "Debug"
+import "FIND"
+import "FindMarket"
+import "Profile"
 
 access(all) contract FindMarketDirectOfferEscrow {
 

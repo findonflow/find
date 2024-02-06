@@ -1,5 +1,5 @@
-import FindForge from "../contracts/FindForge.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FindForge"
+import "FIND"
 
 //link together the administrator to the client, signed by the owner of the contract
 transaction(ownerAddress: Address) {

@@ -1,11 +1,11 @@
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "FindMarketAdmin"
+import "FindMarket"
+import "FlowToken"
+import "FUSD"
+import "FiatToken"
+import "DapperUtilityCoin"
+import "FlowUtilityToken"
+import "MetadataViews"
 
 transaction(tenant: Address, cut: UFix64){
     prepare(account: auth(BorrowValue) &Account){

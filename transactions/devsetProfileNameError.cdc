@@ -1,4 +1,4 @@
-import Profile from "../contracts/Profile.cdc"
+import "Profile"
 
 //THIS always fails
 transaction(address:Address, newName: String) {

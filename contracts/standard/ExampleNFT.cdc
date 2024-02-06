@@ -9,13 +9,13 @@
 *
 */
 
-import NonFungibleToken from "./NonFungibleToken.cdc"
-import FungibleToken from "./FungibleToken.cdc"
-import MetadataViews from "./MetadataViews.cdc"
-import FindViews from "../FindViews.cdc"
-import FindForge from "../FindForge.cdc"
-import DapperUtilityCoin from "./DapperUtilityCoin.cdc"
-import ViewResolver from "./ViewResolver.cdc"
+import "NonFungibleToken"
+import "FungibleToken"
+import "MetadataViews"
+import "FindViews"
+import "FindForge"
+import "DapperUtilityCoin"
+import "ViewResolver"
 
 
 access(all) contract ExampleNFT: ViewResolver {

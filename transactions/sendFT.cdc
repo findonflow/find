@@ -1,7 +1,7 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import Sender from "../contracts/Sender.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
+import "FungibleToken"
+import "Sender"
+import "FIND"
+import "FTRegistry"
 
 
 transaction(name: String, amount: UFix64, ftAliasOrIdentifier: String, tag: String, message:String) {

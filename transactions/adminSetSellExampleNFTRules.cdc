@@ -1,10 +1,10 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import "FindMarket"
+import "FindMarketAdmin"
+import "DapperUtilityCoin"
+import "FlowToken"
+import "ExampleNFT"
+import "MetadataViews"
+import "FungibleToken"
 
 transaction(tenant: Address, merchAddress: Address) {
     prepare(account: auth(BorrowValue) &Account){

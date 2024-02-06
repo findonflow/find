@@ -1,9 +1,9 @@
-import FungibleToken from "../standard/FungibleToken.cdc"
-import NonFungibleToken from "../standard/NonFungibleToken.cdc"
-import FUSD from "../standard/FUSD.cdc"
+import "FungibleToken"
+import "NonFungibleToken"
+import "FUSD"
 
-import FlowtyUtils from "./FlowtyUtils.cdc"
-import CoatCheck from "./CoatCheck.cdc"
+import "FlowtyUtils"
+import "CoatCheck"
 
 // Flowty
 //

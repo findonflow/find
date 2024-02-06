@@ -1,6 +1,6 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import CharityNFT from "../contracts/CharityNFT.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "CharityNFT"
 
 //This transaction will prepare the art collection
 transaction() {

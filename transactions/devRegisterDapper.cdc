@@ -1,7 +1,7 @@
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import Profile from "../contracts/Profile.cdc"
+import "DapperUtilityCoin"
+import "FIND"
+import "FungibleToken"
+import "Profile"
 
 transaction(merchAccount: Address, name: String, amount: UFix64) {
 

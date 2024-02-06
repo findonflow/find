@@ -1,8 +1,8 @@
 //This contract is for testing only and should not be deployed elsewhere
 
-import NonFungibleToken from "../standard/NonFungibleToken.cdc"
-import MetadataViews from "../standard/MetadataViews.cdc"
-import Wearables from "./Wearables.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "Wearables"
 
 access(all) contract WearablesDev {
 

@@ -1,7 +1,7 @@
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FindUtils from "../contracts/FindUtils.cdc"
+import "MetadataViews"
+import "FIND"
+import "FINDNFTCatalog"
+import "FindUtils"
 import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
 
 

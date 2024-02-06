@@ -1,5 +1,5 @@
-import Admin from "../contracts/Admin.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
+import "Admin"
+import "FlowUtilityToken"
 
 transaction() {
 

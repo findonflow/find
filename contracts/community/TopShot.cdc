@@ -1,7 +1,7 @@
 
 
-import NonFungibleToken from "../standard/NonFungibleToken.cdc"
-import MetadataViews from "../standard/MetadataViews.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
 
 access(all) contract TopShot: NonFungibleToken {
 

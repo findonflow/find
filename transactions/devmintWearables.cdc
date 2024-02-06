@@ -1,4 +1,4 @@
-import WearablesDev from "../contracts/community/WearablesDev.cdc"
+import "WearablesDev"
 
 transaction(receiver: Address,) {
 	prepare(account: auth(BorrowValue) &Account) {

@@ -1,5 +1,5 @@
-import FIND from "../contracts/FIND.cdc"
-import Profile from "../contracts/Profile.cdc"
+import "FIND"
+import "Profile"
 
 access(all) fun main(name: String) : NameReport? {
 

@@ -1,11 +1,11 @@
-import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
-import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
+import "TokenForwarding"
+import "FungibleToken"
+import "DapperUtilityCoin"
+import "FlowUtilityToken"
+import "FungibleTokenSwitchboard"
+import "FiatToken"
+import "FUSD"
+import "FlowToken"
 
 /**
  This is a transaction to set up an merchant account

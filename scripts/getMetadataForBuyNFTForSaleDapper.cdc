@@ -1,5 +1,5 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
+import "FindMarket"
+import "FindMarketSale"
 
 access(all) fun main(address: Address, id: UInt64, amount: UFix64) : PurchaseData {
 

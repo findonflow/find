@@ -1,7 +1,7 @@
 
-import Admin from "../contracts/Admin.cdc"
-import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "Admin"
+import "ExampleNFT"
+import "MetadataViews"
 
 transaction(lease: String) {
 

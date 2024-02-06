@@ -1,7 +1,7 @@
-import FungibleToken from "./FungibleToken.cdc"
-import ViewResolver from "./ViewResolver.cdc"
-import MetadataViews from "./MetadataViews.cdc"
-import FungibleTokenMetadataViews from "./FungibleTokenMetadataViews.cdc"
+import "FungibleToken"
+import "ViewResolver"
+import "MetadataViews"
+import "FungibleTokenMetadataViews"
 
 access(all) contract DapperUtilityCoin: ViewResolver  {
 

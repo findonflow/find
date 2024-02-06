@@ -1,4 +1,4 @@
-import FIND from "../contracts/FIND.cdc"
+import "FIND"
 
 access(all) fun main(merchAccount: Address, name: String, amount: UFix64) : PurchaseData {
 

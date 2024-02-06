@@ -1,7 +1,7 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
+import "FungibleToken"
+import "DapperUtilityCoin"
 import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc" 
-import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
+import "TokenForwarding"
 
 transaction(dapperAddress: Address) {
     prepare(account: auth(BorrowValue, SaveValue, Capabilities) &Account) {

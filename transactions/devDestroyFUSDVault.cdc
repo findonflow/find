@@ -1,4 +1,4 @@
-import FUSD from "../contracts/standard/FUSD.cdc"
+import "FUSD"
 
 transaction() {
     prepare(account: auth(UnpublishCapability, LoadValue) &Account) {

@@ -52,7 +52,7 @@ func TestFIND(t *testing.T) {
 		otu.expireLease().tickClock(2.0)
 
 		otu.O.Tx(`
-				import FIND from "../contracts/FIND.cdc"
+				import "FIND"
 
 				transaction(name: String) {
 
@@ -74,7 +74,7 @@ func TestFIND(t *testing.T) {
 	})
 
 	ot.Run(t, "Should be able to lookup address", func(t *testing.T) {
-		ot.O.Script(`import FIND from "../contracts/FIND.cdc"
+		ot.O.Script(`import "FIND"
 access(all) fun main(name: String) :  Address? {
     return FIND.lookupAddress(name) } `,
 			WithArg("name", "user1"),
@@ -525,7 +525,7 @@ access(all) fun main(name: String) :  Address? {
 		otu.expireLease().expireLease().tickClock(2.0)
 
 		otu.O.Script(`
-		 			import FIND from "../contracts/FIND.cdc"
+		 			import "FIND"
 
 		 			access(all) fun main(user: Address) : [FIND.LeaseInformation] {
             let finLeases= getAccount(user).capabilities.borrow<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
@@ -541,7 +541,7 @@ access(all) fun main(name: String) :  Address? {
 		otu.expireLease().expireLease().tickClock(2.0)
 
 		otu.O.Script(`
-		 			import FIND from "../contracts/FIND.cdc"
+		 			import "FIND"
 
 		 			access(all) fun main(user: Address) : [String] {
             let finLeases= getAccount(user).capabilities.borrow<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
@@ -557,7 +557,7 @@ access(all) fun main(name: String) :  Address? {
 		otu.expireLease().expireLease().tickClock(2.0)
 
 		otu.O.Script(`
-		 			import FIND from "../contracts/FIND.cdc"
+		 			import "FIND"
 
 		 			access(all) fun main(user: Address) : [String] {
             let finLeases= getAccount(user).capabilities.borrow<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!

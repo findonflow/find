@@ -1,12 +1,12 @@
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import FungibleToken from "./standard/FungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "NonFungibleToken"
+import "FungibleToken"
+import "MetadataViews"
 import Crypto
-import Clock from "../contracts/Clock.cdc"
-import Debug from "./Debug.cdc"
-import FLOAT from "../contracts/standard/FLOAT.cdc"
-import Bl0x from "../contracts/Bl0x.cdc"
-import ViewResolver from "./standard/ViewResolver.cdc"
+import "Clock"
+import "Debug"
+import "FLOAT"
+import "Bl0x"
+import "ViewResolver"
 
 access(all) contract Bl0xPack: ViewResolver {
     // Events

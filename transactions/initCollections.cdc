@@ -1,10 +1,10 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import NameVoucher from "../contracts/NameVoucher.cdc"
-import Wearables from "../contracts/community/Wearables.cdc"
-import PartyFavorz from "../contracts/PartyFavorz.cdc"
-import NFGv3 from "../contracts/NFGv3.cdc"
-import Dandy from "../contracts/Dandy.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "NameVoucher"
+import "Wearables"
+import "PartyFavorz"
+import "NFGv3"
+import "Dandy"
 
 transaction() {
 	prepare(account: auth(BorrowValue) &Account) {

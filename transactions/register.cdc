@@ -1,6 +1,6 @@
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import "FUSD"
+import "FIND"
+import "FungibleToken"
 
 transaction(name: String, amount: UFix64) {
 

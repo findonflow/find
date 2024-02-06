@@ -1,10 +1,10 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
+import "FindMarket"
+import "FindMarketSale"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FindViews"
+import "FINDNFTCatalog"
+import "FTRegistry"
 
 transaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {
 

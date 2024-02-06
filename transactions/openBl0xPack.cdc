@@ -1,8 +1,8 @@
-import Bl0x from "../contracts/Bl0x.cdc"
-import Bl0xPack from "../contracts/Bl0xPack.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "Bl0x"
+import "Bl0xPack"
+import "FungibleToken"
+import "NonFungibleToken"
+import "MetadataViews"
 
 /// A transaction to open a pack with a given id
 /// @param packId: The id of the pack to open

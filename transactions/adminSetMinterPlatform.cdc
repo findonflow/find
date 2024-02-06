@@ -1,4 +1,4 @@
-import Admin from "../contracts/Admin.cdc"
+import "Admin"
 
 transaction(name: String, forgeType: Type, minterCut: UFix64?, description: String, externalURL: String, squareImage: String, bannerImage: String, socials: {String : String}){
     prepare(account: auth(BorrowValue) &Account){

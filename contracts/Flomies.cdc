@@ -1,9 +1,9 @@
-import FungibleToken from "./standard/FungibleToken.cdc"
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
-import FindForge from "./FindForge.cdc"
-import FindPack from "./FindPack.cdc"
-import ViewResolver from "./standard/ViewResolver.cdc"
+import "FungibleToken"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FindForge"
+import "FindPack"
+import "ViewResolver"
 
 
 access(all) contract Flomies: ViewResolver{

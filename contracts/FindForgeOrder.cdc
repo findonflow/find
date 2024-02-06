@@ -1,9 +1,9 @@
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import FungibleToken from "./standard/FungibleToken.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
-import ViewResolver from "./standard/ViewResolver.cdc"
-import FIND from "./FIND.cdc"
-import FindUtils from "./FindUtils.cdc"
+import "NonFungibleToken"
+import "FungibleToken"
+import "MetadataViews"
+import "ViewResolver"
+import "FIND"
+import "FindUtils"
 
 access(all) contract FindForgeOrder {
 

@@ -1,10 +1,10 @@
-import FIND from "../contracts/FIND.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import PartyFavorz from "../contracts/PartyFavorz.cdc"
-import Profile from "../contracts/Profile.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindForge from "../contracts/FindForge.cdc"
+import "FIND"
+import "NonFungibleToken"
+import "FungibleToken"
+import "PartyFavorz"
+import "Profile"
+import "MetadataViews"
+import "FindForge"
 
 
 transaction(name: String, startFrom: UInt64, number: Int, maxEditions:UInt64, nftName:String, nftDescription:String, imageHash:String, fullSizeHash: String, artist: String, season: UInt64, royaltyReceivers: [Address], royaltyCuts: [UFix64], royaltyDescs: [String], squareImage: String, bannerImage: String) {

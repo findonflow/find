@@ -1,8 +1,8 @@
 
 
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import Admin from "../contracts/Admin.cdc"
+import "MetadataViews"
+import "NFTCatalog"
+import "Admin"
 
 transaction(
     collectionIdentifier : String,

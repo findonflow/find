@@ -1,6 +1,6 @@
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindThoughts from "../contracts/FindThoughts.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "MetadataViews"
+import "FindThoughts"
+import "FIND"
 
 transaction(users: [String], ids: [UInt64] , reactions: [String], undoReactionUsers: [String], undoReactionIds: [UInt64]) {
 

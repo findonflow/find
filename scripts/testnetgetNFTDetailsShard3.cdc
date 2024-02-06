@@ -1,4 +1,4 @@
-import FIND from "../contracts/FIND.cdc"
+import "FIND"
 // import AlchemyMetadataWrapperTestnetShard1 from 0x5ff2c7b4c40de11
 // import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
 import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11

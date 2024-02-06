@@ -1,6 +1,6 @@
 // Mainnet
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
+import "FungibleToken"
+import "FUSD"
 
 // Testnet
 // import FungibleToken from 0x9a0766d93b6608b7

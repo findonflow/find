@@ -1,7 +1,7 @@
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import ViewResolver from "../contracts/standard/ViewResolver.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+import "MetadataViews"
+import "ViewResolver"
+import "FIND"
+import "FINDNFTCatalog"
 
 access(all) fun main(user: String, collections: [String]) : {String : ItemReport} {
     return fetchNFTCatalog(user: user, targetCollections:collections)

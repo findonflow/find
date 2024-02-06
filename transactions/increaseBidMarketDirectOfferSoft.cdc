@@ -1,5 +1,5 @@
-import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
+import "FindMarketDirectOfferSoft"
+import "FindMarket"
 
 transaction(id: UInt64, amount: UFix64) {
 

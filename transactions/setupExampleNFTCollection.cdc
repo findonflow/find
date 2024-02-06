@@ -1,8 +1,8 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import ViewResolver from "../contracts/standard/ViewResolver.cdc"
-import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
-import Debug from "../contracts/Debug.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "ViewResolver"
+import "ExampleNFT"
+import "Debug"
 
 transaction() {
     prepare(account: auth(BorrowValue, SaveValue, PublishCapability, IssueStorageCapabilityController,UnpublishCapability) &Account) {

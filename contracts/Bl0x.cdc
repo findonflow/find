@@ -1,6 +1,6 @@
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
-import ViewResolver from "./standard/ViewResolver.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "ViewResolver"
 
 access(all) contract Bl0x: ViewResolver {
 

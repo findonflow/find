@@ -1,10 +1,10 @@
-import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
+import "FindMarketDirectOfferSoft"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FindViews"
+import "NFTCatalog"
+import "FINDNFTCatalog"
+import "FindMarket"
 
 transaction(ids: [UInt64]) {
 

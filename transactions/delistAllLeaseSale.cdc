@@ -1,6 +1,6 @@
-import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
+import "FindLeaseMarketSale"
+import "FindMarket"
+import "FindLeaseMarket"
 
 transaction() {
 	prepare(account: auth(BorrowValue) &Account) {

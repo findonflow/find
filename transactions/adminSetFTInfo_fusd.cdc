@@ -1,5 +1,5 @@
-import Admin from "../contracts/Admin.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
+import "Admin"
+import "FUSD"
 
 transaction() {
 

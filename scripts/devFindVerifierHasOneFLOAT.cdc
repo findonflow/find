@@ -1,4 +1,4 @@
-import FindVerifier from "../contracts/FindVerifier.cdc"
+import "FindVerifier"
 
 access(all) fun main(user: Address, floatIDs: [UInt64]) : Result {
     let verifier = FindVerifier.HasOneFLOAT(floatIDs)

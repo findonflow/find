@@ -1,4 +1,4 @@
-import MetadataViews from "./standard/MetadataViews.cdc"
+import "MetadataViews"
 
 access(all) contract FindForgeStruct {
 

@@ -1,8 +1,8 @@
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import ViewResolver from "../contracts/standard/ViewResolver.cdc"
-import Admin from "../contracts/Admin.cdc"
+import "MetadataViews"
+import "FINDNFTCatalog"
+import "NFTCatalog"
+import "ViewResolver"
+import "Admin"
 
 transaction(
     collectionIdentifier : String,

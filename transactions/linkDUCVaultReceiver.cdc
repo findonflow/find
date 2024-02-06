@@ -1,5 +1,5 @@
-import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import "TokenForwarding"
+import "FungibleToken"
 
 
 transaction() {

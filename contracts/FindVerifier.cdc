@@ -1,8 +1,8 @@
-import FLOAT from "../contracts/standard/FLOAT.cdc"
-import FIND from "../contracts/FIND.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import ViewResolver from "../contracts/standard/ViewResolver.cdc"
+import "FLOAT"
+import "FIND"
+import "NonFungibleToken"
+import "MetadataViews"
+import "ViewResolver"
 
 access(all) contract FindVerifier {
 

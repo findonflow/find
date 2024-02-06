@@ -1,6 +1,6 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+import "NonFungibleToken"
+import "FIND"
+import "FINDNFTCatalog"
 
 access(all) fun main(user: String) : {String : CollectionLength} {
 

@@ -1,4 +1,4 @@
-import FindRelatedAccounts from "../contracts/FindRelatedAccounts.cdc"
+import "FindRelatedAccounts"
 
 access(all) fun main(user: Address, name: String, address: Address) : Bool {
     let cap = FindRelatedAccounts.getCapability(user)

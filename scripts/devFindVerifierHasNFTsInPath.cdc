@@ -1,4 +1,4 @@
-import FindVerifier from "../contracts/FindVerifier.cdc"
+import "FindVerifier"
 
 access(all) fun main(user: Address, path: String, threshold: Int) : Result {
     let verifier = FindVerifier.HasNFTsInPath(path: PublicPath(identifier: path)!, threshold: threshold)

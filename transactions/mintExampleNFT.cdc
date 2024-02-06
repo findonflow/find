@@ -1,7 +1,7 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "NonFungibleToken"
+import "FungibleToken"
+import "ExampleNFT"
+import "MetadataViews"
 
 transaction(address: Address, name: String, description: String, thumbnail: String, soulBound: Bool) {
     let cap : Capability<&ExampleNFT.Collection>

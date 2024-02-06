@@ -125,7 +125,7 @@ func (otu *OverflowTestUtils) registerUserWithNameTransaction(buyer, name string
 }
 
 func (out *OverflowTestUtils) currentTime() float64 {
-	value, err := out.O.Script(`import Clock from "../contracts/Clock.cdc"
+	value, err := out.O.Script(`import "Clock"
 access(all) fun main() :  UFix64 {
     return Clock.time()
 }`).GetAsInterface()

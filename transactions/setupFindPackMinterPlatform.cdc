@@ -1,7 +1,7 @@
 
-import FIND from "../contracts/FIND.cdc"
-import FindForge from "../contracts/FindForge.cdc"
-import FindPack from "../contracts/FindPack.cdc"
+import "FIND"
+import "FindForge"
+import "FindPack"
 
 transaction(lease: String) {
 	prepare(account: auth(BorrowValue) &Account) {

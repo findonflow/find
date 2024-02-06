@@ -1,8 +1,8 @@
-import LostAndFoundHelper from "../contracts/standard/LostAndFoundHelper.cdc"
-import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+import "LostAndFoundHelper"
+import "FindLostAndFoundWrapper"
+import "NonFungibleToken"
+import "FIND"
+import "FINDNFTCatalog"
 
 access(all) fun main(user: String) : Report {
 

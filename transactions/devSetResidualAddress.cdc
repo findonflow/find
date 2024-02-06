@@ -1,4 +1,4 @@
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
+import "FindMarketAdmin"
 
 transaction(address: Address) {
 

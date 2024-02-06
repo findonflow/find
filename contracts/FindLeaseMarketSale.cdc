@@ -1,10 +1,10 @@
-import FungibleToken from "./standard/FungibleToken.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import Clock from "./Clock.cdc"
-import FIND from "./FIND.cdc"
-import FindLeaseMarket from "./FindLeaseMarket.cdc"
-import FindMarket from "./FindMarket.cdc"
-import Debug from "../contracts/Debug.cdc"
+import "FungibleToken"
+import "FindViews"
+import "Clock"
+import "FIND"
+import "FindLeaseMarket"
+import "FindMarket"
+import "Debug"
 
 /*
 

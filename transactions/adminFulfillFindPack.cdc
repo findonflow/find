@@ -1,5 +1,5 @@
-import FindPack from "../contracts/FindPack.cdc"
-import Admin from "../contracts/Admin.cdc"
+import "FindPack"
+import "Admin"
 
 // access(account) fun fulfill(packId: UInt64, types:[Type], rewardIds: [UInt64], salt:String) {
 transaction(packId:UInt64, rewardIds:[UInt64], typeIdentifiers: [String], salt:String) {

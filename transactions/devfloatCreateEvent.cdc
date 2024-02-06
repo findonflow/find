@@ -1,8 +1,8 @@
-import FLOAT from "../contracts/standard/FLOAT.cdc"
-import FLOATVerifiers from "../contracts/standard/FLOATVerifiers.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import GrantedAccountAccess from "../contracts/standard/GrantedAccountAccess.cdc"
+import "FLOAT"
+import "FLOATVerifiers"
+import "NonFungibleToken"
+import "MetadataViews"
+import "GrantedAccountAccess"
 
 transaction(
     forHost: Address, 

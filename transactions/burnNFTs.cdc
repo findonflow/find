@@ -1,10 +1,10 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FindFurnace from "../contracts/FindFurnace.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "NFTCatalog"
+import "FINDNFTCatalog"
+import "FindViews"
+import "FIND"
+import "FindFurnace"
 
 
 transaction(types: [String] , ids: [UInt64], messages: [String]) {

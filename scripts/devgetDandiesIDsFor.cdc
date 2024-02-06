@@ -1,5 +1,5 @@
-import Dandy from "../contracts/Dandy.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "Dandy"
+import "FIND"
 
 access(all) 
 fun main(user: String, minter: String) : [UInt64] {

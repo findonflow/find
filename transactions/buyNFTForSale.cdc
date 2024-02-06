@@ -1,11 +1,11 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FindMarket"
+import "FindMarketSale"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FINDNFTCatalog"
+import "FTRegistry"
+import "FungibleToken"
+import "FIND"
 transaction(user: String, id: UInt64, amount: UFix64) {
 
     var targetCapability : Capability<&{NonFungibleToken.Receiver}>

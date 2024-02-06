@@ -1,8 +1,8 @@
-import FiatToken from "../contracts/standard/FiatToken.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import SwapRouter from "../contracts/community/SwapRouter.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FiatToken"
+import "FlowToken"
+import "FungibleToken"
+import "SwapRouter"
+import "FIND"
 
 transaction(
     name: String, 

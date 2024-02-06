@@ -1,6 +1,6 @@
-import FindPack from "../contracts/FindPack.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "FindPack"
+import "FTRegistry"
+import "MetadataViews"
 
 access(all) fun main(packTypeName: String) : {UInt64 : Report} {
 	let packs = FindPack.getMetadataByName(packTypeName: packTypeName)

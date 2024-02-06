@@ -1,6 +1,6 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
+import "FungibleToken"
+import "FUSD"
+import "FiatToken"
 
 
 transaction() {

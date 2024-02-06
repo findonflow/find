@@ -1,8 +1,8 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FIND from "../contracts/FIND.cdc"
-import Profile from "../contracts/Profile.cdc"
+import "FungibleToken"
+import "FUSD"
+import "FlowToken"
+import "FIND"
+import "Profile"
 
 // map of {User in string (find name or address) : [tag]}
 transaction(follows:{String : [String]}) {

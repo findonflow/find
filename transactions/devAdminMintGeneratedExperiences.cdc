@@ -1,9 +1,9 @@
-import Admin from "../contracts/Admin.cdc"
-import FIND from "../contracts/FIND.cdc"
-import GeneratedExperiences from "../contracts/GeneratedExperiences.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindForge from "../contracts/FindForge.cdc"
+import "Admin"
+import "FIND"
+import "GeneratedExperiences"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FindForge"
 
 transaction(name: String, info: [GeneratedExperiences.Info]) {
     prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, UnpublishCapability) &Account) {

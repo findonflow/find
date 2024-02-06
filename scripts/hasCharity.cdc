@@ -1,4 +1,4 @@
-import CharityNFT from "../contracts/CharityNFT.cdc"
+import "CharityNFT"
 
 access(all) fun main(user: Address) : Bool {
 	let account=getAccount(user)

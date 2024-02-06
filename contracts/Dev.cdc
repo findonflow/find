@@ -1,9 +1,9 @@
 // This contract is for Development purpose only
 // DO NOT DEPLOY TO TESTNET OR MAINNET
 
-import FindMarket from "../contracts/FindMarket.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import "FindMarket"
+import "FTRegistry"
+import "FungibleToken"
 
 access(all) contract Dev {
     access(all) fun getPaymentWallet(addr: Address, ftType: String, path: PublicPath, panicOnFailCheck: Bool) : &{FungibleToken.Receiver} {

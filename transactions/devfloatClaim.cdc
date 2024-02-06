@@ -1,10 +1,10 @@
-import FLOAT from "../contracts/standard/FLOAT.cdc"
-import FLOATVerifiers from "../contracts/standard/FLOATVerifiers.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import GrantedAccountAccess from "../contracts/standard/GrantedAccountAccess.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import "FLOAT"
+import "FLOATVerifiers"
+import "NonFungibleToken"
+import "MetadataViews"
+import "GrantedAccountAccess"
+import "FlowToken"
+import "FungibleToken"
 
 transaction(eventId: UInt64, host: Address) {
 

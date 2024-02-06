@@ -1,9 +1,9 @@
-import FungibleToken from "./FungibleToken.cdc"
-import FlowStorageFees from "./FlowStorageFees.cdc"
-import FlowToken from "./FlowToken.cdc"
-import NonFungibleToken from "./NonFungibleToken.cdc"
-import MetadataViews from "./MetadataViews.cdc"
-import FeeEstimator from "./FeeEstimator.cdc"
+import "FungibleToken"
+import "FlowStorageFees"
+import "FlowToken"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FeeEstimator"
 
 // LostAndFound
 // One big problem on the flow blockchain is how to handle accounts that are

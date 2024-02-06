@@ -1,9 +1,9 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
-import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
+import "FindMarket"
+import "FIND"
+import "FTRegistry"
+import "FindLeaseMarketSale"
+import "FindLeaseMarket"
+import "FindMarketSale"
 
 transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {
 

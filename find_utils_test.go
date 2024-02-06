@@ -16,7 +16,7 @@ func TestFindUtils(t *testing.T) {
 	otu := &OverflowTestUtils{T: t, O: ot.O}
 	o := otu.O
 
-	devCheckContainsChar := `import FindUtils from "../contracts/FindUtils.cdc"
+	devCheckContainsChar := `import "FindUtils"
 
 	access(all) fun main(string: String, char:Character) : Bool {
 		return FindUtils.containsChar(string, char: char)
@@ -38,7 +38,7 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("true", true))
 	})
 
-	devCheckContains := `import FindUtils from "../contracts/FindUtils.cdc"
+	devCheckContains := `import "FindUtils"
 
 	access(all) fun main(string: String, element:String) : Bool {
 		return FindUtils.contains(string, element: element)
@@ -93,7 +93,7 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("false", false))
 	})
 
-	devCheckHasSuffix := `import FindUtils from "../contracts/FindUtils.cdc"
+	devCheckHasSuffix := `import "FindUtils"
 
 	access(all) fun main(string: String, suffix:String) : Bool {
 		return FindUtils.hasSuffix(string, suffix: suffix)
@@ -140,7 +140,7 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("false", false))
 	})
 
-	devCheckHasPrefix := `import FindUtils from "../contracts/FindUtils.cdc"
+	devCheckHasPrefix := `import "FindUtils"
 
 	access(all) fun main(string: String, prefix:String) : Bool {
 		return FindUtils.hasPrefix(string, prefix: prefix)
@@ -195,7 +195,7 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("false", false))
 	})
 
-	devCheckToUpper := `import FindUtils from "../contracts/FindUtils.cdc"
+	devCheckToUpper := `import "FindUtils"
 
 	access(all) fun main(string: String) : String {
 		return FindUtils.toUpper(string)
@@ -219,7 +219,7 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("if they are already upper cases", strings.ToUpper(s)))
 	})
 
-	devCheckFirstUpperLetter := `import FindUtils from "../contracts/FindUtils.cdc"
+	devCheckFirstUpperLetter := `import "FindUtils"
 
 	access(all) fun main(string: String) : String {
 		return FindUtils.firstUpperLetter(string)
@@ -251,7 +251,7 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("should returns same if first letter is already upper case", s))
 	})
 
-	dev_check_to_snake_case := `import FindUtils from "../contracts/FindUtils.cdc"
+	dev_check_to_snake_case := `import "FindUtils"
 
 access(all) fun main(string: String) : String {
 	return FindUtils.to_snake_case(string)
@@ -283,7 +283,7 @@ access(all) fun main(string: String) : String {
 			AssertWant(t, autogold.Want("Camel case", "camel_case"))
 	})
 
-	devCheckToCamelCase := `import FindUtils from "../contracts/FindUtils.cdc"
+	devCheckToCamelCase := `import "FindUtils"
 
 access(all) fun main(string: String) : String {
 	return FindUtils.toCamelCase(string)
@@ -323,7 +323,7 @@ access(all) fun main(string: String) : String {
 			AssertWant(t, autogold.Want("Camel case", "camelCase"))
 	})
 
-	devTrimSuffix := `import FindUtils from "../contracts/FindUtils.cdc"
+	devTrimSuffix := `import "FindUtils"
 
 access(all) fun main(string: String, suffix:String) : String {
 	return FindUtils.trimSuffix(string, suffix:suffix)
@@ -356,7 +356,7 @@ access(all) fun main(string: String, suffix:String) : String {
 
 	// Extra tests on trimFindSuffix on FIND
 
-	devTrimFindSuffix := `import FIND from "../contracts/FIND.cdc"
+	devTrimFindSuffix := `import "FIND"
 
 access(all) fun main(name: String) : String {
 	return FIND.trimFindSuffix(name)
@@ -377,7 +377,7 @@ access(all) fun main(name: String) : String {
 	})
 
 	// splitString
-	devSplitString := `import FindUtils from "../contracts/FindUtils.cdc"
+	devSplitString := `import "FindUtils"
 
 	access(all) fun main(string: String, sep: Character) : [String] {
 		return FindUtils.splitString(string, sep:sep)
@@ -416,7 +416,7 @@ access(all) fun main(name: String) : String {
 	})
 
 	// joinMapToString
-	devJoinMapToString := `import FindUtils from "../contracts/FindUtils.cdc"
+	devJoinMapToString := `import "FindUtils"
 
 access(all) fun main(map: {String : String}) : String {
 	return FindUtils.joinMapToString(map)
@@ -434,7 +434,7 @@ access(all) fun main(map: {String : String}) : String {
 	})
 
 	// joinString
-	devJoinString := `import FindUtils from "../contracts/FindUtils.cdc"
+	devJoinString := `import "FindUtils"
 
 access(all) fun main(s: [String], sep: String) : String {
 	return FindUtils.joinString(s, sep:sep)
@@ -453,7 +453,7 @@ access(all) fun main(s: [String], sep: String) : String {
 	})
 
 	// deDupTypeArray
-	devDeDupTypeArray := `import FindUtils from "../contracts/FindUtils.cdc"
+	devDeDupTypeArray := `import "FindUtils"
 
 access(all) fun main(s: [String]) : [Type] {
 	var typ : [Type] = []

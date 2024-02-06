@@ -1,6 +1,6 @@
-import FIND from "../contracts/FIND.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
+import "FIND"
+import "NonFungibleToken"
+import "ExampleNFT"
 
 transaction() {
 	prepare(account: auth(BorrowValue) &Account) {

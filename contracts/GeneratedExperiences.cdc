@@ -1,9 +1,9 @@
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import FungibleToken from "./standard/FungibleToken.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
-import ViewResolver from "./standard/ViewResolver.cdc"
-import FindForge from "./FindForge.cdc"
-import FindPack from "./FindPack.cdc"
+import "NonFungibleToken"
+import "FungibleToken"
+import "MetadataViews"
+import "ViewResolver"
+import "FindForge"
+import "FindPack"
 
 access(all) contract GeneratedExperiences: ViewResolver {
 

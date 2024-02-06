@@ -1,5 +1,5 @@
-import Admin from "../contracts/Admin.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
+import "Admin"
+import "DapperUtilityCoin"
 
 transaction() {
 

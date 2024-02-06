@@ -1,4 +1,4 @@
-import Admin from "../contracts/Admin.cdc"
+import "Admin"
 
 transaction(rewards:{UInt64 : [UInt64]}, types: {UInt64 : [String]}, salts: {UInt64:String}) {
 	prepare(account: auth(BorrowValue) &Account) {

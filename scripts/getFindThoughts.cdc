@@ -1,9 +1,9 @@
-import FindThoughts from "../contracts/FindThoughts.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import Profile from "../contracts/Profile.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FindThoughts"
+import "MetadataViews"
+import "FindViews"
+import "FindMarket"
+import "Profile"
+import "FIND"
 
 access(all) fun main(addresses: [Address], ids: [UInt64]) : [Thought] {
     let thoughts : [Thought] = [] 

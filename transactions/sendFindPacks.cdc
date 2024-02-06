@@ -1,8 +1,8 @@
-import FindPack from "../contracts/FindPack.cdc"
-import FIND from "../contracts/FIND.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FindAirdropper from "../contracts/FindAirdropper.cdc"
-import Admin from "../contracts/Admin.cdc"
+import "FindPack"
+import "FIND"
+import "NonFungibleToken"
+import "FindAirdropper"
+import "Admin"
 
 transaction(packInfo: FindPack.AirdropInfo) {
 

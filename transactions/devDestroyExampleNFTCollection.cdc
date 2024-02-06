@@ -1,4 +1,4 @@
-import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
+import "ExampleNFT"
 
 
 transaction() {

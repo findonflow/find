@@ -1,4 +1,4 @@
-import Dandy from "../contracts/Dandy.cdc"
+import "Dandy"
 
 
 transaction() {

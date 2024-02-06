@@ -1,13 +1,13 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
-import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
+import "FungibleToken"
+import "MetadataViews"
+import "DapperUtilityCoin"
+import "FlowUtilityToken"
+import "FindMarket"
+import "FlowToken"
+import "FIND"
+import "FindMarketSale"
+import "FindMarketAuctionSoft"
+import "FindMarketDirectOfferSoft"
 
 transaction(market: String, merchAddress: Address, tenantCut: UFix64){
     prepare(account: auth(BorrowValue) &Account){

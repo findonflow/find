@@ -1,4 +1,4 @@
-import FindRelatedAccounts from "../contracts/FindRelatedAccounts.cdc"
+import "FindRelatedAccounts"
 
 transaction(name: String, address: Address) {
 

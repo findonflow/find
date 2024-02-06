@@ -1,8 +1,8 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FindLeaseMarketAuctionSoft from "../contracts/FindLeaseMarketAuctionSoft.cdc"
-import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
+import "FindMarket"
+import "FTRegistry"
+import "FIND"
+import "FindLeaseMarketAuctionSoft"
+import "FindLeaseMarket"
 
 transaction(leaseName: String, ftAliasOrIdentifier:String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?) {
 

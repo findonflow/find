@@ -1,5 +1,5 @@
-import FindVerifier from "../contracts/FindVerifier.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "FindVerifier"
+import "MetadataViews"
 
 access(all) fun main(user: Address, path: String, rarityA: Bool, rarityB: Bool) : Result {
 

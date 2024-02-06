@@ -1,11 +1,11 @@
-import FungibleToken from "./standard/FungibleToken.cdc"
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import Clock from "./Clock.cdc"
-import FIND from "./FIND.cdc"
-import Profile from "./Profile.cdc"
-import FindMarket from "./FindMarket.cdc"
+import "FungibleToken"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FindViews"
+import "Clock"
+import "FIND"
+import "Profile"
+import "FindMarket"
 
 /*
 

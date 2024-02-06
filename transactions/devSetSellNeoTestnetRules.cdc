@@ -1,6 +1,6 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
+import "FindMarket"
+import "FindMarketAdmin"
+import "FlowToken"
 import NeoVoucher from 0xd6b39e5b5b367aad
 
 

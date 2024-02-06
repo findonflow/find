@@ -1,8 +1,8 @@
-import FungibleToken from "./standard/FungibleToken.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
-import FIND from "./FIND.cdc"
-import FindMarket from "./FindMarket.cdc"
-import FindMarketCutStruct from "./FindMarketCutStruct.cdc"
+import "FungibleToken"
+import "MetadataViews"
+import "FIND"
+import "FindMarket"
+import "FindMarketCutStruct"
 
 access(all) contract FindMarketAdmin {
     access(all) entitlement Owner

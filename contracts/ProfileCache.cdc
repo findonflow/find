@@ -1,4 +1,4 @@
-import Clock from "../contracts/Clock.cdc"
+import "Clock"
 
 access(all) contract ProfileCache {
 

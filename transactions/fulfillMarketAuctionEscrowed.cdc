@@ -1,6 +1,6 @@
-import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
+import "FindMarketAuctionEscrow"
+import "FIND"
+import "FindMarket"
 
 transaction(owner: String, id: UInt64) {
 

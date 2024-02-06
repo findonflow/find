@@ -1,12 +1,12 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import Profile from "../contracts/Profile.cdc"
-import Sender from "../contracts/Sender.cdc"
-import FIND from "../contracts/FIND.cdc"
-import CharityNFT from "../contracts/CharityNFT.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FlowToken"
+import "FungibleToken"
+import "FUSD"
+import "Profile"
+import "Sender"
+import "FIND"
+import "CharityNFT"
 
 
 transaction(name: String, amount: UFix64, type: String, tag:String) {

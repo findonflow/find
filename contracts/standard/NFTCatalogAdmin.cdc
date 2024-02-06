@@ -1,4 +1,4 @@
-import NFTCatalog from "./NFTCatalog.cdc"
+import "NFTCatalog"
 
 // NFTCatalogAdmin
 //

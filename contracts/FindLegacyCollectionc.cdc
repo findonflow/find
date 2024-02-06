@@ -2,7 +2,7 @@
 This is a legacy contract that we will use as a last resort to fetch data that is not present in either the Metadata form or from the Alchemy onChain Registry
 */
 
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import "NonFungibleToken"
 
 //mainnet
 import Beam from 0x86b4a0010a71cfc3 
@@ -37,8 +37,8 @@ import Art from 0xd796ff17107bbff6
 import Marketplace from 0xd796ff17107bbff6
 import Flovatar from 0x921ea449dffec68a
 import FlovatarMarketplace from  0x921ea449dffec68a
-import CharityNFT from "../contracts/CharityNFT.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "CharityNFT"
+import "FIND"
 
 import MatrixWorldAssetsNFT from 0xf20df769e658c257
 

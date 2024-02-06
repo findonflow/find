@@ -1,9 +1,9 @@
-import FIND from "../contracts/FIND.cdc"
+import "FIND"
 
 import NFTStorefront from 0x4eb8a10cb9f87357
 import Marketplace from 0xd796ff17107bbff6
 import Art from 0xd796ff17107bbff6
-import FlowToken from "../contracts/standard/FlowToken.cdc"
+import "FlowToken"
 import Flovatar from 0x921ea449dffec68a
 import FlovatarMarketplace from  0x921ea449dffec68a
 

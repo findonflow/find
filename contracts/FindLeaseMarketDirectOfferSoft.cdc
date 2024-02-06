@@ -1,13 +1,13 @@
-import FungibleToken from "./standard/FungibleToken.cdc"
-import FlowToken from "./standard/FlowToken.cdc"
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import Clock from "./Clock.cdc"
-import Debug from "./Debug.cdc"
-import FIND from "./FIND.cdc"
-import FindMarket from "./FindMarket.cdc"
-import FindLeaseMarket from "./FindLeaseMarket.cdc"
+import "FungibleToken"
+import "FlowToken"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FindViews"
+import "Clock"
+import "Debug"
+import "FIND"
+import "FindMarket"
+import "FindLeaseMarket"
 
 access(all) contract FindLeaseMarketDirectOfferSoft {
 

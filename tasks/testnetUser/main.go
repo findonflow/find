@@ -125,7 +125,7 @@ func main() {
 	ftIdentifiers = ftIdentifiers + ` ]`
 	prices = prices + ` ]`
 
-	returnTime, _ := o.Script(`import Clock from "../contracts/Clock.cdc"
+	returnTime, _ := o.Script(`import "Clock"
 	access(all) main() :  UFix64 {
 		return Clock.time()
 	}`).GetAsJson()

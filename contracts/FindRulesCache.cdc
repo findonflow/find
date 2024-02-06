@@ -1,4 +1,4 @@
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "MetadataViews"
 
 access(all) contract FindRulesCache {
 

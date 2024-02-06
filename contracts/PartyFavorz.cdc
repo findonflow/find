@@ -1,10 +1,10 @@
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import FungibleToken from "./standard/FungibleToken.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
-import FindForge from "./FindForge.cdc"
-import FindPack from "./FindPack.cdc"
-import PartyFavorzExtraData from "./PartyFavorzExtraData.cdc"
-import ViewResolver from "./standard/ViewResolver.cdc"
+import "NonFungibleToken"
+import "FungibleToken"
+import "MetadataViews"
+import "FindForge"
+import "FindPack"
+import "PartyFavorzExtraData"
+import "ViewResolver"
 
 access(all) contract PartyFavorz: ViewResolver {
 

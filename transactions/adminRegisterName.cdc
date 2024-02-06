@@ -1,6 +1,6 @@
-import FIND from "../contracts/FIND.cdc"
-import Admin from "../contracts/Admin.cdc"
-import Profile from "../contracts/Profile.cdc"
+import "FIND"
+import "Admin"
+import "Profile"
 
 transaction(names: [String], user: Address) {
 

@@ -1,10 +1,10 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+import "FindMarket"
+import "FindMarketAuctionSoft"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FindViews"
+import "FTRegistry"
+import "FINDNFTCatalog"
 
 transaction(nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?) {
 

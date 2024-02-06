@@ -1,4 +1,4 @@
-import FindMarket from "../contracts/FindMarket.cdc"
+import "FindMarket"
 
 transaction(saleItemName: String){
     

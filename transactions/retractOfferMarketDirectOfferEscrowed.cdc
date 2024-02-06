@@ -1,5 +1,5 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
+import "FindMarket"
+import "FindMarketDirectOfferEscrow"
 
 transaction(id: UInt64) {
 	let bidsReference: &FindMarketDirectOfferEscrow.MarketBidCollection?

@@ -1,11 +1,11 @@
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import FIND from "./FIND.cdc"
-import FungibleToken from "./standard/FungibleToken.cdc"
-import FlowToken from "./standard/FlowToken.cdc"
-import FindMarket from "./FindMarket.cdc"
-import FindViews from "./FindViews.cdc"
-import FindLostAndFoundWrapper from "./FindLostAndFoundWrapper.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
+import "NonFungibleToken"
+import "FIND"
+import "FungibleToken"
+import "FlowToken"
+import "FindMarket"
+import "FindViews"
+import "FindLostAndFoundWrapper"
+import "MetadataViews"
 
 access(all) contract FindAirdropper {
 

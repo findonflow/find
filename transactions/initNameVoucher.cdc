@@ -1,4 +1,4 @@
-import NameVoucher from "../contracts/NameVoucher.cdc"
+import "NameVoucher"
 
 transaction() {
     prepare(account: auth (StorageCapabilities, SaveValue, PublishCapability, BorrowValue) &Account) {

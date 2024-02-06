@@ -1,6 +1,6 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FIND"
 
 import RaribleNFT from 0x01ab36aaf654a13e
 

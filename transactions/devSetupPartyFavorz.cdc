@@ -1,11 +1,11 @@
 
-import FIND from "../contracts/FIND.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import PartyFavorz from "../contracts/PartyFavorz.cdc"
-import Profile from "../contracts/Profile.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindForge from "../contracts/FindForge.cdc"
+import "FIND"
+import "NonFungibleToken"
+import "FungibleToken"
+import "PartyFavorz"
+import "Profile"
+import "MetadataViews"
+import "FindForge"
 
 transaction(name: String, minterCut: UFix64, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String, collectionBannerImage: String, socials: {String: String}) {
 	prepare(account: auth(BorrowValue) &Account) {

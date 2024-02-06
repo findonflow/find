@@ -1,4 +1,4 @@
-import FindRelatedAccounts from "../contracts/FindRelatedAccounts.cdc"
+import "FindRelatedAccounts"
 
 access(all) fun main(user: Address) : {String : {String : [String]}} {
     let account = getAccount(user)

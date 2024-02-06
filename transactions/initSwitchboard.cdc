@@ -1,11 +1,11 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
-import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
-import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
+import "FungibleToken"
+import "FlowToken"
+import "FUSD"
+import "FiatToken"
+import "TokenForwarding"
+import "FungibleTokenSwitchboard"
+import "DapperUtilityCoin"
+import "FlowUtilityToken"
 
 transaction(dapperAddress: Address) {
     prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {

@@ -1,5 +1,5 @@
-import FungibleToken from "../standard/FungibleToken.cdc"
-import NonFungibleToken from "../standard/NonFungibleToken.cdc"
+import "FungibleToken"
+import "NonFungibleToken"
 
 
 // CoatCheck
