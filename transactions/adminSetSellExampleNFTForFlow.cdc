@@ -1,8 +1,8 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
+import "FindMarket"
+import "FindMarketAdmin"
+import "FlowToken"
+import "FUSD"
+import "ExampleNFT"
 
 transaction(tenant: Address) {
     prepare(account: auth(BorrowValue) &Account){

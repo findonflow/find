@@ -1,5 +1,5 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
+import "FindMarket"
+import "FUSD"
 
 transaction(optionName: String){
     prepare(account: auth(BorrowValue) &Account){

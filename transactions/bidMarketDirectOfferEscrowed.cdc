@@ -1,13 +1,13 @@
-import Profile from "../contracts/Profile.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "Profile"
+import "FindMarket"
+import "FindMarketDirectOfferEscrow"
+import "FungibleToken"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FindViews"
+import "FTRegistry"
+import "FINDNFTCatalog"
+import "FIND"
 
 transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
 

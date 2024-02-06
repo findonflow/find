@@ -1,5 +1,5 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketCutStruct from "../contracts/FindMarketCutStruct.cdc"
+import "FindMarket"
+import "FindMarketCutStruct"
 
 transaction(ftTypes: [String], category: String, cuts: [FindMarketCutStruct.ThresholdCut]){
     prepare(account: auth(BorrowValue) &Account){

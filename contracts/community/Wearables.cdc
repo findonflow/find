@@ -6,11 +6,11 @@ Welcome to the Wearables contract for Doodles2
 A wearable is an equipment that can be equipped  to a Doodle2
 */
 
-import NonFungibleToken from "../standard/NonFungibleToken.cdc"
-import FungibleToken from "../standard/FungibleToken.cdc"
-import MetadataViews from "../standard/MetadataViews.cdc"
-import Templates from "./Templates.cdc"
-import FindUtils from "../FindUtils.cdc"
+import "NonFungibleToken"
+import "FungibleToken"
+import "MetadataViews"
+import "Templates"
+import "FindUtils"
 
 access(all) contract Wearables: NonFungibleToken {
 

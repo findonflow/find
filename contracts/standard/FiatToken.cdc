@@ -1,4 +1,4 @@
-import FungibleToken from "./FungibleToken.cdc"
+import "FungibleToken"
 
 //NB NB NB!
 // THis is a local mocked version of USDC FiatToken that is basically a clone of FUSD just to make it easier to test with

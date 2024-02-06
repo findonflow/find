@@ -1,7 +1,7 @@
-import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
+import "FindMarketDirectOfferSoft"
+import "FungibleToken"
+import "FTRegistry"
+import "FindMarket"
 
 transaction(ids: [UInt64], amounts:[UFix64]) {
 

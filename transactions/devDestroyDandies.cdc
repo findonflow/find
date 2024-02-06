@@ -1,5 +1,5 @@
-import Dandy from "../contracts/Dandy.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import "Dandy"
+import "NonFungibleToken"
 
 
 transaction(ids: [UInt64]) {

@@ -1,8 +1,8 @@
 
-import Admin  from "../contracts/Admin.cdc"
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import "Admin"
+import "FindMarketAdmin"
+import "FUSD"
+import "FungibleToken"
 
 //set up the adminClient in the contract that will own the network
 transaction() {

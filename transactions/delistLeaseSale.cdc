@@ -1,5 +1,5 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
+import "FindMarket"
+import "FindLeaseMarketSale"
 
 transaction(leases: [String]) {
     let saleItems : auth(FindLeaseMarketSale.Seller) &FindLeaseMarketSale.SaleItemCollection?

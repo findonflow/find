@@ -1,6 +1,6 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import Dandy from "../contracts/Dandy.cdc"
+import "FindMarket"
+import "FlowToken"
+import "Dandy"
 
 transaction(){
     prepare(account: auth(BorrowValue) &Account){

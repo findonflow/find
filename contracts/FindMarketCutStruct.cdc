@@ -1,5 +1,5 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "FungibleToken"
+import "MetadataViews"
 
 access(all) contract FindMarketCutStruct {
 

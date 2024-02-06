@@ -1,12 +1,12 @@
 import FIND from "../contracts/FIND.cdc" 
-import NFTStorefront from "../contracts/standard/NFTStorefront.cdc"
-import NFTStorefrontV2 from "../contracts/standard/NFTStorefrontV2.cdc"
-import Flowty from "../contracts/community/Flowty.cdc"
-import FlowtyRentals from "../contracts/community/FlowtyRentals.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FlovatarMarketplace from "../contracts/community/FlovatarMarketplace.cdc"
-import Flovatar from "../contracts/community/Flovatar.cdc"
-import FlovatarComponent from "../contracts/community/FlovatarComponent.cdc"
+import "NFTStorefront"
+import "NFTStorefrontV2"
+import "Flowty"
+import "FlowtyRentals"
+import "FlowToken"
+import "FlovatarMarketplace"
+import "Flovatar"
+import "FlovatarComponent"
 
 access(all) contract FindUserStatus {
 

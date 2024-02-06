@@ -1,5 +1,5 @@
-import FIND from "../contracts/FIND.cdc"
-import Profile from "../contracts/Profile.cdc"
+import "FIND"
+import "Profile"
 
 // array of [User in string (find name or address)]
 transaction(unfollows:[String]) {

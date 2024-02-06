@@ -1,10 +1,10 @@
-import FIND from "../contracts/FIND.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import NFGv3 from "../contracts/NFGv3.cdc"
-import Profile from "../contracts/Profile.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindForge from "../contracts/FindForge.cdc"
+import "FIND"
+import "NonFungibleToken"
+import "FungibleToken"
+import "NFGv3"
+import "Profile"
+import "MetadataViews"
+import "FindForge"
 
 
 transaction(name: String, maxEditions:UInt64, nftName:String, nftDescription:String, imageHash:String, externalURL: String, traits: {String: String}, birthday: UFix64, levels: {String: UFix64}, scalars : {String:UFix64}, medias:{String:String}) {

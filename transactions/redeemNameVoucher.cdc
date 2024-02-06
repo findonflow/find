@@ -1,9 +1,9 @@
 
-import NameVoucher from "../contracts/NameVoucher.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import LostAndFound from "../contracts/standard/LostAndFound.cdc"
-import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
+import "NameVoucher"
+import "NonFungibleToken"
+import "MetadataViews"
+import "LostAndFound"
+import "FindLostAndFoundWrapper"
 
 transaction(id: UInt64, name: String) {
 

@@ -1,5 +1,5 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
+import "FindMarket"
+import "FindMarketAuctionEscrow"
 
 transaction() {
 

@@ -1,5 +1,5 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOfferSoft.cdc"
+import "FindMarket"
+import "FindLeaseMarketDirectOfferSoft"
 
 transaction(leaseNames: [String]) {
 

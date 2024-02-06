@@ -1,9 +1,9 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-//import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
-//import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
-//import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
-//import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
+import "FindMarket"
+//import "FindMarketDirectOfferEscrow"
+//import "FindMarketAuctionEscrow"
+//import "FindMarketAuctionSoft"
+//import "FindMarketDirectOfferSoft"
+import "FindMarketSale"
 
 transaction(ids: {String : [UInt64]}) {
     prepare(account: auth(BorrowValue) &Account) {

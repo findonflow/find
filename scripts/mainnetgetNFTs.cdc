@@ -1,4 +1,4 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import "NonFungibleToken"
 import MetadataViews from 0x1d7e57aa55817448
 
 //are in alchemy
@@ -36,7 +36,7 @@ import MotoGPCard from 0xa49cc0ee46c54bfb
 //we have sent pr
 import Gaia from 0x8b148183c28ff88f
 
-import FIND from "../contracts/FIND.cdc"
+import "FIND"
 
 //They are lacking this one
 import MatrixWorldAssetsNFT from 0xf20df769e658c257
@@ -50,7 +50,7 @@ import Art from 0xd796ff17107bbff6
 import Marketplace from 0xd796ff17107bbff6
 import Flovatar from 0x921ea449dffec68a
 import FlovatarMarketplace from  0x921ea449dffec68a
-import CharityNFT from "../contracts/CharityNFT.cdc"
+import "CharityNFT"
 import GoatedGoatsVouchers from 0xdfc74d9d561374c0
 import TraitPacksVouchers from 0xdfc74d9d561374c0
 import GoatedGoatsTraitPack from 0x2068315349bdfce5

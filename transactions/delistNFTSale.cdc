@@ -1,5 +1,5 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
+import "FindMarket"
+import "FindMarketSale"
 
 //Remove one or more listings from a marketplace
 transaction(ids: [UInt64]) {

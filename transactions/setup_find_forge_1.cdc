@@ -1,4 +1,4 @@
-import FindForge from "../contracts/FindForge.cdc"
+import "FindForge"
 
 transaction() {
     prepare(account: auth(BorrowValue, SaveValue, PublishCapability, IssueStorageCapabilityController) &Account) {

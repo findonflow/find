@@ -1,5 +1,5 @@
-import FindPack from "../contracts/FindPack.cdc"
-import Admin from "../contracts/Admin.cdc"
+import "FindPack"
+import "Admin"
 
 transaction(packTypeName: String, typeId: UInt64, hashes: [String]) {
 	let admin: auth(Admin.Owner) &Admin.AdminProxy

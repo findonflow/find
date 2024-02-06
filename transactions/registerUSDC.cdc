@@ -1,6 +1,6 @@
-import FiatToken from "../contracts/standard/FiatToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FiatToken"
+import "FungibleToken"
+import "FIND"
 
 transaction(name: String, amount: UFix64) {
 

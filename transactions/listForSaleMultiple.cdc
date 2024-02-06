@@ -1,13 +1,13 @@
-import FIND from "../contracts/FIND.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
+import "FIND"
+import "FUSD"
+import "FindMarket"
+import "FindMarketSale"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FindViews"
+import "NFTCatalog"
+import "FINDNFTCatalog"
+import "FTRegistry"
 
 transaction(nftAliasOrIdentifiers: [String], ids: [AnyStruct], ftAliasOrIdentifiers: [String], directSellPrices:[UFix64], validUntil: UFix64?) {
 

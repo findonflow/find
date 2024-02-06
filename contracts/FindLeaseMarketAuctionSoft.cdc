@@ -1,11 +1,11 @@
-import FungibleToken from "./standard/FungibleToken.cdc"
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import Clock from "./Clock.cdc"
-import FIND from "./FIND.cdc"
-import FindMarket from "./FindMarket.cdc"
-import FindLeaseMarket from "./FindLeaseMarket.cdc"
+import "FungibleToken"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FindViews"
+import "Clock"
+import "FIND"
+import "FindMarket"
+import "FindLeaseMarket"
 
 // An auction saleItem contract that escrows the FT, does _not_ escrow the NFT
 access(all) contract FindLeaseMarketAuctionSoft {

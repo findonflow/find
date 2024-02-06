@@ -1,5 +1,5 @@
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "MetadataViews"
+import "FIND"
 
 import AlchemyMetadataWrapperMainnetShard3 from 0xeb8cb4c3157d5dac
 

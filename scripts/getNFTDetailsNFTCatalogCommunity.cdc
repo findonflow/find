@@ -1,8 +1,8 @@
-import FindViews from "../contracts/FindViews.cdc"
-import FIND from "../contracts/FIND.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FindUserStatus from "../contracts/FindUserStatus.cdc"
+import "FindViews"
+import "FIND"
+import "MetadataViews"
+import "FINDNFTCatalog"
+import "FindUserStatus"
 
 access(all) struct NFTDetailReport {
 	access(all) let storefront: FindUserStatus.StorefrontListing?

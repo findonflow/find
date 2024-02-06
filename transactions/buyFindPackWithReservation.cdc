@@ -1,10 +1,10 @@
-import FindPack from "../contracts/FindPack.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import Profile from "../contracts/Profile.cdc"
+import "FindPack"
+import "FungibleToken"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FlowToken"
+import "FUSD"
+import "Profile"
 
 transaction(packTypeName: String, packTypeId:UInt64, packId: UInt64, amount: UFix64, signature:String) {
 	let packs: &FindPack.Collection{FindPack.CollectionPublic}

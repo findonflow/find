@@ -1,5 +1,5 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
+import "FungibleToken"
+import "FiatToken"
 
 transaction(recipient: Address, amount: UFix64) {
     let tokenAdmin: &FiatToken.Administrator

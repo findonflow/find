@@ -1,10 +1,10 @@
-import FungibleToken from "../standard/FungibleToken.cdc"
-import NonFungibleToken from "../standard/NonFungibleToken.cdc"
-import FlowToken from "../standard/FlowToken.cdc"
-import FlovatarComponentTemplate from "./FlovatarComponentTemplate.cdc"
-import FlovatarComponent from "./FlovatarComponent.cdc"
-import FlovatarPack from "./FlovatarPack.cdc"
-import MetadataViews from "../standard/MetadataViews.cdc"
+import "FungibleToken"
+import "NonFungibleToken"
+import "FlowToken"
+import "FlovatarComponentTemplate"
+import "FlovatarComponent"
+import "FlovatarPack"
+import "MetadataViews"
 
 /*
 

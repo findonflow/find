@@ -1,9 +1,9 @@
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import ViewResolver from "../contracts/standard/ViewResolver.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import NFTCatalogAdmin from "../contracts/standard/NFTCatalogAdmin.cdc"
+import "MetadataViews"
+import "NonFungibleToken"
+import "ViewResolver"
+import "FINDNFTCatalog"
+import "NFTCatalog"
+import "NFTCatalogAdmin"
 
 transaction(
     collectionIdentifier : String,

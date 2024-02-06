@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
-import MetadataViews from "../standard/MetadataViews.cdc"
-import FungibleToken from "../standard/FungibleToken.cdc"
+import "MetadataViews"
+import "FungibleToken"
 
 // This contracts stores all the defined interfaces and structs.
 // Interfaces can span on both Characters and Wearables therefore it is better to have them in a central contract

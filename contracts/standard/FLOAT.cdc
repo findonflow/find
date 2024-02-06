@@ -27,12 +27,12 @@
 
 // For more info on GrantedAccountAccess, see GrantedAccountAccess.cdc
 
-import NonFungibleToken from "./NonFungibleToken.cdc"
-import MetadataViews from "./MetadataViews.cdc"
-import ViewResolver from "./ViewResolver.cdc"
-import GrantedAccountAccess from "./GrantedAccountAccess.cdc"
-import FungibleToken from "./FungibleToken.cdc"
-import FlowToken from "./FlowToken.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "ViewResolver"
+import "GrantedAccountAccess"
+import "FungibleToken"
+import "FlowToken"
 
 access(all) contract FLOAT {
 

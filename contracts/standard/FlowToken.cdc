@@ -1,8 +1,8 @@
-import FungibleToken from "./FungibleToken.cdc"
-import MetadataViews from "./MetadataViews.cdc"
-import FungibleTokenMetadataViews from "./FungibleTokenMetadataViews.cdc"
-import ViewResolver from "./ViewResolver.cdc"
-import Burner from "./Burner.cdc"
+import "FungibleToken"
+import "MetadataViews"
+import "FungibleTokenMetadataViews"
+import "ViewResolver"
+import "Burner"
 
 access(all) contract FlowToken: FungibleToken {
 

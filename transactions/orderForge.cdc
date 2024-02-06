@@ -1,6 +1,6 @@
-import FindForge from "../contracts/FindForge.cdc"
-import FIND from "../contracts/FIND.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "FindForge"
+import "FIND"
+import "MetadataViews"
 
 
 transaction(name: String, mintType:String, minterCut: UFix64, collectionDisplay: MetadataViews.NFTCollectionDisplay) {

@@ -1,9 +1,9 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
-import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
+import "FindMarket"
+import "FTRegistry"
+import "FungibleToken"
+import "FIND"
+import "FindLeaseMarketSale"
+import "FindLeaseMarket"
 
 transaction(leaseName: String, amount: UFix64) {
 

@@ -1,6 +1,6 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import Dandy from "../contracts/Dandy.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "NonFungibleToken"
+import "Dandy"
+import "MetadataViews"
 
 
 transaction() {

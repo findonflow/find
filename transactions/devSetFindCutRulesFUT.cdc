@@ -1,6 +1,6 @@
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
+import "FindMarketAdmin"
+import "FindMarket"
+import "FlowUtilityToken"
 
 transaction(tenant: Address, cut: UFix64?){
     prepare(account: auth(BorrowValue) &Account){

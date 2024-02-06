@@ -1,13 +1,13 @@
-import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import FIND from "../contracts/FIND.cdc"
-import Profile from "../contracts/Profile.cdc"
+import "FindMarketAuctionSoft"
+import "NonFungibleToken"
+import "FungibleToken"
+import "MetadataViews"
+import "FindViews"
+import "FTRegistry"
+import "FINDNFTCatalog"
+import "FindMarket"
+import "FIND"
+import "Profile"
 
 transaction(user: String, id: UInt64, amount: UFix64) {
 

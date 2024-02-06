@@ -1,9 +1,9 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-//import FiatToken from "../contracts/standard/FiatToken.cdc"
-import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
+import "FindMarket"
+import "FungibleToken"
+import "FlowToken"
+import "FUSD"
+//import "FiatToken"
+import "FungibleTokenSwitchboard"
 
 transaction() {
     prepare(account: auth(BorrowValue, SaveValue, IssueAccountCapabilityController, PublishCapability) &Account) {

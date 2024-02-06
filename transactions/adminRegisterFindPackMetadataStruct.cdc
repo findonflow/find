@@ -1,13 +1,13 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FindPack from "../contracts/FindPack.cdc"
-import FindVerifier from "../contracts/FindVerifier.cdc"
-import FindForge from "../contracts/FindForge.cdc"
-import Admin from "../contracts/Admin.cdc"
-import Debug from "../contracts/Debug.cdc"
-import ViewResolver from "../contracts/standard/ViewResolver.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FINDNFTCatalog"
+import "FungibleToken"
+import "FindPack"
+import "FindVerifier"
+import "FindForge"
+import "Admin"
+import "Debug"
+import "ViewResolver"
 
 // this is a simple tx to update the metadata of a given type of NeoVoucher
 

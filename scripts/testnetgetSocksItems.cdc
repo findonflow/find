@@ -1,6 +1,6 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FIND"
 
 access(all) fun main(user: String, collectionIDs: {String : [UInt64]}) : {String : [MetadataCollectionItem]} {
 

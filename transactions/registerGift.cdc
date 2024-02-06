@@ -1,6 +1,6 @@
-import FUSD from "../contracts/standard/FUSD.cdc"
-import Profile from "../contracts/Profile.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FUSD"
+import "Profile"
+import "FIND"
 
 transaction(name: String, amount: UFix64, recipient: String) {
 

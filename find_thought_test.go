@@ -115,12 +115,12 @@ func TestFindThought(t *testing.T) {
 
 	ot.Run(t, "Should be able to post a thought with NFT", func(t *testing.T) {
 		nftInfo, err := otu.O.Script(`
-			import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-			import ViewResolver from "../contracts/standard/ViewResolver.cdc"
-			import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-			import FindMarket from "../contracts/FindMarket.cdc"
-			import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-			import FindViews from "../contracts/FindViews.cdc"
+			import "MetadataViews"
+			import "ViewResolver"
+			import "NonFungibleToken"
+			import "FindMarket"
+			import "FINDNFTCatalog"
+			import "FindViews"
 
 			access(all) fun main(quoteNFTOwner: Address?, quoteNFTType: String?, quoteNFTId: UInt64?) : FindMarket.NFTInfo? {
 

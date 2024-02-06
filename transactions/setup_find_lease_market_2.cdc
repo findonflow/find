@@ -1,9 +1,9 @@
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "FindMarketAdmin"
+import "FindMarket"
+import "FungibleToken"
+import "DapperUtilityCoin"
+import "FlowUtilityToken"
+import "MetadataViews"
 
 transaction(tenantAddress: Address) {
     prepare(account: auth(BorrowValue) &Account) {

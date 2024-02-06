@@ -1,6 +1,6 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FlowStorageFees from "../contracts/standard/FlowStorageFees.cdc"
+import "FungibleToken"
+import "FlowToken"
+import "FlowStorageFees"
 
 transaction() {
     prepare(acct: auth(BorrowValue) &Account) {

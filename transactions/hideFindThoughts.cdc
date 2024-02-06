@@ -1,5 +1,5 @@
-import FindThoughts from "../contracts/FindThoughts.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FindThoughts"
+import "FIND"
 
 transaction(ids: [UInt64], hide: [Bool]) {
 

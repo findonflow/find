@@ -1,4 +1,4 @@
-import FindMarket from "../contracts/FindMarket.cdc"
+import "FindMarket"
 
 access(all) fun main(tenant: Address) : TenantSaleItems {
     let tenantCap = FindMarket.getTenantCapability(tenant) ?? panic("No tenant capability is set up. Tenant Address : ".concat(tenant.toString()))

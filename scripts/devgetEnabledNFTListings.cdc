@@ -1,11 +1,11 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FindUtils from "../contracts/FindUtils.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+import "FindMarket"
+import "NFTCatalog"
+import "DapperUtilityCoin"
+import "FlowUtilityToken"
+import "FindMarketSale"
+import "FIND"
+import "FindUtils"
+import "FINDNFTCatalog"
 
 access(all) let paging : (([String], Int) : [String]) = fun(_ items : [String], _ page: Int) : [String] {
 	let pageSize = 20

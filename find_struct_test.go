@@ -13,7 +13,7 @@ func TestFindStruct(t *testing.T) {
 	ot.Run(t, "Should be able to pass in Royalty Struct", func(t *testing.T) {
 		otu.O.Tx(
 			`
-				import FindPack from "../contracts/FindPack.cdc"
+				import "FindPack"
 
 				transaction(i: FindPack.Royalty) {}
 			`,
@@ -31,7 +31,7 @@ func TestFindStruct(t *testing.T) {
 	ot.Run(t, "Should be able to pass in Verifier Struct", func(t *testing.T) {
 		otu.O.Tx(
 			`
-			import FindVerifier from "../contracts/FindVerifier.cdc"
+			import "FindVerifier"
 
 			transaction(i: {FindVerifier.Verifier}) {}
 			`,
@@ -47,7 +47,7 @@ func TestFindStruct(t *testing.T) {
 	ot.Run(t, "Should be able to pass in PackRegisterSaleInfo Struct", func(t *testing.T) {
 		otu.O.Tx(
 			`
-			import FindPack from "../contracts/FindPack.cdc"
+			import "FindPack"
 
 			transaction(i: FindPack.PackRegisterSaleInfo) {}
 			`,
@@ -70,7 +70,7 @@ func TestFindStruct(t *testing.T) {
 	ot.Run(t, "Should be able to pass in PackRegisterInfo Struct", func(t *testing.T) {
 		otu.O.Tx(
 			`
-			import FindPack from "../contracts/FindPack.cdc"
+			import "FindPack"
 
 			transaction(i: FindPack.PackRegisterInfo) {}
 			`,

@@ -1,12 +1,12 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import Dandy from "../contracts/Dandy.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
-import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
-import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
-import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
+import "FindMarket"
+import "FindMarketAdmin"
+import "FUSD"
+import "Dandy"
+import "FindMarketSale"
+import "FindMarketAuctionEscrow"
+import "FindMarketAuctionSoft"
+import "FindMarketDirectOfferEscrow"
+import "FindMarketDirectOfferSoft"
 
 
 transaction(tenant: Address, market: String){

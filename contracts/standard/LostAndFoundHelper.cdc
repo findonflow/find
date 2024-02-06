@@ -1,4 +1,4 @@
-import LostAndFound from "./LostAndFound.cdc"
+import "LostAndFound"
 
 access(all) contract LostAndFoundHelper {
 

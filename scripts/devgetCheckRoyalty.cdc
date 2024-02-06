@@ -1,7 +1,7 @@
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+import "MetadataViews"
+import "NonFungibleToken"
+import "FIND"
+import "FINDNFTCatalog"
 
 access(all) fun main(name: String, id: UInt64, nftAliasOrIdentifier: String, viewIdentifier: String) : AnyStruct? {
 

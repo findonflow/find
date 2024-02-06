@@ -1,12 +1,12 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
-import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
+import "FindMarket"
+import "DapperUtilityCoin"
+import "FlowUtilityToken"
+import "FindMarketSale"
+import "FindMarketAuctionSoft"
+import "FindMarketDirectOfferSoft"
+import "MetadataViews"
+import "FungibleToken"
+import "FungibleTokenSwitchboard"
 
 transaction(nftName: String, nftTypes: [String], cut: UFix64){
     prepare(account: auth(BorrowValue) &Account){

@@ -1,11 +1,11 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FIND from "../contracts/FIND.cdc"
-import Profile from "../contracts/Profile.cdc"
-import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
-import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
+import "FindMarket"
+import "DapperUtilityCoin"
+import "FlowUtilityToken"
+import "FungibleToken"
+import "FIND"
+import "Profile"
+import "FindLeaseMarketSale"
+import "FindLeaseMarket"
 
 transaction(sellerAccount: Address, leaseName: String, amount: UFix64) {
 

@@ -1,5 +1,5 @@
-import Profile from "../contracts/Profile.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "Profile"
+import "FIND"
 
 access(all) fun main(user: Address) : Bool {
 

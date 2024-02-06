@@ -1,4 +1,4 @@
-import FindMarket from "../contracts/FindMarket.cdc"
+import "FindMarket"
 
 transaction(optionName: String, tenantRuleName: String){
     prepare(account: auth(BorrowValue) &Account){

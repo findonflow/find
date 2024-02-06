@@ -1,6 +1,6 @@
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+import "MetadataViews"
+import "NFTCatalog"
+import "FINDNFTCatalog"
 
 access(all) fun main(collectionIdentifier : String, type: String?) : NFTCatalogMetadata? {
 	if let catalog = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier) {

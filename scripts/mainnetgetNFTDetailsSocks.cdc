@@ -1,4 +1,4 @@
-import FIND from "../contracts/FIND.cdc"
+import "FIND"
 import RaribleNFT from 0x01ab36aaf654a13e
 
 access(all) fun main(user: String , project: String, id: UInt64, views: [String]) : NFTData? {

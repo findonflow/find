@@ -1,15 +1,15 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import Profile from "../contracts/Profile.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import DapperStorageRent from "../contracts/standard/DapperStorageRent.cdc"
+import "FindMarket"
+import "Profile"
+import "FindMarketSale"
+import "NFTCatalog"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FungibleToken"
+import "DapperStorageRent"
 
-//import TopShot from "../contracts/community/TopShot.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
+//import "TopShot"
+import "DapperUtilityCoin"
+import "FlowUtilityToken"
 
 //first argument is the address to the merchant that gets the funds
 transaction(address: Address, id: UInt64, amount: UFix64) {

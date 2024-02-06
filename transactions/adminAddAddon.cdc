@@ -1,4 +1,4 @@
-import Admin from "../contracts/Admin.cdc"
+import "Admin"
 
 transaction(name: String, addon: String){
     prepare(account: auth(BorrowValue) &Account){

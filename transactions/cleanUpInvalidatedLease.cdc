@@ -1,4 +1,4 @@
-import FIND from "../contracts/FIND.cdc"
+import "FIND"
 
 
 transaction(names: [String]) {

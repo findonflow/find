@@ -1,6 +1,6 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FIND"
 
 //Fetch a single view from a nft on a given path
 access(all) fun main(user: Address, path:PublicPath, id: UInt64, identifier: String) : AnyStruct? {

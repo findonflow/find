@@ -1,8 +1,8 @@
-import FIND from "../contracts/FIND.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import Dandy from "../contracts/Dandy.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindForge from "../contracts/FindForge.cdc"
+import "FIND"
+import "NonFungibleToken"
+import "Dandy"
+import "MetadataViews"
+import "FindForge"
 
 transaction(name: String, maxEdition:UInt64, nftName:String, nftDescription:String, folderHash:String) {
 	prepare(account: auth(BorrowValue) &Account) {

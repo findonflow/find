@@ -1,4 +1,4 @@
-import FTRegistry from "../contracts/FTRegistry.cdc"
+import "FTRegistry"
 
 access(all) fun main() : {String: FTRegistry.FTInfo}{
 

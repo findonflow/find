@@ -1,6 +1,6 @@
-import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOfferSoft.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
+import "FindLeaseMarketDirectOfferSoft"
+import "FindMarket"
+import "FindLeaseMarket"
 
 transaction(leaseName: String, amount: UFix64) {
 

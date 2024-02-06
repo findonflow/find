@@ -1,9 +1,9 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FIND from "../contracts/FIND.cdc"
-import Profile from "../contracts/Profile.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
-import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
+import "FindMarket"
+import "FIND"
+import "Profile"
+import "DapperUtilityCoin"
+import "FindLeaseMarketSale"
+import "FindLeaseMarket"
 
 access(all) fun main(sellerAccount: Address, leaseName: String, amount: UFix64) :PurchaseData{
 

@@ -14,8 +14,8 @@
 * 
 */
 
-import FungibleToken from "./FungibleToken.cdc"
-import FlowToken from "./FlowToken.cdc"
+import "FungibleToken"
+import "FlowToken"
 
 access(all) contract FlowStorageFees {
 

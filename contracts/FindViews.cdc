@@ -1,7 +1,7 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import ViewResolver from "../contracts/standard/ViewResolver.cdc"
+import "NonFungibleToken"
+import "FungibleToken"
+import "MetadataViews"
+import "ViewResolver"
 
 access(all) contract FindViews {
 

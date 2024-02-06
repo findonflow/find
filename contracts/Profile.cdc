@@ -2,9 +2,9 @@
 * Inspiration: https://flow-view-source.com/testnet/account/0xba1132bc08f82fe2/contract/Ghost
 */
 
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import ProfileCache from "../contracts/ProfileCache.cdc"
-import FindUtils from "../contracts/FindUtils.cdc"
+import "FungibleToken"
+import "ProfileCache"
+import "FindUtils"
 
 access(all) contract Profile {
 

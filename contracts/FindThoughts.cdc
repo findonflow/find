@@ -1,10 +1,10 @@
-import FindViews from "./FindViews.cdc"
-import FindMarket from "./FindMarket.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
-import ViewResolver from "./standard/ViewResolver.cdc"
-import FINDNFTCatalog from "./FINDNFTCatalog.cdc"
-import FIND from "./FIND.cdc"
-import Clock from "./Clock.cdc"
+import "FindViews"
+import "FindMarket"
+import "MetadataViews"
+import "ViewResolver"
+import "FINDNFTCatalog"
+import "FIND"
+import "Clock"
 
 access(all) contract FindThoughts {
 

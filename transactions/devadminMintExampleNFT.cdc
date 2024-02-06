@@ -1,12 +1,12 @@
-import Admin from "../contracts/Admin.cdc"
-import FIND from "../contracts/FIND.cdc"
-import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FindForge from "../contracts/FindForge.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import Profile from "../contracts/Profile.cdc"
+import "Admin"
+import "FIND"
+import "ExampleNFT"
+import "FungibleToken"
+import "MetadataViews"
+import "NonFungibleToken"
+import "FindForge"
+import "FindViews"
+import "Profile"
 
 transaction(name: String, artist:String, nftName:String, nftDescription:String, traits: [UInt64], nftUrl:String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String, collectionBannerImage: String) {
     prepare(account: auth(BorrowValue) &Account){

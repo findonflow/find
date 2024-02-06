@@ -1,5 +1,5 @@
-import FungibleToken from "./FungibleToken.cdc"
-import FlowToken from "./FlowToken.cdc"
+import "FungibleToken"
+import "FlowToken"
 
 /// DapperStorageRent
 /// Provide a means for accounts storage TopUps. To be used during transaction execution.

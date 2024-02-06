@@ -1,5 +1,5 @@
 
-import Admin from "../contracts/Admin.cdc"
+import "Admin"
 
 transaction(type: String) {
 

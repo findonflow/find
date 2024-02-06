@@ -1,9 +1,9 @@
-import FindPack from "../contracts/FindPack.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "FindPack"
+import "FINDNFTCatalog"
+import "NFTCatalog"
+import "FungibleToken"
+import "NonFungibleToken"
+import "MetadataViews"
 
 /// A transaction to open a pack with a given id
 /// @param packId: The id of the pack to open

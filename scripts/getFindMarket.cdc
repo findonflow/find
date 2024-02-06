@@ -1,7 +1,7 @@
-import FIND from "../contracts/FIND.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import Clock from "../contracts/Clock.cdc"
+import "FIND"
+import "FUSD"
+import "FindMarket"
+import "Clock"
 
 access(all) struct FINDReport{
 

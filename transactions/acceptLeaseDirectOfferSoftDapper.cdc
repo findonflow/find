@@ -1,11 +1,11 @@
-import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOfferSoft.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FindLeaseMarketDirectOfferSoft"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FindViews"
+import "FindMarket"
+import "FindLeaseMarket"
+import "FungibleToken"
+import "FIND"
 
 transaction(leaseName: String) {
 

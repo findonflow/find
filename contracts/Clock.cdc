@@ -20,7 +20,7 @@ access(all) fun tickClock(_ time: UFix64) {
 You can then call this from a transaction like this:
 
 ```
-import YourThing from "../contracts/YouThing.cdc"
+import "YourThing"
 
 transaction(clock: UFix64) {
     prepare(account: auth(BorrowValue) &Account) {

@@ -1,4 +1,4 @@
-import FindMarket from "../contracts/FindMarket.cdc"
+import "FindMarket"
 
 
 //Transaction that is signed by find to create a find market tenant for find

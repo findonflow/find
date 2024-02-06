@@ -1,7 +1,7 @@
-import FIND from "../contracts/FIND.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import Profile from "../contracts/Profile.cdc"
+import "FIND"
+import "FungibleToken"
+import "FUSD"
+import "Profile"
 
 transaction(owner: Address, name: String) {
 

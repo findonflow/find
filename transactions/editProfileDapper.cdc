@@ -1,5 +1,5 @@
-import FIND from "../contracts/FIND.cdc"
-import Profile from "../contracts/Profile.cdc"
+import "FIND"
+import "Profile"
 
 transaction(name:String, description: String, avatar: String, tags:[String], allowStoringFollowers: Bool, linkTitles : {String: String}, linkTypes: {String:String}, linkUrls : {String:String}, removeLinks : [String]) {
 	

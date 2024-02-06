@@ -1,5 +1,5 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
+import "FindMarket"
+import "FindMarketAdmin"
 
 transaction(tenant: Address, ftName: String, nftName: String, listingName: String){
 

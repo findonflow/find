@@ -1,13 +1,13 @@
-import FungibleToken from "./standard/FungibleToken.cdc"
-import FlowToken from "./standard/FlowToken.cdc"
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
-import ViewResolver from "./standard/ViewResolver.cdc"
-import FungibleTokenSwitchboard from "./standard/FungibleTokenSwitchboard.cdc"
-import Profile from "./Profile.cdc"
-import FIND from "./FIND.cdc"
-import FindViews from "./FindViews.cdc"
-import FindAirdropper from "./FindAirdropper.cdc"
+import "FungibleToken"
+import "FlowToken"
+import "NonFungibleToken"
+import "MetadataViews"
+import "ViewResolver"
+import "FungibleTokenSwitchboard"
+import "Profile"
+import "FIND"
+import "FindViews"
+import "FindAirdropper"
 
 access(all) contract NameVoucher {
 

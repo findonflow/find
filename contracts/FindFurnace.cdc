@@ -1,7 +1,7 @@
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import FindMarket from "./FindMarket.cdc"
-import FindViews from "./FindViews.cdc"
-import FIND from "./FIND.cdc"
+import "NonFungibleToken"
+import "FindMarket"
+import "FindViews"
+import "FIND"
 
 access(all) contract FindFurnace {
 

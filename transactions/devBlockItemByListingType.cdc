@@ -1,6 +1,6 @@
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import Dandy from "../contracts/Dandy.cdc"
+import "FindMarketAdmin"
+import "FindMarket"
+import "Dandy"
 
 transaction(tenant: Address){
     prepare(account: auth(BorrowValue) &Account){

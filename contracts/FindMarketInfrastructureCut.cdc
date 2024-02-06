@@ -1,6 +1,6 @@
-import FindMarketCutInterface from "../contracts/FindMarketCutInterface.cdc"
-import FindMarketCutStruct from "../contracts/FindMarketCutStruct.cdc"
-import FindMarketCut from "../contracts/FindMarketCut.cdc"
+import "FindMarketCutInterface"
+import "FindMarketCutStruct"
+import "FindMarketCut"
 
 access(all) contract FindMarketInfrastructureCut : FindMarketCutInterface {
 

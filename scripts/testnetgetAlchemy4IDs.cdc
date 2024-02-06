@@ -1,5 +1,5 @@
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "MetadataViews"
+import "FIND"
 
 access(all) fun main(user: String, collections: [String]) : {String : ItemReport}  {
     return {}

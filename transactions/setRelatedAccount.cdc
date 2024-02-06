@@ -1,5 +1,5 @@
-import FindRelatedAccounts from "../contracts/FindRelatedAccounts.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FindRelatedAccounts"
+import "FIND"
 
 transaction(name: String, target: String) {
 

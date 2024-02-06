@@ -1,5 +1,5 @@
-import NFTCatalog from "./standard/NFTCatalog.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
+import "NFTCatalog"
+import "MetadataViews"
 
 // NFTCatalog
 //

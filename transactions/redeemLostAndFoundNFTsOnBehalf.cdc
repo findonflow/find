@@ -1,11 +1,11 @@
-import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
-import LostAndFound from "../contracts/standard/LostAndFound.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FindLostAndFoundWrapper"
+import "LostAndFound"
+import "FINDNFTCatalog"
+import "NFTCatalog"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FindViews"
+import "FIND"
 
 //IMPORT
 

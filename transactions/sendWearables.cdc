@@ -1,9 +1,9 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FindAirdropper from "../contracts/FindAirdropper.cdc"
-import Wearables from "../contracts/community/Wearables.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FindViews"
+import "FIND"
+import "FindAirdropper"
+import "Wearables"
 
 transaction(allReceivers: [String] , ids:[UInt64], memos: [String]) {
 

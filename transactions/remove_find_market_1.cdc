@@ -1,4 +1,4 @@
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
+import "FindMarketAdmin"
 
 //signed by admin to link tenantClient to a new tenant
 transaction(tenant: Address) {

@@ -1,8 +1,8 @@
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import ViewResolver from "../contracts/standard/ViewResolver.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "MetadataViews"
+import "NFTCatalog"
+import "ViewResolver"
+import "FINDNFTCatalog"
+import "FIND"
 
 //get all the views for an nft and address/path/id
 access(all) fun  main(address: Address, aliasOrIdentifier:String, id: UInt64) : [String] {

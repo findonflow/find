@@ -1,5 +1,5 @@
-import Admin from "../contracts/Admin.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
+import "Admin"
+import "FiatToken"
 
 transaction() {
 

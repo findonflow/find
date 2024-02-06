@@ -1,7 +1,7 @@
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import ViewResolver from "../contracts/standard/ViewResolver.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "MetadataViews"
+import "ViewResolver"
+import "FINDNFTCatalog"
+import "FIND"
 
 //Fetch a single view from a nft on a given path
 access(all) fun main(user: String, aliasOrIdentifier:String, id: UInt64, identifier: String) : AnyStruct? {

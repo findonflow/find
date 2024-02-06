@@ -1,12 +1,12 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FindUtils from "../contracts/FindUtils.cdc"
-import FIND from "../contracts/FIND.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import ViewResolver from "../contracts/standard/ViewResolver.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
+import "FindMarket"
+import "FindViews"
+import "FindUtils"
+import "FIND"
+import "MetadataViews"
+import "ViewResolver"
+import "NonFungibleToken"
+import "FINDNFTCatalog"
+import "FTRegistry"
 
 access(all) struct NFTDetailReport {
     access(all) let findMarket: {String : FindMarket.SaleItemInformation}

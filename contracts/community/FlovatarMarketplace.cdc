@@ -1,8 +1,8 @@
-import FungibleToken from "../standard/FungibleToken.cdc"
-import NonFungibleToken from "../standard/NonFungibleToken.cdc"
-import FlowToken from "../standard/FlowToken.cdc"
-import Flovatar from "./Flovatar.cdc"
-import FlovatarComponent from "./FlovatarComponent.cdc"
+import "FungibleToken"
+import "NonFungibleToken"
+import "FlowToken"
+import "Flovatar"
+import "FlovatarComponent"
 
 /*
  A standard marketplace contract with Royalties management and hardcoded against Flovatar and Components.

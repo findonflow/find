@@ -1,12 +1,12 @@
-import FIND from "../contracts/FIND.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import Dandy from "../contracts/Dandy.cdc"
-import Profile from "../contracts/Profile.cdc"
-import ViewResolver from "../contracts/standard/ViewResolver.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FindForge from "../contracts/FindForge.cdc"
+import "FIND"
+import "NonFungibleToken"
+import "FungibleToken"
+import "Dandy"
+import "Profile"
+import "ViewResolver"
+import "MetadataViews"
+import "FindViews"
+import "FindForge"
 
 transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftDescription:String, nftUrl:String, rarity: String, rarityNum:UFix64, to: Address) {
     prepare(account: auth(BorrowValue) &Account) {

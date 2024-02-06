@@ -1,4 +1,4 @@
-import FindVerifier from "../contracts/FindVerifier.cdc"
+import "FindVerifier"
 
 access(all) fun main(user: Address, addresses: [Address]) : Result {
     let verifier = FindVerifier.IsInWhiteList(addresses)

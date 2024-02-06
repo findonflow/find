@@ -1,5 +1,5 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
+import "FungibleToken"
+import "FUSD"
 
 transaction(receiver: Address, amount:UFix64) {
     prepare(acct: auth(BorrowValue) &Account) {

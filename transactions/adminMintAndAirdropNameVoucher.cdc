@@ -1,10 +1,10 @@
 
-import Admin from "../contracts/Admin.cdc"
-import NameVoucher from "../contracts/NameVoucher.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FindAirdropper from "../contracts/FindAirdropper.cdc"
+import "Admin"
+import "NameVoucher"
+import "NonFungibleToken"
+import "FungibleToken"
+import "FlowToken"
+import "FindAirdropper"
 
 transaction(users: [Address], minCharLength: UInt64) {
 

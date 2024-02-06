@@ -1,9 +1,9 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import Dandy from "../contracts/Dandy.cdc"
-import NFTStorefront from "../contracts/standard/NFTStorefront.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "FungibleToken"
+import "NonFungibleToken"
+import "FlowToken"
+import "Dandy"
+import "NFTStorefront"
+import "MetadataViews"
 
 
 

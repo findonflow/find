@@ -1,8 +1,8 @@
-import FindPack from "../contracts/FindPack.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import FlowStorageFees from "../contracts/standard/FlowStorageFees.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FindPack"
+import "FTRegistry"
+import "FlowStorageFees"
+import "MetadataViews"
+import "FIND"
 
 access(all) fun main(packTypeName: String, packTypeId: UInt64, user: Address) : Report? {
 	if let metadata = FindPack.getMetadataById(packTypeName: packTypeName, typeId: packTypeId) {

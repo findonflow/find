@@ -1,6 +1,6 @@
-import Wearables from "../contracts/community/Wearables.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "Wearables"
+import "NonFungibleToken"
+import "MetadataViews"
 
 transaction() {
 	prepare(account: auth(BorrowValue) &Account) {

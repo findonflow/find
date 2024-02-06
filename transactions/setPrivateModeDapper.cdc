@@ -1,4 +1,4 @@
-import Profile from "../contracts/Profile.cdc"
+import "Profile"
 
 transaction(mode: Bool) {
 

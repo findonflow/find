@@ -1,4 +1,4 @@
-import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
+import "TokenForwarding"
 
 
 transaction() {

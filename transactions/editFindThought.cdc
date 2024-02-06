@@ -1,4 +1,4 @@
-import FindThoughts from "../contracts/FindThoughts.cdc"
+import "FindThoughts"
 
 transaction(id: UInt64, header: String , body: String, tags: [String]) {
 
