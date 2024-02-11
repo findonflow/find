@@ -14,7 +14,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
     let saleItemsCap: Capability<&FindMarketAuctionSoft.SaleItemCollection>
     var targetCapability : Capability<&{NonFungibleToken.Receiver}>
     let walletReference : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
-    let bidsReference: &FindMarketAuctionSoft.MarketBidCollection?
+    let bidsReference: auth(FindMarketAuctionSoft.Buyer) &FindMarketAuctionSoft.MarketBidCollection?
     let balanceBeforeBid: UFix64
     let pointer: FindViews.ViewReadPointer
     let ftVaultType: Type
@@ -73,12 +73,12 @@ transaction(user: String, id: UInt64, amount: UFix64) {
             self.targetCapability=targetCapability!
         }
 
-        self.walletReference = account.storage.borrow<auth(FungibleToken.Withdraw) &FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account. Account address : ".concat(account.address.toString()))
+        self.walletReference = account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account. Account address : ".concat(account.address.toString()))
         self.ftVaultType = ft.type
 
         let bidStoragePath=tenant.getStoragePath(Type<@FindMarketAuctionSoft.MarketBidCollection>())
 
-        self.bidsReference= account.storage.borrow<&FindMarketAuctionSoft.MarketBidCollection>(from: bidStoragePath)
+        self.bidsReference= account.storage.borrow<auth(FindMarketAuctionSoft.Buyer) &FindMarketAuctionSoft.MarketBidCollection>(from: bidStoragePath)
         self.balanceBeforeBid=self.walletReference.balance
         self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: item.getItemID())
     }

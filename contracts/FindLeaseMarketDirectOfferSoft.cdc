@@ -11,6 +11,8 @@ import "FindLeaseMarket"
 
 access(all) contract FindLeaseMarketDirectOfferSoft {
 
+    access(all) entitlement Seller
+
     access(all) event DirectOffer(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, leaseInfo: FindLeaseMarket.LeaseInfo?, buyer:Address?, buyerName:String?, buyerAvatar:String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
 
     access(all) resource SaleItem : FindLeaseMarket.SaleItem {
@@ -34,12 +36,12 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
             return self.pointer.name
         }
 
-        access(all) fun acceptDirectOffer() {
+        access(contract) fun acceptDirectOffer() {
             self.directOfferAccepted=true
         }
 
         //Here we do not get a vault back, it is sent in to the method itself
-        access(all) fun acceptNonEscrowedBid() {
+        access(contract) fun acceptNonEscrowedBid() {
             pre{
                 self.offerCallback.check() : "Bidder unlinked the bid collection capability."
                 self.pointer != nil : "Please accept offer"
@@ -118,7 +120,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
             return FindLeaseMarket.LeaseInfo(self.pointer)
         }
 
-        access(all) fun setValidUntil(_ time: UFix64?) {
+        access(contract) fun setValidUntil(_ time: UFix64?) {
             self.validUntil=time
         }
 
@@ -126,11 +128,11 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
             return self.validUntil
         }
 
-        access(all) fun setPointer(_ pointer: FindLeaseMarket.AuthLeasePointer) {
+        access(contract) fun setPointer(_ pointer: FindLeaseMarket.AuthLeasePointer) {
             self.pointer=pointer
         }
 
-        access(all) fun setCallback(_ callback: Capability<&{MarketBidCollectionPublic}>) {
+        access(contract) fun setCallback(_ callback: Capability<&{MarketBidCollectionPublic}>) {
             self.offerCallback=callback
         }
 
@@ -240,7 +242,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
             pre {
                 self.items.containsKey(name) : "Invalid name sale=".concat(name)
             }
-            let saleItem=self.borrow(name)
+            let saleItem=self.borrowAuth(name)
 
             let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:true, name:"increase bid in direct offer soft"), seller: self.owner!.address, buyer: saleItem.offerCallback.address)
 
@@ -271,7 +273,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
             }
 
 
-            let saleItem=self.borrow(name)
+            let saleItem=self.borrowAuth(name)
             if self.borrow(name).getBuyer()! == callback.address {
                 panic("You already have the latest bid on this item, use the incraseBid transaction")
             }
@@ -302,12 +304,12 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
 
 
         //cancel will reject a direct offer
-        access(all) fun cancel(_ name: String) {
+        access(Seller) fun cancel(_ name: String) {
             pre {
                 self.items.containsKey(name) : "Invalid name sale=".concat(name)
             }
 
-            let saleItem=self.borrow(name)
+            let saleItem=self.borrowAuth(name)
 
             let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"reject offer in direct offer soft"), seller: nil, buyer: nil)
 
@@ -323,12 +325,12 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
             destroy <- self.items.remove(key: name)
         }
 
-        access(all) fun acceptOffer(_ pointer: FindLeaseMarket.AuthLeasePointer) {
+        access(Seller) fun acceptOffer(_ pointer: FindLeaseMarket.AuthLeasePointer) {
             pre {
                 self.items.containsKey(pointer.name) : "Invalid name sale=".concat(pointer.name)
             }
 
-            let saleItem = self.borrow(pointer.name)
+            let saleItem = self.borrowAuth(pointer.name)
 
             if saleItem.validUntil != nil && saleItem.validUntil! < Clock.time() {
                 panic("This direct offer is already expired")
@@ -353,7 +355,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
                 self.items.containsKey(name) : "Invalid name sale=".concat(name)
             }
 
-            let saleItem = self.borrow(name)
+            let saleItem = self.borrowAuth(name)
             if !saleItem.directOfferAccepted {
                 panic("cannot fulfill a direct offer that is not accepted yet")
             }
@@ -389,14 +391,21 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
             pre{
                 self.items.containsKey(name) : "This name sale does not exist.".concat(name)
             }
-            return (&self.items[name] as &SaleItem?)!
+            return (&self.items[name])!
+        }
+
+        access(Seller) fun borrowAuth(_ name: String): auth(Seller) &SaleItem {
+            pre{
+                self.items.containsKey(name) : "This name sale does not exist.".concat(name)
+            }
+            return (&self.items[name])!
         }
 
         access(all) fun borrowSaleItem(_ name: String) : &{FindLeaseMarket.SaleItem} {
             pre{
                 self.items.containsKey(name) : "This name sale does not exist.".concat(name)
             }
-            return (&self.items[name] as &{FindLeaseMarket.SaleItem}?)!
+            return (&self.items[name])!
         }
     }
 
@@ -455,6 +464,8 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
         access(contract) fun cancelBidFromSaleItem(_ name: String)
     }
 
+    access(all) entitlement Buyer
+
     //A collection stored for bidders/buyers
     access(all) resource MarketBidCollection: MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic {
 
@@ -499,7 +510,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
         }
 
 
-        access(all) fun bid(name: String, amount:UFix64, vaultType:Type, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}, bidExtraField: {String : AnyStruct}) {
+        access(Buyer) fun bid(name: String, amount:UFix64, vaultType:Type, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}, bidExtraField: {String : AnyStruct}) {
             if self.owner!.address == FIND.status(name).owner! {
                 panic("You cannot bid on your own resource")
             }
@@ -529,7 +540,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
             destroy oldToken
         }
 
-        access(all) fun fulfillDirectOffer(name:String, vault: @{FungibleToken.Vault}) {
+        access(Buyer) fun fulfillDirectOffer(name:String, vault: @{FungibleToken.Vault}) {
             pre {
                 self.bids[name] != nil : "You need to have a bid here already"
             }
@@ -544,7 +555,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
             saleItem.fulfillDirectOfferNonEscrowed(name:name, vault: <- vault)
         }
 
-        access(all) fun increaseBid(name: String, increaseBy: UFix64) {
+        access(Buyer) fun increaseBid(name: String, increaseBy: UFix64) {
             let bid =self.borrowBid(name)
             bid.setBidAt(Clock.time())
             bid.increaseBid(increaseBy)
@@ -555,7 +566,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
         }
 
         /// The users cancel a bid himself
-        access(all) fun cancelBid(_ name: String) {
+        access(Buyer) fun cancelBid(_ name: String) {
             let bid= self.borrowBid(name)
             if !bid.from.check() {
                 panic("Seller unlinked the SaleItem collection capability. seller address : ".concat(bid.from.address.toString()))
@@ -575,14 +586,14 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
             pre{
                 self.bids.containsKey(name) : "This name bid does not exist.".concat(name)
             }
-            return (&self.bids[name] as &Bid?)!
+            return (&self.bids[name])!
         }
 
         access(all) fun borrowBidItem(_ name: String): &{FindLeaseMarket.Bid} {
             pre{
                 self.bids.containsKey(name) : "This name bid does not exist.".concat(name)
             }
-            return (&self.bids[name] as &{FindLeaseMarket.Bid}?)!
+            return (&self.bids[name])!
         }
 
         access(all) fun getBalance(_ name: String) : UFix64 {

@@ -12,7 +12,7 @@ import "FIND"
 transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: String, amount: UFix64, validUntil: UFix64?) {
 
 	var targetCapability : Capability<&{NonFungibleToken.Receiver}>
-	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection?
+	let bidsReference: auth(FindMarketDirectOfferSoft.Buyer) &FindMarketDirectOfferSoft.MarketBidCollection?
 	let pointer: FindViews.ViewReadPointer
 	let ftVaultType: Type
 
@@ -45,7 +45,7 @@ transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIde
 			account.capabilities.publish(cap, at: dosBidPublicPath)
 		}
 
-		self.bidsReference= account.storage.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: dosBidStoragePath)
+		self.bidsReference= account.storage.borrow<auth(FindMarketDirectOfferSoft.Buyer) &FindMarketDirectOfferSoft.MarketBidCollection>(from: dosBidStoragePath)
 		self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: id)
 
 		let col= account.storage.borrow<&AnyResource>(from: nft.storagePath) as? &{NonFungibleToken.Collection}?

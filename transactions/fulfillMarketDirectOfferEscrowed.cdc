@@ -9,7 +9,7 @@ import "ViewResolver"
 
 transaction(id: UInt64) {
 
-	let market : &FindMarketDirectOfferEscrow.SaleItemCollection?
+	let market : auth(FindMarketDirectOfferEscrow.Seller) &FindMarketDirectOfferEscrow.SaleItemCollection?
 	let pointer : FindViews.AuthNFTPointer
 
 	prepare(account: auth(BorrowValue, IssueStorageCapabilityController, PublishCapability, SaveValue) &Account) {
@@ -38,7 +38,7 @@ transaction(id: UInt64) {
 		}
 
 		self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: item.getItemID())
-		self.market = account.storage.borrow<&FindMarketDirectOfferEscrow.SaleItemCollection>(from: storagePath)
+		self.market = account.storage.borrow<auth(FindMarketDirectOfferEscrow.Seller) &FindMarketDirectOfferEscrow.SaleItemCollection>(from: storagePath)
 
 	}
 

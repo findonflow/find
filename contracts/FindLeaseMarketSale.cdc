@@ -7,19 +7,18 @@ import "FindMarket"
 import "Debug"
 
 /*
-
 A Find Market for direct sales
 */
-//TODO: entitlements
-access(all) contract FindLeaseMarketSale {
 
+access(all) contract FindLeaseMarketSale {
+    
+    // A seller can list, delist and relist leases for sale
     access(all) entitlement Seller
 
     access(all) event Sale(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, leaseInfo: FindLeaseMarket.LeaseInfo?, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt:UFix64?)
 
-    //A sale item for a direct sale
+    // A sale item for a direct sale
     access(all) resource SaleItem : FindLeaseMarket.SaleItem{
-
         //this is set when bought so that pay will work
         access(self) var buyer: Address?
 
@@ -52,7 +51,7 @@ access(all) contract FindLeaseMarketSale {
             return Type<@SaleItem>().identifier
         }
 
-        access(all) fun setBuyer(_ address:Address) {
+        access(account) fun setBuyer(_ address:Address) {
             self.buyer=address
         }
 
@@ -100,7 +99,7 @@ access(all) contract FindLeaseMarketSale {
             return self.vaultType
         }
 
-        access(all) fun setValidUntil(_ time: UFix64?) {
+        access(contract) fun setValidUntil(_ time: UFix64?) {
             self.validUntil=time
         }
 

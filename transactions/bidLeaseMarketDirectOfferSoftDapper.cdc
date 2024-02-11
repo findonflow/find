@@ -8,7 +8,7 @@ import "FindLeaseMarketDirectOfferSoft"
 
 transaction(leaseName: String, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
 
-    let bidsReference: &FindLeaseMarketDirectOfferSoft.MarketBidCollection?
+    let bidsReference: auth(FindLeaseMarketDirectOfferSoft.Buyer) &FindLeaseMarketDirectOfferSoft.MarketBidCollection?
     let ftVaultType: Type
 
     prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue, IssueStorageCapabilityController) &Account) {
@@ -32,7 +32,7 @@ transaction(leaseName: String, ftAliasOrIdentifier:String, amount: UFix64, valid
             account.capabilities.publish(cap, at: leaseDOSBidPublicPath)
         }
 
-        self.bidsReference= account.storage.borrow<&FindLeaseMarketDirectOfferSoft.MarketBidCollection>(from: leaseDOSBidStoragePath)
+        self.bidsReference= account.storage.borrow<auth(FindLeaseMarketDirectOfferSoft.Buyer) &FindLeaseMarketDirectOfferSoft.MarketBidCollection>(from: leaseDOSBidStoragePath)
 
     }
 

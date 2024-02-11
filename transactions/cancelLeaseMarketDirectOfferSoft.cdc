@@ -3,12 +3,12 @@ import "FindLeaseMarketDirectOfferSoft"
 
 transaction(leaseNames: [String]) {
 
-	let saleItems : &FindLeaseMarketDirectOfferSoft.SaleItemCollection?
+	let saleItems : auth(FindLeaseMarketDirectOfferSoft.Seller) &FindLeaseMarketDirectOfferSoft.SaleItemCollection?
 
 	prepare(account: auth(BorrowValue) &Account) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
-		self.saleItems= account.storage.borrow<&FindLeaseMarketDirectOfferSoft.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>()))
+		self.saleItems= account.storage.borrow<auth(FindLeaseMarketDirectOfferSoft.Seller) &FindLeaseMarketDirectOfferSoft.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>()))
 
 	}
 

@@ -2,13 +2,13 @@ import "FindMarket"
 import "FindLeaseMarketDirectOfferSoft"
 
 transaction(leaseName: String) {
-	let bidsReference: &FindLeaseMarketDirectOfferSoft.MarketBidCollection?
+	let bidsReference: auth(FindLeaseMarketDirectOfferSoft.Buyer) &FindLeaseMarketDirectOfferSoft.MarketBidCollection?
 
 	prepare(account: auth(BorrowValue) &Account) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>())
-		self.bidsReference= account.storage.borrow<&FindLeaseMarketDirectOfferSoft.MarketBidCollection>(from: storagePath)
+		self.bidsReference= account.storage.borrow<auth(FindLeaseMarketDirectOfferSoft.Buyer) &FindLeaseMarketDirectOfferSoft.MarketBidCollection>(from: storagePath)
 	}
 
 	pre{

@@ -306,10 +306,7 @@
         "LostAndFoundHelper",
         "FeeEstimator"
       ],
-      "emulator-dapper": [
-        "DapperUtilityCoin",
-        "FlowUtilityToken"
-      ],
+      "emulator-dapper": ["DapperUtilityCoin", "FlowUtilityToken"],
       "emulator-find": [
         "Profile",
         "FindThoughts",
@@ -344,7 +341,6 @@
         "FindMarketInfrastructureCut",
         "Dev",
         "NameVoucher",
-        "FIND",
         "Bl0x",
         "Bl0xPack",
         "CharityNFT",
@@ -355,16 +351,15 @@
         "FindLeaseMarket",
         "FindLeaseMarketSale",
         "FindLeaseMarketAuctionSoft",
-        "FindLeaseMarketDirectOfferSoft",
         "FindMarketAuctionEscrow",
         "FindMarketAuctionSoft",
+        "FindLeaseMarketDirectOfferSoft",
         "FindMarketDirectOfferSoft",
-        "FindMarketDirectOfferEscrow"
+        "FindMarketDirectOfferEscrow",
+        "FIND"
       ],
       "emulator-find-admin": [],
-      "emulator-find-forge": [
-        "GeneratedExperiences"
-      ],
+      "emulator-find-forge": ["GeneratedExperiences"],
       "emulator-find-lease": [],
       "emulator-user1": [],
       "emulator-user2": [],

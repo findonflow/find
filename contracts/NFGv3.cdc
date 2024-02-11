@@ -296,7 +296,7 @@ access(all) contract NFGv3: ViewResolver {
                 royalties: MetadataViews.Royalties(royalties)
             )
 
-            NFGv3.totalSupply = NFGv3.totalSupply + UInt64(1)
+            NFGv3.totalSupply = NFGv3.totalSupply + 1
             return <- newNFT
         }
 

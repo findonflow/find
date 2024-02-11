@@ -6,20 +6,20 @@ import "FindMarket"
 transaction(id: UInt64, amount:UFix64) {
 
     let walletReference : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
-    let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection
+    let bidsReference: auth(FindMarketDirectOfferSoft.Buyer) &FindMarketDirectOfferSoft.MarketBidCollection
     let requiredAmount:UFix64
 
     prepare(account: auth(BorrowValue) &Account) {
         let marketplace = FindMarket.getFindTenantAddress()
         let tenant=FindMarket.getTenant(marketplace)
         let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
-        self.bidsReference= account.storage.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Cannot borrow direct offer soft bid collection")
+        self.bidsReference= account.storage.borrow<auth(FindMarketDirectOfferSoft.Buyer) &FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Cannot borrow direct offer soft bid collection")
         let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
         let item = FindMarket.assertBidOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, id: id)
 
         let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
 
-        self.walletReference = account.storage.borrow<auth(FungibleToken.Withdraw) &FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+        self.walletReference = account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
 
         self.requiredAmount = self.bidsReference.getBalance(id)
     }

@@ -7,7 +7,7 @@ import "FindLeaseMarket"
 transaction(leaseName: String, amount:UFix64) {
 
     let walletReference : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
-    let bidsReference: &FindLeaseMarketAuctionSoft.MarketBidCollection
+    let bidsReference: auth(FindLeaseMarketAuctionSoft.Buyer) &FindLeaseMarketAuctionSoft.MarketBidCollection
     let requiredAmount: UFix64
     let mainDapperCoinVault: &{FungibleToken.Vault}
     let balanceBeforeTransfer: UFix64
@@ -17,7 +17,7 @@ transaction(leaseName: String, amount:UFix64) {
         let tenant=FindMarket.getTenant(marketplace)
         let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketAuctionSoft.MarketBidCollection>())
 
-        self.bidsReference= account.storage.borrow<&FindLeaseMarketAuctionSoft.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
+        self.bidsReference= account.storage.borrow<auth(FindLeaseMarketAuctionSoft.Buyer) &FindLeaseMarketAuctionSoft.MarketBidCollection>(from: storagePath) ?? panic("This account does not have a bid collection")
 
         let marketOption = FindMarket.getMarketOptionFromType(Type<@FindLeaseMarketAuctionSoft.MarketBidCollection>())
         let item = FindLeaseMarket.assertBidOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, name: leaseName)

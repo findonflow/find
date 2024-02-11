@@ -12,6 +12,7 @@ access(all) contract FindMarketDirectOfferEscrow {
 
     access(all) event DirectOffer(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo?, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt: UFix64?, previousBuyer:Address?, previousBuyerName:String?)
 
+    access(all) entitlement Seller
 
     access(all) resource SaleItem : FindMarket.SaleItem {
 
@@ -34,7 +35,7 @@ access(all) contract FindMarketDirectOfferEscrow {
             return self.pointer.getUUID()
         }
 
-        access(all) fun acceptEscrowedBid() : @{FungibleToken.Vault} {
+        access(contract) fun acceptEscrowedBid() : @{FungibleToken.Vault} {
             if !self.offerCallback.check() {
                 panic("Bidder unlinked bid collection capability. Bidder Address : ".concat(self.offerCallback.address.toString()))
             }
@@ -92,7 +93,7 @@ access(all) contract FindMarketDirectOfferEscrow {
             return Type<@SaleItem>().identifier
         }
 
-        access(all) fun setPointer(_ pointer: FindViews.AuthNFTPointer) {
+        access(contract) fun setPointer(_ pointer: FindViews.AuthNFTPointer) {
             self.pointer=pointer
         }
 
@@ -115,7 +116,7 @@ access(all) contract FindMarketDirectOfferEscrow {
             return self.offerCallback.borrow()!.getVaultType(self.getId())
         }
 
-        access(all) fun setValidUntil(_ time: UFix64?) {
+        access(contract) fun setValidUntil(_ time: UFix64?) {
             self.validUntil=time
         }
 
@@ -123,7 +124,7 @@ access(all) contract FindMarketDirectOfferEscrow {
             return self.validUntil
         }
 
-        access(all) fun setCallback(_ callback: Capability<&MarketBidCollection>) {
+        access(contract) fun setCallback(_ callback: Capability<&MarketBidCollection>) {
             self.offerCallback=callback
         }
 
@@ -336,7 +337,7 @@ access(all) contract FindMarketDirectOfferEscrow {
         }
 
         //cancel will reject a direct offer
-        access(all) fun cancel(_ id: UInt64) {
+        access(Seller) fun cancel(_ id: UInt64) {
 
             if !self.items.containsKey(id) {
                 panic("Invalid id=".concat(id.toString()))
@@ -366,7 +367,7 @@ access(all) contract FindMarketDirectOfferEscrow {
             destroy <- self.items.remove(key: id)
         }
 
-        access(all) fun acceptDirectOffer(_ pointer: FindViews.AuthNFTPointer) {
+        access(Seller) fun acceptDirectOffer(_ pointer: FindViews.AuthNFTPointer) {
 
             let id = pointer.getUUID()
             if !self.items.containsKey(id) {
@@ -446,7 +447,7 @@ access(all) contract FindMarketDirectOfferEscrow {
             if !self.items.containsKey(id) {
                 panic("This id does not exist : ".concat(id.toString()))
             }
-            return (&self.items[id] as &{FindMarket.SaleItem}?)!
+            return (&self.items[id])!
         }
     }
 
@@ -495,6 +496,8 @@ access(all) contract FindMarketDirectOfferEscrow {
         access(contract) fun accept(_ nft: @{NonFungibleToken.NFT}, path:PublicPath) : @{FungibleToken.Vault}
         access(contract) fun cancelBidFromSaleItem(_ id: UInt64)
     }
+
+    access(all) entitlement Buyer
 
     //A collection stored for bidders/buyers
     access(all) resource MarketBidCollection: MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic {
@@ -555,7 +558,7 @@ access(all) contract FindMarketDirectOfferEscrow {
             return Type<@Bid>()
         }
 
-        access(all) fun bid(item: FindViews.ViewReadPointer, vault: @{FungibleToken.Vault}, nftCap: Capability<&{NonFungibleToken.Receiver}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}, bidExtraField: {String : AnyStruct}) {
+        access(Buyer) fun bid(item: FindViews.ViewReadPointer, vault: @{FungibleToken.Vault}, nftCap: Capability<&{NonFungibleToken.Receiver}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}, bidExtraField: {String : AnyStruct}) {
 
             // ensure it is not a 0 dollar listing
             if vault.balance <= 0.0 {
@@ -600,7 +603,7 @@ access(all) contract FindMarketDirectOfferEscrow {
             destroy oldToken
         }
 
-        access(all) fun increaseBid(id: UInt64, vault: @{FungibleToken.Vault}) {
+        access(Buyer) fun increaseBid(id: UInt64, vault: @{FungibleToken.Vault}) {
             let bid =self.borrowBid(id)
             bid.setBidAt(Clock.time())
             bid.vault.deposit(from: <- vault)
@@ -611,7 +614,7 @@ access(all) contract FindMarketDirectOfferEscrow {
         }
 
         /// The users cancel a bid himself
-        access(all) fun cancelBid(_ id: UInt64) {
+        access(Buyer) fun cancelBid(_ id: UInt64) {
             let bid= self.borrowBid(id)
             bid.from.borrow()!.cancelBid(id)
             self.cancelBidFromSaleItem(id)
@@ -639,7 +642,7 @@ access(all) contract FindMarketDirectOfferEscrow {
             if !self.bids.containsKey(id){
                 panic("This id does not exist : ".concat(id.toString()))
             }
-            return (&self.bids[id] as &{FindMarket.Bid}?)!
+            return (&self.bids[id])!
         }
 
         access(all) fun getBalance(_ id: UInt64) : UFix64 {

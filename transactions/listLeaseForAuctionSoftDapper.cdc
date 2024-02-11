@@ -6,7 +6,7 @@ import "FindLeaseMarket"
 
 transaction(leaseName: String, ftAliasOrIdentifier: String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?) {
 
-    let saleItems : &FindLeaseMarketAuctionSoft.SaleItemCollection?
+    let saleItems : auth(FindLeaseMarketAuctionSoft.Seller) &FindLeaseMarketAuctionSoft.SaleItemCollection?
     let pointer : FindLeaseMarket.AuthLeasePointer
     let vaultType : Type
 
@@ -30,7 +30,7 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, price:UFix64, auctio
             account.capabilities.publish(saleColCap, at: leaseASPublicPath)
         }
 
-        self.saleItems= account.storage.borrow<&FindLeaseMarketAuctionSoft.SaleItemCollection>(from: leaseASStoragePath)
+        self.saleItems= account.storage.borrow<auth(FindLeaseMarketAuctionSoft.Seller) &FindLeaseMarketAuctionSoft.SaleItemCollection>(from: leaseASStoragePath)
         let cap = account.capabilities.storage.issue<auth(FIND.Leasee) &FIND.LeaseCollection>(FIND.LeaseStoragePath)
         self.pointer= FindLeaseMarket.AuthLeasePointer(cap: cap, name: leaseName)
         self.vaultType= ft.type

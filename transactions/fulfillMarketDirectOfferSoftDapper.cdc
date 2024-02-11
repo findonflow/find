@@ -6,7 +6,7 @@ import "FindMarket"
 transaction(id: UInt64, amount:UFix64) {
 
     let walletReference : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
-    let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection
+    let bidsReference: auth(FindMarketDirectOfferSoft.Buyer) &FindMarketDirectOfferSoft.MarketBidCollection
     let requiredAmount:UFix64
     let mainDapperCoinVault: &{FungibleToken.Vault}
     let balanceBeforeTransfer: UFix64
@@ -16,7 +16,7 @@ transaction(id: UInt64, amount:UFix64) {
         let marketplace = FindMarket.getFindTenantAddress()
         let tenant=FindMarket.getTenant(marketplace)
         let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
-        self.bidsReference= account.storage.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Cannot borrow direct offer soft bid collection")
+        self.bidsReference= account.storage.borrow<auth(FindMarketDirectOfferSoft.Buyer) &FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Cannot borrow direct offer soft bid collection")
         let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
         let item = FindMarket.assertBidOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, id: id)
 

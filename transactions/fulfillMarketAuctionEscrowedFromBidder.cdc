@@ -3,13 +3,13 @@ import "FindMarket"
 
 transaction(id: UInt64) {
 
-	let bidsReference : &FindMarketAuctionEscrow.MarketBidCollection?
+	let bidsReference : auth(FindMarketAuctionEscrow.Buyer) &FindMarketAuctionEscrow.MarketBidCollection?
 
 	prepare(account: auth(BorrowValue) &Account) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketAuctionEscrow.MarketBidCollection>())
-		self.bidsReference= account.storage.borrow<&FindMarketAuctionEscrow.MarketBidCollection>(from: storagePath)
+		self.bidsReference= account.storage.borrow<auth(FindMarketAuctionEscrow.Buyer) &FindMarketAuctionEscrow.MarketBidCollection>(from: storagePath)
 
 
 	}

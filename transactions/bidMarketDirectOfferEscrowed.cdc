@@ -14,7 +14,7 @@ transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIde
     var targetCapability : Capability<&{NonFungibleToken.Receiver}>?
     let saleItemsCap: Capability<&{FindMarketDirectOfferEscrow.SaleItemCollectionPublic}>
     let walletReference : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
-    let bidsReference: &FindMarketDirectOfferEscrow.MarketBidCollection?
+    let bidsReference: auth(FindMarketDirectOfferEscrow.Buyer) &FindMarketDirectOfferEscrow.MarketBidCollection?
     let pointer: FindViews.ViewReadPointer
 
     prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue, UnpublishCapability) &Account) {
@@ -47,7 +47,7 @@ transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIde
             account.capabilities.publish(doeCap, at: doeBidPublicPath)
         }
 
-        self.bidsReference= account.storage.borrow<&FindMarketDirectOfferEscrow.MarketBidCollection>(from: doeBidStoragePath)
+        self.bidsReference= account.storage.borrow<auth(FindMarketDirectOfferEscrow.Buyer) &FindMarketDirectOfferEscrow.MarketBidCollection>(from: doeBidStoragePath)
         self.pointer= FindViews.createViewReadPointer(address: address, path:nft.publicPath, id: id)
 
         /* Check for nftCapability */

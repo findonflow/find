@@ -1344,7 +1344,7 @@ access(all) contract FIND {
         }
 
         access(LeaseOwner) fun borrowAuth(_ name: String): auth(LeaseOwner) &FIND.Lease {
-            return (&self.leases[name] as auth(LeaseOwner) &FIND.Lease?)!
+            return (&self.leases[name])!
         }
 
         //borrow the auction
@@ -1534,7 +1534,7 @@ access(all) contract FIND {
                 if vault.balance != cost {
                     panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
                 }
-                let walletRef = self.wallet!.borrow() ?? panic("The receiver capability is invalid. Wallet address : ".concat(self.wallet.address.toString()))
+                let walletRef = self.wallet.borrow() ?? panic("The receiver capability is invalid. Wallet address : ".concat(self.wallet.address.toString()))
                 walletRef.deposit(from: <- vault)
                 self.internal_renew(name: name)
                 return

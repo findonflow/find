@@ -12,6 +12,8 @@ import "FindMarket"
 A Find Market for direct sales
 */
 access(all) contract FindMarketSale {
+
+    // A seller can list, delist and relist leases for sale
     access(all) entitlement Seller
 
     access(all) event Sale(tenant: String, id: UInt64, saleID: UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, nft: FindMarket.NFTInfo?, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt:UFix64?)
@@ -58,7 +60,7 @@ access(all) contract FindMarketSale {
             return Type<@SaleItem>().identifier
         }
 
-        access(all) fun setBuyer(_ address:Address) {
+        access(account) fun setBuyer(_ address:Address) {
             self.buyer=address
         }
 
@@ -109,7 +111,7 @@ access(all) contract FindMarketSale {
             return self.vaultType
         }
 
-        access(all) fun setValidUntil(_ time: UFix64?) {
+        access(contract) fun setValidUntil(_ time: UFix64?) {
             self.validUntil=time
         }
 

@@ -9,7 +9,7 @@ import "FindLeaseMarket"
 transaction(leaseName: String, amount: UFix64) {
 
 	let saleItemsCap: Capability<&{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic}>
-	let bidsReference: &FindLeaseMarketAuctionSoft.MarketBidCollection?
+	let bidsReference: auth(FindLeaseMarketAuctionSoft.Buyer) &FindLeaseMarketAuctionSoft.MarketBidCollection?
 	let ftVaultType: Type
 
 	prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
@@ -44,7 +44,7 @@ transaction(leaseName: String, amount: UFix64) {
 
 		let bidStoragePath=leaseTenant.getStoragePath(Type<@FindLeaseMarketAuctionSoft.MarketBidCollection>())
 
-		self.bidsReference= account.storage.borrow<&FindLeaseMarketAuctionSoft.MarketBidCollection>(from: bidStoragePath)
+		self.bidsReference= account.storage.borrow<auth(FindLeaseMarketAuctionSoft.Buyer) &FindLeaseMarketAuctionSoft.MarketBidCollection>(from: bidStoragePath)
 	}
 
 	pre {

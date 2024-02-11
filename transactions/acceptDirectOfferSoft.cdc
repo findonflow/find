@@ -7,14 +7,14 @@ import "FindMarket"
 
 transaction(id: UInt64) {
 
-	let market : &FindMarketDirectOfferSoft.SaleItemCollection
+	let market : auth(FindMarketDirectOfferSoft.Seller) &FindMarketDirectOfferSoft.SaleItemCollection
 	let pointer : FindViews.AuthNFTPointer
 
 	prepare(account: auth(BorrowValue) &Account) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())
-		self.market = account.storage.borrow<&FindMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
+		self.market = account.storage.borrow<auth(FindMarketDirectOfferSoft.Seller) &FindMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())
 		let item = FindMarket.assertOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, id: id)
 		let nftIdentifier = item.getItemType().identifier

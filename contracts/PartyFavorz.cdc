@@ -198,7 +198,7 @@ access(all) contract PartyFavorz: ViewResolver {
 				var fullImageMediaType = "image/png"
 
 				switch season {
-					case 2 as UInt64 : 
+					case 2: 
 						fullImageMediaType = "image/gif"
 
 				}
@@ -354,7 +354,7 @@ access(all) contract PartyFavorz: ViewResolver {
 				bannerImage: info["bannerImage"]! as! String
 			)
 
-			PartyFavorz.totalSupply = PartyFavorz.totalSupply + UInt64(1)
+			PartyFavorz.totalSupply = PartyFavorz.totalSupply + 1
 			emit Minted(id:newNFT.id, serial: PartyFavorz.totalSupply, season: info["season"]! as! UInt64 , name: newNFT.info.name )
 			return <- newNFT
 		}
@@ -362,7 +362,6 @@ access(all) contract PartyFavorz: ViewResolver {
 
 		access(FindForge.ForgeOwner) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
 			// not used here 
-
 			panic("Not supported for PartyFavorz Contract") 
         }
 	}

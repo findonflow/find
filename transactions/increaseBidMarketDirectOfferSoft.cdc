@@ -3,13 +3,13 @@ import "FindMarket"
 
 transaction(id: UInt64, amount: UFix64) {
 
-	let bidsReference: &FindMarketDirectOfferSoft.MarketBidCollection
+	let bidsReference: auth(FindMarketDirectOfferSoft.Buyer) &FindMarketDirectOfferSoft.MarketBidCollection
 
 	prepare(account: auth(BorrowValue) &Account) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
-		self.bidsReference= account.storage.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Bid resource does not exist")
+		self.bidsReference= account.storage.borrow<auth(FindMarketDirectOfferSoft.Buyer) &FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Bid resource does not exist")
 		// get Bidding Fungible Token Vault
   		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
 		let item = FindMarket.assertBidOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, id: id)

@@ -8,7 +8,7 @@ import "FINDNFTCatalog"
 
 transaction(nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?) {
 
-    let saleItems : &FindMarketAuctionSoft.SaleItemCollection?
+    let saleItems : auth(FindMarketAuctionSoft.Seller) &FindMarketAuctionSoft.SaleItemCollection?
     let pointer : FindViews.AuthNFTPointer
     let vaultType : Type
 
@@ -38,7 +38,7 @@ transaction(nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String,
 
         var providerCap = account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(nft.storagePath)
 
-        self.saleItems= account.storage.borrow<&FindMarketAuctionSoft.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionSoft.SaleItemCollection>()))
+        self.saleItems= account.storage.borrow<auth(FindMarketAuctionSoft.Seller) &FindMarketAuctionSoft.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionSoft.SaleItemCollection>()))
         self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
         self.vaultType= ft.type
     }
