@@ -7,13 +7,14 @@ transaction(name: String) {
 
 		var collections : {String: [String]} = {}
 		if account.storage.borrow<&{String: [String]}>(from:path) != nil {
-			 collections=account.load<{String: [String]}>(from:path)!
+			 collections=account.storage.load<{String: [String]}>(from:path)!
 		}
 		collections.remove(key: name)
 		account.storage.save(collections, to: path)
-		let link = account.getCapability<&{String: [String]}>(publicPath)
-		if !link.check() {
-			account.link<&{String: [String]}>( publicPath, target: path)
+		let link = account.capabilities.get<&{String: [String]}>(publicPath)
+		if link == nil {
+			let newCap = account.capabilities.storage.issue<&{String: [String]}>(path)
+			account.capabilities.publish(newCap, at: publicPath)
 		}
 	}
 }

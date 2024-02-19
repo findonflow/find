@@ -66,14 +66,7 @@ transaction(name: String) {
         }
 
 
-        /*
-        let thoughtsCap= account.capabilities.get<&{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
-        if !thoughtsCap.check() {
-            account.storage.save(<- FindThoughts.createEmptyCollection(), to: FindThoughts.CollectionStoragePath)
-            let cap = account.capabilities.storage.issue<&FindThoughts.Collection>(FindThoughts.CollectionStoragePath)
-            account.capabilities.publish(cap, at: FindThoughts.CollectionPublicPath)
-        }
-        */
+
 
         let findPackCap= account.capabilities.get<&{NonFungibleToken.Collection}>(FindPack.CollectionPublicPath)
         if findPackCap == nil {

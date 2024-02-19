@@ -9,11 +9,10 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 
 		self.profile =account.storage.borrow<&Profile.User>(from:Profile.storagePath) ?? panic("You do not have a profile set up, initialize the user first")
 
-		let leaseCollection = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+		let leaseCollection = account.capabilities.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)
 		if !leaseCollection!.check() {
-			account.storage.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
-			account.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
-
+			let newCap = account.capabilities.storage.issue<&FIND.LeaseCollection>(FIND.LeaseStoragePath)
+			account.capabilities.publish(newCap, at: FIND.LeasePublicPath)
 		}
 
 	}
