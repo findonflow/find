@@ -8,7 +8,7 @@ import "FindLostAndFoundWrapper"
 import "MetadataViews"
 
 access(all) contract FindAirdropper {
-
+    // Events
     access(all) event Airdropped(from: Address ,fromName: String?, to: Address, toName: String?,uuid: UInt64, nftInfo: FindMarket.NFTInfo, context: {String : String}, remark: String?)
     access(all) event AirdroppedToLostAndFound(from: Address, fromName: String? , to: Address, toName: String?, uuid: UInt64, nftInfo: FindMarket.NFTInfo, context: {String : String}, remark: String?, ticketID: UInt64)
     access(all) event AirdropFailed(from: Address, fromName: String? , to: Address, toName: String?, uuid: UInt64, id: UInt64, type: String, context: {String : String}, reason: String)

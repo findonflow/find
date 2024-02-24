@@ -12,6 +12,7 @@ import "FungibleTokenSwitchboard"
 import "TokenForwarding"
 
 access(all) contract FindMarket {
+    // Variables
     access(account) let  pathMap : {String: String}
     access(account) let  listingName : {String: String}
     access(contract) let  saleItemTypes : [Type]
@@ -19,6 +20,7 @@ access(all) contract FindMarket {
     access(contract) let  marketBidTypes : [Type]
     access(contract) let  marketBidCollectionTypes : [Type]
 
+    // Events
     access(all) event RoyaltyPaid(tenant:String, id: UInt64, saleID: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo)
     access(all) event RoyaltyCouldNotBePaid(tenant:String, id: UInt64, saleID: UInt64, address:Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, nft:NFTInfo, residualAddress: Address)
     access(all) event FindBlockRules(tenant: String, ruleName: String, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
@@ -26,15 +28,13 @@ access(all) contract FindMarket {
     access(all) event FindCutRules(tenant: String, ruleName: String, cut:UFix64, ftTypes:[String], nftTypes:[String], listingTypes:[String], status:String)
     access(all) event FindTenantRemoved(tenant: String, address: Address)
 
-    //Residual Royalty
+    // Residual Royalty
     access(all) var residualAddress : Address
 
     // Tenant information
     access(all) let TenantClientPublicPath: PublicPath
     access(all) let TenantClientStoragePath: StoragePath
-
     access(contract) let tenantPathPrefix :String
-
     access(account) let tenantNameAddress : {String:Address}
     access(account) let tenantAddressName : {Address:String}
 
@@ -176,7 +176,6 @@ access(all) contract FindMarket {
 
     /* Get Sale Reports and Sale Item */
     access(all) fun getSaleInformation(tenant: Address, address: Address, marketOption: String, id:UInt64, getNFTInfo: Bool) : FindMarket.SaleItemInformation? {
-
         let tenantRef=self.getTenant(tenant)
         let info = self.checkSaleInformation(tenantRef: tenantRef, marketOption:marketOption, address: address, itemId: id, getGhost: false, getNFTInfo: getNFTInfo, getRoyaltyChanged: true )
         if info.items.length > 0 {
@@ -1595,7 +1594,6 @@ access(all) struct GhostListing{
     access(all) let listingTypeIdentifier: String
     access(all) let id: UInt64
 
-
     init(listingType:Type, id:UInt64) {
         //			self.listingType=listingType
         self.listingTypeIdentifier=listingType.identifier
@@ -1667,7 +1665,6 @@ access(all) resource interface Bid {
 }
 
 access(all) resource interface SaleItem {
-
     //this is the type of sale this is, auction, direct offer etc
     access(all) fun getSaleType(): String
     access(all) fun getListingTypeIdentifier(): String
@@ -1793,9 +1790,6 @@ init() {
     self.listingName={}
     self.marketBidTypes = []
     self.marketBidCollectionTypes = []
-
     self.residualAddress = self.account.address // This has to be changed
-
-}
-
+    }
 }

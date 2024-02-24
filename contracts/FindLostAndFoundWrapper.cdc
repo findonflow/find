@@ -12,7 +12,7 @@ import "FindViews"
 
 
 access(all) contract FindLostAndFoundWrapper {
-
+    // Events
     access(all) event NFTDeposited(receiver: Address, receiverName: String?, sender: Address?, senderName: String?, type: String, id: UInt64?, uuid: UInt64?, memo: String?, name: String?, description: String?, thumbnail: String?, collectionName: String?, collectionImage: String?)
     access(all) event UserStorageSubsidized(receiver: Address, receiverName: String?, sender: Address, senderName: String?, forUUID: UInt64, storageFee: UFix64)
     access(all) event TicketDeposited(receiver: Address, receiverName: String?, sender: Address, senderName: String?, ticketID: UInt64, type: String, id: UInt64, uuid: UInt64?, memo: String?, name: String?, description: String?, thumbnail: String?, collectionName: String?, collectionImage: String?, flowStorageFee: UFix64)

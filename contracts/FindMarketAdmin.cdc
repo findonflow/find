@@ -5,6 +5,7 @@ import "FindMarket"
 import "FindMarketCutStruct"
 
 access(all) contract FindMarketAdmin {
+    // Entitlements
     access(all) entitlement Owner
 
     //store the proxy for the admin
@@ -238,12 +239,9 @@ access(all) contract FindMarketAdmin {
 
     }
 
-
     init() {
-
         self.AdminProxyPublicPath= /public/findMarketAdminProxy
         self.AdminProxyStoragePath=/storage/findMarketAdminProxy
-
     }
 
 }

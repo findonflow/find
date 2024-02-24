@@ -44,7 +44,6 @@ access(all) contract FindViews {
 
     access(all) resource interface VaultViews {
         access(all) var balance: UFix64
-
         access(all) view fun getViews() : [Type]
         access(all) fun resolveView(_ view: Type): AnyStruct?
     }
@@ -105,7 +104,6 @@ access(all) contract FindViews {
             self.type=type
         }
     }
-
 
     /// A basic pointer that can resolve data and get owner/id/uuid and gype
     access(all) struct interface Pointer {
@@ -231,7 +229,6 @@ access(all) contract FindViews {
         }
         return 0
     }
-
 
     access(all) struct AuthNFTPointer : Pointer, AuthPointer{
         access(self) let cap: Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>
