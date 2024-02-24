@@ -17,6 +17,7 @@ import "NameVoucher"
 import "ViewResolver"
 
 access(all) contract Admin {
+    // Entitlements
     access(all) entitlement Owner
 
     //store the proxy for the admin
@@ -34,8 +35,6 @@ access(all) contract Admin {
 
     //interface to use for capability receiver pattern
     access(all) resource interface AdminProxyClient {
-        //TODO: all methods but this in here needs to be behind andentitlement
-        //the rule is, any method that is publicly linked that was previously _not_ in the linked interface needs an entitlement
         access(all) fun addCapability(_ cap: Capability<&FIND.Network>)
     }
 
@@ -366,7 +365,6 @@ access(all) contract Admin {
             self.capability = nil
         }
     }
-
 
     init() {
         self.AdminProxyPublicPath= /public/findAdminProxy
