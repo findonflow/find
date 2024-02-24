@@ -7,23 +7,27 @@ import "ProfileCache"
 import "FindUtils"
 
 access(all) contract Profile {
-
+    // entitlements
     access(all) entitlement Owner
 
+    // paths
     access(all) let publicPath: PublicPath
     access(all) let publicReceiverPath: PublicPath
     access(all) let storagePath: StoragePath
 
-    //and event emitted when somebody follows another user
+    // an event emitted when somebody follows another user
     access(all) event Follow(follower:Address, following: Address, tags: [String])
 
-    //an event emitted when somebody unfollows somebody
+    // an event emitted when somebody unfollows somebody
     access(all) event Unfollow(follower:Address, unfollowing: Address)
 
-    //and event emitted when a user verifies something
+    // an event emitted when a user verifies something
     access(all) event Verification(account:Address, message:String)
 
+    // an event emitted when a user creates a profile
     access(all) event Created(account:Address, userName:String, findName:String, createdAt:String)
+    
+    // an event emitted when a user updates their profile
     access(all) event Updated(account:Address, userName:String, findName:String, thumbnail:String)
 
     /*
@@ -174,8 +178,6 @@ access(all) contract Profile {
         }
     }
 
-
-
     //This format is deperated
     access(all) struct UserProfile {
         access(all) let findName: String
@@ -248,7 +250,6 @@ access(all) contract Profile {
         access(all) fun asReport() : UserReport
         access(all) fun isBanned(_ val: Address): Bool
         access(all) fun isPrivateModeEnabled() : Bool
-
         access(contract) fun internal_addFollower(_ val: FriendStatus)
         access(contract) fun internal_removeFollower(_ address: Address)
         access(account) fun setFindName(_ val: String)
@@ -474,7 +475,6 @@ access(all) contract Profile {
             panic("could not find a supported wallet for:".concat(identifier).concat(" for address ").concat(self.owner!.address.toString()))
         }
 
-
         access(all) fun hasWallet(_ name: String) : Bool {
             for wallet in self.wallets {
                 if wallet.name == name || wallet.accept.identifier == name {
@@ -585,7 +585,6 @@ access(all) contract Profile {
             return supportedVaults
         }
 
-
         /// Returns whether or not the given type is accepted by the Receiver
         access(all) view fun isSupportedVaultType(type: Type): Bool {
             let supportedVaults = self.getSupportedVaultTypes()
@@ -618,16 +617,13 @@ access(all) contract Profile {
         .capabilities.borrow<&{Profile.Public}>(Profile.publicPath)!
     }
 
-
     access(all) fun createUser(name: String, createdAt:String) : @Profile.User {
-
         if name.length > 64 {
             panic("Name must be 64 or less characters")
         }
         if createdAt.length > 32 {
             panic("createdAt must be 32 or less characters")
         }
-
         return <- create Profile.User(name: name,createdAt: createdAt)
     }
 
