@@ -47,11 +47,9 @@ access(all) contract Clock{
     access(contract) var fakeClock:UFix64
     access(contract) var enabled:Bool
 
-
     access(account) fun tick(_ duration: UFix64) {
         self.fakeClock = self.fakeClock + duration
     }
-
 
     access(account) fun enable() {
         self.enabled=true
@@ -69,6 +67,5 @@ access(all) contract Clock{
         self.fakeClock=0.0
         self.enabled=false
     }
-
 }
 
