@@ -1,7 +1,6 @@
 access(all) contract Debug {
 
 	access(all) event Log(msg: String)
-	
 	access(account) var enabled :Bool
 
 	access(all) fun log(_ msg: String) {
@@ -17,6 +16,4 @@ access(all) contract Debug {
 	init() {
 		self.enabled=false
 	}
-
-
 }
