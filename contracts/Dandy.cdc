@@ -6,9 +6,9 @@ import "FindForge"
 import "ViewResolver"
 
 access(all) contract Dandy :ViewResolver{
-
+    
+    // Paths
     access(all) let CollectionStoragePath: StoragePath
-    access(all) let CollectionPrivatePath: PrivatePath
     access(all) let CollectionPublicPath: PublicPath
     access(all) var totalSupply: UInt64
 
@@ -20,6 +20,7 @@ access(all) contract Dandy :ViewResolver{
     */
     access(account) var viewConverters: {String: [{ViewConverter}]}
 
+    // Events
     access(all) event ContractInitialized()
     access(all) event Minted(id:UInt64, minter:String, name:String, description:String)
 
@@ -85,14 +86,12 @@ access(all) contract Dandy :ViewResolver{
 
         access(all) fun getMinterPlatform() : FindForge.MinterPlatform {
             if let fetch = FindForge.getMinterPlatform(name: self.platform.name, forgeType: Dandy.getForgeType()) {
-
                 let platform = &self.platform as &FindForge.MinterPlatform
                 platform.updateExternalURL(fetch.externalURL)
                 platform.updateDesription(fetch.description)
                 platform.updateSquareImagen(fetch.squareImage)
                 platform.updateBannerImage(fetch.bannerImage)
                 platform.updateSocials(fetch.socials)
-
             }
 
             return self.platform
@@ -106,7 +105,6 @@ access(all) contract Dandy :ViewResolver{
             Type<MetadataViews.NFTCollectionDisplay>(),
             Type<MetadataViews.Display>(),
             Type<MetadataViews.Royalties>()]
-
 
             //TODO: fix
             //if any specific here they will override
@@ -243,7 +241,6 @@ access(all) contract Dandy :ViewResolver{
 
         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT. withdrawID : ".concat(withdrawID.toString()))
-
             let dandyToken <- token as! @NFT
             let minterPlatform = dandyToken.getMinterPlatform()
             let minterName = minterPlatform.name 
@@ -256,7 +253,6 @@ access(all) contract Dandy :ViewResolver{
 
             return <- dandyToken
         }
-
 
         // deposit takes a NFT and adds it to the collections dictionary
         // and adds the ID to the id array
@@ -300,7 +296,6 @@ access(all) contract Dandy :ViewResolver{
         access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
             return &self.ownedNFTs[id]
         }
-
 
         /// Borrow the view resolver for the specified NFT ID
         access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}?   {
@@ -361,7 +356,6 @@ access(all) contract Dandy :ViewResolver{
 
         access(FindForge.ForgeOwner) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
             // not used here 
-
             panic("Not supported for Dandy Contract") 
         }
     }
@@ -384,7 +378,6 @@ access(all) contract Dandy :ViewResolver{
     access(all) struct interface ViewConverter {
         access(all) let to: Type
         access(all) let from: Type
-
         access(all) fun convert(_ value:AnyStruct) : AnyStruct
     }
 
@@ -392,7 +385,6 @@ access(all) contract Dandy :ViewResolver{
         // Initialize the total supply
         self.totalSupply=0
         self.CollectionPublicPath = /public/findDandy
-        self.CollectionPrivatePath = /private/findDandy
         self.CollectionStoragePath = /storage/findDandy
         self.viewConverters={}
 
