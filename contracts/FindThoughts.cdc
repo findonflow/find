@@ -7,17 +7,18 @@ import "FIND"
 import "Clock"
 
 access(all) contract FindThoughts {
-
+    // Entitlements
     access(all) entitlement Owner
 
+    // Events
     access(all) event Published(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], nfts:[FindMarket.NFTInfo], tags: [String], quoteOwner: Address?, quoteId: UInt64?)
     access(all) event Edited(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], hide: Bool, tags: [String])
     access(all) event Deleted(id: UInt64, creator: Address, creatorName: String?, header: String, message: String, medias: [String], tags: [String])
     access(all) event Reacted(id: UInt64, by: Address, byName: String?, creator: Address, creatorName: String?, header: String, reaction: String?, totalCount: {String : Int})
 
+    // Paths
     access(all) let CollectionStoragePath : StoragePath 
     access(all) let CollectionPublicPath : PublicPath 
-    access(all) let CollectionPrivatePath : PrivatePath 
 
     access(all) struct ThoughtPointer {
         access(all) let cap: Capability<&{FindThoughts.CollectionPublic}>
@@ -230,13 +231,11 @@ access(all) contract FindThoughts {
 
     access(all) resource interface CollectionPublic {
         access(all) fun contains(_ id: UInt64) : Bool 
-
         access(all) view fun borrowThoughtPublic(_ id: UInt64) : &{FindThoughts.ThoughtPublic}
     }
 
     access(all) resource Collection : CollectionPublic, ViewResolver.ResolverCollection {
         access(self) let ownedThoughts : @{UInt64 : FindThoughts.Thought}
-
         access(self) let sequence : [UInt64] 
 
         init() {
@@ -356,9 +355,5 @@ access(all) contract FindThoughts {
     init(){
         self.CollectionStoragePath = /storage/FindThoughts 
         self.CollectionPublicPath = /public/FindThoughts 
-        self.CollectionPrivatePath = /private/FindThoughts 
     }
-
 }
-
-
