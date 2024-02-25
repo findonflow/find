@@ -1,9 +1,12 @@
 access(all) contract FindRelatedAccounts {
+    // Entitlements
     access(all) entitlement Owner
 
+    // Paths
     access(all) let storagePath: StoragePath
     access(all) let publicPath: PublicPath
 
+    // Events
     access(all) event RelatedAccount(user: Address, walletId: String, walletName: String, address: String, network: String, action: String)
 
     access(all) struct AccountInformation{
@@ -250,7 +253,6 @@ access(all) contract FindRelatedAccounts {
     }
 
     init() {
-
         self.storagePath = /storage/findRelatedAccounts
         self.publicPath = /public/findRelatedAccounts
     }
