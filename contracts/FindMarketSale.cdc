@@ -155,7 +155,7 @@ access(all) contract FindMarketSale {
     access(all) resource interface SaleItemCollectionPublic {
         //fetch all the tokens in the collection
         access(all) fun getIds(): [UInt64]
-        access(all) fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem}? //TODO: look if this is safe
+        access(all) fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem}?
         access(all) fun containsId(_ id: UInt64): Bool
         access(all) fun buy(id: UInt64, vault: @{FungibleToken.Vault}, nftCap: Capability<&{NonFungibleToken.Receiver}>)
     }
@@ -354,14 +354,14 @@ access(all) contract FindMarketSale {
         }
 
         access(all) fun borrow(_ id: UInt64): &SaleItem {
-            return (&self.items[id] as &SaleItem?)!
+            return (&self.items[id])!
         }
 
         access(all) fun borrowSaleItem(_ id: UInt64) : &{FindMarket.SaleItem}? {
             if !self.items.containsKey(id) {
                 panic("This id does not exist : ".concat(id.toString()))
             }
-            return &self.items[id] as &{FindMarket.SaleItem}?
+            return &self.items[id]
         }
     }
 
