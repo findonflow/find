@@ -84,5 +84,4 @@ access(all) contract FindMarketCut {
     init(){
         self.categoryToContractName = {}
     }
-
 }

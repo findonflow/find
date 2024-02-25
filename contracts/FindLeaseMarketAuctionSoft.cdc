@@ -210,7 +210,6 @@ access(all) contract FindLeaseMarketAuctionSoft {
         access(all) fun getSaleItemExtraField() : {String : AnyStruct} {
             return self.saleItemExtraField
         }
-
     }
 
     access(all) resource interface SaleItemCollectionPublic {
@@ -578,7 +577,6 @@ access(all) contract FindLeaseMarketAuctionSoft {
 
     //A collection stored for bidders/buyers
     access(all) resource MarketBidCollection: MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic {
-
         access(contract) var bids : @{String: Bid}
         access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
         access(contract) let tenantCapability: Capability<&{FindMarket.TenantPublic}>
@@ -716,7 +714,6 @@ access(all) contract FindLeaseMarketAuctionSoft {
     }
 
     access(all) fun getBidCapability( marketplace:Address, user:Address) : Capability<&{MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>? {
-
         if FindMarket.getTenantCapability(marketplace) == nil {
             panic("invalid tenant")
         }
@@ -732,5 +729,4 @@ access(all) contract FindLeaseMarketAuctionSoft {
         FindLeaseMarket.addMarketBidType(Type<@Bid>())
         FindLeaseMarket.addMarketBidCollectionType(Type<@MarketBidCollection>())
     }
-
 }

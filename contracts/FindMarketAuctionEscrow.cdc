@@ -17,7 +17,6 @@ access(all) contract FindMarketAuctionEscrow {
 
     access(all) resource SaleItem : FindMarket.SaleItem {
         access(contract) var pointer: FindViews.AuthNFTPointer
-
         access(contract) var vaultType: Type
         access(contract) var auctionStartPrice: UFix64
         access(contract) var auctionReservePrice: UFix64
@@ -255,7 +254,6 @@ access(all) contract FindMarketAuctionEscrow {
         access(all) fun getIds(): [UInt64]
         access(all) fun containsId(_ id: UInt64): Bool
         access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance:UFix64)
-
         //place a bid on a tokenƒ
         access(contract) fun registerBid(item: FindViews.ViewReadPointer, callback: Capability<&{MarketBidCollectionPublic}>, vaultType:Type)
 
@@ -274,7 +272,6 @@ access(all) contract FindMarketAuctionEscrow {
             self.tenantCapability=tenantCapability
         }
 
-
         access(self) fun getTenant() : &{FindMarket.TenantPublic} {
             if !self.tenantCapability.check()  {
                 panic("Tenant client is not linked anymore")
@@ -288,8 +285,6 @@ access(all) contract FindMarketAuctionEscrow {
 
         access(self) fun addBid(id:UInt64, newOffer: Capability<&{MarketBidCollectionPublic}>, oldBalance:UFix64) {
             let saleItem=self.borrowAuth(id)
-
-
             let tenant=self.getTenant()
             let nftType=saleItem.getItemType()
             let ftType=saleItem.getFtType()
@@ -352,7 +347,6 @@ access(all) contract FindMarketAuctionEscrow {
         }
 
         access(contract) fun registerIncreasedBid(_ id: UInt64, oldBalance:UFix64) {
-
             if !self.items.containsKey(id) {
                 panic("Invalid id=".concat(id.toString()))
             }
@@ -519,7 +513,6 @@ access(all) contract FindMarketAuctionEscrow {
             }
             destroy <- self.items.remove(key: id)
         }
-
 
         /// fulfillAuction wraps the fulfill method and ensure that only a finished auction can be fulfilled by anybody
         access(all) fun fulfillAuction(_ id: UInt64) {
@@ -838,8 +831,7 @@ access(all) contract FindMarketAuctionEscrow {
             destroy oldToken
         }
 
-        access(Buyer) fun fulfillAuction(_ id:UInt64) {
-
+        access(all) fun fulfillAuction(_ id:UInt64) {
             if self.bids[id] == nil {
                 panic("You need to have a bid here already")
             }

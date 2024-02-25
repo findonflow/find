@@ -540,7 +540,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
             destroy oldToken
         }
 
-        access(Buyer) fun fulfillDirectOffer(name:String, vault: @{FungibleToken.Vault}) {
+        access(all) fun fulfillDirectOffer(name:String, vault: @{FungibleToken.Vault}) {
             pre {
                 self.bids[name] != nil : "You need to have a bid here already"
             }

@@ -292,6 +292,5 @@ access(all) contract FindVerifier {
             }
             return false
         }
-
     }
 }

@@ -163,5 +163,4 @@ access(all) contract FindMarketCutStruct {
             }
         }
     }
-
 }

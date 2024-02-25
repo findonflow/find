@@ -59,7 +59,6 @@ access(all) contract FINDNFTCatalog {
     access(all) event ProposalEntryRemoved(proposalID : UInt64)
 
     access(all) let ProposalManagerStoragePath: StoragePath
-
     access(all) let ProposalManagerPublicPath: PublicPath
 
     access(self) let catalog: {String : NFTCatalog.NFTCatalogMetadata} // { collectionIdentifier -> Metadata }
@@ -311,5 +310,4 @@ access(all) contract FINDNFTCatalog {
 
         self.catalogProposals = {}
     }
-
 }

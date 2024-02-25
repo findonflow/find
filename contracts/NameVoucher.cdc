@@ -23,13 +23,11 @@ access(all) contract NameVoucher {
 
     access(all) let CollectionStoragePath: StoragePath
     access(all) let CollectionPublicPath: PublicPath
-    access(all) let CollectionPrivatePath: PrivatePath
 
     access(all) var royalties : [MetadataViews.Royalty]
     access(all) var thumbnail : {MetadataViews.File}
 
     access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
-
         access(all) let id:UInt64
         access(all) var nounce:UInt64
         // 3 characters voucher should be able to claim name with at LEAST 3 char and so on
@@ -367,7 +365,6 @@ access(all) contract NameVoucher {
         // Set the named paths
         self.CollectionStoragePath = /storage/nameVoucher
         self.CollectionPublicPath = /public/nameVoucher
-        self.CollectionPrivatePath = /private/nameVoucher
 
         self.account.storage.save<@{NonFungibleToken.Collection}>(<- NameVoucher.createEmptyCollection(), to: NameVoucher.CollectionStoragePath)
         let collectionCap = self.account.capabilities.storage.issue<&NameVoucher.Collection>(NameVoucher.CollectionStoragePath)

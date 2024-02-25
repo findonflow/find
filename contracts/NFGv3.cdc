@@ -302,7 +302,6 @@ access(all) contract NFGv3: ViewResolver {
 
         access(FindForge.ForgeOwner) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
             // not used here 
-
             panic("Not supported for NFGv3 Contract") 
         }
     }

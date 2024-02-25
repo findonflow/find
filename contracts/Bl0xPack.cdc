@@ -34,7 +34,6 @@ access(all) contract Bl0xPack: ViewResolver {
     access(all) let OpenedCollectionPublicPath: PublicPath
     access(all) let OpenedCollectionStoragePath: StoragePath
 
-
     access(all) let DLQCollectionPublicPath: PublicPath
     access(all) let DLQCollectionStoragePath: StoragePath
 

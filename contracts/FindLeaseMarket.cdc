@@ -64,11 +64,8 @@ access(all) contract FindLeaseMarket {
         panic("Cannot find market option : ".concat(marketOption))
     }
 
-
-
     /* Get Sale Reports and Sale Item */
     access(all) fun assertOperationValid(tenant: Address, name: String, marketOption: String) : &{SaleItem} {
-
         let tenantRef=self.getTenant(tenant)
         let address=FIND.lookupAddress(name) ?? panic("Name is not owned by anyone. Name : ".concat(name))
         let collectionCap = self.getSaleItemCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
@@ -295,7 +292,6 @@ access(all) contract FindLeaseMarket {
     }
 
     access(all) fun assertBidOperationValid(tenant: Address, address: Address, marketOption: String, name:String) : &{SaleItem} {
-
         let tenantRef=self.getTenant(tenant)
         let collectionCap = self.getMarketBidCollectionCapability(tenantRef: tenantRef, marketOption: marketOption, address: address)
         let optRef = collectionCap?.borrow()
@@ -324,7 +320,6 @@ access(all) contract FindLeaseMarket {
     access(all) struct interface LeasePointer {
         access(all) let name: String
         access(all) let uuid: UInt64
-
         access(all) fun valid() : Bool
         access(all) fun getUUID() :UInt64
         access(all) fun getLease() : FIND.LeaseInformation
@@ -339,7 +334,6 @@ access(all) contract FindLeaseMarket {
 
         // Passing in the reference here to ensure that is the owner
         init(name: String) {
-
             let address = FIND.lookupAddress(name) ?? panic("This lease name is not owned")
             self.cap=getAccount(address).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
             self.name=name
@@ -349,7 +343,6 @@ access(all) contract FindLeaseMarket {
             }
 
             self.uuid = self.cap.borrow()!.getLeaseUUID(name)
-
         }
 
         access(contract) fun borrow() : &{FIND.LeaseCollectionPublic} {
@@ -638,7 +631,7 @@ access(all) contract FindLeaseMarket {
     }
 
     access(all) struct GhostListing{
-        //		access(all) let listingType: Type
+        // access(all) let listingType: Type
         access(all) let listingTypeIdentifier: String
         access(all) let name: String
 
@@ -740,12 +733,9 @@ access(all) contract FindLeaseMarket {
     }
 
     init() {
-
         self.saleItemTypes = []
         self.saleItemCollectionTypes = []
         self.marketBidTypes = []
         self.marketBidCollectionTypes = []
-
     }
-
 }

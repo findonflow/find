@@ -17,7 +17,6 @@ access(all) contract FINDNFTCatalogAdmin {
     // Admin
     // Admin resource to manage NFT Catalog
     access(all) resource Admin {
-
         access(all) fun addCatalogEntry(collectionIdentifier: String, metadata : NFTCatalog.NFTCatalogMetadata) {
             FINDNFTCatalog.addCatalogEntry(collectionIdentifier: collectionIdentifier, metadata : metadata)
         }

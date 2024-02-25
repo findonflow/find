@@ -290,7 +290,6 @@ access(all) contract CharityNFT: ViewResolver {
     // mintNFT mints a new NFT with a new ID
     // and deposit it in the recipients collection using their collection reference
     access(account) fun mintCharity(metadata: {String:String}, recipient: Capability<&{NonFungibleToken.Collection}>) {
-
         // create a new NFT
         var newNFT <- create NFT(initID: CharityNFT.totalSupply, metadata:metadata)
 

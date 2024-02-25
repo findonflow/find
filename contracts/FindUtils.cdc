@@ -1,7 +1,6 @@
 access(all) contract FindUtils {
 
 	access(all) fun deDupTypeArray(_ arr:[Type]) : [Type] {
-
 		let removeElement = fun (_ arr: [Type], _ element: Type): [Type] {
 			var i = arr.firstIndex(of: element)
 			let firstIndex = i
@@ -22,7 +21,6 @@ access(all) contract FindUtils {
 			c = c + 1
 		}
 		return arr
-
 	}
 
 	access(all) fun joinString(_ arr:[String], sep: String) : String {
@@ -241,6 +239,5 @@ access(all) contract FindUtils {
             "Z" : "z"
         }
     }
-
 }
 

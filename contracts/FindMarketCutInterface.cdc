@@ -13,5 +13,4 @@ access(all) contract interface FindMarketCutInterface {
     access(all) fun getTenantRulesCache(tenant: String, ruleId: String) : FindMarketCutStruct.Cuts?
     access(all) fun getCut(tenant: String, listingType: Type, nftType: Type, ftType: Type) : FindMarketCutStruct.Cuts?
     access(account) fun resetTenantRulesCache(_ tenant: String)
-
 }

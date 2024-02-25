@@ -113,5 +113,4 @@ access(all) contract FindRulesCache {
         self.tenantTenantRules = {}
         self.tenantCuts = {}
     }
-
 }

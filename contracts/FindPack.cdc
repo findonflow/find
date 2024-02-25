@@ -30,11 +30,9 @@ access(all) contract FindPack {
 
     access(all) let CollectionStoragePath: StoragePath
     access(all) let CollectionPublicPath: PublicPath
-    access(all) let CollectionPrivatePath: PrivatePath
 
     access(all) let OpenedCollectionPublicPath: PublicPath
     access(all) let OpenedCollectionStoragePath: StoragePath
-
 
     access(all) let DLQCollectionPublicPath: PublicPath
     access(all) let DLQCollectionStoragePath: StoragePath
@@ -315,7 +313,6 @@ access(all) contract FindPack {
     }
 
     access(all) struct PackRevealData {
-
         access(all) let data: {String:String}
 
         init(_ data: {String:String}) {
@@ -1194,7 +1191,6 @@ access(all) contract FindPack {
     init() {
         self.CollectionStoragePath = /storage/FindPackCollection
         self.CollectionPublicPath = /public/FindPackCollection
-        self.CollectionPrivatePath = /private/FindPackCollection
 
         self.OpenedCollectionStoragePath = /storage/FindPackOpenedCollection
         self.OpenedCollectionPublicPath = /public/FindPackOpenedCollection
@@ -1227,7 +1223,6 @@ access(all) contract FindPack {
         FindForge.addPublicForgeType(forgeType: Type<@Forge>())
 
         emit ContractInitialized()
-
     }
 }
 

@@ -290,7 +290,6 @@ access(all) contract FindLeaseMarketSale {
         return nil
     }
 
-
     init() {
         FindLeaseMarket.addSaleItemType(Type<@SaleItem>())
         FindLeaseMarket.addSaleItemCollectionType(Type<@SaleItemCollection>())

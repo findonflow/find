@@ -161,13 +161,11 @@ access(all) contract FindMarketDirectOfferEscrow {
         }
     }
 
-
     access(all) resource interface SaleItemCollectionPublic {
         //fetch all the tokens in the collection
         access(all) fun getIds(): [UInt64]
         access(all) fun containsId(_ id: UInt64): Bool
         access(contract)fun cancelBid(_ id: UInt64)
-
         access(contract) fun registerIncreasedBid(_ id: UInt64)
 
         //place a bid on a token
