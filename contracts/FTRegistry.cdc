@@ -102,7 +102,7 @@ access(all) contract FTRegistry {
     access(account) fun removeFTInfoByTypeIdentifier(_ typeIdentifier: String) : FTInfo {
         let info = FTRegistry.fungibleTokenList.remove(key: typeIdentifier) ?? panic("Cannot find this Fungible Token Registry. Type : ".concat(typeIdentifier))
         FTRegistry.aliasMap.remove(key: info.alias)
-        emit FTInfoRemoved(alias:info!.alias, typeIdentifier: info!.typeIdentifier)
+        emit FTInfoRemoved(alias:info.alias, typeIdentifier: info.typeIdentifier)
         return info 
     }
 

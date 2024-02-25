@@ -72,7 +72,6 @@ access(all) contract FindForge {
 
     // This is an empty resource that is created and passed into mint methods to verify that it comes from .find
     access(all) resource Verifier {
-
     }
 
     // ForgeMinter Interface 
@@ -437,7 +436,6 @@ access(all) contract FindForge {
             pre {
                 self.capability != nil: "Cannot create FIND, capability is not set"
             }
-
             return FindForge.fulfillForgeOrder(contractName, forgeType: forgeType)
         }
     }
