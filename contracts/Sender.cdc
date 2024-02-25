@@ -12,6 +12,5 @@ access(all) contract Sender {
     init() {
         self.storagePath = /storage/findSender
     }
-
 }
 
