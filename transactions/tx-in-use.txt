@@ -11,7 +11,7 @@ registerFlow
 
 # Missing from repo
 
-registerDapper
+registerDapper, these have testnetergisterDapper, mainnetregisterDapper prefixes, can we modify thse
 renewNameDapper
 //mainnet
 fixAccount
