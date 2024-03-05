@@ -6,7 +6,7 @@ import "FindForge"
 import "ViewResolver"
 
 access(all) contract Dandy :ViewResolver{
-    
+
     // Paths
     access(all) let CollectionStoragePath: StoragePath
     access(all) let CollectionPublicPath: PublicPath
@@ -106,8 +106,6 @@ access(all) contract Dandy :ViewResolver{
             Type<MetadataViews.Display>(),
             Type<MetadataViews.Royalties>()]
 
-            //TODO: fix
-            //if any specific here they will override
             for s in self.schemas.keys {
                 if !views.contains(self.schemas[s]!.typ) {
                     views.concat([self.schemas[s]!.typ])
@@ -343,7 +341,6 @@ access(all) contract Dandy :ViewResolver{
 
         let nft <-  create NFT(name: name, description:description,thumbnail: thumbnail, schemas:views, platform: platform, externalUrlPrefix:externalUrlPrefix)
 
-        //TODO: remove this
         emit Minted(id:nft.id, minter:nft.platform.name, name: name, description:description)
         return <-  nft
     }
@@ -390,7 +387,6 @@ access(all) contract Dandy :ViewResolver{
 
         FindForge.addForgeType(<- create Forge())
 
-        //TODO: Add the Forge resource aswell
         FindForge.addPublicForgeType(forgeType: Type<@Forge>())
 
         emit ContractInitialized()
