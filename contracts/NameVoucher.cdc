@@ -41,7 +41,6 @@ access(all) contract NameVoucher {
             self.id=self.uuid
         }
 
-        //TODO: emit destory event
         access(all) view fun getViews(): [Type] {
             return  [
             Type<MetadataViews.Display>(),
@@ -180,7 +179,6 @@ access(all) contract NameVoucher {
             let token <- token as! @NFT
 
             let id: UInt64 = token.id
-            //TODO: add nounce and emit better event the first time it is moved.
 
             token.increaseNounce()
             // add the new token to the dictionary which removes the old one
@@ -320,7 +318,6 @@ access(all) contract NameVoucher {
         // Initialize the total supply
         self.totalSupply = 0
 
-        //TODO: why on earth are we doing this here in a contract initializer?
         // Check if the account already has a Switchboard resource
         if self.account.storage.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath) == nil {
             // Create a new Switchboard resource and put it into storage
