@@ -131,22 +131,6 @@ access(all) contract FindThoughts {
             self.reactions = {}
         }
 
-        /*
-        destroy(){
-            let address = self.owner?.address
-            let medias : [String] = []
-            for m in self.medias {
-                medias.append(m.file.uri())
-            }
-
-            var name : String? = nil 
-            if address != nil {
-                name = FIND.reverseLookup(address!)
-            }
-            emit Deleted(id: self.id, creator: self.creator, creatorName: FIND.reverseLookup(self.creator), header: self.header, message: self.body, medias: medias, tags: self.tags)
-        }
-        */
-
         access(all) fun getQuotedThought() : ThoughtPointer? {
             if let r = self.extras["quote"] {
                 return r as! ThoughtPointer
@@ -250,7 +234,7 @@ access(all) contract FindThoughts {
         access(all) view fun getIDs() : [UInt64] {
             return self.ownedThoughts.keys
         }
-        
+
         access(Owner) fun borrow(_ id: UInt64) : auth(Owner) &{FindThoughts.ThoughtPrivate} {
             pre{
                 self.ownedThoughts.containsKey(id) : "Cannot borrow Thought with ID : ".concat(id.toString())
@@ -272,8 +256,6 @@ access(all) contract FindThoughts {
             return (&self.ownedThoughts[id] as &FindThoughts.Thought?)!
         }
 
-        // TODO : Restructure this to take structs , and declare the structs in Trxn.  And identify IPFS and url
-        // So take pointer, thought pointer and media
         access(Owner) fun publish(header: String , body: String , tags: [String], media: MetadataViews.Media?, nftPointer: FindViews.ViewReadPointer?, quote: FindThoughts.ThoughtPointer?) {
             let medias : [MetadataViews.Media] = []
             let m : [String] = []
