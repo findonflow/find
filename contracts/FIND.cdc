@@ -27,6 +27,7 @@ Taxonomy:
 */
 access(all) contract FIND {
 
+    // Entitlements
     access(all) entitlement Leasee
 
     //Old events not in use anymore we cannot remove
@@ -1759,8 +1760,7 @@ access(all) contract FIND {
             }
             return nil
         }
-
-
+        
         //lookup a name that is not locked
         access(all) fun lookup(_ name: String) : &{Profile.Public}? {
             let nameStatus=self.readStatus(name)
