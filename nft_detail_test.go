@@ -156,11 +156,11 @@ func TestNFTDetailScript(t *testing.T) {
 						"date.Birthday":      1.660145023e+09,
 						"edition_set_max":    3,
 						"edition_set_number": 2,
-						"uuid":               803,
 					},
 					"tags": map[string]interface{}{
 						"NeoMotorCycleTag": "Tag1",
 						"external_url":     "https://find.xyz/collection/user1/dandy/803",
+						"uuid":             "803",
 					},
 					"thumbnail":      "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
 					"totalInEdition": 3,

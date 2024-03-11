@@ -1468,13 +1468,13 @@ pub contract FindMarket {
 
         init(_ item: &{MetadataViews.Resolver}, id: UInt64, detail: Bool){
 
-            self.tags = {}
 
             self.collectionName=nil
             self.collectionDescription=nil
-            self.scalars = {
-                "uuid" : UFix64(item.uuid)
+            self.tags = {
+                "uuid" : item.uuid.toString()
             }
+            self.scalars = {}
             self.rarity= nil
             self.editionNumber=nil
             self.totalInEdition=nil
