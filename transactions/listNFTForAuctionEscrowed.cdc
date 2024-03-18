@@ -12,7 +12,7 @@ transaction(nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String,
     let vaultType : Type
     let pointer : FindViews.AuthNFTPointer
 
-    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, NonFungibleToken.Withdraw) &Account) {
+    prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, Storage, IssueStorageCapabilityController) &Account) {
         let marketplace = FindMarket.getFindTenantAddress()
         let tenantCapability= FindMarket.getTenantCapability(marketplace)!
         let tenant = tenantCapability.borrow()!
@@ -33,12 +33,24 @@ transaction(nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String,
         // Get supported NFT and FT Information from Registries from input alias
         let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftAliasOrIdentifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(nftAliasOrIdentifier))
         let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
-        let nft = collection.collectionData
+        let collectionData = collection.collectionData
 
         let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
 
 
-        var providerCap=account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(nft.storagePath)
+        let storagePathIdentifer = collectionData.storagePath.toString().split(separator:"/")[1]
+        let providerIdentifier = storagePathIdentifer.concat("Provider")
+        let providerStoragePath = StoragePath(identifier: providerIdentifier)!
+
+        //if this stores anything but this it will panic, why does it not return nil?
+        var existingProvider= account.storage.copy<Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>>(from: providerStoragePath) 
+        if existingProvider==nil {
+            existingProvider=account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(collectionData.storagePath)
+            //we save it to storage to memoize it
+            account.storage.save(existingProvider!, to: providerStoragePath)
+            log("create new cap")
+        }
+        var providerCap = existingProvider!
 
         self.saleItems= account.storage.borrow<auth(FindMarketAuctionEscrow.Seller) &FindMarketAuctionEscrow.SaleItemCollection>(from: path)
         self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)
