@@ -24,8 +24,7 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix
         let leaseSaleItemCap= account.capabilities.get<&{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}>(leasePublicPath)
         if leaseSaleItemCap == nil {
             //The link here has to be a capability not a tenant, because it can change.
-            account.storage.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
-            let leaseSaleItemCap= account.capabilities.storage.issue<&{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}>(leaseStoragePath)
+            account.storage.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath) let leaseSaleItemCap= account.capabilities.storage.issue<&{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}>(leaseStoragePath)
             account.capabilities.publish(leaseSaleItemCap, at: leasePublicPath)
         }
 
