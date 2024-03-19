@@ -15,7 +15,7 @@ transaction(header: String , body: String , tags: [String], mediaHash: String?, 
             account.storage.save( <- FindThoughts.createEmptyCollection(), to: FindThoughts.CollectionStoragePath)
             account.capabilities.unpublish(FindThoughts.CollectionPublicPath)
             //TODO: i do not think we can store an auth cap in a publis path
-            let cap = account.capabilities.storage.issue<auth(FindThoughts.Owner) &FindThoughts.Collection>(FindThoughts.CollectionStoragePath)
+            let cap = account.capabilities.storage.issue<&FindThoughts.Collection>(FindThoughts.CollectionStoragePath)
             account.capabilities.publish(cap, at: FindThoughts.CollectionPublicPath)
             self.collection=account.storage.borrow<auth(FindThoughts.Owner) &FindThoughts.Collection>(from: FindThoughts.CollectionStoragePath) ?? panic("Cannot borrow thoughts reference from path")
         }else {
