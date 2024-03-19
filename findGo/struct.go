@@ -1,7 +1,7 @@
 package findGo
 
 import (
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 )
 
 type FindMarketCutStruct_ThresholdCut struct {

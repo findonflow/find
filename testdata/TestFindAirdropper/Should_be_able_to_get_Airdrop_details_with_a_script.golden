@@ -1,10 +1,10 @@
 []test_main.SendNFTScript{
 	{
-		Address:  "0xf669cb8d41ce0c74",
+		Address:  "0x192440c99cb17282",
 		Avatar:   "https://find.xyz/assets/img/avatars/avatar14.png",
 		Message:  "Message 0",
 		Receiver: "user1",
-		Type:     "A.179b6b1cb6755e31.Dandy.NFT",
+		Type:     "A.f3fcd2c1a78f5eee.Dandy.NFT",
 		Royalties: struct {
 			Royalties []struct {
 				Address     string
@@ -23,7 +23,7 @@
 				Cut         float64
 			}{
 				{
-					Address:     "0xf669cb8d41ce0c74",
+					Address:     "0x192440c99cb17282",
 					Description: "creator",
 					Name:        "user1",
 					AcceptTypes: []string{
@@ -35,61 +35,7 @@
 				},
 
 				{
-					Address:     "0x179b6b1cb6755e31",
-					Description: "find forge",
-					Name:        "find",
-					AcceptTypes: []string{
-						"A.0ae53cb6e3f42a79.FlowToken.Vault",
-						"A.f8d6e0586b0a20c7.FUSD.Vault",
-						"A.f8d6e0586b0a20c7.FiatToken.Vault",
-					},
-					Cut: 0.025,
-				}},
-			TotalRoyalty: 0.075,
-		},
-		AccountInitialized:     true,
-		CollectionPublicLinked: true,
-		NftInPlace:             true,
-		Ok:                     true,
-		ReceiverLinked:         true,
-	},
-	{
-		Address:  "0x192440c99cb17282",
-		Avatar:   "https://find.xyz/assets/img/avatars/avatar14.png",
-		Message:  "Message 1",
-		Receiver: "user2",
-		Type:     "A.179b6b1cb6755e31.Dandy.NFT",
-		Royalties: struct {
-			Royalties []struct {
-				Address     string
-				Description string
-				Name        string
-				AcceptTypes []string
-				Cut         float64
-			}
-			TotalRoyalty float64
-		}{
-			Royalties: []struct {
-				Address     string
-				Description string
-				Name        string
-				AcceptTypes []string
-				Cut         float64
-			}{
-				{
-					Address:     "0xf669cb8d41ce0c74",
-					Description: "creator",
-					Name:        "user1",
-					AcceptTypes: []string{
-						"A.0ae53cb6e3f42a79.FlowToken.Vault",
-						"A.f8d6e0586b0a20c7.FUSD.Vault",
-						"A.f8d6e0586b0a20c7.FiatToken.Vault",
-					},
-					Cut: 0.05,
-				},
-
-				{
-					Address:     "0x179b6b1cb6755e31",
+					Address:     "0xf3fcd2c1a78f5eee",
 					Description: "find forge",
 					Name:        "find",
 					AcceptTypes: []string{
@@ -110,9 +56,9 @@
 	{
 		Address:  "0xfd43f9148d4b725d",
 		Avatar:   "https://find.xyz/assets/img/avatars/avatar14.png",
-		Message:  "Message 2",
-		Receiver: "0xfd43f9148d4b725d",
-		Type:     "A.179b6b1cb6755e31.Dandy.NFT",
+		Message:  "Message 1",
+		Receiver: "user2",
+		Type:     "A.f3fcd2c1a78f5eee.Dandy.NFT",
 		Royalties: struct {
 			Royalties []struct {
 				Address     string
@@ -131,7 +77,7 @@
 				Cut         float64
 			}{
 				{
-					Address:     "0xf669cb8d41ce0c74",
+					Address:     "0x192440c99cb17282",
 					Description: "creator",
 					Name:        "user1",
 					AcceptTypes: []string{
@@ -143,7 +89,61 @@
 				},
 
 				{
-					Address:     "0x179b6b1cb6755e31",
+					Address:     "0xf3fcd2c1a78f5eee",
+					Description: "find forge",
+					Name:        "find",
+					AcceptTypes: []string{
+						"A.0ae53cb6e3f42a79.FlowToken.Vault",
+						"A.f8d6e0586b0a20c7.FUSD.Vault",
+						"A.f8d6e0586b0a20c7.FiatToken.Vault",
+					},
+					Cut: 0.025,
+				}},
+			TotalRoyalty: 0.075,
+		},
+		AccountInitialized:     true,
+		CollectionPublicLinked: true,
+		NftInPlace:             true,
+		Ok:                     true,
+		ReceiverLinked:         true,
+	},
+	{
+		Address:  "0xeb179c27144f783c",
+		Avatar:   "https://find.xyz/assets/img/avatars/avatar14.png",
+		Message:  "Message 2",
+		Receiver: "0xeb179c27144f783c",
+		Type:     "A.f3fcd2c1a78f5eee.Dandy.NFT",
+		Royalties: struct {
+			Royalties []struct {
+				Address     string
+				Description string
+				Name        string
+				AcceptTypes []string
+				Cut         float64
+			}
+			TotalRoyalty float64
+		}{
+			Royalties: []struct {
+				Address     string
+				Description string
+				Name        string
+				AcceptTypes []string
+				Cut         float64
+			}{
+				{
+					Address:     "0x192440c99cb17282",
+					Description: "creator",
+					Name:        "user1",
+					AcceptTypes: []string{
+						"A.0ae53cb6e3f42a79.FlowToken.Vault",
+						"A.f8d6e0586b0a20c7.FUSD.Vault",
+						"A.f8d6e0586b0a20c7.FiatToken.Vault",
+					},
+					Cut: 0.05,
+				},
+
+				{
+					Address:     "0xf3fcd2c1a78f5eee",
 					Description: "find forge",
 					Name:        "find",
 					AcceptTypes: []string{

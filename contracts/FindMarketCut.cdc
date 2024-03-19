@@ -26,12 +26,12 @@ access(all) contract FindMarketCut {
     }
 
     // Helper functions for setting up cuts
-    access(contract) fun borrowContract(_ contractName: String) : &FindMarketCutInterface {
+    access(contract) fun borrowContract(_ contractName: String) : &{FindMarketCutInterface} {
         var identifier = contractName
         if let category = self.categoryToContractName[contractName] {
             identifier = category
         }
-        return self.account.contracts.borrow<&FindMarketCutInterface>(name: identifier) ?? panic("Cannor borrow contract with identifier : ".concat(identifier))
+        return self.account.contracts.borrow<&{FindMarketCutInterface}>(name: identifier) ?? panic("Cannor borrow contract with identifier : ".concat(identifier))
     }
 
     access(account) fun setTenantCuts(tenant: String, types: [Type], category: String, cuts: FindMarketCutStruct.Cuts) {

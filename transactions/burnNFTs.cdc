@@ -11,7 +11,7 @@ transaction(types: [String] , ids: [UInt64], messages: [String]) {
 
     let authPointers : [FindViews.AuthNFTPointer]
 
-    prepare(account : auth(NonFungibleToken.Withdraw, IssueStorageCapabilityController) &Account) {
+    prepare(account : auth(Storage, IssueStorageCapabilityController) &Account) {
 
         self.authPointers = []
 

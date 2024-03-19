@@ -3,7 +3,7 @@ package test_main
 import (
 	"testing"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 	"github.com/hexops/autogold"
 	"github.com/onflow/cadence"
 	"github.com/stretchr/testify/assert"
@@ -250,7 +250,7 @@ type ThoughtData struct {
 	Medias             map[string]string `json:"medias"`
 	Reacted            interface{}       `json:"reacted"`
 	ReactedUsers       interface{}       `json:"reactedUsers"`
-	Reactions          map[string]int    `json:"reactions"`
+	Reactions          map[string]string `json:"reactions"`
 	Tags               []string          `json:"tags"`
 	QuotedThought      *ThoughtData      `json:"quotedThought"`
 	NFT                []NftDetail       `json:"nft"`

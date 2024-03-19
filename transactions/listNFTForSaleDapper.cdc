@@ -15,7 +15,7 @@ transaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: Strin
     let pointer : FindViews.AuthNFTPointer
     let vaultType : Type
 
-    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
+    prepare(account: auth (StorageCapabilities, PublishCapability, Storage, IssueStorageCapabilityController) &Account) {
 
         let marketplace = FindMarket.getFindTenantAddress()
         let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
@@ -61,7 +61,7 @@ transaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: Strin
         //if this stores anything but this it will panic, why does it not return nil?
         var existingProvider= account.storage.copy<Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>>(from: providerStoragePath) 
         if existingProvider==nil {
-            existingProvider=account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(collectionData.storagePath)
+            existingProvider=account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(nft.storagePath)
             //we save it to storage to memoize it
             account.storage.save(existingProvider!, to: providerStoragePath)
             log("create new cap")

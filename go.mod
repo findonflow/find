@@ -3,7 +3,7 @@ module github.com/findonflow/find
 go 1.20
 
 require (
-	github.com/bjartek/overflow v1.14.1-0.20240201172206-df28bd63430b
+	github.com/bjartek/overflow/v2 v2.0.0-stable-cadence-beta.4
 	github.com/hexops/autogold v1.3.1
 	github.com/onflow/cadence v1.0.0-preview.15
 	github.com/recursionpharma/go-csv-map v0.0.0-20160524001940-792523c65ae9
@@ -28,7 +28,6 @@ require (
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bits-and-blooms/bitset v1.10.0 // indirect
-	github.com/bjartek/overflow/v2 v2.0.0-stable-cadence-beta.4 // indirect
 	github.com/bjartek/underflow v1.1.0 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.2.1 // indirect
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.0.3 // indirect
@@ -123,7 +122,6 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
-	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/minio/sha256-simd v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
@@ -142,7 +140,6 @@ require (
 	github.com/onflow/atree v0.6.1-0.20240308163425-dc825c20b1a2 // indirect
 	github.com/onflow/crypto v0.25.0 // indirect
 	github.com/onflow/flixkit-go v1.2.1-cadence-v1-preview.5 // indirect
-	github.com/onflow/flow-cli/flowkit v1.12.1-0.20240201023546-64f79447f333 // indirect
 	github.com/onflow/flow-core-contracts/lib/go/contracts v0.15.2-0.20240305214031-d81e0c3b42f3 // indirect
 	github.com/onflow/flow-core-contracts/lib/go/templates v0.15.2-0.20240305214031-d81e0c3b42f3 // indirect
 	github.com/onflow/flow-emulator v1.0.0-preview.12 // indirect
@@ -171,7 +168,6 @@ require (
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/rs/zerolog v1.29.1 // indirect
-	github.com/samber/lo v1.38.1 // indirect
 	github.com/sethvargo/go-retry v0.2.3 // indirect
 	github.com/shirou/gopsutil v3.21.4-0.20210419000835-c7a38de76ee5+incompatible // indirect
 	github.com/slok/go-http-metrics v0.10.0 // indirect
@@ -200,7 +196,6 @@ require (
 	github.com/zeebo/blake3 v0.2.3 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel v1.22.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.16.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.21.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.21.0 // indirect
 	go.opentelemetry.io/otel/metric v1.22.0 // indirect

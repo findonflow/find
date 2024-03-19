@@ -3,7 +3,7 @@ package test_main
 import (
 	"testing"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 )
 
 // There used to be lots more tests here, but since we are not actively using that part of packs anymore then i have commented them out.
