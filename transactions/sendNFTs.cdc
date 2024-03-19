@@ -26,7 +26,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
     var token : &Sender.Token
 
 
-    prepare(account: auth (BorrowValue, SaveValue, StorageCapabilities, NonFungibleToken.Withdraw, IssueStorageCapabilityController, FungibleToken.Withdraw) &Account) {
+    prepare(account: auth (Storage, StorageCapabilities, NonFungibleToken.Withdraw, IssueStorageCapabilityController, FungibleToken.Withdraw) &Account) {
 
         self.authPointers = []
         self.paths = []

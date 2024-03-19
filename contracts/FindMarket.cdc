@@ -1791,5 +1791,5 @@ init() {
     self.marketBidTypes = []
     self.marketBidCollectionTypes = []
     self.residualAddress = self.account.address // This has to be changed
-    }
+}
 }

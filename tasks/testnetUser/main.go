@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 )
 
 func main() {

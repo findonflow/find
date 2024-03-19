@@ -275,7 +275,7 @@ access(all) contract Admin {
             pre {
                 self.capability != nil: "Cannot create Admin, capability is not set"
             }
-            return Admin.account.capabilities.storage.issue<&{ViewResolver.ResolverCollection, NonFungibleToken.Provider}>(path)!
+            return Admin.account.capabilities.storage.issue<&{ViewResolver.ResolverCollection, NonFungibleToken.Provider}>(path)
         }
 
         access(Owner) fun mintFindPack(packTypeName: String, typeId:UInt64,hash: String) {

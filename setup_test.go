@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 	"github.com/findonflow/find/findGo"
 	"github.com/findonflow/find/utils"
 )
