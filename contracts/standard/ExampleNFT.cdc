@@ -97,7 +97,7 @@ access(all) contract ExampleNFT: ViewResolver {
         }
 
         access(all) view fun getViews(): [Type] {
-            let views = [
+            var views = [
             Type<MetadataViews.Display>(),
             Type<MetadataViews.Royalties>(),
             Type<MetadataViews.Editions>(),
@@ -109,7 +109,7 @@ access(all) contract ExampleNFT: ViewResolver {
             ]
 
             if self.soulBound {
-                views.concat([Type<FindViews.SoulBound>()])
+                views=views.concat([Type<FindViews.SoulBound>()])
             }
 
             return views

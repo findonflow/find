@@ -1,36 +1,4 @@
 `{
-    "A.01cf0e2f2f715450.DapperUtilityCoin.Vault": {
-        "alias": "DUC",
-        "balancePath": "/public/dapperUtilityCoinBalance",
-        "balancePathIdentifier": "dapperUtilityCoinBalance",
-        "icon": "https://assets.website-files.com/5bf4437b68f8b29e67b7ebdc/61a159f8899a41507bc46bcb_feature%20image%20dapper%20post.png",
-        "receiverPath": "/public/dapperUtilityCoinReceiver",
-        "receiverPathIdentifier": "dapperUtilityCoinReceiver",
-        "tag": [
-            "dapper utility coin",
-            "dapper"
-        ],
-        "type": "A.01cf0e2f2f715450.DapperUtilityCoin.Vault",
-        "typeIdentifier": "A.01cf0e2f2f715450.DapperUtilityCoin.Vault",
-        "vaultPath": "/storage/dapperUtilityCoinVault",
-        "vaultPathIdentifier": "dapperUtilityCoinVault"
-    },
-    "A.01cf0e2f2f715450.FlowUtilityToken.Vault": {
-        "alias": "FUT",
-        "balancePath": "/public/flowUtilityTokenBalance",
-        "balancePathIdentifier": "flowUtilityTokenBalance",
-        "icon": "https://assets.website-files.com/5bf4437b68f8b29e67b7ebdc/61a159f8899a41507bc46bcb_feature%20image%20dapper%20post.png",
-        "receiverPath": "/public/flowUtilityTokenReceiver",
-        "receiverPathIdentifier": "flowUtilityTokenReceiver",
-        "tag": [
-            "flow utility token",
-            "dapper"
-        ],
-        "type": "A.01cf0e2f2f715450.FlowUtilityToken.Vault",
-        "typeIdentifier": "A.01cf0e2f2f715450.FlowUtilityToken.Vault",
-        "vaultPath": "/storage/flowUtilityTokenVault",
-        "vaultPathIdentifier": "flowUtilityTokenVault"
-    },
     "A.0ae53cb6e3f42a79.FlowToken.Vault": {
         "alias": "Flow",
         "balancePath": "/public/flowTokenBalance",
@@ -45,6 +13,38 @@
         "typeIdentifier": "A.0ae53cb6e3f42a79.FlowToken.Vault",
         "vaultPath": "/storage/flowTokenVault",
         "vaultPathIdentifier": "flowTokenVault"
+    },
+    "A.179b6b1cb6755e31.DapperUtilityCoin.Vault": {
+        "alias": "DUC",
+        "balancePath": "/public/dapperUtilityCoinBalance",
+        "balancePathIdentifier": "dapperUtilityCoinBalance",
+        "icon": "https://assets.website-files.com/5bf4437b68f8b29e67b7ebdc/61a159f8899a41507bc46bcb_feature%20image%20dapper%20post.png",
+        "receiverPath": "/public/dapperUtilityCoinReceiver",
+        "receiverPathIdentifier": "dapperUtilityCoinReceiver",
+        "tag": [
+            "dapper utility coin",
+            "dapper"
+        ],
+        "type": "A.179b6b1cb6755e31.DapperUtilityCoin.Vault",
+        "typeIdentifier": "A.179b6b1cb6755e31.DapperUtilityCoin.Vault",
+        "vaultPath": "/storage/dapperUtilityCoinVault",
+        "vaultPathIdentifier": "dapperUtilityCoinVault"
+    },
+    "A.179b6b1cb6755e31.FlowUtilityToken.Vault": {
+        "alias": "FUT",
+        "balancePath": "/public/flowUtilityTokenBalance",
+        "balancePathIdentifier": "flowUtilityTokenBalance",
+        "icon": "https://assets.website-files.com/5bf4437b68f8b29e67b7ebdc/61a159f8899a41507bc46bcb_feature%20image%20dapper%20post.png",
+        "receiverPath": "/public/flowUtilityTokenReceiver",
+        "receiverPathIdentifier": "flowUtilityTokenReceiver",
+        "tag": [
+            "flow utility token",
+            "dapper"
+        ],
+        "type": "A.179b6b1cb6755e31.FlowUtilityToken.Vault",
+        "typeIdentifier": "A.179b6b1cb6755e31.FlowUtilityToken.Vault",
+        "vaultPath": "/storage/flowUtilityTokenVault",
+        "vaultPathIdentifier": "flowUtilityTokenVault"
     },
     "A.f8d6e0586b0a20c7.FUSD.Vault": {
         "alias": "FUSD",

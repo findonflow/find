@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 	"github.com/hexops/autogold"
 	"github.com/onflow/cadence"
 	"github.com/sanity-io/litter"

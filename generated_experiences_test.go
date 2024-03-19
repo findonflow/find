@@ -3,7 +3,7 @@ package test_main
 import (
 	"testing"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 	"github.com/findonflow/find/findGo"
 	"github.com/hexops/autogold"
 )
@@ -146,14 +146,17 @@ func TestGeneratedExperiences(t *testing.T) {
   "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionDisplay",
   "A.f8d6e0586b0a20c7.MetadataViews.Medias",
   "A.f8d6e0586b0a20c7.MetadataViews.Rarity",
-  "A.179b6b1cb6755e31.FindPack.PackRevealData",
+  "A.f3fcd2c1a78f5eee.FindPack.PackRevealData",
 }`))
 
 		tcs := map[string]autogold.Value{
-			"A.f8d6e0586b0a20c7.MetadataViews.Display":   autogold.Want("Display", map[string]interface{}{"description": "Description", "name": "Name", "thumbnail": map[string]interface{}{"cid": "thumbnail"}}),
-			"A.f8d6e0586b0a20c7.MetadataViews.Royalties": autogold.Want("Royalties", map[string]interface{}{"cutInfos": []interface{}{map[string]interface{}{"cut": 0.1, "description": "Royalty", "receiver": "Capability<&{A.ee82856bf20e2aa6.FungibleToken.Receiver}>(address: 0xf669cb8d41ce0c74, id: 10)"}}}),
-			"A.f8d6e0586b0a20c7.MetadataViews.Editions":  autogold.Want("Editions", map[string]interface{}{"infoList": []interface{}{map[string]interface{}{"max": 2, "name": "generatedexperiences", "number": 1}}}),
-			"A.f8d6e0586b0a20c7.MetadataViews.Traits":    autogold.Want("Traits", map[string]interface{}{"traits": []interface{}{map[string]interface{}{"displayType": "String", "name": "Artist", "value": "Artist"}}}),
+			"A.f8d6e0586b0a20c7.MetadataViews.Display": autogold.Want("Display", map[string]interface{}{"description": "Description", "name": "Name", "thumbnail": map[string]interface{}{"cid": "thumbnail"}}),
+			"A.f8d6e0586b0a20c7.MetadataViews.Royalties": autogold.Want("Royalties", map[string]interface{}{"cutInfos": []interface{}{map[string]interface{}{"cut": 0.1, "description": "Royalty", "receiver": map[string]interface{}{
+				"address": "0x192440c99cb17282",
+				"id":      10,
+			}}}}),
+			"A.f8d6e0586b0a20c7.MetadataViews.Editions": autogold.Want("Editions", map[string]interface{}{"infoList": []interface{}{map[string]interface{}{"max": 2, "name": "generatedexperiences", "number": 1}}}),
+			"A.f8d6e0586b0a20c7.MetadataViews.Traits":   autogold.Want("Traits", map[string]interface{}{"traits": []interface{}{map[string]interface{}{"displayType": "String", "name": "Artist", "value": "Artist"}}}),
 			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionDisplay": autogold.Want("NFTCollectionDisplay", map[string]interface{}{
 				"bannerImage": map[string]interface{}{"file": map[string]interface{}{"cid": "banner"}, "mediaType": "png"}, "description": "Description",
 				"externalURL": map[string]interface{}{"url": "https://find.xyz/mp/GeneratedExperiences"},
@@ -172,7 +175,7 @@ func TestGeneratedExperiences(t *testing.T) {
 				"mediaType": "image",
 			}}}),
 			"A.f8d6e0586b0a20c7.MetadataViews.Rarity":    autogold.Want("Rarity", map[string]interface{}{"description": "Common"}),
-			"A.179b6b1cb6755e31.FindPack.PackRevealData": autogold.Want("PackRevealData", map[string]interface{}{"data": map[string]interface{}{"nftImage": "ipfs://thumbnail", "nftName": "Name", "packType": "GeneratedExperiences"}}),
+			"A.179b6b1cb6755e31.FindPack.PackRevealData": autogold.Want("PackRevealData", nil),
 		}
 
 		for view, val := range tcs {

@@ -18,7 +18,7 @@ transaction(info: FindPack.PackRegisterInfo) {
     let providerCaps : {Type : Capability<auth (NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>}
     let types : [Type]
 
-    prepare(account: auth(BorrowValue, IssueStorageCapabilityController, NonFungibleToken.Withdraw) &Account) {
+    prepare(account: auth(Storage, IssueStorageCapabilityController, NonFungibleToken.Withdraw) &Account) {
         self.admin =account.storage.borrow<auth(Admin.Owner) &Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
         self.wallet = getAccount(info.paymentAddress).capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
 
@@ -32,10 +32,20 @@ transaction(info: FindPack.PackRegisterInfo) {
             }
             let collectionInfo = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collection!.keys[0])!.collectionData
 
-            let providerCap = account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(collectionInfo.storagePath)
-            if !providerCap.check() {
-                panic("provider cap for user ".concat(account.address.toString()).concat(" and path ").concat(collectionInfo.storagePath.toString()).concat(" is not setup correctly"))
+            let storagePathIdentifer = collectionInfo.storagePath.toString().split(separator:"/")[1]
+            let providerIdentifier = storagePathIdentifer.concat("Provider")
+            let providerStoragePath = StoragePath(identifier: providerIdentifier)!
+
+            //if this stores anything but this it will panic, why does it not return nil?
+            var existingProvider= account.storage.copy<Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>>(from: providerStoragePath) 
+            if existingProvider==nil {
+                existingProvider=account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(collectionInfo.storagePath)
+                //we save it to storage to memoize it
+                account.storage.save(existingProvider!, to: providerStoragePath)
+                log("create new cap")
             }
+            var providerCap = existingProvider!
+
             let type = CompositeType(typeName)!
             self.types.append(type)
             self.providerCaps[type] = providerCap

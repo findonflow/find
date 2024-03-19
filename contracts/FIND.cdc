@@ -2075,7 +2075,7 @@ access(all) contract FIND {
             }
         } else {
             // otherwise falls into emulator and user dapper
-            if merchAccount != 0x01cf0e2f2f715450{
+            if merchAccount !=  0x179b6b1cb6755e31 {
                 panic("Merch Account address does not match with expected ".concat(merchAccount.toString()))
             }
         }
@@ -2093,7 +2093,7 @@ access(all) contract FIND {
             return 0x4748780c8bf65e19
         } else {
             // otherwise falls into emulator and user dapper
-            return 0x01cf0e2f2f715450
+            return 0x179b6b1cb6755e31
         }
     }
 

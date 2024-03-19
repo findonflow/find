@@ -66,7 +66,21 @@ transaction(nftAliasOrIdentifiers: [String], ids: [UInt64], ftAliasOrIdentifiers
                 fts[ftAliasOrIdentifiers[counter]] = ft
             }
 
-            var providerCap=account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(nft!.storagePath)
+
+            let storagePathIdentifer = nft.storagePath.toString().split(separator:"/")[1]
+            let providerIdentifier = storagePathIdentifer.concat("Provider")
+            let providerStoragePath = StoragePath(identifier: providerIdentifier)!
+
+            //if this stores anything but this it will panic, why does it not return nil?
+            var existingProvider= account.storage.copy<Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>>(from: providerStoragePath) 
+            if existingProvider==nil {
+                existingProvider=account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(collectionData.storagePath)
+                //we save it to storage to memoize it
+                account.storage.save(existingProvider!, to: providerStoragePath)
+                log("create new cap")
+            }
+            var providerCap = existingProvider!
+
             // Get the salesItemRef from tenant
             self.pointers.append(FindViews.AuthNFTPointer(cap: providerCap, id: ids[counter]))
             self.vaultTypes.append(ft!.type)

@@ -50,7 +50,20 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
             let path = data!.collectionData
 
             let storage = account.capabilities.storage
-            var providerCap=storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(path.storagePath)
+
+            let storagePathIdentifer = path.storagePath.toString().split(separator:"/")[1]
+            let providerIdentifier = storagePathIdentifer.concat("Provider")
+            let providerStoragePath = StoragePath(identifier: providerIdentifier)!
+
+            //if this stores anything but this it will panic, why does it not return nil?
+            var optProviderCap= account.storage.copy<Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>>(from: providerStoragePath) 
+            if optProviderCap==nil {
+                optProviderCap=account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(path.storagePath)
+                account.storage.save(optProviderCap!, to: providerStoragePath)
+            }
+
+            let providerCap=optProviderCap!
+
             let pointer = FindViews.AuthNFTPointer(cap: providerCap, id: ids[i])
 
             if let dt = donationTypes[i] {

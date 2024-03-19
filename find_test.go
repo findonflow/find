@@ -3,7 +3,7 @@ package test_main
 import (
 	"testing"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
@@ -331,7 +331,7 @@ access(all) fun main(name: String) :  Address? {
 			"avatar":         "https://find.xyz/assets/img/avatars/avatar14.png",
 			"cost":           5,
 			"lockedUntil":    3.9312001e+07,
-			"owner":          "0xf669cb8d41ce0c74",
+			"owner":          "0x192440c99cb17282",
 			"registeredTime": 1,
 			"status":         "TAKEN",
 			"validUntil":     3.1536001e+07,
@@ -350,7 +350,7 @@ access(all) fun main(name: String) :  Address? {
 				"avatar":         "https://find.xyz/assets/img/avatars/avatar14.png",
 				"cost":           5,
 				"lockedUntil":    3.9312001e+07,
-				"owner":          "0xf669cb8d41ce0c74",
+				"owner":          "0x192440c99cb17282",
 				"registeredTime": 1,
 				"status":         "LOCKED",
 				"validUntil":     3.1536001e+07,
@@ -462,18 +462,18 @@ access(all) fun main(name: String) :  Address? {
 			AssertWithPointerWant(t, "/accounts",
 				autogold.Want("with accounts", `[]interface {}{
   map[string]interface {}{
-    "address": "0x192440c99cb17282",
-    "name": "link",
-    "network": "Flow",
-    "node": "FindRelatedAccounts",
-    "trusted": true,
-  },
-  map[string]interface {}{
-    "address": "0xfd43f9148d4b725d",
+    "address": "0xeb179c27144f783c",
     "name": "notLink",
     "network": "Flow",
     "node": "FindRelatedAccounts",
     "trusted": false,
+  },
+  map[string]interface {}{
+    "address": "0xfd43f9148d4b725d",
+    "name": "link",
+    "network": "Flow",
+    "node": "FindRelatedAccounts",
+    "trusted": true,
   },
 }`))
 	})

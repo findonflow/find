@@ -245,7 +245,8 @@ access(all) contract FindViews {
                 panic("The capability is not valid.")
             }
 
-            let viewResolver=self.cap.borrow()!.borrowNFT(self.id)!
+            let collection = self.cap.borrow() ?? panic("could not find collection")
+            let viewResolver=collection.borrowNFT(self.id) ?? panic("could not borrow nft")
             let display = MetadataViews.getDisplay(viewResolver) ?? panic("MetadataViews Display View is not implemented on this NFT.")
             let nftCollectionData = MetadataViews.getNFTCollectionData(viewResolver) ?? panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
             self.nounce=FindViews.getNounce(viewResolver)

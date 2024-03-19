@@ -267,15 +267,23 @@ access(all) contract Admin {
             }
 
             let storagePath = StoragePath(identifier: pathIdentifier)!
-            var cap = Admin.account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(storagePath)
-            return FindViews.AuthNFTPointer(cap: cap, id: id)
-        }
 
-        access(Owner) fun getProviderCap(_ path: StoragePath): Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}> {
-            pre {
-                self.capability != nil: "Cannot create Admin, capability is not set"
+            let account=Admin.account
+            let providerIdentifier = pathIdentifier.concat("Provider")
+            let providerStoragePath = StoragePath(identifier: providerIdentifier)!
+
+            //if this stores anything but this it will panic, why does it not return nil?
+            var existingProvider= account.storage.copy<Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>>(from: providerStoragePath) 
+            if existingProvider==nil {
+                existingProvider=account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(storagePath)
+                //we save it to storage to memoize it
+                account.storage.save(existingProvider!, to: providerStoragePath)
+                log("create new cap")
             }
-            return Admin.account.capabilities.storage.issue<&{ViewResolver.ResolverCollection, NonFungibleToken.Provider}>(path)!
+            var providerCap = existingProvider!
+
+
+            return FindViews.AuthNFTPointer(cap: providerCap, id: id)
         }
 
         access(Owner) fun mintFindPack(packTypeName: String, typeId:UInt64,hash: String) {

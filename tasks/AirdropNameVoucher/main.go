@@ -1,6 +1,6 @@
 package main
 
-import . "github.com/bjartek/overflow"
+import . "github.com/bjartek/overflow/v2"
 
 func main() {
 	o := Overflow(
