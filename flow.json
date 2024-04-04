@@ -6,6 +6,20 @@
     }
   },
   "contracts": {
+    "FLOAT": {
+      "source": "./contracts/standard/FLOAT.cdc",
+      "aliases": {
+        "mainnet": "0x2d4c3caffbeab845",
+        "testnet": "0x0afe396ebc8eee65"
+      }
+    },
+    "FungibleTokenSwitchboard": {
+      "source": "./contracts/standard/FungibleTokenSwitchboard.cdc",
+      "aliases": {
+        "testnet": "9a0766d93b6608b7",
+        "mainnet": "0xf233dcee88fe0abe"
+      }
+    },
     "EmeraldIdentity": {
       "source": "./contracts/standard/EmeraldIdentity.cdc",
       "aliases": {
@@ -198,10 +212,8 @@
     "FindViews": "./contracts/FindViews.cdc",
     "NameVoucher": "./contracts/NameVoucher.cdc",
     "FindVerifier": "./contracts/FindVerifier.cdc",
-    "FLOAT": "./contracts/standard/FLOAT.cdc",
     "FLOATVerifiers": "./contracts/standard/FLOATVerifiers.cdc",
     "FINDNFTCatalog": "./contracts/FINDNFTCatalog.cdc",
-    "FungibleTokenSwitchboard": "./contracts/standard/FungibleTokenSwitchboard.cdc",
     "GrantedAccountAccess": "./contracts/standard/GrantedAccountAccess.cdc",
     "FindMarketCut": "./contracts/FindMarketCut.cdc",
     "FindMarketCutInterface": "./contracts/FindMarketCutInterface.cdc",
