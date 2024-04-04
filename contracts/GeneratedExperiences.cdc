@@ -221,7 +221,7 @@ access(all) contract GeneratedExperiences: ViewResolver {
     access(all) resource Collection: NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         /// dictionary of NFT conforming tokens
         /// NFT is a resource type with an `UInt64` ID field
-        access(contract) var ownedNFTs: @{UInt64: GeneratedExperiences.NFT}
+        access(contract) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
 
         /// Return the default storage path for the collection
         access(all) view fun getDefaultStoragePath(): StoragePath? {

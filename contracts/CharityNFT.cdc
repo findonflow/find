@@ -179,15 +179,11 @@ access(all) contract CharityNFT: ViewResolver {
     access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, CollectionPublic , ViewResolver.ResolverCollection{
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
-        access(all) var ownedNFTs: @{UInt64: CharityNFT.NFT}
-        access(self) var storagePath: StoragePath
-        access(self) var publicPath: PublicPath
+        access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
 
         init () {
             self.ownedNFTs <- {}
             let identifier = "charityNFTCollection"
-            self.storagePath = StoragePath(identifier: identifier)!
-            self.publicPath = PublicPath(identifier: identifier)!
         }
 
         // withdraw removes an NFT from the collection and moves it to the caller
@@ -250,16 +246,6 @@ access(all) contract CharityNFT: ViewResolver {
             let supportedTypes: {Type: Bool} = {}
             supportedTypes[Type<@CharityNFT.NFT>()] = true
             return supportedTypes
-        }
-
-        /// Return the default storage path for the collection
-        access(all) view fun getDefaultStoragePath(): StoragePath? {
-            return self.storagePath
-        }
-
-        /// Return the default public path for the collection
-        access(all) view fun getDefaultPublicPath(): PublicPath? {
-            return self.publicPath
         }
 
         /// Returns whether or not the given type is accepted by the collection

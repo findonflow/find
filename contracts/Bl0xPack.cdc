@@ -275,7 +275,7 @@ access(all) contract Bl0xPack: ViewResolver {
             // dictionary of NFT conforming tokens
             // NFT is a resource type with an `UInt64` ID field
             //
-            access(all) var ownedNFTs: @{UInt64: Bl0xPack.NFT}
+            access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
 
             access(all) var nftsPerType: {UInt64:UInt64}
 
