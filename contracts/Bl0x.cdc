@@ -383,7 +383,7 @@ access(all) contract Bl0x: ViewResolver {
         }
 
         access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}? {
-            if let nft = &self.ownedNFTs[id] as &Bl0x.NFT? {
+            if let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?) as! &Bl0x.NFT? {
                 return nft as &{ViewResolver.Resolver}
             }
             return nil

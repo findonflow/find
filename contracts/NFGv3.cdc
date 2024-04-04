@@ -188,7 +188,7 @@ access(all) contract NFGv3: ViewResolver {
     access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
-        access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}T}
+        access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
         access(self) var storagePath: StoragePath
         access(self) var publicPath: PublicPath
 

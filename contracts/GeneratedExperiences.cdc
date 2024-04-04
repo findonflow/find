@@ -289,7 +289,7 @@ access(all) contract GeneratedExperiences: ViewResolver {
 
         /// Borrow the view resolver for the specified NFT ID
         access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}? {
-            if let nft = &self.ownedNFTs[id] as &GeneratedExperiences.NFT? {
+            if let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?) as! &GeneratedExperiences.NFT? {
                 return nft as &{ViewResolver.Resolver}
             }
             return nil

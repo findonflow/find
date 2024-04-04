@@ -469,7 +469,7 @@ access(all) contract Bl0xPack: ViewResolver {
             access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
                 let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("Could not withdraw nft")
 
-                let nft <- token
+                let nft <- token as! @Bl0xPack.NFT
 
                 let oldNumber= self.nftsPerType[nft.getTypeID()]!
                 self.nftsPerType[nft.getTypeID()]=oldNumber-1
@@ -558,7 +558,7 @@ access(all) contract Bl0xPack: ViewResolver {
             //
             access(all) fun borrowBl0xPack(id: UInt64): &Bl0xPack.NFT? {
                 if self.ownedNFTs[id] != nil {
-                    let ref = (&self.ownedNFTs[id] as &Bl0xPack.NFT?)
+                    let ref = ((&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?) as! &Bl0xPack.NFT?)
                     return ref
                 } else {
                     return nil
@@ -566,7 +566,7 @@ access(all) contract Bl0xPack: ViewResolver {
             }
 
             access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}? {
-                if let nft = &self.ownedNFTs[id] as &Bl0xPack.NFT? {
+                if let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?) as!&Bl0xPack.NFT? {
                     return nft as &{ViewResolver.Resolver}
                 }
                 return nil
