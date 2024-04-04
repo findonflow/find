@@ -285,6 +285,14 @@
     "emulator-user9": {
       "address": "f4a3472b32eac8d8",
       "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+    },
+    "testnet-find": {
+      "address": "35717efbbce11c74",
+      "key": "${TESTNET_ACCOUNT}"
+    },
+    "testnet-find-forge": {
+      "address": "3e5b4c627064625d",
+      "key": "${TESTNET_ACCOUNT}"
     }
   },
   "deployments": {
@@ -306,7 +314,10 @@
         "LostAndFoundHelper",
         "FeeEstimator"
       ],
-      "emulator-dapper": ["DapperUtilityCoin", "FlowUtilityToken"],
+      "emulator-dapper": [
+        "DapperUtilityCoin",
+        "FlowUtilityToken"
+      ],
       "emulator-find": [
         "Profile",
         "FindThoughts",
@@ -359,7 +370,9 @@
         "FIND"
       ],
       "emulator-find-admin": [],
-      "emulator-find-forge": ["GeneratedExperiences"],
+      "emulator-find-forge": [
+        "GeneratedExperiences"
+      ],
       "emulator-find-lease": [],
       "emulator-user1": [],
       "emulator-user2": [],
@@ -371,6 +384,60 @@
       "emulator-user8": [],
       "emulator-user9": [],
       "emulator-residual": []
+    },
+    "testnet": {
+      "testnet-find": [
+        "FIND",
+        "Clock",
+        "Profile",
+        "Debug",
+        "Admin",
+        "FindMarketAdmin",
+        "CharityNFT",
+        "FindViews",
+        "Dandy",
+        "FindMarket",
+        "FindMarketSale",
+        "FindMarketDirectOfferEscrow",
+        "FindMarketDirectOfferSoft",
+        "FindMarketAuctionEscrow",
+        "FindMarketAuctionSoft",
+        "Sender",
+        "FindRelatedAccounts",
+        "FTRegistry",
+        "FindForge",
+        "FindForgeOrder",
+        "FindForgeStruct",
+        "FindLeaseMarket",
+        "FindLeaseMarketSale",
+        "FindLeaseMarketAuctionSoft",
+        "FindLeaseMarketDirectOfferSoft",
+        "ProfileCache",
+        "FindRulesCache",
+        "FINDNFTCatalog",
+        "FINDNFTCatalogAdmin",
+        "FindPack",
+        "FindVerifier",
+        "FindAirdropper",
+        "FindFurnace",
+        "FindThoughts",
+        "FindUtils",
+        "FindUserStatus",
+        "FindLostAndFoundWrapper",
+        "FindMarketCut",
+        "FindMarketCutStruct",
+        "FindMarketCutInterface",
+        "FindMarketInfrastructureCut",
+        "NameVoucher",
+        "Giefts"
+      ],
+      "testnet-find-forge": [
+        "NFGv3",
+        "PartyFavorz",
+        "PartyFavorzExtraData",
+        "Flomies",
+        "GeneratedExperiences"
+      ]
     }
   }
 }
