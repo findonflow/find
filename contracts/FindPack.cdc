@@ -609,7 +609,7 @@ access(all) contract FindPack {
     // Collection
     // A collection of FindPack NFTs owned by an account
     //
-    access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, CollectionPublic, ViewResolver.ResolverCollection {
+    access(all) resource Collection: NonFungibleToken.Collection, CollectionPublic, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         //

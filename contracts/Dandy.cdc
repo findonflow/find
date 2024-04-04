@@ -222,7 +222,7 @@ access(all) contract Dandy :ViewResolver{
         access(all) fun getMinters(): [String] 
     }
 
-    access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection, CollectionPublic {
+    access(all) resource Collection: NonFungibleToken.Collection, CollectionPublic, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
