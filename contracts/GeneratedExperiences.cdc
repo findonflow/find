@@ -5,7 +5,7 @@ import "ViewResolver"
 import "FindForge"
 import "FindPack"
 
-access(all) contract GeneratedExperiences: ViewResolver {
+access(all) contract GeneratedExperiences: NonFungibleToken {
 
     access(all) var totalSupply: UInt64
 
@@ -187,7 +187,7 @@ access(all) contract GeneratedExperiences: ViewResolver {
         }
 
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-            return <-GeneratedExperiences.createEmptyCollection()
+            return <-GeneratedExperiences.createEmptyCollection(nftType:Type<@GeneratedExperiences.NFT>())
         }
     }
 
@@ -210,7 +210,7 @@ access(all) contract GeneratedExperiences: ViewResolver {
                 publicCollection: Type<&GeneratedExperiences.Collection>(),
                 publicLinkedType: Type<&GeneratedExperiences.Collection>(),
                 createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
-                    return <-GeneratedExperiences.createEmptyCollection()
+                    return <-GeneratedExperiences.createEmptyCollection(nftType:Type<@GeneratedExperiences.NFT>())
                 })
             )
             return collectionData
@@ -297,13 +297,14 @@ access(all) contract GeneratedExperiences: ViewResolver {
 
         /// public function that anyone can call to create a new empty collection
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+
             return <- create GeneratedExperiences.Collection()
         }
     }
 
 
     // public function that anyone can call to create a new empty collection
-    access(all) fun createEmptyCollection(): @GeneratedExperiences.Collection {
+    access(all) fun createEmptyCollection(nftType:Type): @GeneratedExperiences.Collection {
         return <- create Collection()
     }
 

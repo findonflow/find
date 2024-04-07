@@ -18,7 +18,7 @@ import "DapperUtilityCoin"
 import "ViewResolver"
 
 
-access(all) contract ExampleNFT: ViewResolver {
+access(all) contract ExampleNFT: NonFungibleToken {
 
     access(all) var totalSupply: UInt64
 
@@ -166,7 +166,7 @@ access(all) contract ExampleNFT: ViewResolver {
         }
 
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-            return <-ExampleNFT.createEmptyCollection()
+            return <-ExampleNFT.createEmptyCollection(nftType:Type<@ExampleNFT.NFT>())
         }
     }
 
@@ -186,7 +186,7 @@ access(all) contract ExampleNFT: ViewResolver {
                 publicCollection: Type<&ExampleNFT.Collection>(),
                 publicLinkedType: Type<&ExampleNFT.Collection>(),
                 createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
-                    return <-ExampleNFT.createEmptyCollection()
+                    return <-ExampleNFT.createEmptyCollection(nftType:Type<@ExampleNFT.NFT>())
                 })
             )
             return collectionData
@@ -279,7 +279,7 @@ access(all) contract ExampleNFT: ViewResolver {
 
         /// public function that anyone can call to create a new empty collection
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-            return <- create ExampleNFT.Collection()
+            return <-ExampleNFT.createEmptyCollection(nftType:Type<@ExampleNFT.NFT>())
         }
     }
 
@@ -288,7 +288,7 @@ access(all) contract ExampleNFT: ViewResolver {
     /// public function that anyone can call to create a new empty collection
     /// Since multiple collection types can be defined in a contract,
     /// The caller needs to specify which one they want to create
-    access(all) fun createEmptyCollection(): @ExampleNFT.Collection {
+    access(all) fun createEmptyCollection(nftType:Type): @ExampleNFT.Collection {
         return <- create Collection()
     }
 
@@ -352,7 +352,9 @@ access(all) contract ExampleNFT: ViewResolver {
                 publicCollection: Type<&ExampleNFT.Collection>(),
                 publicLinkedType: Type<&ExampleNFT.Collection>(),
                 createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
-                    return <-ExampleNFT.createEmptyCollection()
+
+                    return <-ExampleNFT.createEmptyCollection(nftType:Type<@ExampleNFT.NFT>())
+
                 })
             )
             return collectionData

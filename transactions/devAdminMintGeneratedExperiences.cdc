@@ -10,7 +10,7 @@ transaction(name: String, info: [GeneratedExperiences.Info]) {
 
         let col= account.storage.borrow<&GeneratedExperiences.Collection>(from: GeneratedExperiences.CollectionStoragePath)
         if col == nil {
-            account.storage.save( <- GeneratedExperiences.createEmptyCollection(), to: GeneratedExperiences.CollectionStoragePath)
+            account.storage.save( <- GeneratedExperiences.createEmptyCollection(nftType:Type<@GeneratedExperiences.NFT>()), to: GeneratedExperiences.CollectionStoragePath)
             account.capabilities.unpublish(GeneratedExperiences.CollectionPublicPath)
             let cap = account.capabilities.storage.issue<&GeneratedExperiences.Collection>(GeneratedExperiences.CollectionStoragePath)
             account.capabilities.publish(cap, at: GeneratedExperiences.CollectionPublicPath)

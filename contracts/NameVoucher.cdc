@@ -9,7 +9,7 @@ import "FIND"
 import "FindViews"
 import "FindAirdropper"
 
-access(all) contract NameVoucher {
+access(all) contract NameVoucher :NonFungibleToken{
 
     access(all) var totalSupply: UInt64
 
@@ -122,7 +122,7 @@ access(all) contract NameVoucher {
         }
 
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-            return <-NameVoucher.createEmptyCollection()
+            return <-NameVoucher.createEmptyCollection(nftType:Type<@NameVoucher.NFT>())
         }
     }
 
@@ -145,7 +145,7 @@ access(all) contract NameVoucher {
                 publicCollection: Type<&NameVoucher.Collection>(),
                 publicLinkedType: Type<&NameVoucher.Collection>(),
                 createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
-                    return <-NameVoucher.createEmptyCollection()
+                    return <-NameVoucher.createEmptyCollection(nftType:Type<@NameVoucher.NFT>())
                 })
             )
             return collectionData
@@ -270,7 +270,7 @@ access(all) contract NameVoucher {
 
         // public function that anyone can call to create a new empty collection
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-            return <- NameVoucher.createEmptyCollection()
+            return <- NameVoucher.createEmptyCollection(nftType:Type<@NameVoucher.NFT>())
         }
 
         access(all) view fun getDefaultStoragePath() : StoragePath {
@@ -310,7 +310,7 @@ access(all) contract NameVoucher {
     }
 
     // public function that anyone can call to create a new empty collection
-    access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+    access(all) fun createEmptyCollection(nftType:Type): @{NonFungibleToken.Collection} {
         return <- create Collection()
     }
 
@@ -363,7 +363,7 @@ access(all) contract NameVoucher {
         self.CollectionStoragePath = /storage/nameVoucher
         self.CollectionPublicPath = /public/nameVoucher
 
-        self.account.storage.save<@{NonFungibleToken.Collection}>(<- NameVoucher.createEmptyCollection(), to: NameVoucher.CollectionStoragePath)
+        self.account.storage.save<@{NonFungibleToken.Collection}>(<- NameVoucher.createEmptyCollection(nftType:Type<@NameVoucher.NFT>()) , to: NameVoucher.CollectionStoragePath)
         let collectionCap = self.account.capabilities.storage.issue<&NameVoucher.Collection>(NameVoucher.CollectionStoragePath)
         self.account.capabilities.publish(collectionCap, at: self.CollectionPublicPath)
 

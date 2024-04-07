@@ -63,7 +63,7 @@ access(all) contract interface NonFungibleToken: ViewResolver {
     /// and query the updated metadata from the owners' collections.
     ///
     access(all) event Updated(type: String, id: UInt64, uuid: UInt64, owner: Address?)
-    access(contract) view fun emitNFTUpdated(_ nftRef: auth(Update | Owner) &{NonFungibleToken.NFT})
+    access(all) view fun emitNFTUpdated(_ nftRef: auth(Update | Owner) &{NonFungibleToken.NFT})
     {
         emit Updated(type: nftRef.getType().identifier, id: nftRef.id, uuid: nftRef.uuid, owner: nftRef.owner?.address)
     }
@@ -85,9 +85,6 @@ access(all) contract interface NonFungibleToken: ViewResolver {
     ///
     access(all) event Deposited(type: String, id: UInt64, uuid: UInt64, to: Address?, collectionUUID: UInt64)
 
-    /// Included for backwards-compatibility
-    access(all) resource interface INFT: NFT {}
-
     /// Interface that the NFTs must conform to
     ///
     access(all) resource interface NFT: ViewResolver.Resolver {
@@ -105,6 +102,7 @@ access(all) contract interface NonFungibleToken: ViewResolver {
         access(all) fun createEmptyCollection(): @{Collection} {
             post {
                 result.getLength() == 0: "The created collection must be empty!"
+                result.isSupportedNFTType(type: self.getType()): "The created collection must support this NFT type"
             }
         }
 
@@ -169,10 +167,18 @@ access(all) contract interface NonFungibleToken: ViewResolver {
         access(all) view fun isSupportedNFTType(type: Type): Bool
     }
 
+    /// Kept for backwards-compatibility reasons
+    access(all) resource interface CollectionPublic {
+        access(all) fun deposit(token: @{NFT})
+        access(all) view fun getLength(): Int
+        access(all) view fun getIDs(): [UInt64]
+        access(all) view fun borrowNFT(_ id: UInt64): &{NFT}?
+    }
+
     /// Requirement for the concrete resource type
     /// to be declared in the implementing contract
     ///
-    access(all) resource interface Collection: Provider, Receiver {
+    access(all) resource interface Collection: Provider, Receiver, CollectionPublic, ViewResolver.ResolverCollection {
 
         /// deposit takes a NFT as an argument and stores it in the collection
         /// @param token: The NFT to deposit into the collection
@@ -189,10 +195,6 @@ access(all) contract interface NonFungibleToken: ViewResolver {
         /// Gets the amount of NFTs stored in the collection
         /// @return An integer indicating the size of the collection
         access(all) view fun getLength(): Int
-
-        /// Gets a list of all the IDs in the collection
-        /// @return An array of NFT IDs in the collection
-        access(all) view fun getIDs(): [UInt64] 
 
         /// Borrows a reference to an NFT stored in the collection
         /// If the NFT with the specified ID is not in the collection,
@@ -228,4 +230,3 @@ access(all) contract interface NonFungibleToken: ViewResolver {
         }
     }
 }
-

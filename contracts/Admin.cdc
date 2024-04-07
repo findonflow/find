@@ -267,15 +267,14 @@ access(all) contract Admin {
             }
 
             let storagePath = StoragePath(identifier: pathIdentifier)!
-
             let account=Admin.account
             let providerIdentifier = pathIdentifier.concat("Provider")
             let providerStoragePath = StoragePath(identifier: providerIdentifier)!
 
             //if this stores anything but this it will panic, why does it not return nil?
-            var existingProvider= account.storage.copy<Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>>(from: providerStoragePath) 
+            var existingProvider= account.storage.copy<Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection, NonFungibleToken.Provider, ViewResolver.ResolverCollection}>>(from: providerStoragePath) 
             if existingProvider==nil {
-                existingProvider=account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(storagePath)
+                existingProvider=account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection, NonFungibleToken.Provider, ViewResolver.ResolverCollection}>(storagePath)
                 //we save it to storage to memoize it
                 account.storage.save(existingProvider!, to: providerStoragePath)
                 log("create new cap")

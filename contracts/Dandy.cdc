@@ -5,7 +5,7 @@ import "FindViews"
 import "FindForge"
 import "ViewResolver"
 
-access(all) contract Dandy :ViewResolver{
+access(all) contract Dandy :NonFungibleToken{
 
     // Paths
     access(all) let CollectionStoragePath: StoragePath
@@ -49,7 +49,7 @@ access(all) contract Dandy :ViewResolver{
             self.externalUrlPrefix=externalUrlPrefix 
         }
     }
-    access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
+    access(all) resource NFT: NonFungibleToken.NFT {
         access(all) let id: UInt64
         access(self) var nounce: UInt64
 
@@ -186,7 +186,7 @@ access(all) contract Dandy :ViewResolver{
         }
 
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-            return <-Dandy.createEmptyCollection()
+            return <-Dandy.createEmptyCollection(nftType: Type<@Dandy.NFT>())
         }
     }
 
@@ -208,7 +208,7 @@ access(all) contract Dandy :ViewResolver{
                 publicCollection: Type<&Dandy.Collection>(),
                 publicLinkedType: Type<&Dandy.Collection>(),
                 createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
-                    return <-Dandy.createEmptyCollection()
+                    return <-Dandy.createEmptyCollection(nftType: Type<@Dandy.NFT>())
                 })
             )
             return collectionData
@@ -297,7 +297,7 @@ access(all) contract Dandy :ViewResolver{
 
         /// Borrow the view resolver for the specified NFT ID
         access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}?   {
-            return (&self.ownedNFTs[id] as &{ViewResolver.Resolver}?)!
+            return &self.ownedNFTs[id]
         }
 
         access(all) view fun getDefaultStoragePath() : StoragePath {
@@ -361,8 +361,9 @@ access(all) contract Dandy :ViewResolver{
         return <- create Forge()
     }
 
-    // public function that anyone can call to create a new empty collection
-    access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+
+    access(all) fun createEmptyCollection(nftType: Type): @{NonFungibleToken.Collection} {
+
         return <- create Collection()
     }
 

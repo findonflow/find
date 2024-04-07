@@ -4,7 +4,7 @@ import "MetadataViews"
 import "FindForge"
 import "ViewResolver"
 
-access(all) contract NFGv3: ViewResolver {
+access(all) contract NFGv3: NonFungibleToken {
 
     access(all) var totalSupply: UInt64
 
@@ -129,58 +129,58 @@ access(all) contract NFGv3: ViewResolver {
         }
 
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-            return <-NFGv3.createEmptyCollection()
+            return <-NFGv3.createEmptyCollection(nftType:Type<@NFGv3.NFT>())
         }
     }
 
     access(all) view fun getContractViews(resourceType: Type?): [Type] {
         return [
-            Type<MetadataViews.NFTCollectionData>(),
-            Type<MetadataViews.NFTCollectionDisplay>()
+        Type<MetadataViews.NFTCollectionData>(),
+        Type<MetadataViews.NFTCollectionDisplay>()
         ]
     }
 
     access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
         switch viewType {
-            case Type<MetadataViews.NFTCollectionData>():
-                let collectionRef = self.account.storage.borrow<&NFGv3.Collection>(
-                        from: NFGv3.CollectionStoragePath
-                    ) ?? panic("Could not borrow a reference to the stored collection")
-                let collectionData = MetadataViews.NFTCollectionData(
-                    storagePath: NFGv3.CollectionStoragePath,
-                    publicPath: NFGv3.CollectionPublicPath,
-                    publicCollection: Type<&NFGv3.Collection>(),
-                    publicLinkedType: Type<&NFGv3.Collection>(),
-                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
-                        return <-NFGv3.createEmptyCollection()
-                    })
-                )
-                return collectionData
-            case Type<MetadataViews.NFTCollectionDisplay>():
-                let square = MetadataViews.Media(
-                    file: MetadataViews.IPFSFile(
-                        cid: "QmeG1rPaLWmn4uUSjQ2Wbs7QnjxdQDyeadCGWyGwvHTB7c",
-                        path: nil
-                    ),
-                    mediaType: "image/png"
-                )
-                let banner = MetadataViews.Media(
-                    file: MetadataViews.IPFSFile(
-                        cid: "QmWmDRnSrv8HK5QsiHwUNR4akK95WC8veydq6dnnFbMja1",
-                        path: nil
-                    ),
-                    mediaType: "image/png"
-                )
-                return MetadataViews.NFTCollectionDisplay(
-                    name: "NonFunGerbils",
-                    description: "The NonFunGerbils are a collaboration between the NonFunGerbils Podcast, their audience and sometimes fabolous artists. Harnessing the power of MEMEs with creative writing and collaboration they create the most dankest, cutest gerbils in the NFT space.",
-                    externalURL: MetadataViews.ExternalURL("https://nonfungerbils.com"),
-                    squareImage: square,
-                    bannerImage: banner,
-                    socials: {
-                        "twitter": MetadataViews.ExternalURL("https://twitter.com/NonFunGerbils")
-                    }
-                )
+        case Type<MetadataViews.NFTCollectionData>():
+            let collectionRef = self.account.storage.borrow<&NFGv3.Collection>(
+                from: NFGv3.CollectionStoragePath
+            ) ?? panic("Could not borrow a reference to the stored collection")
+            let collectionData = MetadataViews.NFTCollectionData(
+                storagePath: NFGv3.CollectionStoragePath,
+                publicPath: NFGv3.CollectionPublicPath,
+                publicCollection: Type<&NFGv3.Collection>(),
+                publicLinkedType: Type<&NFGv3.Collection>(),
+                createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                    return <-NFGv3.createEmptyCollection(nftType:Type<@NFGv3.NFT>())
+                })
+            )
+            return collectionData
+        case Type<MetadataViews.NFTCollectionDisplay>():
+            let square = MetadataViews.Media(
+                file: MetadataViews.IPFSFile(
+                    cid: "QmeG1rPaLWmn4uUSjQ2Wbs7QnjxdQDyeadCGWyGwvHTB7c",
+                    path: nil
+                ),
+                mediaType: "image/png"
+            )
+            let banner = MetadataViews.Media(
+                file: MetadataViews.IPFSFile(
+                    cid: "QmWmDRnSrv8HK5QsiHwUNR4akK95WC8veydq6dnnFbMja1",
+                    path: nil
+                ),
+                mediaType: "image/png"
+            )
+            return MetadataViews.NFTCollectionDisplay(
+                name: "NonFunGerbils",
+                description: "The NonFunGerbils are a collaboration between the NonFunGerbils Podcast, their audience and sometimes fabolous artists. Harnessing the power of MEMEs with creative writing and collaboration they create the most dankest, cutest gerbils in the NFT space.",
+                externalURL: MetadataViews.ExternalURL("https://nonfungerbils.com"),
+                squareImage: square,
+                bannerImage: banner,
+                socials: {
+                    "twitter": MetadataViews.ExternalURL("https://twitter.com/NonFunGerbils")
+                }
+            )
         }
         return nil
     }
@@ -244,11 +244,11 @@ access(all) contract NFGv3: ViewResolver {
             return self.ownedNFTs.keys.length
         }
 
-		access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
             return <- create NFGv3.Collection()
         }
 
-		/// getSupportedNFTTypes returns a list of NFT types that this receiver accepts
+        /// getSupportedNFTTypes returns a list of NFT types that this receiver accepts
         access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
             let supportedTypes: {Type: Bool} = {}
             supportedTypes[Type<@NFGv3.NFT>()] = true
@@ -277,7 +277,7 @@ access(all) contract NFGv3: ViewResolver {
     }
 
     // public function that anyone can call to create a new empty collection
-    access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+    access(all) fun createEmptyCollection(nftType: Type): @{NonFungibleToken.Collection} {
         return <- create Collection()
     }
 
@@ -323,7 +323,7 @@ access(all) contract NFGv3: ViewResolver {
         let collection <- create Collection()
         self.account.storage.save(<-collection, to: self.CollectionStoragePath)
         let collectionCap = self.account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(self.CollectionStoragePath)
-		self.account.capabilities.publish(collectionCap, at: self.CollectionPublicPath)
+        self.account.capabilities.publish(collectionCap, at: self.CollectionPublicPath)
 
         FindForge.addForgeType(<- create Forge())
         emit ContractInitialized()

@@ -24,7 +24,7 @@ transaction(name: String) {
 
         let dandyCap= account.capabilities.get<&{NonFungibleToken.Collection}>(Dandy.CollectionPublicPath)
         if dandyCap == nil {
-            account.storage.save<@{NonFungibleToken.Collection}>(<- Dandy.createEmptyCollection(), to: Dandy.CollectionStoragePath)
+            account.storage.save<@{NonFungibleToken.Collection}>(<- Dandy.createEmptyCollection(nftType:Type<@Dandy.NFT>()), to: Dandy.CollectionStoragePath)
             let dandyCollectionCap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(Dandy.CollectionStoragePath)
             account.capabilities.publish(dandyCollectionCap, at: Dandy.CollectionPublicPath) 
         }
