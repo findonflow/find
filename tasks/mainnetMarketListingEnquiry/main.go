@@ -5,7 +5,7 @@ import (
 	"os"
 	"sort"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 	"github.com/sanity-io/litter"
 )
 

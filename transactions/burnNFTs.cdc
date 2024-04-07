@@ -11,7 +11,7 @@ transaction(types: [String] , ids: [UInt64], messages: [String]) {
 
     let authPointers : [FindViews.AuthNFTPointer]
 
-    prepare(account : auth(NonFungibleToken.Withdraw, IssueStorageCapabilityController) &Account) {
+    prepare(account : auth(Storage, IssueStorageCapabilityController) &Account) {
 
         self.authPointers = []
 
@@ -29,7 +29,20 @@ transaction(types: [String] , ids: [UInt64], messages: [String]) {
 
             let path = data!.collectionData
 
-            var providerCap = account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(path.storagePath)
+
+            let storagePathIdentifer = path.storagePath.toString().split(separator:"/")[1]
+            let providerIdentifier = storagePathIdentifer.concat("Provider")
+            let providerStoragePath = StoragePath(identifier: providerIdentifier)!
+
+            //if this stores anything but this it will panic, why does it not return nil?
+            var existingProvider= account.storage.copy<Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>>(from: providerStoragePath) 
+            if existingProvider==nil {
+                existingProvider=account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(path.storagePath)
+                //we save it to storage to memoize it
+                account.storage.save(existingProvider!, to: providerStoragePath)
+                log("create new cap")
+            }
+            var providerCap = existingProvider!
             let pointer = FindViews.AuthNFTPointer(cap: providerCap, id: ids[i])
             self.authPointers.append(pointer)
         }

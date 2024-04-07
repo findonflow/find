@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 	"github.com/findonflow/find/findGo"
 	"github.com/findonflow/find/utils"
 	"github.com/hexops/autogold"
@@ -415,8 +415,7 @@ func (otu *OverflowTestUtils) checkRoyalty(name string, id uint64, royaltyName s
 		WithArg("id", id),
 		WithArg("nftAliasOrIdentifier", nftAlias),
 		WithArg("viewIdentifier", royaltyIden),
-	).
-		MarshalAs(&royalty)
+	).MarshalAs(&royalty)
 
 	assert.NoError(otu.T, err)
 
@@ -913,10 +912,14 @@ func (otu *OverflowTestUtils) fulfillLeaseMarketDirectOfferSoft(user, name strin
 	return otu
 }
 
+type Cap struct {
+	Address string
+	Id      uint64
+}
 type Royalty struct {
 	Items []struct {
 		Description string  `json:"description"`
-		Receiver    string  `json:"receiver"`
+		Receiver    Cap     `json:"receiver"`
 		Cut         float64 `json:"cut"`
 	} `json:"cutInfos"`
 }
@@ -1952,42 +1955,6 @@ func (otu *OverflowTestUtils) createExampleNFTTicket() uint64 {
 	return ticketID
 }
 
-func (otu *OverflowTestUtils) mintExampleNFTs() uint64 {
-	t := otu.T
-
-	res, err := otu.O.Tx("devMintExampleNFT",
-		WithSigner("user1"),
-		WithArg("name", "user1"),
-		WithArg("artist", "Bam"),
-		WithArg("nftName", "ExampleNFT"),
-		WithArg("nftDescription", "This is an ExampleNFT"),
-		WithArg("nftUrl", "This is an exampleNFT url"),
-		WithArg("traits", []uint64{1, 2, 3}),
-		WithArg("collectionDescription", "Example NFT FIND"),
-		WithArg("collectionExternalURL", "Example NFT external url"),
-		WithArg("collectionSquareImage", "Example NFT square image"),
-		WithArg("collectionBannerImage", "Example NFT banner image"),
-	).
-		AssertSuccess(t).
-		GetIdFromEvent("ExampleNFT.Deposit", "id")
-
-	otu.O.Tx("setupExampleNFTCollection",
-		WithSigner("find-admin"),
-	).
-		AssertSuccess(t)
-
-	otu.O.Tx("sendExampleNFT",
-		WithSigner("user1"),
-		WithArg("user", otu.O.Address("find-admin")),
-		WithArg("id", res),
-	).
-		AssertSuccess(t)
-
-	assert.NoError(t, err)
-
-	return res
-}
-
 func generatePackStruct(o *OverflowState, user string, packTypeId uint64, itemType []string, whitelistTime float64, buyTime float64, openTime float64, requiresReservation bool, floatId uint64, clientAddress string) findGo.FindPack_PackRegisterInfo {
 	flow, _ := o.QualifiedIdentifier("FlowToken", "Vault")
 
@@ -2387,7 +2354,7 @@ func (otu *OverflowTestUtils) reactToThought(thoughtId uint64, reaction string) 
 			"creatorName": "user1",
 			"reaction":    reaction,
 			"totalCount": map[string]interface{}{
-				"fire": 1,
+				"fire": "1",
 			},
 		})
 	return otu

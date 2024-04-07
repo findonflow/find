@@ -34,7 +34,7 @@ transaction(packId:UInt64) {
             if storage == nil {
                 let newCollection <- FindPack.createEmptyCollectionFromPackData(packData: packMetadata, type: type)
                 account.storage.save(<- newCollection, to: collectionInfo.storagePath)
-                let fc= account.capabilities.storage.issue<auth(FindPack.Owner) &FindPack.Collection>(collectionInfo.storagePath)
+                let fc= account.capabilities.storage.issue<&FindPack.Collection>(collectionInfo.storagePath)
                 account.capabilities.publish(fc, at: collectionInfo.publicPath)
             }
             self.receiver[type] = account.capabilities.get<&{NonFungibleToken.Collection}>(collectionInfo.publicPath)!

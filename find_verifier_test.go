@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )

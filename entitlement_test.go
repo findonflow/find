@@ -3,7 +3,7 @@ package test_main
 import (
 	"testing"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 )
 
 /*

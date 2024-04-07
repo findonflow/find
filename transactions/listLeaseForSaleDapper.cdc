@@ -11,7 +11,7 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix
     let pointer : FindLeaseMarket.AuthLeasePointer
     let vaultType : Type
 
-    prepare(account: auth(BorrowValue, IssueStorageCapabilityController, PublishCapability, SaveValue) &Account) {
+    prepare(account: auth(Storage, IssueStorageCapabilityController, PublishCapability, IssueStorageCapabilityController) &Account) {
 
         // Get the salesItemRef from tenant
         let leaseMarketplace = FindMarket.getFindTenantAddress()
@@ -24,10 +24,11 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix
         let leaseSaleItemCap= account.capabilities.get<&{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}>(leasePublicPath)
         if leaseSaleItemCap == nil {
             //The link here has to be a capability not a tenant, because it can change.
-            account.storage.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
+            account.storage.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath) 
             let leaseSaleItemCap= account.capabilities.storage.issue<&{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}>(leaseStoragePath)
             account.capabilities.publish(leaseSaleItemCap, at: leasePublicPath)
         }
+
 
         self.saleItems= account.storage.borrow<auth(FindLeaseMarketSale.Seller) &FindLeaseMarketSale.SaleItemCollection>(from: leaseStoragePath)!
 
@@ -35,8 +36,16 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix
         let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
         self.vaultType= ft.type
 
-        //TODO: figure out how to get or save this. init problem
-        let cap=account.capabilities.storage.issue<auth(FIND.Leasee) &FIND.LeaseCollection>(FIND.LeaseStoragePath)
+        let storagePathIdentifer = FIND.LeaseStoragePath.toString().split(separator:"/")[1]
+        let providerIdentifier = storagePathIdentifer.concat("Provider")
+        let providerStoragePath = StoragePath(identifier: providerIdentifier)!
+
+        var existingProvider= account.storage.copy<Capability<auth(FIND.Leasee) &FIND.LeaseCollection>>(from: providerStoragePath) 
+        if existingProvider==nil {
+            existingProvider=account.capabilities.storage.issue<auth(FIND.Leasee) &FIND.LeaseCollection>(FIND.LeaseStoragePath) 
+            account.storage.save(existingProvider!, to: providerStoragePath)
+        }
+        var cap = existingProvider!
         self.pointer= FindLeaseMarket.AuthLeasePointer(cap: cap, name: leaseName)
     }
 

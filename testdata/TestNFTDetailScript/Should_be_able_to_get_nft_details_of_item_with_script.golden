@@ -1,7 +1,7 @@
 test_main.NFTDetailsReturnData{
 	AllowedListingActions: map[string]test_main.FindMarketSaleListing{
 		"FindMarketAuctionEscrow": {
-			ListingType: "A.179b6b1cb6755e31.FindMarketAuctionEscrow.SaleItem",
+			ListingType: "A.f3fcd2c1a78f5eee.FindMarketAuctionEscrow.SaleItem",
 			Status:      "active",
 			ListingDetails: []test_main.ListingDetails{
 				{
@@ -9,19 +9,19 @@ test_main.NFTDetailsReturnData{
 					FtIdentifier: "A.0ae53cb6e3f42a79.FlowToken.Vault",
 					Royalties: []test_main.ListingRoyalties{
 						{
-							Address:     "0x179b6b1cb6755e31",
+							Address:     "0xf3fcd2c1a78f5eee",
 							FindName:    "find",
 							RoyaltyName: "find",
 							Cut:         0.025,
 						},
 						{
-							Address:     "0xf669cb8d41ce0c74",
+							Address:     "0x192440c99cb17282",
 							FindName:    "user1",
 							RoyaltyName: "creator",
 							Cut:         0.05,
 						},
 						{
-							Address:     "0x179b6b1cb6755e31",
+							Address:     "0xf3fcd2c1a78f5eee",
 							FindName:    "find",
 							RoyaltyName: "find forge",
 							Cut:         0.025,
@@ -33,26 +33,26 @@ test_main.NFTDetailsReturnData{
 			FtIdentifiers: []string{"A.0ae53cb6e3f42a79.FlowToken.Vault"},
 		},
 		"FindMarketDirectOfferEscrow": {
-			ListingType: "A.179b6b1cb6755e31.FindMarketDirectOfferEscrow.SaleItem",
+			ListingType: "A.f3fcd2c1a78f5eee.FindMarketDirectOfferEscrow.SaleItem",
 			Status:      "active",
 			ListingDetails: []test_main.ListingDetails{{
 				FtAlias:      "Flow",
 				FtIdentifier: "A.0ae53cb6e3f42a79.FlowToken.Vault",
 				Royalties: []test_main.ListingRoyalties{
 					{
-						Address:     "0x179b6b1cb6755e31",
+						Address:     "0xf3fcd2c1a78f5eee",
 						FindName:    "find",
 						RoyaltyName: "find",
 						Cut:         0.025,
 					},
 					{
-						Address:     "0xf669cb8d41ce0c74",
+						Address:     "0x192440c99cb17282",
 						FindName:    "user1",
 						RoyaltyName: "creator",
 						Cut:         0.05,
 					},
 					{
-						Address:     "0x179b6b1cb6755e31",
+						Address:     "0xf3fcd2c1a78f5eee",
 						FindName:    "find",
 						RoyaltyName: "find forge",
 						Cut:         0.025,
@@ -63,26 +63,26 @@ test_main.NFTDetailsReturnData{
 			FtIdentifiers: []string{"A.0ae53cb6e3f42a79.FlowToken.Vault"},
 		},
 		"FindMarketSale": {
-			ListingType: "A.179b6b1cb6755e31.FindMarketSale.SaleItem",
+			ListingType: "A.f3fcd2c1a78f5eee.FindMarketSale.SaleItem",
 			Status:      "active",
 			ListingDetails: []test_main.ListingDetails{{
 				FtAlias:      "Flow",
 				FtIdentifier: "A.0ae53cb6e3f42a79.FlowToken.Vault",
 				Royalties: []test_main.ListingRoyalties{
 					{
-						Address:     "0x179b6b1cb6755e31",
+						Address:     "0xf3fcd2c1a78f5eee",
 						FindName:    "find",
 						RoyaltyName: "find",
 						Cut:         0.025,
 					},
 					{
-						Address:     "0xf669cb8d41ce0c74",
+						Address:     "0x192440c99cb17282",
 						FindName:    "user1",
 						RoyaltyName: "creator",
 						Cut:         0.05,
 					},
 					{
-						Address:     "0x179b6b1cb6755e31",
+						Address:     "0xf3fcd2c1a78f5eee",
 						FindName:    "find",
 						RoyaltyName: "find forge",
 						Cut:         0.025,
@@ -97,10 +97,10 @@ test_main.NFTDetailsReturnData{
 		FtAlias:               "Flow",
 		FtTypeIdentifier:      "A.0ae53cb6e3f42a79.FlowToken.Vault",
 		ListingStatus:         "active",
-		ListingTypeIdentifier: "A.179b6b1cb6755e31.FindMarketSale.SaleItem",
-		NftIdentifier:         "A.179b6b1cb6755e31.Dandy.NFT",
+		ListingTypeIdentifier: "A.f3fcd2c1a78f5eee.FindMarketSale.SaleItem",
+		NftIdentifier:         "A.f3fcd2c1a78f5eee.Dandy.NFT",
 		SaleType:              "active_listed",
-		Seller:                "0xf669cb8d41ce0c74",
+		Seller:                "0x192440c99cb17282",
 		SellerName:            "user1",
 		Amount:                10,
 		ListingValidUntil:     101,
@@ -120,7 +120,7 @@ test_main.NFTDetailsReturnData{
 		Description: "Bringing the motorcycle world into the 21st century with cutting edge EV technology and advanced performance in a great classic British style, all here in the UK",
 		Name:        "Neo Motorcycle 2 of 3",
 		Thumbnail:   "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-		Type:        "A.179b6b1cb6755e31.Dandy.NFT",
+		Type:        "A.f3fcd2c1a78f5eee.Dandy.NFT",
 		Editions: []interface{}{
 			map[string]interface{}{
 				"max":    3,
@@ -150,7 +150,7 @@ test_main.NFTDetailsReturnData{
 			},
 		},
 		Views: []string{
-			"A.179b6b1cb6755e31.FindViews.Nounce",
+			"A.f3fcd2c1a78f5eee.FindViews.Nounce",
 			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionData",
 			"A.f8d6e0586b0a20c7.MetadataViews.Royalties",
 		},

@@ -10,7 +10,7 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, price:UFix64, auctio
     let pointer : FindLeaseMarket.AuthLeasePointer
     let vaultType : Type
 
-    prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
+    prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, Storage, IssueStorageCapabilityController) &Account) {
 
         // Get supported NFT and FT Information from Registries from input alias
         let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
@@ -31,7 +31,17 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, price:UFix64, auctio
         }
 
         self.saleItems= account.storage.borrow<auth(FindLeaseMarketAuctionSoft.Seller) &FindLeaseMarketAuctionSoft.SaleItemCollection>(from: leaseASStoragePath)
-        let cap = account.capabilities.storage.issue<auth(FIND.Leasee) &FIND.LeaseCollection>(FIND.LeaseStoragePath)
+
+        let storagePathIdentifer = FIND.LeaseStoragePath.toString().split(separator:"/")[1]
+        let providerIdentifier = storagePathIdentifer.concat("Provider")
+        let providerStoragePath = StoragePath(identifier: providerIdentifier)!
+
+        var existingProvider= account.storage.copy<Capability<auth(FIND.Leasee) &FIND.LeaseCollection>>(from: providerStoragePath) 
+        if existingProvider==nil {
+            existingProvider=account.capabilities.storage.issue<auth(FIND.Leasee) &FIND.LeaseCollection>(FIND.LeaseStoragePath) 
+            account.storage.save(existingProvider!, to: providerStoragePath)
+        }
+        var cap = existingProvider!
         self.pointer= FindLeaseMarket.AuthLeasePointer(cap: cap, name: leaseName)
         self.vaultType= ft.type
     }

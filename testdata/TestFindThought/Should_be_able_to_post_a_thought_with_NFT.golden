@@ -1,7 +1,7 @@
 []test_main.ThoughtData{{
 	Body:               "body",
 	Created:            1,
-	Creator:            "0xf669cb8d41ce0c74",
+	Creator:            "0x192440c99cb17282",
 	CreatorAvatar:      "https://find.xyz/assets/img/avatars/avatar14.png",
 	CreatorName:        "user1",
 	CreatorProfileName: "user1",
@@ -14,6 +14,6 @@
 	NFT: []test_main.NftDetail{{
 		Name:      "Neo Motorcycle 1 of 3",
 		Thumbnail: "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
-		Type:      "A.179b6b1cb6755e31.Dandy.NFT",
+		Type:      "A.f3fcd2c1a78f5eee.Dandy.NFT",
 	}},
 }}

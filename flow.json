@@ -239,63 +239,59 @@
       "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
     },
     "emulator-dapper": {
-      "address": "01cf0e2f2f715450",
+      "address": "0x179b6b1cb6755e31",
       "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
     },
     "emulator-find": {
-      "address": "179b6b1cb6755e31",
+      "address": "0xf3fcd2c1a78f5eee",
       "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
     },
     "emulator-find-admin": {
-      "address": "f3fcd2c1a78f5eee",
+      "address": "0xe03daebed8ca0615",
       "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
     },
     "emulator-find-forge": {
-      "address": "e03daebed8ca0615",
+      "address": "0x045a1763c93006ca",
       "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
     },
     "emulator-find-lease": {
-      "address": "045a1763c93006ca",
+      "address": "0x120e725050340cab",
       "key": "573b0db3fe91458e2aceefb8318d6daf3aee2af986a850cbf27a8ffff8a4ef9f"
     },
     "emulator-residual": {
-      "address": "120e725050340cab",
-      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
-    },
-    "emulator-user1": {
       "address": "0xf669cb8d41ce0c74",
       "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
     },
+    "emulator-user1": {
+      "address": "0x192440c99cb17282",
+      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
+    },
     "emulator-user2": {
-      "address": "192440c99cb17282",
+      "address": "0xfd43f9148d4b725d",
       "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
     },
     "emulator-user3": {
-      "address": "fd43f9148d4b725d",
+      "address": "0xeb179c27144f783c",
       "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
     },
     "emulator-user4": {
-      "address": "eb179c27144f783c",
+      "address": "0x0f7025fa05b578e3",
       "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
     },
     "emulator-user5": {
-      "address": "0f7025fa05b578e3",
+      "address": "0xe2f72218abeec2b9",
       "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
     },
     "emulator-user6": {
-      "address": "e2f72218abeec2b9",
+      "address": "0x06909bc5ba14c266",
       "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
     },
     "emulator-user7": {
-      "address": "06909bc5ba14c266",
+      "address": "0x10c4fef62310c807",
       "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
     },
     "emulator-user8": {
-      "address": "10c4fef62310c807",
-      "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
-    },
-    "emulator-user9": {
-      "address": "f4a3472b32eac8d8",
+      "address": "0xf4a3472b32eac8d8",
       "key": "d5457a187e9642a8e49d4032b3b4f85c92da7202c79681d9302c6e444e7033a8"
     },
     "testnet-find": {
@@ -394,7 +390,6 @@
       "emulator-user6": [],
       "emulator-user7": [],
       "emulator-user8": [],
-      "emulator-user9": [],
       "emulator-residual": []
     },
     "testnet": {

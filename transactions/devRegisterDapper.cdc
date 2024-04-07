@@ -19,15 +19,16 @@ transaction(merchAccount: Address, name: String, amount: UFix64) {
         var finLeasesRef = account.storage.borrow<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
         if finLeasesRef == nil {
             account.storage.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
+            //this is only dev so it does not really matter
             let cap = account.capabilities.storage.issue<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(FIND.LeaseStoragePath)
             account.capabilities.publish(cap, at: FIND.LeasePublicPath)
-            finLeasesRef = cap.borrow()
+            finLeasesRef = account.storage.borrow<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
         }
         self.finLeases = finLeasesRef!
     }
 
     pre{
-        merchAccount == 0x01cf0e2f2f715450 : "Merchant accuont is not .find"
+        merchAccount ==  0x179b6b1cb6755e31 : "Merchant accuont is not .find"
         self.price == amount : "Calculated cost : ".concat(self.price.toString()).concat(" does not match expected cost : ").concat(amount.toString())
     }
 
