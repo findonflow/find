@@ -199,9 +199,6 @@ access(all) contract Dandy :NonFungibleToken{
     access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
         switch viewType {
         case Type<MetadataViews.NFTCollectionData>():
-            let collectionRef = self.account.storage.borrow<&Dandy.Collection>(
-                from: Dandy.CollectionStoragePath
-            ) ?? panic("Could not borrow a reference to the stored collection")
             let collectionData = MetadataViews.NFTCollectionData(
                 storagePath: Dandy.CollectionStoragePath,
                 publicPath: Dandy.CollectionPublicPath,
