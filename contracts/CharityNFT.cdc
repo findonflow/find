@@ -3,7 +3,7 @@ import "NonFungibleToken"
 import "MetadataViews"
 import "ViewResolver"
 
-access(all) contract CharityNFT: ViewResolver {
+access(all) contract CharityNFT: NonFungibleToken {
 
     access(all) var totalSupply: UInt64
 
@@ -45,7 +45,7 @@ access(all) contract CharityNFT: ViewResolver {
         }
 
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-            return <-CharityNFT.createEmptyCollection()
+            return <-CharityNFT.createEmptyCollection(nftType:Type<@CharityNFT.NFT>())
         }
 
         access(all) fun resolveView(_ view: Type): AnyStruct? {
@@ -84,7 +84,7 @@ access(all) contract CharityNFT: ViewResolver {
                 )
 
                 case Type<MetadataViews.NFTCollectionData>() : 
-                    return CharityNFT.resolveContractView(resourceType: Type<@CharityNFT.Collection>(), viewType: Type<MetadataViews.NFTCollectionData>()) as! MetadataViews.NFTCollectionData
+                return CharityNFT.resolveContractView(resourceType: Type<@CharityNFT.Collection>(), viewType: Type<MetadataViews.NFTCollectionData>()) as! MetadataViews.NFTCollectionData
 
                 case Type<MetadataViews.Edition>() : 
                 let edition = self.metadata["edition"] 
@@ -138,26 +138,26 @@ access(all) contract CharityNFT: ViewResolver {
 
     access(all) view fun getContractViews(resourceType: Type?): [Type] {
         return [
-            Type<MetadataViews.NFTCollectionData>()
+        Type<MetadataViews.NFTCollectionData>()
         ]
     }
 
     access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
         switch viewType {
-            case Type<MetadataViews.NFTCollectionData>():
-                let collectionRef = self.account.storage.borrow<&CharityNFT.Collection>(
-                        from: CharityNFT.CollectionStoragePath
-                    ) ?? panic("Could not borrow a reference to the stored collection")
-                let collectionData = MetadataViews.NFTCollectionData(
-                    storagePath: CharityNFT.CollectionStoragePath,
-                    publicPath: CharityNFT.CollectionPublicPath,
-                    publicCollection: Type<&CharityNFT.Collection>(),
-                    publicLinkedType: Type<&CharityNFT.Collection>(),
-                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
-                        return <-CharityNFT.createEmptyCollection()
-                    })
-                )
-                return collectionData
+        case Type<MetadataViews.NFTCollectionData>():
+            let collectionRef = self.account.storage.borrow<&CharityNFT.Collection>(
+                from: CharityNFT.CollectionStoragePath
+            ) ?? panic("Could not borrow a reference to the stored collection")
+            let collectionData = MetadataViews.NFTCollectionData(
+                storagePath: CharityNFT.CollectionStoragePath,
+                publicPath: CharityNFT.CollectionPublicPath,
+                publicCollection: Type<&CharityNFT.Collection>(),
+                publicLinkedType: Type<&CharityNFT.Collection>(),
+                createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                    return <-CharityNFT.createEmptyCollection(nftType:Type<@CharityNFT.NFT>())
+                })
+            )
+            return collectionData
         }
         return nil
     }
@@ -268,7 +268,7 @@ access(all) contract CharityNFT: ViewResolver {
     }
 
     // public function that anyone can call to create a new empty collection
-    access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+    access(all) fun createEmptyCollection(nftType:Type): @{NonFungibleToken.Collection} {
         return <- create Collection()
     }
 
