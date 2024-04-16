@@ -31,6 +31,7 @@ access(all) contract FindMarketCut {
         if let category = self.categoryToContractName[contractName] {
             identifier = category
         }
+        //TODO:deploy
         return self.account.contracts.borrow<&{FindMarketCutInterface}>(name: identifier) ?? panic("Cannor borrow contract with identifier : ".concat(identifier))
     }
 

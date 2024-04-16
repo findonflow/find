@@ -6,293 +6,287 @@ import "FindPack"
 import "ViewResolver"
 
 
-access(all) contract Flomies: ViewResolver{
+access(all) contract Flomies: NonFungibleToken{
 
-	access(all) var totalSupply: UInt64
+    access(all) var totalSupply: UInt64
 
-	access(all) event ContractInitialized()
-	access(all) event Withdraw(id: UInt64, from: Address?)
-	access(all) event Deposit(id: UInt64, to: Address?)
-	access(all) event Minted(id:UInt64, serial: UInt64, traits: [UInt64])
-	access(all) event RegisteredTraits(traitId:UInt64, trait:{String : String})
+    access(all) event ContractInitialized()
+    access(all) event Minted(id:UInt64, serial: UInt64, traits: [UInt64])
+    access(all) event RegisteredTraits(traitId:UInt64, trait:{String : String})
 
-	access(all) let CollectionStoragePath: StoragePath
-	access(all) let CollectionPublicPath: PublicPath
+    access(all) let CollectionStoragePath: StoragePath
+    access(all) let CollectionPublicPath: PublicPath
 
-	access(account) var royalties : [MetadataViews.Royalty]
-	access(self) let traits : {UInt64: MetadataViews.Trait}
+    access(account) var royalties : [MetadataViews.Royalty]
+    access(self) let traits : {UInt64: MetadataViews.Trait}
 
-	/*
-	Iconic
-	Legendary
-	Rare
-	Common
-	*/
+    /*
+    Iconic
+    Legendary
+    Rare
+    Common
+    */
 
-	access(all) struct Metadata {
-		access(all) let nftId: UInt64
-		access(all) let name: String
-		access(all) let serial:UInt64
-		access(all) let thumbnail: String
-		access(all) let image: String
-		access(all) let traits: [UInt64]
+    access(all) struct Metadata {
+        access(all) let nftId: UInt64
+        access(all) let name: String
+        access(all) let serial:UInt64
+        access(all) let thumbnail: String
+        access(all) let image: String
+        access(all) let traits: [UInt64]
 
-		init(nftId: UInt64,name:String,thumbnail: String, image:String, serial:UInt64, traits: [UInt64]) {
-			self.nftId=nftId
-			self.name=name
-			self.thumbnail=thumbnail
-			self.image=image
-			self.serial=serial
-			self.traits=traits
-		}
-	}
+        init(nftId: UInt64,name:String,thumbnail: String, image:String, serial:UInt64, traits: [UInt64]) {
+            self.nftId=nftId
+            self.name=name
+            self.thumbnail=thumbnail
+            self.image=image
+            self.serial=serial
+            self.traits=traits
+        }
+    }
 
-	access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
+    access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
 
-		access(all) let id:UInt64
-		access(all) let serial:UInt64
-		access(all) var nounce:UInt64
-		access(all) let rootHash:String
-		access(all) let traits: [UInt64]
+        access(all) let id:UInt64
+        access(all) let serial:UInt64
+        access(all) var nounce:UInt64
+        access(all) let rootHash:String
+        access(all) let traits: [UInt64]
 
-		init(
-			serial:UInt64,
-			rootHash:String,
-			traits: [UInt64]
-		) {
-			self.nounce=0
-			self.serial=serial
-			self.id=self.uuid
-			self.rootHash=rootHash
-			self.traits=traits
-		}
+        init(
+            serial:UInt64,
+            rootHash:String,
+            traits: [UInt64]
+        ) {
+            self.nounce=0
+            self.serial=serial
+            self.id=self.uuid
+            self.rootHash=rootHash
+            self.traits=traits
+        }
 
-		access(all) view fun getViews(): [Type] {
-			return  [
-			Type<MetadataViews.Display>(),
-			Type<MetadataViews.Medias>(),
-			Type<MetadataViews.Royalties>(),
-			Type<MetadataViews.ExternalURL>(),
-			Type<Metadata>(),
-			Type<MetadataViews.NFTCollectionData>(),
-			Type<MetadataViews.NFTCollectionDisplay>(),
-			Type<MetadataViews.Traits>(), 
-			Type<FindPack.PackRevealData>(), 
-			Type<MetadataViews.Editions>(), 
-			Type<MetadataViews.Serial>()
-			]
-		}
+        access(all) view fun getViews(): [Type] {
+            return  [
+            Type<MetadataViews.Display>(),
+            Type<MetadataViews.Medias>(),
+            Type<MetadataViews.Royalties>(),
+            Type<MetadataViews.ExternalURL>(),
+            Type<Metadata>(),
+            Type<MetadataViews.NFTCollectionData>(),
+            Type<MetadataViews.NFTCollectionDisplay>(),
+            Type<MetadataViews.Traits>(), 
+            Type<FindPack.PackRevealData>(), 
+            Type<MetadataViews.Editions>(), 
+            Type<MetadataViews.Serial>()
+            ]
+        }
 
-     	access(all) view fun getID(): UInt64 {
+        access(all) view fun getID(): UInt64 {
             return self.id
         }
 
-		access(all) fun resolveView(_ view: Type): AnyStruct? {
+        access(all) fun resolveView(_ view: Type): AnyStruct? {
 
-			let imageFile=MetadataViews.IPFSFile( cid: self.rootHash, path: self.serial.toString().concat(".png"))
-			var fullMediaType="image/png"
-			let traits = self.traits
+            let imageFile=MetadataViews.IPFSFile( cid: self.rootHash, path: self.serial.toString().concat(".png"))
+            var fullMediaType="image/png"
+            let traits = self.traits
 
-			let fullMedia=MetadataViews.Media(file:imageFile, mediaType: fullMediaType)
+            let fullMedia=MetadataViews.Media(file:imageFile, mediaType: fullMediaType)
 
-			let name ="Flomies #".concat(self.serial.toString())
-			let description= "Flomies is a collection of 3333 homies living on the flow blockchain. Flomies are about art, mental health and innovating in this ecosystem. Our adventure is unique, as is our community."
+            let name ="Flomies #".concat(self.serial.toString())
+            let description= "Flomies is a collection of 3333 homies living on the flow blockchain. Flomies are about art, mental health and innovating in this ecosystem. Our adventure is unique, as is our community."
 
-			switch view {
-			case Type<MetadataViews.Display>():
-				return MetadataViews.Display(
-					name: name,
-					description: description,
-					thumbnail: imageFile
-				)
+            switch view {
+            case Type<MetadataViews.Display>():
+                return MetadataViews.Display(
+                    name: name,
+                    description: description,
+                    thumbnail: imageFile
+                )
 
-			case Type<MetadataViews.ExternalURL>():
-				if self.owner == nil {
-					return MetadataViews.ExternalURL("https://find.xyz/")
-				}
-				return MetadataViews.ExternalURL("https://find.xyz/".concat(self.owner!.address.toString()).concat("/collection/flomies/").concat(self.id.toString()))
+            case Type<MetadataViews.ExternalURL>():
+                if self.owner == nil {
+                    return MetadataViews.ExternalURL("https://find.xyz/")
+                }
+                return MetadataViews.ExternalURL("https://find.xyz/".concat(self.owner!.address.toString()).concat("/collection/flomies/").concat(self.id.toString()))
 
-			case Type<MetadataViews.Royalties>():
-				return MetadataViews.Royalties(Flomies.royalties)
+            case Type<MetadataViews.Royalties>():
+                return MetadataViews.Royalties(Flomies.royalties)
 
-			case Type<MetadataViews.Medias>():
-				return MetadataViews.Medias([fullMedia])
+            case Type<MetadataViews.Medias>():
+                return MetadataViews.Medias([fullMedia])
 
-			case Type<Metadata>():
-				return Metadata(
-					nftId : self.id ,
-					name : name ,
-					thumbnail : imageFile.uri(),
-					image : imageFile.uri(),
-					serial:self.serial,
-					traits:self.traits
-				)
-			case Type<MetadataViews.NFTCollectionDisplay>():
-				return Flomies.resolveContractView(resourceType: Type<@Flomies.NFT>(), viewType: Type<MetadataViews.NFTCollectionDisplay>()) as! MetadataViews.NFTCollectionDisplay
+            case Type<Metadata>():
+                return Metadata(
+                    nftId : self.id ,
+                    name : name ,
+                    thumbnail : imageFile.uri(),
+                    image : imageFile.uri(),
+                    serial:self.serial,
+                    traits:self.traits
+                )
+            case Type<MetadataViews.NFTCollectionDisplay>():
+                return Flomies.resolveContractView(resourceType: Type<@Flomies.NFT>(), viewType: Type<MetadataViews.NFTCollectionDisplay>()) as! MetadataViews.NFTCollectionDisplay
 
-			case Type<MetadataViews.NFTCollectionData>():
-				return Flomies.resolveContractView(resourceType: Type<@Flomies.NFT>(), viewType: Type<MetadataViews.NFTCollectionData>()) as! MetadataViews.NFTCollectionData
+            case Type<MetadataViews.NFTCollectionData>():
+                return Flomies.resolveContractView(resourceType: Type<@Flomies.NFT>(), viewType: Type<MetadataViews.NFTCollectionData>()) as! MetadataViews.NFTCollectionData
 
-			case Type<MetadataViews.Traits>():
-				return MetadataViews.Traits(self.getAllTraitsMetadataAsArray())
-			
+            case Type<MetadataViews.Traits>():
+                return MetadataViews.Traits(self.getAllTraitsMetadataAsArray())
 
-			case Type<FindPack.PackRevealData>():
-				let data : {String : String} = {
-					"nftImage" : imageFile.uri() ,
-					"nftName" : "Flomies ".concat(self.serial.toString()), 
-					"packType" : "Flomies"
-				}
-				return FindPack.PackRevealData(data)
 
-			case Type<MetadataViews.Editions>() : 
-				return MetadataViews.Editions([
-					MetadataViews.Edition(name: "set", number: self.serial, max: 3333)
-				])
+            case Type<FindPack.PackRevealData>():
+                let data : {String : String} = {
+                    "nftImage" : imageFile.uri() ,
+                    "nftName" : "Flomies ".concat(self.serial.toString()), 
+                    "packType" : "Flomies"
+                }
+                return FindPack.PackRevealData(data)
 
-			case Type<MetadataViews.Serial>() : 
-				return MetadataViews.Serial(self.serial)
-			}
+                case Type<MetadataViews.Editions>() : 
+                return MetadataViews.Editions([
+                MetadataViews.Edition(name: "set", number: self.serial, max: 3333)
+                ])
 
-			return nil
-		}
+                case Type<MetadataViews.Serial>() : 
+                return MetadataViews.Serial(self.serial)
+            }
 
-		access(all) fun increaseNounce() {
-			self.nounce=self.nounce+1
-		}
-
-		access(all) fun getAllTraitsMetadataAsArray() : [MetadataViews.Trait] {
-			let traits = self.traits
-
-			var traitMetadata : [MetadataViews.Trait] = []
-			for trait in traits {
-				traitMetadata.append(Flomies.traits[trait]!)
-			}
-			return traitMetadata
-		}
-
-		access(all) fun getAllTraitsMetadata() : {String : MetadataViews.Trait} {
-			let traitMetadata : {String : MetadataViews.Trait} = {}
-			for trait in self.getAllTraitsMetadataAsArray() {
-				let traitName = trait.name
-				traitMetadata[traitName] = trait
-			}
-			return traitMetadata
-		}
-
-		access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-            return <-Flomies.createEmptyCollection()
+            return nil
         }
-	}
 
-	access(all) view fun getContractViews(resourceType: Type?): [Type] {
+        access(all) fun increaseNounce() {
+            self.nounce=self.nounce+1
+        }
+
+        access(all) fun getAllTraitsMetadataAsArray() : [MetadataViews.Trait] {
+            let traits = self.traits
+
+            var traitMetadata : [MetadataViews.Trait] = []
+            for trait in traits {
+                traitMetadata.append(Flomies.traits[trait]!)
+            }
+            return traitMetadata
+        }
+
+        access(all) fun getAllTraitsMetadata() : {String : MetadataViews.Trait} {
+            let traitMetadata : {String : MetadataViews.Trait} = {}
+            for trait in self.getAllTraitsMetadataAsArray() {
+                let traitName = trait.name
+                traitMetadata[traitName] = trait
+            }
+            return traitMetadata
+        }
+
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <-Flomies.createEmptyCollection(nftType:Type<@Flomies.NFT>())
+        }
+    }
+
+    access(all) view fun getContractViews(resourceType: Type?): [Type] {
         return [
-            Type<MetadataViews.NFTCollectionData>(),
-            Type<MetadataViews.NFTCollectionDisplay>()
+        Type<MetadataViews.NFTCollectionData>(),
+        Type<MetadataViews.NFTCollectionDisplay>()
         ]
     }
 
     access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
         switch viewType {
-            case Type<MetadataViews.NFTCollectionData>():
-                let collectionRef = self.account.storage.borrow<&Flomies.Collection>(
-                        from: Flomies.CollectionStoragePath
-                    ) ?? panic("Could not borrow a reference to the stored collection")
-                let collectionData = MetadataViews.NFTCollectionData(
-                    storagePath: Flomies.CollectionStoragePath,
-                    publicPath: Flomies.CollectionPublicPath,
-                    publicCollection: Type<&Flomies.Collection>(),
-                    publicLinkedType: Type<&Flomies.Collection>(),
-                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
-                        return <-Flomies.createEmptyCollection()
-                    })
-                )
-                return collectionData
-			case Type<MetadataViews.NFTCollectionDisplay>():
-				let externalURL = MetadataViews.ExternalURL("https://flomiesnft.com")
-				let squareImage = MetadataViews.Media(file: MetadataViews.IPFSFile(cid: "QmYtowktCz6GbP6MqMd6SXqJEYazCpGTcFm4HrWX89nUvo", path: nil), mediaType: "image/png")
-				let bannerImage = MetadataViews.Media(file: MetadataViews.IPFSFile(cid: "QmPeZUjsfrFvkB1bvKBpAsxfoQ6jSoezqwWz9grkmNYdz1", path: nil), mediaType: "image/png")
-				return MetadataViews.NFTCollectionDisplay(name: "flomies", 
-														  description: "Flomies is a collection of 3333 homies living on the flow blockchain. Flomies are about art, mental health and innovating in this ecosystem. Our adventure is unique, as is our community.", 
-														  externalURL: externalURL, 
-														  squareImage: squareImage, 
-														  bannerImage: bannerImage, 
-														  socials: { 
-														  	"discord": MetadataViews.ExternalURL("https://discord.gg/tVavHtPD"), 
-															"twitter" : MetadataViews.ExternalURL("https://twitter.com/flomiesnft"),
-															"instagram" : MetadataViews.ExternalURL("https://www.instagram.com/flomies_nft/")
-														  })
+        case Type<MetadataViews.NFTCollectionData>():
+            let collectionRef = self.account.storage.borrow<&Flomies.Collection>(
+                from: Flomies.CollectionStoragePath
+            ) ?? panic("Could not borrow a reference to the stored collection")
+            let collectionData = MetadataViews.NFTCollectionData(
+                storagePath: Flomies.CollectionStoragePath,
+                publicPath: Flomies.CollectionPublicPath,
+                publicCollection: Type<&Flomies.Collection>(),
+                publicLinkedType: Type<&Flomies.Collection>(),
+                createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                    return <-Flomies.createEmptyCollection(nftType:Type<@Flomies.NFT>())
+                })
+            )
+            return collectionData
+        case Type<MetadataViews.NFTCollectionDisplay>():
+            let externalURL = MetadataViews.ExternalURL("https://flomiesnft.com")
+            let squareImage = MetadataViews.Media(file: MetadataViews.IPFSFile(cid: "QmYtowktCz6GbP6MqMd6SXqJEYazCpGTcFm4HrWX89nUvo", path: nil), mediaType: "image/png")
+            let bannerImage = MetadataViews.Media(file: MetadataViews.IPFSFile(cid: "QmPeZUjsfrFvkB1bvKBpAsxfoQ6jSoezqwWz9grkmNYdz1", path: nil), mediaType: "image/png")
+            return MetadataViews.NFTCollectionDisplay(name: "flomies", 
+            description: "Flomies is a collection of 3333 homies living on the flow blockchain. Flomies are about art, mental health and innovating in this ecosystem. Our adventure is unique, as is our community.", 
+            externalURL: externalURL, 
+            squareImage: squareImage, 
+            bannerImage: bannerImage, 
+            socials: { 
+                "discord": MetadataViews.ExternalURL("https://discord.gg/tVavHtPD"), 
+                "twitter" : MetadataViews.ExternalURL("https://twitter.com/flomiesnft"),
+                "instagram" : MetadataViews.ExternalURL("https://www.instagram.com/flomies_nft/")
+            })
         }
         return nil
     }
 
-	access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
-		// dictionary of NFT conforming tokens
-		// NFT is a resource type with an `UInt64` ID field
-		access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
-		access(self) var storagePath: StoragePath
+    access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
+        // dictionary of NFT conforming tokens
+        // NFT is a resource type with an `UInt64` ID field
+        access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
+        access(self) var storagePath: StoragePath
         access(self) var publicPath: PublicPath
 
-		init () {
-			self.ownedNFTs <- {}
-			let identifier = "FlomiesNFTCollection"
+        init () {
+            self.ownedNFTs <- {}
+            let identifier = "FlomiesNFTCollection"
             self.storagePath = StoragePath(identifier: identifier)!
             self.publicPath = PublicPath(identifier: identifier)!
-		}
+        }
 
-		// withdraw removes an NFT from the collection and moves it to the caller
-		access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
-			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
+        // withdraw removes an NFT from the collection and moves it to the caller
+        access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+            let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
-			emit Withdraw(id: token.id, from: self.owner?.address)
+            return <-token
+        }
 
-			return <-token
-		}
+        // deposit takes a NFT and adds it to the collections dictionary
+        // and adds the ID to the id array
+        access(all) fun deposit(token: @{NonFungibleToken.NFT}) {
+            let token <- token as! @NFT
 
-		// deposit takes a NFT and adds it to the collections dictionary
-		// and adds the ID to the id array
-		access(all) fun deposit(token: @{NonFungibleToken.NFT}) {
-			let token <- token as! @NFT
+            let id: UInt64 = token.id
+            //TODO: add nounce and emit better event the first time it is moved.
 
-			let id: UInt64 = token.id
-			//TODO: add nounce and emit better event the first time it is moved.
-
-			token.increaseNounce()
-			// add the new token to the dictionary which removes the old one
-			let oldToken <- self.ownedNFTs[id] <- token
-
-			emit Deposit(id: id, to: self.owner?.address)
+            token.increaseNounce()
+            // add the new token to the dictionary which removes the old one
+            let oldToken <- self.ownedNFTs[id] <- token
 
 
-			destroy oldToken
-		}
+            destroy oldToken
+        }
 
-		// getIDs returns an array of the IDs that are in the collection
-		access(all) view fun getIDs(): [UInt64] {
-			return self.ownedNFTs.keys
-		}
+        // getIDs returns an array of the IDs that are in the collection
+        access(all) view fun getIDs(): [UInt64] {
+            return self.ownedNFTs.keys
+        }
 
-		access(all) view fun getLength(): Int {
+        access(all) view fun getLength(): Int {
             return self.ownedNFTs.keys.length
         }
 
-		// borrowNFT gets a reference to an NFT in the collection
-		// so that the caller can read its metadata and call its methods
-		access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
-			return &self.ownedNFTs[id]
-		}
+        // borrowNFT gets a reference to an NFT in the collection
+        // so that the caller can read its metadata and call its methods
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
+            return &self.ownedNFTs[id]
+        }
 
-		access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
-			let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
-			let flomies = nft as! &NFT
-			return flomies
-		}
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
+            let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
+            let flomies = nft as! &NFT
+            return flomies
+        }
 
-		access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
             return <- create Flomies.Collection()
         }
 
-		/// getSupportedNFTTypes returns a list of NFT types that this receiver accepts
+        /// getSupportedNFTTypes returns a list of NFT types that this receiver accepts
         access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
             let supportedTypes: {Type: Bool} = {}
             supportedTypes[Type<@Flomies.NFT>()] = true
@@ -318,128 +312,128 @@ access(all) contract Flomies: ViewResolver{
                 return false
             }
         }
-	}
+    }
 
-	// public function that anyone can call to create a new empty collection
-	access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-		return <- create Collection()
-	}
 
-	// mintNFT mints a new NFT with a new ID
-	// and deposit it in the recipients collection using their collection reference
-	//The distinction between sending in a reference and sending in a capability is that when you send in a reference it cannot be stored. So it can only be used in this method
-	//while a capability can be stored and used later. So in this case using a reference is the right choice, but it needs to be owned so that you can have a good event
-	access(account) fun mintNFT( 
-		serial:UInt64,
-		rootHash:String,
-		traits: [UInt64]
-	) : @{NonFungibleToken.NFT} {
+    access(all) fun createEmptyCollection(nftType: Type): @{NonFungibleToken.Collection} {
+        return <- create Collection()
+    }
 
-		Flomies.totalSupply = Flomies.totalSupply + 1
-		// create a new NFT
-		var newNFT <- create NFT(
-			serial:serial,
-			rootHash:rootHash,
-			traits: traits)
+    // mintNFT mints a new NFT with a new ID
+    // and deposit it in the recipients collection using their collection reference
+    //The distinction between sending in a reference and sending in a capability is that when you send in a reference it cannot be stored. So it can only be used in this method
+    //while a capability can be stored and used later. So in this case using a reference is the right choice, but it needs to be owned so that you can have a good event
+    access(account) fun mintNFT( 
+        serial:UInt64,
+        rootHash:String,
+        traits: [UInt64]
+    ) : @{NonFungibleToken.NFT} {
 
-		emit Minted(id: newNFT.uuid, serial: newNFT.serial, traits: traits)
+        Flomies.totalSupply = Flomies.totalSupply + 1
+        // create a new NFT
+        var newNFT <- create NFT(
+            serial:serial,
+            rootHash:rootHash,
+            traits: traits)
 
-			//Always emit events on state changes! always contain human readable and machine readable information
-			//TODO: discuss that fields we want in this event. Or do we prefer to use the richer deposit event, since this is really done in the backend
-			//emit Minted(id:newNFT.id, address:recipient.owner!.address)
-			// deposit it in the recipient's account using their reference
-		return <-newNFT
+            emit Minted(id: newNFT.uuid, serial: newNFT.serial, traits: traits)
 
-	}
+            //Always emit events on state changes! always contain human readable and machine readable information
+            //TODO: discuss that fields we want in this event. Or do we prefer to use the richer deposit event, since this is really done in the backend
+            //emit Minted(id:newNFT.id, address:recipient.owner!.address)
+            // deposit it in the recipient's account using their reference
+            return <-newNFT
 
-	access(account) fun addTrait(_ traits: {UInt64 : MetadataViews.Trait}) {
-		for key in traits.keys {
-			let trait = traits[key]!
-			self.traits[key]=trait
-			let traits : {String : String} = {}
-			traits["name"] = trait.name 
-			traits["value"] = trait.value as! String 
-			traits["rarity_description"] = trait.rarity?.description
-			traits["rarity_score"] = trait.rarity?.score?.toString()
-			traits["rarity_max"] = trait.rarity?.max?.toString()
+        }
 
-			emit RegisteredTraits(traitId: key, trait:traits)
-		}
-	}
+        access(account) fun addTrait(_ traits: {UInt64 : MetadataViews.Trait}) {
+            for key in traits.keys {
+                let trait = traits[key]!
+                self.traits[key]=trait
+                let traits : {String : String} = {}
+                traits["name"] = trait.name 
+                traits["value"] = trait.value as! String 
+                traits["rarity_description"] = trait.rarity?.description
+                traits["rarity_score"] = trait.rarity?.score?.toString()
+                traits["rarity_max"] = trait.rarity?.max?.toString()
 
-	access(all) fun getTraits() : {UInt64:MetadataViews.Trait}{
-		return self.traits
-	}
+                emit RegisteredTraits(traitId: key, trait:traits)
+            }
+        }
 
-	access(all) fun getTrait(_ id:UInt64) : MetadataViews.Trait? {
-		return self.traits[id]
-	}
+        access(all) fun getTraits() : {UInt64:MetadataViews.Trait}{
+            return self.traits
+        }
 
-	access(account) fun addRoyaltycut(_ cutInfo: [MetadataViews.Royalty]) {
-		var cutInfos = self.royalties 
-		cutInfos.appendAll(cutInfo)
-		// for validation only
-		let royalties = MetadataViews.Royalties(cutInfos)
-		self.royalties.appendAll(cutInfo)
-	}
+        access(all) fun getTrait(_ id:UInt64) : MetadataViews.Trait? {
+            return self.traits[id]
+        }
 
-	access(all) resource Forge: FindForge.Forge {
-		access(FindForge.ForgeOwner) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
-			let info = data as? {String : AnyStruct} ?? panic("The data passed in is not in form of {String : AnyStruct}")
+        access(account) fun addRoyaltycut(_ cutInfo: [MetadataViews.Royalty]) {
+            var cutInfos = self.royalties 
+            cutInfos.appendAll(cutInfo)
+            // for validation only
+            let royalties = MetadataViews.Royalties(cutInfos)
+            self.royalties.appendAll(cutInfo)
+        }
 
-			let serial = info["serial"]! as? UInt64 ?? panic("Serial is missing")
-			let rootHash = info["rootHash"]! as? String ?? panic("RootHash is missing")
-			let traits = info["traits"]! as? [UInt64] ?? panic("traits are missing")
+        access(all) resource Forge: FindForge.Forge {
+            access(FindForge.ForgeOwner) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
+                let info = data as? {String : AnyStruct} ?? panic("The data passed in is not in form of {String : AnyStruct}")
 
-			return <- Flomies.mintNFT( 
-				serial:serial,
-				rootHash:rootHash,
-				traits:traits
-			)
-		}
+                let serial = info["serial"]! as? UInt64 ?? panic("Serial is missing")
+                let rootHash = info["rootHash"]! as? String ?? panic("RootHash is missing")
+                let traits = info["traits"]! as? [UInt64] ?? panic("traits are missing")
 
-		access(FindForge.ForgeOwner) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
-			let type = data.getType() 
+                return <- Flomies.mintNFT( 
+                    serial:serial,
+                    rootHash:rootHash,
+                    traits:traits
+                )
+            }
 
-			switch type {
-				case Type<{UInt64 : MetadataViews.Trait}>() : 
-					// for duplicated indexes, the new one will replace the old one 
-					let typedData = data as! {UInt64 : MetadataViews.Trait}
-					Flomies.addTrait(typedData)
-					return
+            access(FindForge.ForgeOwner) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
+                let type = data.getType() 
 
-				case Type<[MetadataViews.Royalty]>() : 
-					let typedData = data as! [MetadataViews.Royalty]
-					Flomies.royalties = typedData
-					return
+                switch type {
+                    case Type<{UInt64 : MetadataViews.Trait}>() : 
+                    // for duplicated indexes, the new one will replace the old one 
+                    let typedData = data as! {UInt64 : MetadataViews.Trait}
+                    Flomies.addTrait(typedData)
+                    return
 
-			}
-		}
-	}
+                    case Type<[MetadataViews.Royalty]>() : 
+                    let typedData = data as! [MetadataViews.Royalty]
+                    Flomies.royalties = typedData
+                    return
 
-	access(account) fun createForge() : @{FindForge.Forge} {
-		return <- create Forge()
-	}
+                }
+            }
+        }
 
-	init() {
-		self.traits={}
-		// Initialize the total supply
-		self.totalSupply = 0
+        access(account) fun createForge() : @{FindForge.Forge} {
+            return <- create Forge()
+        }
 
-		self.royalties = []
+        init() {
+            self.traits={}
+            // Initialize the total supply
+            self.totalSupply = 0
 
-		// Set the named paths
-		self.CollectionStoragePath = /storage/flomiesNFT
-		self.CollectionPublicPath = /public/flomiesNFT
+            self.royalties = []
 
-       	let collection <- create Collection()
-        self.account.storage.save(<-collection, to: self.CollectionStoragePath)
-		let collectionCap = self.account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(self.CollectionStoragePath)
-		self.account.capabilities.publish(collectionCap, at: self.CollectionPublicPath)
+            // Set the named paths
+            self.CollectionStoragePath = /storage/flomiesNFT
+            self.CollectionPublicPath = /public/flomiesNFT
 
-		FindForge.addForgeType(<- create Forge())
+            let collection <- create Collection()
+            self.account.storage.save(<-collection, to: self.CollectionStoragePath)
+            let collectionCap = self.account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(self.CollectionStoragePath)
+            self.account.capabilities.publish(collectionCap, at: self.CollectionPublicPath)
 
-		emit ContractInitialized()
-	}
-}
- 
+            FindForge.addForgeType(<- create Forge())
+
+            emit ContractInitialized()
+        }
+    }
+

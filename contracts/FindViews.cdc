@@ -231,7 +231,7 @@ access(all) contract FindViews {
     }
 
     access(all) struct AuthNFTPointer : Pointer, AuthPointer{
-        access(self) let cap: Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection, NonFungibleToken.Provider, ViewResolver.ResolverCollection}>
+        access(self) let cap: Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.CollectionPublic, NonFungibleToken.Provider, ViewResolver.ResolverCollection}>
         access(all) let id: UInt64
         access(all) let nounce: UInt64
         access(all) let uuid: UInt64

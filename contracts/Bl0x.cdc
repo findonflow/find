@@ -2,13 +2,11 @@ import "NonFungibleToken"
 import "MetadataViews"
 import "ViewResolver"
 
-access(all) contract Bl0x: ViewResolver {
+access(all) contract Bl0x: NonFungibleToken {
 
     access(all) var totalSupply: UInt64
 
     access(all) event ContractInitialized()
-    access(all) event Withdraw(id: UInt64, from: Address?)
-    access(all) event Deposit(id: UInt64, to: Address?)
     access(all) event Minted(id:UInt64, address:Address)
 
     access(all) let CollectionStoragePath: StoragePath
@@ -46,7 +44,6 @@ access(all) contract Bl0x: ViewResolver {
         }
     }
 
-    //TODO: This can be removed before mainnet
     access(all) struct Data {
         access(all) let nftId: UInt64
         access(all) let name: String
@@ -67,7 +64,7 @@ access(all) contract Bl0x: ViewResolver {
         }
     }
 
-    access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
+    access(all) resource NFT: NonFungibleToken.NFT {
 
         access(all) let id:UInt64
         access(all) let serial:UInt64
@@ -185,7 +182,7 @@ access(all) contract Bl0x: ViewResolver {
 
             case Type<MetadataViews.NFTCollectionData>():
                 return Bl0x.resolveContractView(resourceType: Type<@Bl0x.Collection>(), viewType: Type<MetadataViews.NFTCollectionData>()) as! MetadataViews.NFTCollectionData
-            case Type<MetadataViews.Rarity>(): 
+                case Type<MetadataViews.Rarity>(): 
                 return MetadataViews.Rarity(score:nil, max:nil, description: self.getRarity()) 
 
             case Type<MetadataViews.Traits>():
@@ -268,36 +265,37 @@ access(all) contract Bl0x: ViewResolver {
         }
 
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
-            return <-Bl0x.createEmptyCollection()
+            return <-Bl0x.createEmptyCollection(nftType: Type<@Bl0x.NFT>())
         }
     }
 
     access(all) view fun getContractViews(resourceType: Type?): [Type] {
         return [
-            Type<MetadataViews.NFTCollectionData>(),
-            Type<MetadataViews.NFTCollectionDisplay>()
+        Type<MetadataViews.NFTCollectionData>(),
+        Type<MetadataViews.NFTCollectionDisplay>()
         ]
     }
 
     access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
         switch viewType {
-            case Type<MetadataViews.NFTCollectionData>():
-                let collectionRef = self.account.storage.borrow<&Bl0x.Collection>(
-                        from: Bl0x.CollectionStoragePath
-                    ) ?? panic("Could not borrow a reference to the stored collection")
-                let collectionData = MetadataViews.NFTCollectionData(
-                    storagePath: Bl0x.CollectionStoragePath,
-                    publicPath: Bl0x.CollectionPublicPath,
-                    publicCollection: Type<&Bl0x.Collection>(),
-                    publicLinkedType: Type<&Bl0x.Collection>(),
-                    createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
-                        return <-Bl0x.createEmptyCollection()
-                    })
-                )
-                return collectionData
+        case Type<MetadataViews.NFTCollectionData>():
+            let collectionRef = self.account.storage.borrow<&Bl0x.Collection>(
+                from: Bl0x.CollectionStoragePath
+            ) ?? panic("Could not borrow a reference to the stored collection")
+            let collectionData = MetadataViews.NFTCollectionData(
+                storagePath: Bl0x.CollectionStoragePath,
+                publicPath: Bl0x.CollectionPublicPath,
+                publicCollection: Type<&Bl0x.Collection>(),
+                publicLinkedType: Type<&Bl0x.Collection>(),
+                createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                    return <-Bl0x.createEmptyCollection(nftType: Type<@Bl0x.NFT>())
+                })
+            )
+            return collectionData
         }
         return nil
     }
+
 
     access(all) resource Collection: NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
@@ -307,7 +305,7 @@ access(all) contract Bl0x: ViewResolver {
         access(self) var storagePath: StoragePath
         access(self) var publicPath: PublicPath
 
-          init () {
+        init () {
             self.ownedNFTs <- {}
             let identifier = "bl0xNFTCollection"
             self.storagePath = StoragePath(identifier: identifier)!
@@ -316,8 +314,6 @@ access(all) contract Bl0x: ViewResolver {
         // withdraw removes an NFT from the collection and moves it to the caller
         access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
-
-            emit Withdraw(id: token.id, from: self.owner?.address)
 
             return <-token
         }
@@ -333,8 +329,6 @@ access(all) contract Bl0x: ViewResolver {
             token.increaseNounce()
             // add the new token to the dictionary which removes the old one
             let oldToken <- self.ownedNFTs[id] <- token
-
-            emit Deposit(id: id, to: self.owner?.address)
 
 
             destroy oldToken
@@ -394,8 +388,7 @@ access(all) contract Bl0x: ViewResolver {
         }
     }
 
-    // public function that anyone can call to create a new empty collection
-    access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+    access(all) fun createEmptyCollection(nftType: Type): @{NonFungibleToken.Collection} {
         return <- create Collection()
     }
 
@@ -421,11 +414,6 @@ access(all) contract Bl0x: ViewResolver {
             rootHash:rootHash,
             season:season,
             traits: traits)
-
-            //Always emit events on state changes! always contain human readable and machine readable information
-            //TODO: discuss that fields we want in this event. Or do we prefer to use the richer deposit event, since this is really done in the backend
-            //emit Minted(id:newNFT.id, address:recipient.owner!.address)
-            // deposit it in the recipient's account using their reference
             recipient.deposit(token: <- (newNFT))
 
         }
@@ -496,7 +484,7 @@ access(all) contract Bl0x: ViewResolver {
             // Set the named paths
             self.CollectionStoragePath = /storage/bl0xNFTs
             self.CollectionPublicPath = /public/bl0xNFTs
-  
+
 
             // Create a Collection resource and save it to storage
             let collection <- create Collection()

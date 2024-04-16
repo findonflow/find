@@ -26,7 +26,7 @@ access(all) contract Profile {
 
     // an event emitted when a user creates a profile
     access(all) event Created(account:Address, userName:String, findName:String, createdAt:String)
-    
+
     // an event emitted when a user updates their profile
     access(all) event Updated(account:Address, userName:String, findName:String, thumbnail:String)
 
@@ -36,7 +36,7 @@ access(all) contract Profile {
     access(all) struct Wallet {
         access(all) let name: String
         access(all) let receiver: Capability<&{FungibleToken.Receiver}>
-        access(all) let balance: Capability<&{FungibleToken.Vault}>
+        access(all) let balance: Capability<&{FungibleToken.Balance}>
         access(all) let accept: Type
         access(all) let tags: [String]
 
