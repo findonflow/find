@@ -18,6 +18,6 @@ func TestEntitlments(t *testing.T) {
 			WithArg("address", "user1"),
 			WithArg("newName", "badUser"),
 		)
-		res.AssertFailure(t, "function requires `Owner` authorization, but reference is unauthorized")
+		res.AssertFailure(t, "function requires `Admin` authorization, but reference is unauthorized")
 	})
 }

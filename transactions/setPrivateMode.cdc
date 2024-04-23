@@ -2,10 +2,10 @@ import "Profile"
 
 transaction(mode: Bool) {
 
-    let profile : auth(Profile.Owner) &Profile.User?
+    let profile : auth(Profile.Admin) &Profile.User?
 
-    prepare(acct: auth(Profile.Owner, BorrowValue) &Account) {
-        self.profile =acct.storage.borrow<auth(Profile.Owner) &Profile.User>(from:Profile.storagePath)
+    prepare(acct: auth(Profile.Admin, BorrowValue) &Account) {
+        self.profile =acct.storage.borrow<auth(Profile.Admin) &Profile.User>(from:Profile.storagePath)
     }
 
     pre{

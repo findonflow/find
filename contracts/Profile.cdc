@@ -7,8 +7,9 @@ import "ProfileCache"
 import "FindUtils"
 
 access(all) contract Profile {
+
     // entitlements
-    access(all) entitlement Owner
+    access(all) entitlement Admin
 
     // paths
     access(all) let publicPath: PublicPath
@@ -255,6 +256,75 @@ access(all) contract Profile {
         access(account) fun setFindName(_ val: String)
     }
 
+    access(all) resource interface Owner {
+        access(Admin) fun setName(_ val: String) {
+            pre {
+                val.length <= 64: "Name must be 64 or less characters"
+            }
+        }
+
+        access(Admin) fun setGender(_ val:String){
+            pre {
+                val.length <= 64: "Gender must be 64 or less characters"
+            }
+        }
+
+        access(Admin) fun setAvatar(_ val: String){
+            pre {
+                val.length <= 1024: "Avatar must be 1024 characters or less"
+            }
+        }
+
+        access(Admin) fun setTags(_ val: [String])  {
+            pre {
+                Profile.verifyTags(tags: val, tagLength:64, tagSize:32) : "cannot have more then 32 tags of length 64"
+            }
+        }
+
+        //validate length of description to be 255 or something?
+        access(Admin) fun setDescription(_ val: String) {
+            pre {
+                val.length <= 1024: "Description must be 1024 characters or less"
+            }
+        }
+
+        access(Admin) fun follow(_ address: Address, tags:[String]) {
+            pre {
+                Profile.verifyTags(tags: tags, tagLength:64, tagSize:32) : "cannot have more then 32 tags of length 64"
+            }
+        }
+        access(Admin) fun unfollow(_ address: Address)
+
+        access(Admin) fun removeCollection(_ val: String)
+        access(Admin) fun addCollection(_ val: ResourceCollection)
+
+        access(Admin) fun addWallet(_ val : Wallet)
+        access(Admin) fun removeWallet(_ val: String)
+        access(Admin) fun setWallets(_ val: [Wallet])
+        access(Admin) fun hasWallet(_ name: String) : Bool
+        access(Admin) fun addLink(_ val: Link)
+        access(Admin) fun addLinkWithName(name:String, link:Link)
+
+        access(Admin) fun removeLink(_ val: String)
+
+        //Verify that this user has signed something.
+        access(Admin) fun verify(_ val:String)
+
+        //A user must be able to remove a follower since this data in your account is added there by another user
+        access(Admin) fun removeFollower(_ val: Address)
+
+        //manage bans
+        access(Admin) fun addBan(_ val: Address)
+        access(Admin) fun removeBan(_ val: Address)
+        access(Admin) fun getBans(): [Address]
+
+        //Set if user is allowed to store followers or now
+        access(Admin) fun setAllowStoringFollowers(_ val: Bool)
+
+        //set if this user prefers sensitive information about his account to be kept private, no guarantee here but should be honored
+        access(Admin) fun setPrivateMode(_ val: Bool)
+    }
+
     access(all) resource User: Public, FungibleToken.Receiver {
         access(self) var name: String
         access(self) var findName: String
@@ -295,7 +365,7 @@ access(all) contract Profile {
         }
 
         /// We do not have a seperate field for this so we use the additionalProperties 'bag' to store this in
-        access(Owner) fun setPrivateMode(_ val: Bool) {
+        access(Admin) fun setPrivateMode(_ val: Bool) {
             var private="true"
             if !val{
                 private="false"
@@ -303,11 +373,11 @@ access(all) contract Profile {
             self.additionalProperties["privateMode"]  = private
         }
 
-        access(Owner) fun emitUpdatedEvent() {
+        access(Admin) fun emitUpdatedEvent() {
             emit Updated(account:self.owner!.address, userName:self.name, findName:self.findName, thumbnail:self.avatar)
         }
 
-        access(Owner) fun emitCreatedEvent() {
+        access(Admin) fun emitCreatedEvent() {
             emit Created(account:self.owner!.address, userName:self.name, findName:self.findName, createdAt:self.createdAt)
         }
 
@@ -319,15 +389,15 @@ access(all) contract Profile {
             return true
         }
 
-        access(Owner) fun addBan(_ val: Address) { 
+        access(Admin) fun addBan(_ val: Address) { 
             self.bans[val]= true
         }
 
-        access(Owner) fun removeBan(_ val:Address) { 
+        access(Admin) fun removeBan(_ val:Address) { 
             self.bans.remove(key: val) 
         }
 
-        access(Owner) fun getBans() : [Address] { 
+        access(Admin) fun getBans() : [Address] { 
             return self.bans.keys 
         }
 
@@ -335,11 +405,11 @@ access(all) contract Profile {
             return self.bans.containsKey(val)
         }
 
-        access(Owner) fun setAllowStoringFollowers(_ val: Bool) {
+        access(Admin) fun setAllowStoringFollowers(_ val: Bool) {
             self.allowStoringFollowers=val
         }
 
-        access(Owner) fun verify(_ val:String) {
+        access(Admin) fun verify(_ val:String) {
             emit Verification(account: self.owner!.address, message:val)
         }
 
@@ -407,15 +477,15 @@ access(all) contract Profile {
             return self.links.values
         }
 
-        access(Owner) fun addLinkWithName(name:String, link:Link) {
+        access(Admin) fun addLinkWithName(name:String, link:Link) {
             self.links[name]=link
         }
 
-        access(Owner) fun addLink(_ val: Link) {
+        access(Admin) fun addLink(_ val: Link) {
             self.links[val.title]=val
         }
 
-        access(Owner) fun removeLink(_ val: String) {
+        access(Admin) fun removeLink(_ val: String) {
             self.links.remove(key: val)
         }
 
@@ -486,11 +556,11 @@ access(all) contract Profile {
 
         access(all) fun getWallets() : [Wallet] { return self.wallets}
 
-        access(Owner) fun addWallet(_ val: Wallet) { 
+        access(Admin) fun addWallet(_ val: Wallet) { 
             self.wallets.append(val) 
         }
 
-        access(Owner) fun removeWallet(_ val: String) {
+        access(Admin) fun removeWallet(_ val: String) {
             let numWallets=self.wallets.length
             var i=0
             while(i < numWallets) {
@@ -503,12 +573,12 @@ access(all) contract Profile {
             }
         }
 
-        access(Owner) fun setWallets(_ val: [Wallet]) {
+        access(Admin) fun setWallets(_ val: [Wallet]) {
             self.wallets=val
             ProfileCache.resetWalletIndexCache(address: self.owner!.address)
         }
 
-        access(Owner) fun removeFollower(_ val: Address) {
+        access(Admin) fun removeFollower(_ val: Address) {
             self.followers.remove(key:val)
         }
 
@@ -526,24 +596,24 @@ access(all) contract Profile {
         access(all) fun getFollowers(): [FriendStatus] { return self.followers.values }
         access(all) fun getFollowing(): [FriendStatus] { return self.following.values }
 
-        access(Owner) fun setName(_ val: String) { self.name = val }
+        access(Admin) fun setName(_ val: String) { self.name = val }
         access(account) fun setFindName(_ val: String) {
             emit Updated(account:self.owner!.address, userName:self.name, findName:val, thumbnail:self.avatar)
             ProfileCache.resetLeaseCache(address: self.owner!.address, leaseName: self.findName)
             self.findName = val
         }
 
-        access(Owner) fun setGender(_ val: String) { self.gender = val }
-        access(Owner) fun setAvatar(_ val: String) { self.avatar = val }
-        access(Owner) fun setDescription(_ val: String) { self.description=val}
-        access(Owner) fun setTags(_ val: [String]) { self.tags=val}
+        access(Admin) fun setGender(_ val: String) { self.gender = val }
+        access(Admin) fun setAvatar(_ val: String) { self.avatar = val }
+        access(Admin) fun setDescription(_ val: String) { self.description=val}
+        access(Admin) fun setTags(_ val: [String]) { self.tags=val}
 
-        access(Owner) fun removeCollection(_ val: String) { self.collections.remove(key: val)}
-        access(Owner) fun addCollection(_ val: ResourceCollection) { self.collections[val.name]=val}
+        access(Admin) fun removeCollection(_ val: String) { self.collections.remove(key: val)}
+        access(Admin) fun addCollection(_ val: ResourceCollection) { self.collections[val.name]=val}
         access(all) fun getCollections(): [ResourceCollection] { return self.collections.values}
 
 
-        access(Owner) fun follow(_ address: Address, tags:[String]) {
+        access(Admin) fun follow(_ address: Address, tags:[String]) {
             let friendProfile=Profile.find(address)
             let owner=self.owner!.address
             let status=FriendStatus(follower:owner, following:address, tags:tags)
@@ -553,7 +623,7 @@ access(all) contract Profile {
             emit Follow(follower:owner, following: address, tags:tags)
         }
 
-        access(Owner) fun unfollow(_ address: Address) {
+        access(Admin) fun unfollow(_ address: Address) {
             self.following.remove(key: address)
             Profile.find(address).internal_removeFollower(self.owner!.address)
             emit Unfollow(follower: self.owner!.address, unfollowing:address)
@@ -627,7 +697,7 @@ access(all) contract Profile {
         return <- create Profile.User(name: name,createdAt: createdAt)
     }
 
-    access(all) fun verifyTags(tags : [String], tagLength: Int, tagSize: Int): Bool {
+    access(all) view fun verifyTags(tags : [String], tagLength: Int, tagSize: Int): Bool {
         if tags.length > tagSize {
             return false
         }

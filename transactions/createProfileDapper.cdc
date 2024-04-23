@@ -14,7 +14,7 @@ import "TokenForwarding"
 import "FindViews"
 
 transaction(name: String) {
-    prepare(account: auth(Profile.Owner, StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
+    prepare(account: auth(Profile.Admin, StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
         let leaseCollection = account.capabilities.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)
         if leaseCollection == nil {
             account.storage.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
@@ -42,7 +42,7 @@ transaction(name: String) {
             created=true
         }
 
-        let profile=account.storage.borrow<auth(Profile.Owner) &Profile.User>(from: Profile.storagePath)!
+        let profile=account.storage.borrow<auth(Profile.Admin) &Profile.User>(from: Profile.storagePath)!
 
         let dapper=getAccount(FindViews.getDapperAddress())
 
