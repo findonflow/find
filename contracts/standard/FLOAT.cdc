@@ -250,7 +250,7 @@ access(all) contract FLOAT {
 
         //TODO: this will be removed
         /// withdrawWithUUID removes an NFT from the collection, using its UUID, and moves it to the caller
-        access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdrawWithUUID(_ uuid: UInt64): @{NonFungibleToken.NFT} {
+        access(NonFungibleToken.Withdraw) fun withdrawWithUUID(_ uuid: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: uuid) ?? panic("Could not withdraw nft")
 
             let nft <- token as! @NFT
@@ -263,7 +263,7 @@ access(all) contract FLOAT {
 
         /// withdrawWithType removes an NFT from the collection, using its Type and ID and moves it to the caller
         /// This would be used by a collection that can store multiple NFT types
-        access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdrawWithType(type: Type, withdrawID: UInt64): @{NonFungibleToken.NFT} {
+        access(NonFungibleToken.Withdraw) fun withdrawWithType(type: Type, withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("Could not withdraw nft")
 
             let nft <- token as! @NFT
@@ -276,7 +276,7 @@ access(all) contract FLOAT {
 
         /// withdrawWithTypeAndUUID removes an NFT from the collection using its type and uuid and moves it to the caller
         /// This would be used by a collection that can store multiple NFT types
-        access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdrawWithTypeAndUUID(type: Type, uuid: UInt64): @{NonFungibleToken.NFT} {
+        access(NonFungibleToken.Withdraw) fun withdrawWithTypeAndUUID(type: Type, uuid: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: uuid) ?? panic("Could not withdraw nft")
 
             let nft <- token as! @NFT
@@ -287,7 +287,7 @@ access(all) contract FLOAT {
         }
 
 
-        access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+        access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("You do not own this FLOAT in your collection")
             let nft <- token as! @NFT
             let id = nft.id
@@ -317,7 +317,7 @@ access(all) contract FLOAT {
         }
 
 
-        access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun transfer(id: UInt64, receiver: Capability<&{NonFungibleToken.Receiver}>): Bool {
+        access(NonFungibleToken.Withdraw) fun transfer(id: UInt64, receiver: Capability<&{NonFungibleToken.Receiver}>): Bool {
             let token <- self.ownedNFTs.remove(key: id) ?? panic("missing NFT")
             let receiver = receiver as! &{NonFungibleToken.Receiver}
             receiver.deposit(token: <-token)

@@ -234,7 +234,7 @@ access(all) contract Dandy :NonFungibleToken{
         }
 
 
-        access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+        access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT. withdrawID : ".concat(withdrawID.toString()))
             let dandyToken <- token as! @NFT
             let minterPlatform = dandyToken.getMinterPlatform()

@@ -197,7 +197,7 @@ access(all) contract ExampleNFT: NonFungibleToken {
     access(all) resource Collection: NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         /// dictionary of NFT conforming tokens
         /// NFT is a resource type with an `UInt64` ID field
-        access(contract) var ownedNFTs: @{UInt64: ExampleNFT.NFT}
+        access(all) var ownedNFTs: @{UInt64: ExampleNFT.NFT}
 
         access(self) var storagePath: StoragePath
         access(self) var publicPath: PublicPath
@@ -237,7 +237,7 @@ access(all) contract ExampleNFT: NonFungibleToken {
         }
 
         /// withdraw removes an NFT from the collection and moves it to the caller
-        access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+        access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID)
             ?? panic("Could not withdraw an NFT with the provided ID from the collection")
 

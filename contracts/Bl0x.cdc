@@ -312,7 +312,7 @@ access(all) contract Bl0x: NonFungibleToken {
             self.publicPath = PublicPath(identifier: identifier)!
         }
         // withdraw removes an NFT from the collection and moves it to the caller
-        access(NonFungibleToken.Withdraw | NonFungibleToken.Owner) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
+        access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
             return <-token
