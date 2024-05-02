@@ -314,7 +314,7 @@ access(all) contract FindMarket {
         for type in self.getMarketBidCollectionTypes() {
             let cap = getAccount(address).capabilities.get<&{FindMarket.MarketBidCollectionPublic}>(tenantRef.getPublicPath(type))
             if cap != nil {
-                caps.append(cap)
+                caps.append(cap!)
             }
         }
         return caps
