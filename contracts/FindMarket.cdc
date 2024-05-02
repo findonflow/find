@@ -312,7 +312,8 @@ access(all) contract FindMarket {
     access(all) fun getMarketBidCollectionCapabilities(tenantRef: &{FindMarket.TenantPublic}, address: Address) : [Capability<&{FindMarket.MarketBidCollectionPublic}>] {
         var caps : [Capability<&{FindMarket.MarketBidCollectionPublic}>] = []
         for type in self.getMarketBidCollectionTypes() {
-            if let cap = getAccount(address).capabilities.get<&{FindMarket.MarketBidCollectionPublic}>(tenantRef.getPublicPath(type)) {
+            let cap = getAccount(address).capabilities.get<&{FindMarket.MarketBidCollectionPublic}>(tenantRef.getPublicPath(type))
+            if cap != nil {
                 caps.append(cap)
             }
         }
@@ -1408,7 +1409,7 @@ access(all) contract FindMarket {
                 // If it is not registered, it falls through and be handled by residual
             case Type<@FungibleTokenSwitchboard.Switchboard>() :
                 if let sbRef = getAccount(cap.address).capabilities.borrow<&{FungibleTokenSwitchboard.SwitchboardPublic}>(FungibleTokenSwitchboard.PublicPath) {
-                    if sbRef.getVaultTypes().contains(ftInfo.type) {
+                    if sbRef.isSupportedVaultType(ftInfo.type) {
                         return ref
                     }
                 }
