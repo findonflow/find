@@ -301,7 +301,7 @@ access(all) contract Profile {
         access(Admin) fun addWallet(_ val : Wallet)
         access(Admin) fun removeWallet(_ val: String)
         access(Admin) fun setWallets(_ val: [Wallet])
-        access(Admin) fun hasWallet(_ name: String) : Bool
+        access(all) fun hasWallet(_ name: String) : Bool
         access(Admin) fun addLink(_ val: Link)
         access(Admin) fun addLinkWithName(name:String, link:Link)
 
@@ -325,7 +325,7 @@ access(all) contract Profile {
         access(Admin) fun setPrivateMode(_ val: Bool)
     }
 
-    access(all) resource User: Public, FungibleToken.Receiver {
+    access(all) resource User: Owner, Public, FungibleToken.Receiver {
         access(self) var name: String
         access(self) var findName: String
         access(self) var createdAt: String
