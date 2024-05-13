@@ -180,7 +180,7 @@
         "emulator": "0xf8d6e0586b0a20c7",
         "testnet": "0x8c5303eaa26202d6",
         "mainnet": "0xe467b9dd11fa00df",
-        "previwenet": "0xb6763b4399a888c8"
+        "previewnet": "0xb6763b4399a888c8"
       }
     },
     "SwapRouter": {
@@ -246,6 +246,7 @@
   },
   "networks": {
     "emulator": "127.0.0.1:3569",
+    "previewnet": "access.previewnet.nodes.onflow.org:9000",
     "mainnet": "access.mainnet.nodes.onflow.org:9000",
     "testnet": "access.devnet.nodes.onflow.org:9000"
   },
