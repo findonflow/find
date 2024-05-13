@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	. "github.com/bjartek/overflow/v2"
+	"github.com/bjartek/underflow"
 	"github.com/findonflow/find/findGo"
 	"github.com/findonflow/find/utils"
 	"github.com/hexops/autogold"
@@ -2402,7 +2403,7 @@ func (otu *OverflowTestUtils) postExampleThought() uint64 {
 }
 
 func (otu *OverflowTestUtils) createOptional(value any) (cadence.Value, error) {
-	val, err := cadence.NewValue(value)
+	val, err := underflow.NewCadenceValue(value)
 	if err != nil {
 		return nil, err
 	}

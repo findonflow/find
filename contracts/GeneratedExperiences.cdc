@@ -268,7 +268,7 @@ access(all) contract GeneratedExperiences: NonFungibleToken {
             let token <- token as! @GeneratedExperiences.NFT
 
             // add the new token to the dictionary which removes the old one
-            let oldToken <- self.ownedNFTs[token.getID()] <- token
+            let oldToken <- self.ownedNFTs[token.id] <- token
 
             destroy oldToken
         }

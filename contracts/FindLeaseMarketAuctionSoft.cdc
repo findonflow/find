@@ -626,12 +626,12 @@ access(all) contract FindLeaseMarketAuctionSoft {
                 panic("You already have an bid for this item, use increaseBid on that bid")
             }
 
-            let from=getAccount(FIND.status(name).owner!).capabilities.get<&{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))!
+            let from=getAccount(FIND.status(name).owner!).capabilities.get<&{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))
 
             let bid <- create Bid(from: from, leaseName:name, vaultType: vaultType, balance:amount, bidExtraField: bidExtraField)
             let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for lease name=".concat(name))
 
-            let callbackCapability =self.owner!.capabilities.get<&{MarketBidCollectionPublic}>(self.getTenant().getPublicPath(Type<@MarketBidCollection>()))!
+            let callbackCapability =self.owner!.capabilities.get<&{MarketBidCollectionPublic}>(self.getTenant().getPublicPath(Type<@MarketBidCollection>()))
             let oldToken <- self.bids[name] <- bid
             saleItemCollection.registerBid(name: name, callback: callbackCapability, vaultType: vaultType)
             destroy oldToken
@@ -708,7 +708,7 @@ access(all) contract FindLeaseMarketAuctionSoft {
             panic("invalid tenant")
         }
         if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
-            return getAccount(user).capabilities.get<&{SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))!
+            return getAccount(user).capabilities.get<&{SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
         }
         return nil
     }
@@ -718,7 +718,7 @@ access(all) contract FindLeaseMarketAuctionSoft {
             panic("invalid tenant")
         }
         if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
-            return getAccount(user).capabilities.get<&{MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))!
+            return getAccount(user).capabilities.get<&{MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
         }
         return nil
     }

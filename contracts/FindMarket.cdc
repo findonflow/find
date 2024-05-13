@@ -1409,7 +1409,7 @@ access(all) contract FindMarket {
                 // If it is not registered, it falls through and be handled by residual
             case Type<@FungibleTokenSwitchboard.Switchboard>() :
                 if let sbRef = getAccount(cap.address).capabilities.borrow<&{FungibleTokenSwitchboard.SwitchboardPublic}>(FungibleTokenSwitchboard.PublicPath) {
-                    if sbRef.isSupportedVaultType(ftInfo.type) {
+                    if sbRef.isSupportedVaultType(type: ftInfo.type) {
                         return ref
                     }
                 }
@@ -1620,7 +1620,7 @@ access(all) contract FindMarket {
         access(all) fun getIds(): [UInt64]
         access(all) fun getRoyaltyChangedIds(): [UInt64]
         access(all) fun containsId(_ id: UInt64): Bool
-        access(account) fun borrowSaleItem(_ id: UInt64) : &{SaleItem}?
+        access(all) fun borrowSaleItem(_ id: UInt64) : &{SaleItem}?
         access(all) fun getListingType() : Type
     }
 
@@ -1638,7 +1638,8 @@ access(all) contract FindMarket {
         access(all) fun getIds() : [UInt64]
         access(all) fun containsId(_ id: UInt64): Bool
         access(all) fun getBidType() : Type
-        access(account) fun borrowBidItem(_ id: UInt64) : &{Bid}
+        //TODO: this used to be access account, look ino this, because now we can downcast
+        access(all) fun borrowBidItem(_ id: UInt64) : &{Bid}
     }
 
     access(all) struct BidItemCollectionReport {

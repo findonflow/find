@@ -60,41 +60,39 @@ access(all) contract FindLostAndFoundWrapper {
         let receiverAvailableStorage = getAccount(receiverAddress).storage.capacity- getAccount(receiverAddress).storage.used
 
         // Try to send before using Lost & FIND
-        if let receiverCap = getAccount(receiverAddress).capabilities.get<&{NonFungibleToken.Receiver}>(collectionPublicPath) {
-            if receiverCap.check() {
-                // If the receiver has sufficient storage, then subsidize it
-                var readyToSend = true
-                if receiverAvailableStorage < requiredStorage {
-                    readyToSend = false 
-                    if subsidizeReceiverStorage {
-                        readyToSend = FindLostAndFoundWrapper.subsidizeUserStorage(requiredStorage: requiredStorage, receiverAvailableStorage: receiverAvailableStorage, receiver: receiver, vault: storagePayment, sender: sender, uuid: item.uuid)
-                    }
-                }   
-
-                if readyToSend {
-                    receiverCap.borrow()!.deposit(token: <- item)
-                    emit NFTDeposited(receiver: receiverCap.address, receiverName: FIND.reverseLookup(receiverAddress), sender: sender, senderName: senderName, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
-                    return nil
+        let receiverCap = getAccount(receiverAddress).capabilities.get<&{NonFungibleToken.Receiver}>(collectionPublicPath) 
+        if receiverCap.check() {
+            // If the receiver has sufficient storage, then subsidize it
+            var readyToSend = true
+            if receiverAvailableStorage < requiredStorage {
+                readyToSend = false 
+                if subsidizeReceiverStorage {
+                    readyToSend = FindLostAndFoundWrapper.subsidizeUserStorage(requiredStorage: requiredStorage, receiverAvailableStorage: receiverAvailableStorage, receiver: receiver, vault: storagePayment, sender: sender, uuid: item.uuid)
                 }
+            }   
+
+            if readyToSend {
+                receiverCap.borrow()!.deposit(token: <- item)
+                emit NFTDeposited(receiver: receiverCap.address, receiverName: FIND.reverseLookup(receiverAddress), sender: sender, senderName: senderName, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
+                return nil
             }
         }
 
-        if let collectionPublicCap = getAccount(receiverAddress).capabilities.get<&{NonFungibleToken.Collection}>(collectionPublicPath) {
-            if collectionPublicCap.check() {
-                // If the receiver has sufficient storage, then subsidize it
-                var readyToSend = true
-                if receiverAvailableStorage < requiredStorage {
-                    readyToSend = false 
-                    if subsidizeReceiverStorage {
-                        readyToSend = FindLostAndFoundWrapper.subsidizeUserStorage(requiredStorage: requiredStorage, receiverAvailableStorage: receiverAvailableStorage, receiver: receiver, vault: storagePayment, sender: sender, uuid: item.uuid)
-                    }
-                }   
-
-                if readyToSend {
-                    collectionPublicCap.borrow()!.deposit(token: <- item)
-                    emit NFTDeposited(receiver: receiverAddress, receiverName: FIND.reverseLookup(receiverAddress), sender: sender, senderName: senderName, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
-                    return nil
+        let collectionPublicCap = getAccount(receiverAddress).capabilities.get<&{NonFungibleToken.Collection}>(collectionPublicPath) 
+        if collectionPublicCap.check() {
+            // If the receiver has sufficient storage, then subsidize it
+            var readyToSend = true
+            if receiverAvailableStorage < requiredStorage {
+                readyToSend = false 
+                if subsidizeReceiverStorage {
+                    readyToSend = FindLostAndFoundWrapper.subsidizeUserStorage(requiredStorage: requiredStorage, receiverAvailableStorage: receiverAvailableStorage, receiver: receiver, vault: storagePayment, sender: sender, uuid: item.uuid)
                 }
+            }   
+
+            if readyToSend {
+                collectionPublicCap.borrow()!.deposit(token: <- item)
+                emit NFTDeposited(receiver: receiverAddress, receiverName: FIND.reverseLookup(receiverAddress), sender: sender, senderName: senderName, type: type.identifier, id: id, uuid: uuid, memo: memo, name: display.name, description: display.description, thumbnail: display.thumbnail.uri(), collectionName: collectionDisplay?.name, collectionImage: collectionDisplay?.squareImage?.file?.uri())
+                return nil
             }
         }
 
@@ -136,7 +134,7 @@ access(all) contract FindLostAndFoundWrapper {
     access(all) fun redeemNFT(type: Type, ticketID: UInt64, receiverAddress: Address, collectionPublicPath: PublicPath) {
 
         let cap= getAccount(receiverAddress).capabilities.get<&{NonFungibleToken.Collection}>(collectionPublicPath) 
-        if cap == nil || !cap!.check() {
+        if !cap.check() {
             emit TicketRedeemFailed(receiver: receiverAddress, receiverName: FIND.reverseLookup(receiverAddress), ticketID: ticketID, type: type.identifier, remark: "invalid capability")
             return
         }
@@ -151,9 +149,9 @@ access(all) contract FindLostAndFoundWrapper {
         let memo = ticket.memo
 
         // if receiverCap is valid, pass that in, otherwise pass collectionPublicCap
-        shelf.redeem(type: type, ticketID: ticketID, receiver: cap!)
+        shelf.redeem(type: type, ticketID: ticketID, receiver: cap)
 
-        let viewResolver=cap!.borrow()!.borrowNFT(nftID)!
+        let viewResolver=cap.borrow()!.borrowNFT(nftID)!
         let display = MetadataViews.getDisplay(viewResolver)
         let collectionDisplay= MetadataViews.getNFTCollectionDisplay(viewResolver)
 
@@ -256,13 +254,11 @@ access(all) contract FindLostAndFoundWrapper {
         let subsidizeCapacity = requiredStorage - receiverAvailableStorage
         let subsidizeAmount = FlowStorageFees.storageCapacityToFlow(FlowStorageFees.convertUInt64StorageBytesToUFix64Megabytes(subsidizeCapacity))
         let flowReceiverCap = getAccount(receiver).capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
-        if flowReceiverCap==nil{
+
+        if !flowReceiverCap.check() {
             return false
         }
-        if !flowReceiverCap!.check() {
-            return false
-        }
-        let flowReceiver = flowReceiverCap!.borrow()! 
+        let flowReceiver = flowReceiverCap.borrow()! 
         if !flowReceiver.isInstance(Type<@FlowToken.Vault>()){
             return false
         }

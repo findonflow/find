@@ -142,7 +142,7 @@ access(all) contract ExampleNFT: NonFungibleToken {
                     return self.royalties
                 }
                 return MetadataViews.Royalties([
-                MetadataViews.Royalty(receiver:ExampleNFT.account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!, cut: 0.99, description: "cheater")
+                MetadataViews.Royalty(receiver:ExampleNFT.account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver), cut: 0.99, description: "cheater")
                 ])
             case Type<MetadataViews.ExternalURL>():
                 return MetadataViews.ExternalURL("https://example-nft.onflow.org/".concat(self.id.toString()))
@@ -197,7 +197,7 @@ access(all) contract ExampleNFT: NonFungibleToken {
     access(all) resource Collection: NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         /// dictionary of NFT conforming tokens
         /// NFT is a resource type with an `UInt64` ID field
-        access(all) var ownedNFTs: @{UInt64: ExampleNFT.NFT}
+        access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
 
         access(self) var storagePath: StoragePath
         access(self) var publicPath: PublicPath
@@ -250,7 +250,7 @@ access(all) contract ExampleNFT: NonFungibleToken {
             let token <- token as! @ExampleNFT.NFT
 
             // add the new token to the dictionary which removes the old one
-            let oldToken <- self.ownedNFTs[token.getID()] <- token
+            let oldToken <- self.ownedNFTs[token.id] <- token
 
             destroy oldToken
         }
@@ -270,12 +270,11 @@ access(all) contract ExampleNFT: NonFungibleToken {
         }
 
         /// Borrow the view resolver for the specified NFT ID
-        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}? {
-            if let nft = &self.ownedNFTs[id] as &ExampleNFT.NFT? {
-                return nft as &{ViewResolver.Resolver}
-            }
-            return nil
+        //
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}?   {
+            return &self.ownedNFTs[id]
         }
+
 
         /// public function that anyone can call to create a new empty collection
         access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {

@@ -184,7 +184,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
             return self.tenantCapability.borrow()!
         }
 
-        access(all) fun isAcceptedDirectOffer(_ name:String) : Bool{
+        access(contract) fun isAcceptedDirectOffer(_ name:String) : Bool{
             pre {
                 self.items.containsKey(name) : "Invalid name sale=".concat(name)
             }
@@ -529,11 +529,11 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
                 panic("Valid until is before current time")
             }
 
-            let from=getAccount(FIND.status(name).owner!).capabilities.get<&{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))!
+            let from=getAccount(FIND.status(name).owner!).capabilities.get<&{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))
 
             let bid <- create Bid(from: from, leaseName: name, vaultType: vaultType, nonEscrowedBalance:amount, bidExtraField: bidExtraField)
             let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for name=".concat(name))
-            let callbackCapability =self.owner!.capabilities.get<&{MarketBidCollectionPublic}>(self.getTenant().getPublicPath(Type<@MarketBidCollection>()))!
+            let callbackCapability =self.owner!.capabilities.get<&{MarketBidCollectionPublic}>(self.getTenant().getPublicPath(Type<@MarketBidCollection>()))
 
             let oldToken <- self.bids[name] <- bid
             saleItemCollection.registerBid(name: name, callback: callbackCapability, validUntil: validUntil, saleItemExtraField: saleItemExtraField)
@@ -617,7 +617,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
         }
         if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
 
-            return getAccount(user).capabilities.get<&{SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))!
+            return getAccount(user).capabilities.get<&{SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
         }
         return nil
     }
@@ -627,7 +627,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
             panic("Invalid tenant")
         }
         if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
-            return getAccount(user).capabilities.get<&{MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))!
+            return getAccount(user).capabilities.get<&{MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
         }
         return nil
     }

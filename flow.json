@@ -17,6 +17,7 @@
       "source": "./contracts/standard/FungibleTokenSwitchboard.cdc",
       "aliases": {
         "testnet": "9a0766d93b6608b7",
+        "emulator": "ee82856bf20e2aa6",
         "mainnet": "0xf233dcee88fe0abe"
       }
     },
@@ -121,6 +122,7 @@
       "source": "./contracts/standard/FungibleTokenMetadataViews.cdc",
       "aliases": {
         "mainnet": "0xf233dcee88fe0abe",
+        "emulator": "ee82856bf20e2aa6",
         "testnet": "0x9a0766d93b6608b7"
       }
     },
@@ -306,8 +308,6 @@
   "deployments": {
     "emulator": {
       "emulator-account": [
-        "FungibleTokenSwitchboard",
-        "FungibleTokenMetadataViews",
         "FUSD",
         "FiatToken",
         "TokenForwarding",
@@ -327,6 +327,7 @@
         "FlowUtilityToken"
       ],
       "emulator-find": [
+        "FIND",
         "Profile",
         "FindThoughts",
         "Clock",
@@ -374,8 +375,7 @@
         "FindMarketAuctionSoft",
         "FindLeaseMarketDirectOfferSoft",
         "FindMarketDirectOfferSoft",
-        "FindMarketDirectOfferEscrow",
-        "FIND"
+        "FindMarketDirectOfferEscrow"
       ],
       "emulator-find-admin": [],
       "emulator-find-forge": [

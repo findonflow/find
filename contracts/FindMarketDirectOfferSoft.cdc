@@ -204,7 +204,7 @@ access(all) contract FindMarketDirectOfferSoft {
             return self.tenantCapability.borrow()!
         }
 
-        access(all) fun isAcceptedDirectOffer(_ id:UInt64) : Bool{
+        access(contract) fun isAcceptedDirectOffer(_ id:UInt64) : Bool{
 
             if !self.items.containsKey(id) {
                 panic("Invalid id=".concat(id.toString()))
