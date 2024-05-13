@@ -17,7 +17,8 @@
       "source": "./contracts/standard/FungibleTokenSwitchboard.cdc",
       "aliases": {
         "testnet": "9a0766d93b6608b7",
-        "mainnet": "0xf233dcee88fe0abe"
+        "mainnet": "0xf233dcee88fe0abe",
+        "previewnet": "0xa0225e7000ac82a9"
       }
     },
     "EmeraldIdentity": {
@@ -32,7 +33,8 @@
       "aliases": {
         "testnet": "0x631e88ae7f1d7c20",
         "mainnet": "0x1d7e57aa55817448",
-        "emulator": "0xf8d6e0586b0a20c7"
+        "emulator": "0xf8d6e0586b0a20c7",
+        "previewnet": "0xb6763b4399a888c8"
       }
     },
     "MetadataViews": {
@@ -40,35 +42,40 @@
       "aliases": {
         "mainnet": "0x1d7e57aa55817448",
         "testnet": "0x631e88ae7f1d7c20",
-        "emulator": "0xf8d6e0586b0a20c7"
+        "emulator": "0xf8d6e0586b0a20c7",
+        "previewnet": "0xb6763b4399a888c8"
       }
     },
     "TokenForwarding": {
       "source": "./contracts/standard/TokenForwarding.cdc",
       "aliases": {
         "mainnet": "0xe544175ee0461c4b",
-        "testnet": "0x51ea0e37c27a1f1a"
+        "testnet": "0x51ea0e37c27a1f1a",
+        "previewnet": "0xcbc6dbbfcc60e595"
       }
     },
     "FUSD": {
       "source": "./contracts/standard/FUSD.cdc",
       "aliases": {
         "testnet": "0xe223d8a629e49c68",
-        "mainnet": "0x3c5959b568896393"
+        "mainnet": "0x3c5959b568896393",
+        "previewnet": "0x7e3499582a06616f"
       }
     },
     "FiatToken": {
       "source": "./contracts/standard/FiatToken.cdc",
       "aliases": {
         "testnet": "0xa983fecbed621163",
-        "mainnet": "0xb19436aae4d94622"
+        "mainnet": "0xb19436aae4d94622",
+        "previewnet": "0x7e3499582a06616f"
       }
     },
     "DapperStorageRent": {
       "source": "./contracts/standard/DapperStorageRent.cdc",
       "aliases": {
         "testnet": "0x43ee8c22fcf94ea3",
-        "mainnet": "0xa08e88e23f332538"
+        "mainnet": "0xa08e88e23f332538",
+        "previewnet": "0xcbc6dbbfcc60e595"
       }
     },
     "FungibleToken": {
@@ -76,7 +83,8 @@
       "aliases": {
         "testnet": "9a0766d93b6608b7",
         "emulator": "ee82856bf20e2aa6",
-        "mainnet": "0xf233dcee88fe0abe"
+        "mainnet": "0xf233dcee88fe0abe",
+        "previewnet": "0xa0225e7000ac82a9"
       }
     },
     "FlowToken": {
@@ -84,7 +92,8 @@
       "aliases": {
         "testnet": "0x7e60df042a9c0868",
         "emulator": "0x0ae53cb6e3f42a79",
-        "mainnet": "0x1654653399040a61"
+        "mainnet": "0x1654653399040a61",
+        "previewnet": "0x4445e7ad11568276"
       }
     },
     "ViewResolver": {
@@ -92,7 +101,8 @@
       "aliases": {
         "emulator": "0xf8d6e0586b0a20c7",
         "mainnet": "0xf233dcee88fe0abe",
-        "testnet": "0x631e88ae7f1d7c20"
+        "testnet": "0x631e88ae7f1d7c20",
+        "previewnet": "0xb6763b4399a888c8"
       }
     },
     "Burner": {
@@ -100,14 +110,16 @@
       "aliases": {
         "emulator": "0xf8d6e0586b0a20c7",
         "mainnet": "0xf233dcee88fe0abe",
-        "testnet": "0x9a0766d93b6608b7"
+        "testnet": "0x9a0766d93b6608b7",
+        "previewnet": "0xb6763b4399a888c8"
       }
     },
     "DapperUtilityCoin": {
       "source": "./contracts/standard/DapperUtilityCoin.cdc",
       "aliases": {
         "mainnet": "0xead892083b3e2c6c",
-        "testnet": "0x82ec283f88a62e65"
+        "testnet": "0x82ec283f88a62e65",
+        "previewnet": "0xcbc6dbbfcc60e595"
       }
     },
     "FlowUtilityToken": {
@@ -121,21 +133,24 @@
       "source": "./contracts/standard/FungibleTokenMetadataViews.cdc",
       "aliases": {
         "mainnet": "0xf233dcee88fe0abe",
-        "testnet": "0x9a0766d93b6608b7"
+        "testnet": "0x9a0766d93b6608b7",
+        "previewnet": "0xa0225e7000ac82a9"
       }
     },
     "NFTCatalog": {
       "source": "./contracts/standard/NFTCatalog.cdc",
       "aliases": {
         "mainnet": "0x49a7cda3a1eecc29",
-        "testnet": "0x324c34e1c517e4db"
+        "testnet": "0x324c34e1c517e4db",
+        "previewnet": "0xd5a5e5c94f9cdb36"
       }
     },
     "NFTCatalogAdmin": {
       "source": "./contracts/standard/NFTCatalogAdmin.cdc",
       "aliases": {
         "mainnet": "0x49a7cda3a1eecc29",
-        "testnet": "0x324c34e1c517e4db"
+        "testnet": "0x324c34e1c517e4db",
+        "previewnet": "0xd5a5e5c94f9cdb36"
       }
     },
     "LostAndFound": {
@@ -164,7 +179,8 @@
       "aliases": {
         "emulator": "0xf8d6e0586b0a20c7",
         "testnet": "0x8c5303eaa26202d6",
-        "mainnet": "0xe467b9dd11fa00df"
+        "mainnet": "0xe467b9dd11fa00df",
+        "previwenet": "0xb6763b4399a888c8"
       }
     },
     "SwapRouter": {
