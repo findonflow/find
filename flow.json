@@ -10,7 +10,7 @@
       "source": "./contracts/standard/FLOAT.cdc",
       "aliases": {
         "mainnet": "0x2d4c3caffbeab845",
-        "testnet": "0x0afe396ebc8eee65"
+        "testnet": "0x857dc34d5e1631d3"
       }
     },
     "FungibleTokenSwitchboard": {
