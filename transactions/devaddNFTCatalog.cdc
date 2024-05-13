@@ -24,8 +24,7 @@ transaction(
 
         let nftAccount = getAccount(addressWithNFT)
         let pubPath = PublicPath(identifier: publicPathIdentifier)!
-        let collectionCap = nftAccount.capabilities.get<&{NonFungibleToken.Collection}>(pubPath) ?? panic("MetadataViews Collection is not set up properly, ensure the Capability was created/linked correctly.")
-        let collectionRef = collectionCap.borrow()!
+        let collectionRef = nftAccount.capabilities.borrow<&{NonFungibleToken.Collection}>(pubPath) ?? panic("MetadataViews Collection is not set up properly, ensure the Capability was created/linked correctly.")
         assert(collectionRef.getIDs().length > 0, message: "No NFTs exist in this collection.")
         let nftResolver = collectionRef.borrowNFT(nftID) ?? panic("could not find item with id")
 

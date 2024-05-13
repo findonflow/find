@@ -23,7 +23,7 @@ transaction(dapperAddress: Address) {
 
         //FUSD
         var fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-        if fusdReceiver == nil {
+        if !fusdReceiver.check() {
             let fusd <- FUSD.createEmptyVault()
 
             account.storage.save(<- fusd, to: /storage/fusdVault)
@@ -44,7 +44,6 @@ transaction(dapperAddress: Address) {
             account.capabilities.publish(cap, at: FiatToken.VaultBalancePubPath)
             usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
         }
-
 
 
         //Dapper utility token
