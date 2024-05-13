@@ -617,7 +617,7 @@ access(all) contract FIND {
         access(all) fun checkAddon(name:String, addon: String) : Bool
         access(account) fun getNames() : [String]
         access(account) fun containsName(_ name: String) : Bool
-        access(account) fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection>)
+        access(Leasee) fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection>)
         access(all) fun getLeaseUUID(_ name: String) : UInt64
     }
 
@@ -1283,7 +1283,7 @@ access(all) contract FIND {
             tokenRef.setSalePrice(nil)
         }
 
-        access(account) fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection>) {
+        access(Leasee) fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection>) {
 
             let lease = self.borrowAuth(name)
             if !lease.validate() {
@@ -1623,7 +1623,7 @@ access(all) contract FIND {
 
             let address=self.wallet.address
             let account=getAccount(address)
-            let usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)!
+            let usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
             let usdcReceiver = usdcCap.borrow() ?? panic("cound not find usdc vault receiver for address".concat(self.wallet.address.toString()))
             usdcReceiver.deposit(from: <- vault)
 

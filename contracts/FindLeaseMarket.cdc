@@ -393,7 +393,7 @@ access(all) contract FindLeaseMarket {
             self.uuid = self.cap.borrow()!.getLeaseUUID(name)
         }
 
-        access(contract) fun borrow() : &{FIND.LeaseCollectionPublic} {
+        access(contract) fun borrow() : auth(FIND.Leasee) &{FIND.LeaseCollectionPublic} {
             return self.cap.borrow() ?? panic("The capability of pointer is not linked.")
         }
 
