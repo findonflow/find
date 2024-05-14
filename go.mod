@@ -2,8 +2,6 @@ module github.com/findonflow/find
 
 go 1.21
 
-toolchain go1.22.3
-
 require (
 	github.com/bjartek/overflow/v2 v2.0.0-stable-cadence-beta.13
 	github.com/hexops/autogold v1.3.1

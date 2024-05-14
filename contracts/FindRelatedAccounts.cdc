@@ -230,7 +230,11 @@ access(all) contract FindRelatedAccounts {
     }
 
     access(all) fun getCapability(_ addr: Address) : Capability<&{Public}>? {
-        return getAccount(addr).capabilities.get<&{Public}>(self.publicPath)
+        let cap = getAccount(addr).capabilities.get<&{Public}>(self.publicPath)
+        if !cap.check() {
+            return nil
+        } 
+        return cap
 
     }
 
