@@ -22,12 +22,14 @@ transaction(user: String, id: UInt64, amount: UFix64) {
 
         let marketplace = FindMarket.getFindTenantAddress()
         let resolveAddress = FIND.resolve(user)
-        if resolveAddress == nil {panic("The address input is not a valid name nor address. Input : ".concat(user))}
+        if resolveAddress == nil {
+            panic("The address input is not a valid name nor address. Input : ".concat(user))
+        }
         let address = resolveAddress!
 
         let tenantCapability= FindMarket.getTenantCapability(marketplace)!
         let tenant = tenantCapability.borrow()!
-        let receiverCap=account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
+        let receiverCap=account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
         /// auctions that escrow ft
         let aeBidType= Type<@FindMarketAuctionEscrow.MarketBidCollection>()
 
@@ -35,7 +37,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
         let aeBidStoragePath= FindMarket.getStoragePath(aeBidType, name:tenant.name)
 
         let aeBidCap= account.capabilities.get<&{FindMarketAuctionEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aeBidPublicPath)
-        if aeBidCap==nil{
+        if !aeBidCap.check(){
             account.storage.save<@FindMarketAuctionEscrow.MarketBidCollection>(<- FindMarketAuctionEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: aeBidStoragePath)
             let cap = account.capabilities.storage.issue<&{FindMarketAuctionEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aeBidStoragePath)
             account.capabilities.publish(cap, at: aeBidPublicPath)
@@ -63,14 +65,13 @@ transaction(user: String, id: UInt64, amount: UFix64) {
             self.targetCapability=cap
         } else {
             //TODO: I do not think this works as intended, this works as intended
-            var targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
-            if targetCapability == nil || !targetCapability!.check() {
+            self.targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
+            if  self.targetCapability.check() {
                 let cd = item.getNFTCollectionData()
                 let cap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(cd.storagePath)
                 account.capabilities.publish(cap, at: cd.publicPath)
-                targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
+                self.targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
             }
-            self.targetCapability=targetCapability!
         }
 
         self.walletReference = account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")

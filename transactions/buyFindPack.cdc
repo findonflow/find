@@ -29,12 +29,12 @@ transaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, total
         }
 
 
-        let profileCap = account.capabilities.get<&{Profile.Public}>(Profile.publicPath)!
+        let profileCap = account.capabilities.get<&{Profile.Public}>(Profile.publicPath)
         if !profileCap.check() {
             let profile <-Profile.createUser(name:account.address.toString(), createdAt: "find")
 
             let fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-            if fusdReceiver == nil {
+            if !fusdReceiver.check() {
                 let fusd <- FUSD.createEmptyVault()
                 account.storage.save(<- fusd, to: /storage/fusdVault)
                 var cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/fusdVault)
@@ -46,8 +46,8 @@ transaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, total
 
             let fusdWallet=Profile.Wallet(
                 name:"FUSD", 
-                receiver:account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)!,
-                balance:account.capabilities.get<&{FungibleToken.Vault}>(/public/fusdBalance)!,
+                receiver:account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver),
+                balance:account.capabilities.get<&{FungibleToken.Vault}>(/public/fusdBalance),
                 accept: Type<@FUSD.Vault>(),
                 tags: ["fusd", "stablecoin"]
             )
@@ -56,8 +56,8 @@ transaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, total
 
             let flowWallet=Profile.Wallet(
                 name:"Flow", 
-                receiver:account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!,
-                balance:account.capabilities.get<&{FungibleToken.Vault}>(/public/flowTokenBalance)!,
+                receiver:account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver),
+                balance:account.capabilities.get<&{FungibleToken.Vault}>(/public/flowTokenBalance),
                 accept: Type<@FlowToken.Vault>(),
                 tags: ["flow"]
             )
@@ -69,7 +69,7 @@ transaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, total
             account.capabilities.publish(cap, at: Profile.publicReceiverPath)
         }
 
-        self.userPacks=account.capabilities.get<&FindPack.Collection>(FindPack.CollectionPublicPath)!
+        self.userPacks=account.capabilities.get<&FindPack.Collection>(FindPack.CollectionPublicPath)
         self.packs=FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId:packTypeId)
 
         self.salePrice= FindPack.getCurrentPrice(packTypeName: packTypeName, packTypeId:packTypeId, user:account.address) ?? panic ("Cannot buy the pack now") 

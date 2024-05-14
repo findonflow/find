@@ -11,8 +11,7 @@ fun main(user: String, minter: String) : [UInt64] {
     if account.balance == 0.0 {
         return []
     }
-    let cap = account.capabilities.get<&Dandy.Collection>(Dandy.CollectionPublicPath)!
-    let ref = cap.borrow() ?? panic("Cannot borrow reference to Dandy Collection. Account address : ".concat(address!.toString()))
+    let ref = account.capabilities.borrow<&Dandy.Collection>(Dandy.CollectionPublicPath) ?? panic("Cannot borrow reference to Dandy Collection. Account address : ".concat(address!.toString()))
 
     return ref.getIDsFor(minter: minter)
 }

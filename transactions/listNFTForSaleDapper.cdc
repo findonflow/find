@@ -30,7 +30,7 @@ transaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: Strin
         let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
 
         let saleItemCap= account.capabilities.get<&FindMarketSale.SaleItemCollection>(publicPath)
-        if saleItemCap==nil {
+        if !saleItemCap.check() {
             account.storage.save(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
             let cap = account.capabilities.storage.issue<&FindMarketSale.SaleItemCollection>(storagePath)
             account.capabilities.publish(cap, at: publicPath)
@@ -43,9 +43,9 @@ transaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: Strin
         let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
 
         let futReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-        if ft.type == Type<@FlowUtilityToken.Vault>() && !futReceiver!.check() {
+        if ft.type == Type<@FlowUtilityToken.Vault>() && !futReceiver.check() {
             // Create a new Forwarder resource for FUT and store it in the new account's storage
-            let futForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.capabilities.get<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)!)
+            let futForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.capabilities.get<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver))
             account.storage.save(<-futForwarder, to: /storage/flowUtilityTokenReceiver)
             let receiverCap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/flowUtilityTokenReceiver)
             account.capabilities.publish(receiverCap, at: /public/flowUtilityTokenReceiver)

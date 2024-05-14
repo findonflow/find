@@ -41,11 +41,9 @@ access(all) contract FindAirdropper {
             return
         }
 
-        if receiverCap !=nil && receiverCap!.check() {
-
+        if  receiverCap.check() {
             emit Airdropped(from: from , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid, nftInfo: nftInfo, context: context, remark: nil)
-
-            receiverCap!.borrow()!.deposit(token: <- item)
+            receiverCap.borrow()!.deposit(token: <- item)
             return
         } else {
             let collectionPublic = getAccount(receiver).capabilities.borrow<&{NonFungibleToken.Collection}>(path)
@@ -109,7 +107,7 @@ access(all) contract FindAirdropper {
         let vr = pointer.getViewResolver()
         let nftInfo = FindMarket.NFTInfo(vr, id: pointer.id, detail: true)
 
-        let receiverCap = getAccount(receiver).capabilities.get<&{NonFungibleToken.Receiver}>(path)!
+        let receiverCap = getAccount(receiver).capabilities.get<&{NonFungibleToken.Receiver}>(path)
 
         // use LostAndFound for dropping
         let ticketID = FindLostAndFoundWrapper.depositNFT(

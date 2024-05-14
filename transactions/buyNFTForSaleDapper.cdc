@@ -33,7 +33,7 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
         let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
 
         let saleItemCap= account.capabilities.get<&{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath)
-        if saleItemCap==nil {
+        if !saleItemCap.check() {
             account.storage.save(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
             let cap = account.capabilities.storage.issue<&{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(storagePath)
             account.capabilities.publish(cap, at: publicPath)
@@ -71,7 +71,7 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
         } else {
             //TODO: I do not think this works as intended
             var targetCapability= account.capabilities.get<&AnyResource>(nft.publicPath) as? Capability<&{NonFungibleToken.Collection}>
-            if targetCapability == nil || !targetCapability!.check() {
+            if  !targetCapability!.check() {
                 let cd = item.getNFTCollectionData()
                 let cap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(cd.storagePath)
                 account.capabilities.unpublish(cd.publicPath)

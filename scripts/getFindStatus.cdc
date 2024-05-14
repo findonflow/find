@@ -164,7 +164,7 @@ fun main(user: String) : FINDReport? {
             readyForWearables = false
         }
 
-        let wearablesCap= account.capabilities.get<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(Wearables.CollectionPublicPath)
+        let wearablesCap= account.capabilities.borrow<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(Wearables.CollectionPublicPath)
         if wearablesCap == nil {
             readyForWearables = false
         }

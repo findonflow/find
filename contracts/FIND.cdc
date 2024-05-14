@@ -1132,7 +1132,7 @@ access(all) contract FIND {
                 let salePrice=lease.salePrice
                 let uuid=lease.uuid
                 let offer= cb.borrow()!
-                let newProfile= getAccount(cb.address).capabilities.get<&{Profile.Public}>(Profile.publicPath)!
+                let newProfile= getAccount(cb.address).capabilities.get<&{Profile.Public}>(Profile.publicPath)
                 let avatar= newProfile.borrow()?.getAvatar() ?? panic("Create a profile before you fulfill a bid")
                 let soldFor=offer.getBalance(name)
 
@@ -1180,7 +1180,7 @@ access(all) contract FIND {
                 self.cancel(name)
                 return
             }
-            let newProfile= getAccount(auctionRef.latestBidCallback.address).capabilities.get<&{Profile.Public}>(Profile.publicPath)!
+            let newProfile= getAccount(auctionRef.latestBidCallback.address).capabilities.get<&{Profile.Public}>(Profile.publicPath)
             let avatar= newProfile.borrow()?.getAvatar() ?? panic("Create a profile before you fulfill a bid")
 
 
@@ -1225,7 +1225,7 @@ access(all) contract FIND {
             //if we have a callback there is no auction and it is a blind bid
             if let cb= tokenRef.offerCallback {
                 let bidder= cb.address
-                let bidderProfile= getAccount(bidder).capabilities.get<&{Profile.Public}>(Profile.publicPath)!.borrow()
+                let bidderProfile= getAccount(bidder).capabilities.get<&{Profile.Public}>(Profile.publicPath).borrow()
                 let bidderName= bidderProfile?.getName()
                 let bidderAvatar= bidderProfile?.getAvatar()
                 let owner=tokenRef.owner!.address
@@ -1349,8 +1349,8 @@ access(all) contract FIND {
 
         //TODO test
         access(LeaseOwner) fun registerUSDC(name: String, vault: @FiatToken.Vault){
-            let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)!
-            let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
+            let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)
+            let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
             let network=FIND.account.storage.borrow<&Network>(from: FIND.NetworkStoragePath)!
 
@@ -1364,9 +1364,8 @@ access(all) contract FIND {
 
         //This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
         access(LeaseOwner) fun register(name: String, vault: @FUSD.Vault){
-            let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)!
-            let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
-
+            let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)
+            let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
             let network=FIND.account.storage.borrow<&Network>(from: FIND.NetworkStoragePath)!
 
@@ -1379,8 +1378,8 @@ access(all) contract FIND {
 
         //This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
         access(LeaseOwner) fun registerDapper(merchAccount: Address, name: String, vault: @DapperUtilityCoin.Vault){
-            let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)!
-            let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
+            let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)
+            let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
             let network=FIND.account.storage.borrow<&Network>(from: FIND.NetworkStoragePath)!
 
@@ -1545,9 +1544,7 @@ access(all) contract FIND {
                 if vault.balance != cost {
                     panic("Vault did not contain ".concat(cost.toString()).concat(" amount of Dapper Credit"))
                 }
-                let wallet = getAccount(merchAccount).capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-
-                let walletRef = wallet!.borrow() ?? panic("Cannot borrow reference to Dapper Merch Account receiver. Address : ".concat(merchAccount.toString()))
+                let walletRef = getAccount(merchAccount).capabilities.borrow<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver) ?? panic("Cannot borrow reference to Dapper Merch Account receiver. Address : ".concat(merchAccount.toString()))
                 walletRef.deposit(from: <- vault)
                 self.internal_renew(name: name)
                 return
@@ -1679,9 +1676,7 @@ access(all) contract FIND {
                 panic("Vault did not contain ".concat(cost.toString()).concat(" amount of Dapper Credit"))
             }
 
-            let wallet = getAccount(merchAccount).capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-
-            let walletRef = wallet!.borrow() ?? panic("Cannot borrow reference to Dapper Merch Account receiver. Address : ".concat(merchAccount.toString()))
+            let walletRef = getAccount(merchAccount).capabilities.borrow<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver) ?? panic("Cannot borrow reference to Dapper Merch Account receiver. Address : ".concat(merchAccount.toString()))
             walletRef.deposit(from: <- vault)
             self.internal_register(name: name, profile: profile, leases: leases)
         }
@@ -1917,13 +1912,13 @@ access(all) contract FIND {
                 panic("cannot bid on your own name")
             }
 
-            let fromCap=getAccount(nameStatus.owner!).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
+            let fromCap=getAccount(nameStatus.owner!).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
             let bid <- create Bid(from: fromCap, name:name, vault: <- vault)
             let leaseCollection= fromCap.borrow() ?? panic("Could not borrow lease bid from owner of name=".concat(name))
 
 
-            let callbackCapability =self.owner!.capabilities.get<&{BidCollectionPublic}>(FIND.BidPublicPath)!
+            let callbackCapability =self.owner!.capabilities.get<&{BidCollectionPublic}>(FIND.BidPublicPath)
             let oldToken <- self.bids[bid.name] <- bid
             //send info to leaseCollection
             destroy oldToken
@@ -1942,11 +1937,11 @@ access(all) contract FIND {
             bid.setBidAt(Clock.time())
             bid.vault.deposit(from: <- vault)
 
-            let fromCap=getAccount(nameStatus.owner!).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-            if fromCap == nil {
+            let from=getAccount(nameStatus.owner!).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow()
+            if from == nil {
                 panic("The seller unlinked the lease collection capability. seller address : ".concat(nameStatus.owner!.toString()))
             }
-            fromCap!.borrow()!.increaseBid(name, balance: balance)
+            from!.increaseBid(name, balance: balance)
         }
 
         //cancel a bid, will panic if called after auction has started
@@ -1957,11 +1952,11 @@ access(all) contract FIND {
                 self.cancel(name)
                 return
             }
-            let fromCap=getAccount(nameStatus.owner!).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-            if fromCap == nil {
+            let from=getAccount(nameStatus.owner!).capabilities.borrow<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+            if from == nil {
                 panic("The seller unlinked the lease collection capability. seller address : ".concat(nameStatus.owner!.toString()))
             }
-            fromCap!.borrow()!.cancelUserBid(name)
+            from!.cancelUserBid(name)
             self.cancel(name)
         }
 

@@ -100,7 +100,7 @@ access(all) contract FindMarket {
         var caps : [Capability<&{FindMarket.SaleItemCollectionPublic}>] = []
         for type in self.getSaleItemCollectionTypes() {
             if type != nil {
-                let cap = getAccount(address).capabilities.get<&{FindMarket.SaleItemCollectionPublic}>(tenantRef.getPublicPath(type))!
+                let cap = getAccount(address).capabilities.get<&{FindMarket.SaleItemCollectionPublic}>(tenantRef.getPublicPath(type))
                 if cap.check() {
                     caps.append(cap)
                 }
@@ -313,8 +313,8 @@ access(all) contract FindMarket {
         var caps : [Capability<&{FindMarket.MarketBidCollectionPublic}>] = []
         for type in self.getMarketBidCollectionTypes() {
             let cap = getAccount(address).capabilities.get<&{FindMarket.MarketBidCollectionPublic}>(tenantRef.getPublicPath(type))
-            if cap != nil {
-                caps.append(cap!)
+            if cap.check() {
+                caps.append(cap)
             }
         }
         return caps
@@ -673,7 +673,7 @@ access(all) contract FindMarket {
             for key in self.findSaleItems.keys {
                 let val = self.findSaleItems[key]!
                 if val.cut != nil {
-                    let newReceiver = getAccount(val.cut!.receiver.address).capabilities.get<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)!
+                    let newReceiver = getAccount(val.cut!.receiver.address).capabilities.get<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)
                     let newCut = MetadataViews.Royalty(
                         receiver: newReceiver,
                         cut: val.cut!.cut,
@@ -692,7 +692,7 @@ access(all) contract FindMarket {
             for key in self.tenantSaleItems.keys {
                 let val = self.tenantSaleItems[key]!
                 if val.cut != nil {
-                    let newReceiver = getAccount(val.cut!.receiver.address).capabilities.get<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)!
+                    let newReceiver = getAccount(val.cut!.receiver.address).capabilities.get<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)
                     let newCut = MetadataViews.Royalty(
                         receiver: newReceiver,
                         cut: val.cut!.cut,
@@ -711,7 +711,7 @@ access(all) contract FindMarket {
             for key in self.findCuts.keys {
                 let val = self.findCuts[key]!
                 if val.cut != nil {
-                    let newReceiver = getAccount(val.cut!.receiver.address).capabilities.get<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)!
+                    let newReceiver = getAccount(val.cut!.receiver.address).capabilities.get<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)
                     let newCut = MetadataViews.Royalty(
                         receiver: newReceiver,
                         cut: val.cut!.cut,
@@ -1295,7 +1295,11 @@ access(all) contract FindMarket {
             "tenant is not registered in registry"
         }
 
-        return FindMarket.account.capabilities.get<&{TenantPublic}>(PublicPath(identifier:self.getTenantPathForAddress(marketplace))!)!
+        let cap= FindMarket.account.capabilities.get<&{TenantPublic}>(PublicPath(identifier:self.getTenantPathForAddress(marketplace))!)
+        if !cap.check() {
+            return nil
+        }
+        return cap
     }
 
 
@@ -1330,7 +1334,7 @@ access(all) contract FindMarket {
         var payInFUT = false
         var payInDUC = false
         let ftInfo = FTRegistry.getFTInfoByTypeIdentifier(ftType.identifier)! // If this panic, there is sth wrong in FT set up
-        let oldProfileCap= getAccount(seller).capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
+        let oldProfileCap= getAccount(seller).capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
         let oldProfile = self.getPaymentWallet(oldProfileCap, ftInfo, panicOnFailCheck: true)
 
         /* Check the total royalty to prevent changing of royalties */
