@@ -212,7 +212,7 @@ access(all) contract FungibleTokenSwitchboard {
     access(all) fun deposit(from: @{FungibleToken.Vault}) {
         // Get the capability from the ones stored at the switchboard
         let depositedVaultCapability = self.receiverCapabilities[from.getType()]
-        ?? panic ("The deposited vault is not available on this switchboard")
+        ?? panic ("The deposited vault is not available on this switchboard ".concat(from.getType().identifier))
 
         // Borrow the reference to the desired vault
         let vaultRef = depositedVaultCapability.borrow()

@@ -65,8 +65,6 @@ transaction(name: String) {
             account.capabilities.publish(cap, at: Dandy.CollectionPublicPath)
         }
 
-
-
         let findPackCap= account.capabilities.get<&{NonFungibleToken.Collection}>(FindPack.CollectionPublicPath)
         if !findPackCap.check() {
             account.storage.save( <- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)

@@ -70,15 +70,15 @@ transaction(address: Address, id: UInt64, amount: UFix64) {
             self.targetCapability=cap
         } else {
             //TODO: I do not think this works as intended
-            var targetCapability= account.capabilities.get<&AnyResource>(nft.publicPath) as? Capability<&{NonFungibleToken.Collection}>
-            if  !targetCapability!.check() {
+            var targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
+            if  !targetCapability.check() {
                 let cd = item.getNFTCollectionData()
                 let cap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(cd.storagePath)
                 account.capabilities.unpublish(cd.publicPath)
                 account.capabilities.publish(cap, at: cd.publicPath)
                 targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
             }
-            self.targetCapability=targetCapability!
+            self.targetCapability=targetCapability
 
         }
 
