@@ -9,6 +9,7 @@ transaction(dapperAddress: Address) {
         let dapper=getAccount(dapperAddress)
         //this is only for emulator
         let ducReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+        var ducBalanceCap = account.capabilities.get<&{FungibleToken.Vault}>(/public/dapperUtilityCoinVault)
         if !ducReceiver.check() {
             // Create a new Forwarder resource for DUC and store it in the new account's storage
             let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver))
@@ -16,8 +17,10 @@ transaction(dapperAddress: Address) {
             let receiverCap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/dapperUtilityCoinVault)
             account.capabilities.publish(receiverCap, at: /public/dapperUtilityCoinReceiver)
 
-            let vaultCap = account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/dapperUtilityCoinVault)
-            account.capabilities.publish(vaultCap, at: /public/dapperUtilityCoinVault)
+            if !ducBalanceCap.check() {
+                let vaultCap = account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/dapperUtilityCoinVault)
+                account.capabilities.publish(vaultCap, at: /public/dapperUtilityCoinVault)
+            }
         }
 
         //this is only for emulator

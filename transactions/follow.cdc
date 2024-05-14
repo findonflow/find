@@ -15,7 +15,7 @@ transaction(follows:{String : [String]}) {
 
 
         let fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-        if fusdReceiver == nil {
+        if !fusdReceiver.check(){
             let fusd <- FUSD.createEmptyVault()
             account.storage.save(<- fusd, to: /storage/fusdVault)
             var cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/fusdVault)
@@ -40,8 +40,8 @@ transaction(follows:{String : [String]}) {
         if !hasFlowWallet {
             let flowWallet=Profile.Wallet(
                 name:"Flow",
-                receiver:account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!,
-                balance:account.capabilities.get<&{FungibleToken.Vault}>(/public/flowTokenBalance)!,
+                receiver:account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver),
+                balance:account.capabilities.get<&{FungibleToken.Vault}>(/public/flowTokenBalance),
                 accept: Type<@FlowToken.Vault>(),
                 tags: ["flow"]
             )
@@ -51,25 +51,25 @@ transaction(follows:{String : [String]}) {
         if !hasFusdWallet {
             let fusdWallet=Profile.Wallet(
                 name:"FUSD",
-                receiver:account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)!,
-                balance:account.capabilities.get<&{FungibleToken.Vault}>(/public/fusdBalance)!,
+                receiver:account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver),
+                balance:account.capabilities.get<&{FungibleToken.Vault}>(/public/fusdBalance),
                 accept: Type<@FUSD.Vault>(),
                 tags: ["fusd", "stablecoin"]
             )
             self.profile.addWallet(fusdWallet)
         }
 
-        let leaseCollection = account.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
-        if leaseCollection == nil {
+        let leaseCollection = account.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+        if !leaseCollection.check() {
             account.storage.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
             let cap = account.capabilities.storage.issue<&FIND.LeaseCollection>(FIND.LeaseStoragePath)
             account.capabilities.publish(cap, at: FIND.LeasePublicPath)
         }
 
         let bidCollection = account.capabilities.get<&FIND.BidCollection>(FIND.BidPublicPath)
-        if bidCollection == nil {
-            let fr = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)!
-            let lc = account.capabilities.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)!
+        if !bidCollection.check(){
+            let fr = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
+            let lc = account.capabilities.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)
             account.storage.save(<- FIND.createEmptyBidCollection(receiver: fr, leases: lc), to: FIND.BidStoragePath)
             let cap = account.capabilities.storage.issue<&FIND.BidCollection>(FIND.BidStoragePath)
             account.capabilities.publish(cap, at: FIND.BidPublicPath)

@@ -29,12 +29,12 @@ transaction(user: String, id: UInt64, amount: UFix64) {
         let tenantCapability= FindMarket.getTenantCapability(marketplace)!
         let tenant = tenantCapability.borrow()!
 
-        let receiverCap=account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
+        let receiverCap=account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
         let asBidType= Type<@FindMarketAuctionSoft.MarketBidCollection>()
         let asBidPublicPath=FindMarket.getPublicPath(asBidType, name: tenant.name)
         let asBidStoragePath= FindMarket.getStoragePath(asBidType, name:tenant.name)
         let asBidCap= account.capabilities.get<&FindMarketAuctionSoft.MarketBidCollection>(asBidPublicPath)
-        if asBidCap == nil {
+        if !asBidCap.check() {
             account.storage.save<@FindMarketAuctionSoft.MarketBidCollection>(<- FindMarketAuctionSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: asBidStoragePath)
             let cap = account.capabilities.storage.issue<&FindMarketAuctionSoft.MarketBidCollection>(asBidStoragePath)
             account.capabilities.publish(cap, at: asBidPublicPath)
@@ -62,15 +62,15 @@ transaction(user: String, id: UInt64, amount: UFix64) {
             self.targetCapability=cap
         } else {
             //TODO: I do not think this works as intended
-            var targetCapability= account.capabilities.get<&AnyResource>(nft.publicPath) as? Capability<&{NonFungibleToken.Collection}>
-            if targetCapability == nil || !targetCapability!.check() {
+            var targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath) 
+            if !targetCapability.check() {
                 let cd = item.getNFTCollectionData()
                 let cap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(cd.storagePath)
                 account.capabilities.unpublish(cd.publicPath)
                 account.capabilities.publish(cap, at: cd.publicPath)
                 targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
             }
-            self.targetCapability=targetCapability!
+            self.targetCapability=targetCapability
         }
 
         self.walletReference = account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account. Account address : ".concat(account.address.toString()))

@@ -34,11 +34,11 @@ transaction(sellerAccount: Address, leaseName: String, amount: UFix64) {
         let leaseSaleItemType= Type<@FindLeaseMarketSale.SaleItemCollection>()
         let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: "find")
         let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:"find")
-        let leaseSaleItemCap= account.capabilities.get<&{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath)
-        if leaseSaleItemCap == nil {
+        var leaseSaleItemCap= account.capabilities.get<&{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath)
+        if !leaseSaleItemCap.check(){
             //The link here has to be a capability not a tenant, because it can change.
             account.storage.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
-            let leaseSaleItemCap= account.capabilities.storage.issue<&{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}>(leaseStoragePath)
+            leaseSaleItemCap= account.capabilities.storage.issue<&{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}>(leaseStoragePath)
         }
 
         self.to= account.address

@@ -49,14 +49,14 @@ transaction(name: String) {
         if !profile.hasWallet("DUC") {
             var ducReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
             var ducBalanceCap = account.capabilities.get<&{FungibleToken.Vault}>(/public/dapperUtilityCoinVault)
-            if ducReceiver == nil {
+            if !ducReceiver.check() {
                 // Create a new Forwarder resource for DUC and store it in the new account's storage
                 let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapper.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver))
                 account.storage.save(<-ducForwarder, to: /storage/dapperUtilityCoinVault)
                 ducReceiver = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/dapperUtilityCoinVault)
                 account.capabilities.publish(ducReceiver, at: /public/dapperUtilityCoinReceiver)
             }
-            if ducBalanceCap == nil {
+            if !ducBalanceCap.check() {
                 ducBalanceCap = account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/dapperUtilityCoinVault)
                 account.capabilities.publish(ducBalanceCap, at: /public/dapperUtilityCoinVault)
             }

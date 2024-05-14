@@ -14,7 +14,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
 
 
         let dandyCap= account.capabilities.get<&{NonFungibleToken.Collection}>(Dandy.CollectionPublicPath)
-        if dandyCap == nil {
+        if !dandyCap.check() {
             account.storage.save(<- Dandy.createEmptyCollection(nftType:Type<@Dandy.NFT>()), to: Dandy.CollectionStoragePath)
             let cap = account.capabilities.storage.issue<&Dandy.Collection>(Dandy.CollectionStoragePath)
             account.capabilities.publish(cap, at: Dandy.CollectionPublicPath)
@@ -44,7 +44,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
         let httpFile=MetadataViews.HTTPFile(url:nftUrl)
         let media=MetadataViews.Media(file: httpFile, mediaType: "image/png")
 
-        let receiver=account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
+        let receiver=account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
         let nftReceiver=account.capabilities.borrow<&{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(Dandy.CollectionPublicPath) ?? panic("Cannot borrow reference to Dandy collection.")
 
         let traits = MetadataViews.Traits([])
@@ -52,7 +52,7 @@ transaction(name: String, maxEdition:UInt64, artist:String, nftName:String, nftD
         traits.addTrait(MetadataViews.Trait(name: "Speed", value: 100.0, displayType:"Numeric", rarity:nil))
         traits.addTrait(MetadataViews.Trait(name: "Birthday", value: 1660145023.0, displayType:"Date", rarity:nil))
 
-        let collection=dandyCap!.borrow()!
+        let collection=dandyCap.borrow()!
         var i:UInt64=1
 
         while i <= maxEdition {

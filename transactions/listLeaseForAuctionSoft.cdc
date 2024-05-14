@@ -23,7 +23,7 @@ transaction(leaseName: String, ftAliasOrIdentifier:String, price:UFix64, auction
         let leaseASPublicPath=leaseTenant.getPublicPath(leaseASSaleItemType)
         let leaseASStoragePath= leaseTenant.getStoragePath(leaseASSaleItemType)
         let leaseASSaleItemCap= account.capabilities.get<&FindLeaseMarketAuctionSoft.SaleItemCollection>(leaseASPublicPath)
-        if leaseASSaleItemCap == nil {
+        if !leaseASSaleItemCap.check() {
             //The link here has to be a capability not a tenant, because it can change.
             account.storage.save<@FindLeaseMarketAuctionSoft.SaleItemCollection>(<- FindLeaseMarketAuctionSoft.createEmptySaleItemCollection(leaseTenantCapability), to: leaseASStoragePath)
             let saleColCap = account.capabilities.storage.issue<&FindLeaseMarketAuctionSoft.SaleItemCollection>(leaseASStoragePath)
