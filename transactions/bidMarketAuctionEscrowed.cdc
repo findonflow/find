@@ -66,7 +66,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
         } else {
             //TODO: I do not think this works as intended, this works as intended
             self.targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
-            if  self.targetCapability.check() {
+            if  !self.targetCapability.check() {
                 let cd = item.getNFTCollectionData()
                 let cap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(cd.storagePath)
                 account.capabilities.publish(cap, at: cd.publicPath)
