@@ -27,10 +27,6 @@ Taxonomy:
 - leaseStatus: FREE|TAKEN|LOCKED, a LOCKED lease can be reopend by the owner. A lease will be locked for 90 days before it is freed
 */
 access(all) contract FIND {
-
-    // Entitlements
-    access(all) entitlement Leasee
-
     //Old events not in use anymore we cannot remove
     access(all) event Sold()
     access(all) event SoldAuction()
@@ -617,7 +613,7 @@ access(all) contract FIND {
         access(all) fun checkAddon(name:String, addon: String) : Bool
         access(account) fun getNames() : [String]
         access(account) fun containsName(_ name: String) : Bool
-        access(Leasee) fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection>)
+        access(LeaseOwner) fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection>)
         access(all) fun getLeaseUUID(_ name: String) : UInt64
     }
 
@@ -1283,7 +1279,7 @@ access(all) contract FIND {
             tokenRef.setSalePrice(nil)
         }
 
-        access(Leasee) fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection>) {
+        access(LeaseOwner) fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection>) {
 
             let lease = self.borrowAuth(name)
             if !lease.validate() {

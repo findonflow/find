@@ -373,12 +373,12 @@ access(all) contract FindLeaseMarket {
     }
 
     access(all) struct AuthLeasePointer : LeasePointer {
-        access(self) let cap: Capability<auth(FIND.Leasee) &FIND.LeaseCollection>
+        access(self) let cap: Capability<auth(FIND.LeaseOwner) &FIND.LeaseCollection>
         access(all) let name: String
         access(all) let uuid: UInt64
 
         // Passing in the reference here to ensure that is the owner
-        init(cap:Capability<auth(FIND.Leasee) &FIND.LeaseCollection>, name: String) {
+        init(cap:Capability<auth(FIND.LeaseOwner) &FIND.LeaseCollection>, name: String) {
             self.cap=cap
             self.name=name
 
@@ -393,7 +393,7 @@ access(all) contract FindLeaseMarket {
             self.uuid = self.cap.borrow()!.getLeaseUUID(name)
         }
 
-        access(contract) fun borrow() : auth(FIND.Leasee) &{FIND.LeaseCollectionPublic} {
+        access(contract) fun borrow() : auth(FIND.LeaseOwner) &{FIND.LeaseCollectionPublic} {
             return self.cap.borrow() ?? panic("The capability of pointer is not linked.")
         }
 

@@ -7,10 +7,10 @@ transaction(name: String, receiver:String) {
 
     let receiverAddress:Address?
     //TODO: what entitlement is correct here?
-    let sender : auth(FIND.Leasee) &FIND.LeaseCollection
+    let sender : auth(FIND.LeaseOwner) &FIND.LeaseCollection
 
     prepare(acct: auth(BorrowValue) &Account) {
-        self.sender= acct.storage.borrow<auth(FIND.Leasee) &FIND.LeaseCollection>(from:FIND.LeaseStoragePath) ?? panic("You do not have a profile set up, initialize the user first")
+        self.sender= acct.storage.borrow<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(from:FIND.LeaseStoragePath) ?? panic("You do not have a profile set up, initialize the user first")
         self.receiverAddress=FIND.resolve(receiver)
     } 
 

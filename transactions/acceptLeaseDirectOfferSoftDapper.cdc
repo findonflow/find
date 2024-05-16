@@ -24,9 +24,9 @@ transaction(leaseName: String) {
         let providerIdentifier = storagePathIdentifer.concat("Provider")
         let providerStoragePath = StoragePath(identifier: providerIdentifier)!
 
-        var existingProvider= account.storage.copy<Capability<auth(FIND.Leasee) &FIND.LeaseCollection>>(from: providerStoragePath) 
+        var existingProvider= account.storage.copy<Capability<auth(FIND.LeaseOwner) &FIND.LeaseCollection>>(from: providerStoragePath) 
         if existingProvider==nil {
-            existingProvider=account.capabilities.storage.issue<auth(FIND.Leasee) &FIND.LeaseCollection>(FIND.LeaseStoragePath) 
+            existingProvider=account.capabilities.storage.issue<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(FIND.LeaseStoragePath) 
             account.storage.save(existingProvider!, to: providerStoragePath)
         }
         var cap = existingProvider!
