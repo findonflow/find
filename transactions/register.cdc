@@ -23,7 +23,7 @@ transaction(name: String, amount: UFix64) {
     }
 
     execute{
-        let payVault <- self.vaultRef!.withdraw(amount: self.price)
+        let payVault <- self.vaultRef!.withdraw(amount: self.price) as! @FUSD.Vault
 
         //TODO: entitlements
         self.leases!.register(name: name, vault: <- payVault)

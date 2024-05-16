@@ -9,7 +9,7 @@ transaction() {
 
     prepare(account: auth(SaveValue, IssueStorageCapabilityController,PublishCapability) &Account) {
 
-        let fusd <- FUSD.createEmptyVault()
+        let fusd <- FUSD.createEmptyVault(vaultType: Type<@FUSD.Vault>())
         account.storage.save(<- fusd, to: /storage/fusdVault)
         let cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/fusdVault)
         account.capabilities.publish(cap, at: /public/fusdReceiver)

@@ -14,7 +14,7 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 
         let fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
         if !fusdReceiver.check() {
-            let fusd <- FUSD.createEmptyVault()
+            let fusd <- FUSD.createEmptyVault(vaultType: Type<@FUSD.Vault>())
             account.storage.save(<- fusd, to: /storage/fusdVault)
             var cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/fusdVault)
             account.capabilities.publish(cap, at: /public/fusdReceiver)

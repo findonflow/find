@@ -1,7 +1,7 @@
 import "FungibleToken"
 import "FUSD"
 import "FlowToken"
-import "FiatToken"
+// import "FiatToken"
 import "DapperUtilityCoin"
 import "Profile"
 import "Debug"
@@ -310,7 +310,7 @@ access(all) contract FIND {
         access(contract) var auctionDuration: UFix64
         access(contract) var auctionMinBidIncrement: UFix64
         access(contract) var auctionExtensionOnLateBid: UFix64
-        access(contract) var offerCallback: Capability<&{BidCollectionPublic}>?
+        access(contract) var offerCallback: Capability<&BidCollection>?
         access(contract) var addons: {String: Bool}
 
         init(name:String, networkCap: Capability<&Network>) {
@@ -369,7 +369,7 @@ access(all) contract FIND {
             self.auctionStartPrice=price
         }
 
-        access(LeaseOwner) fun setCallback(_ callback: Capability<&{BidCollectionPublic}>?) {
+        access(LeaseOwner) fun setCallback(_ callback: Capability<&BidCollection>?) {
             self.offerCallback=callback
         }
 
@@ -474,10 +474,10 @@ access(all) contract FIND {
         access(contract) var endsAt: UFix64
         access(contract) var startedAt: UFix64
         access(contract) let extendOnLateBid: UFix64
-        access(contract) var latestBidCallback: Capability<&{BidCollectionPublic}>
+        access(contract) var latestBidCallback: Capability<&BidCollection>
         access(contract) let name: String
 
-        init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&{BidCollectionPublic}>, name: String) {
+        init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&BidCollection>, name: String) {
 
             if startedAt >= endsAt {
                 panic("Cannot start before it will end")
@@ -497,7 +497,7 @@ access(all) contract FIND {
             return cb.getBalance(self.name)
         }
 
-        access(account) fun addBid(callback: Capability<&{BidCollectionPublic}>, timestamp: UFix64, lease: &Lease) {
+        access(account) fun addBid(callback: Capability<&BidCollection>, timestamp: UFix64, lease: &Lease) {
             let offer=callback.borrow()!
             offer.setBidType(name: self.name, type: "auction")
 
@@ -602,7 +602,7 @@ access(all) contract FIND {
         access(contract) fun increaseBid(_ name: String, balance: UFix64)
 
         //place a bid on a token
-        access(contract) fun registerBid(name: String, callback: Capability<&{BidCollectionPublic}>)
+        access(contract) fun registerBid(name: String, callback: Capability<&BidCollection>)
 
         //anybody should be able to fulfill an auction as long as it is done
         access(all) fun fulfillAuction(_ name: String)
@@ -947,7 +947,7 @@ access(all) contract FIND {
 
         }
 
-        access(contract) fun registerBid(name: String, callback: Capability<&{BidCollectionPublic}>) {
+        access(contract) fun registerBid(name: String, callback: Capability<&BidCollection>) {
 
             if !self.leases.containsKey(name) {
                 panic("Invalid name=".concat(name))
@@ -1343,19 +1343,19 @@ access(all) contract FIND {
         }
 
 
-        //TODO test
-        access(LeaseOwner) fun registerUSDC(name: String, vault: @FiatToken.Vault){
-            let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)
-            let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+        // //TODO test
+        // access(LeaseOwner) fun registerUSDC(name: String, vault: @FiatToken.Vault){
+        //     let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)
+        //     let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
-            let network=FIND.account.storage.borrow<&Network>(from: FIND.NetworkStoragePath)!
+        //     let network=FIND.account.storage.borrow<&Network>(from: FIND.NetworkStoragePath)!
 
-            if !network.publicEnabled {
-                panic("Public registration is not enabled yet")
-            }
+        //     if !network.publicEnabled {
+        //         panic("Public registration is not enabled yet")
+        //     }
 
-            network.registerUSDC(name:name, vault: <- vault, profile: profileCap, leases: leases)
-        }
+        //     network.registerUSDC(name:name, vault: <- vault, profile: profileCap, leases: leases)
+        // }
 
 
         //This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
@@ -1593,35 +1593,35 @@ access(all) contract FIND {
         }
 
         //TODO test
-        access(all) fun registerUSDC(name: String, vault: @FiatToken.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
+        // access(all) fun registerUSDC(name: String, vault: @FiatToken.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
 
-            if name.length < 3 {
-                panic( "A FIND name has to be minimum 3 letters long")
-            }
+        //     if name.length < 3 {
+        //         panic( "A FIND name has to be minimum 3 letters long")
+        //     }
 
-            let nameStatus=self.readStatus(name)
-            if nameStatus.status == LeaseStatus.TAKEN {
-                panic("Name already registered")
-            }
+        //     let nameStatus=self.readStatus(name)
+        //     if nameStatus.status == LeaseStatus.TAKEN {
+        //         panic("Name already registered")
+        //     }
 
-            //if we have a locked profile that is not owned by the same identity then panic
-            if nameStatus.status == LeaseStatus.LOCKED {
-                panic("Name is locked")
-            }
+        //     //if we have a locked profile that is not owned by the same identity then panic
+        //     if nameStatus.status == LeaseStatus.LOCKED {
+        //         panic("Name is locked")
+        //     }
 
-            let cost= self.calculateCost(name)
-            if vault.balance != cost {
-                panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
-            }
+        //     let cost= self.calculateCost(name)
+        //     if vault.balance != cost {
+        //         panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
+        //     }
 
-            let address=self.wallet.address
-            let account=getAccount(address)
-            let usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
-            let usdcReceiver = usdcCap.borrow() ?? panic("cound not find usdc vault receiver for address".concat(self.wallet.address.toString()))
-            usdcReceiver.deposit(from: <- vault)
+        //     let address=self.wallet.address
+        //     let account=getAccount(address)
+        //     let usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
+        //     let usdcReceiver = usdcCap.borrow() ?? panic("cound not find usdc vault receiver for address".concat(self.wallet.address.toString()))
+        //     usdcReceiver.deposit(from: <- vault)
 
-            self.internal_register(name: name, profile: profile, leases: leases)
-        }
+        //     self.internal_register(name: name, profile: profile, leases: leases)
+        // }
 
         //everybody can call register, normally done through the convenience method in the contract
         access(all) fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
@@ -1812,13 +1812,13 @@ access(all) contract FIND {
     }
 
     access(all) resource Bid {
-        access(contract) let from: Capability<&{LeaseCollectionPublic}>
+        access(contract) let from: Capability<&LeaseCollection>
         access(contract) let name: String
         access(contract) var type: String
         access(contract) let vault: @FUSD.Vault
         access(contract) var bidAt: UFix64
 
-        init(from: Capability<&{LeaseCollectionPublic}>, name: String, vault: @FUSD.Vault){
+        init(from: Capability<&LeaseCollection>, name: String, vault: @FUSD.Vault){
             self.vault <- vault
             self.name=name
             self.from=from
@@ -1848,9 +1848,9 @@ access(all) contract FIND {
 
         access(contract) var bids : @{String: Bid}
         access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
-        access(contract) let leases: Capability<&{LeaseCollectionPublic}>
+        access(contract) let leases: Capability<&LeaseCollection>
 
-        init(receiver: Capability<&{FungibleToken.Receiver}>, leases: Capability<&{LeaseCollectionPublic}>) {
+        init(receiver: Capability<&{FungibleToken.Receiver}>, leases: Capability<&LeaseCollection>) {
             self.bids <- {}
             self.receiver=receiver
             self.leases=leases
@@ -1908,13 +1908,13 @@ access(all) contract FIND {
                 panic("cannot bid on your own name")
             }
 
-            let fromCap=getAccount(nameStatus.owner!).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+            let fromCap=getAccount(nameStatus.owner!).capabilities.get<&LeaseCollection>(FIND.LeasePublicPath)
 
             let bid <- create Bid(from: fromCap, name:name, vault: <- vault)
             let leaseCollection= fromCap.borrow() ?? panic("Could not borrow lease bid from owner of name=".concat(name))
 
 
-            let callbackCapability =self.owner!.capabilities.get<&{BidCollectionPublic}>(FIND.BidPublicPath)
+            let callbackCapability =self.owner!.capabilities.get<&BidCollection>(FIND.BidPublicPath)
             let oldToken <- self.bids[bid.name] <- bid
             //send info to leaseCollection
             destroy oldToken
@@ -2091,28 +2091,32 @@ access(all) contract FIND {
         self.BidStoragePath=/storage/findBids
 
         // Check if wallet is already initialized
-        if self.account.storage.borrow<&FUSD.Vault>(from: FUSD.VaultStoragePath) == nil {
+        if self.account.storage.borrow<&FUSD.Vault>(from: /storage/fusdVault) == nil {
+
+            // Unpublished the capabilites
+            self.account.capabilities.unpublish(/public/fusdBalance)
+            self.account.capabilities.unpublish(/public/fusdReceiver)
+
             // Initialize Wallet
-            let vault <- FUSD.createEmptyVault()
+            let vault <- FUSD.createEmptyVault(vaultType: Type<@FUSD.Vault>())
 
             // Save the vault to storage
-            self.account.storage.save(<-vault, to: FUSD.VaultStoragePath)
+            self.account.storage.save(<-vault, to: /storage/fusdVault)
 
             // Create a public capability for the vault
             let vaultCap = self.account.capabilities.storage.issue<&FUSD.Vault>(
-                FUSD.VaultStoragePath
+               /storage/fusdVault
             )
-            self.account.capabilities.publish(vaultCap, at: FUSD.VaultPublicPath)
 
-            let capb = self.account.capabilities.storage.issue<&{FungibleToken.Vault}>(FUSD.VaultStoragePath)
+            let capb = self.account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/fusdVault)
             self.account.capabilities.publish(capb, at: /public/fusdBalance)
 
 
             // Create a public Capability to the Vault's Receiver functionality
             let receiverCap = self.account.capabilities.storage.issue<&{FungibleToken.Receiver}>(
-                FUSD.VaultStoragePath
+                /storage/fusdVault
             )
-            self.account.capabilities.publish(receiverCap, at: FUSD.ReceiverPublicPath)
+            self.account.capabilities.publish(receiverCap, at: /public/fusdReceiver)
         }
 
         // Get

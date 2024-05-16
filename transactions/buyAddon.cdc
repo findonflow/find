@@ -21,7 +21,7 @@ transaction(name: String, addon:String, amount:UFix64) {
     }
 
     execute {
-        let vault <- self.vaultRef!.withdraw(amount: amount)
+        let vault <- self.vaultRef!.withdraw(amount: amount) as! @FUSD.Vault
         self.leases!.buyAddon(name: name, addon: addon, vault: <- vault)
     }
 }

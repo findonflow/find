@@ -36,7 +36,7 @@ transaction(packTypeName: String, packTypeId:UInt64, packId: UInt64, amount: UFi
 			//Add exising FUSD or create a new one and add it
 			let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 			if !fusdReceiver.check() {
-				let fusd <- FUSD.createEmptyVault()
+				let fusd <- FUSD.createEmptyVault(vaultType: Type<@FUSD.Vault>())
 				account.storage.save(<- fusd, to: /storage/fusdVault)
 				account.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
 				account.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)

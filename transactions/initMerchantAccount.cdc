@@ -27,7 +27,7 @@ transaction(dapperMerchantAccountAddress: Address) {
 		//FUSD
 		let fusdReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 		if !fusdReceiver.check() {
-			let fusd <- FUSD.createEmptyVault()
+			let fusd <- FUSD.createEmptyVault(vaultType: Type<@FUSD.Vault>())
 			acct.save(<- fusd, to: /storage/fusdVault)
 			acct.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
 			acct.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)

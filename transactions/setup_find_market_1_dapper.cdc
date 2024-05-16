@@ -24,7 +24,7 @@ transaction(dapperAddress: Address) {
         //FUSD
         var fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
         if !fusdReceiver.check() {
-            let fusd <- FUSD.createEmptyVault()
+            let fusd <- FUSD.createEmptyVault(vaultType: Type<@FUSD.Vault>())
 
             account.storage.save(<- fusd, to: /storage/fusdVault)
             var cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/fusdVault)
