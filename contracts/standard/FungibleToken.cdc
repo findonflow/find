@@ -4,12 +4,21 @@
 
 ## `FungibleToken` contract
 
-The Fungible Token standard is no longer an interface
-that all fungible token contracts would have to conform to.
-
 If a users wants to deploy a new token contract, their contract
-does not need to implement the FungibleToken interface, but their tokens
-do need to implement the interfaces defined in this contract.
+needs to implement the FungibleToken interface and their tokens
+need to implement the interfaces defined in this contract.
+
+/// Contributors (please add to this list if you contribute!):
+/// - Joshua Hannan - https://github.com/joshuahannan
+/// - Bastian Müller - https://twitter.com/turbolent
+/// - Dete Shirley - https://twitter.com/dete73
+/// - Bjarte Karlsen - https://twitter.com/0xBjartek
+/// - Austin Kline - https://twitter.com/austin_flowty
+/// - Giovanni Sanchez - https://twitter.com/gio_incognito
+/// - Deniz Edincik - https://twitter.com/bluesign
+/// - Jonny - https://github.com/dryruner
+///
+/// Repo reference: https://github.com/onflow/flow-ft
 
 ## `Vault` resource interface
 
@@ -36,21 +45,18 @@ import "Burner"
 
 /// FungibleToken
 ///
-/// Fungible Token implementations are no longer required to implement the fungible token
-/// interface. We still have it as an interface here because there are some useful
-/// utility methods that many projects will still want to have on their contracts,
-/// but they are by no means required. all that is required is that the token
-/// implements the `Vault` interface
+/// Fungible Token implementations should implement the fungible token
+/// interface.
 access(all) contract interface FungibleToken: ViewResolver {
 
     // An entitlement for allowing the withdrawal of tokens from a Vault
     access(all) entitlement Withdraw
 
     /// The event that is emitted when tokens are withdrawn from a Vault
-    access(all) event Withdrawn(type: String, amount: UFix64, from: Address?, fromUUID: UInt64, withdrawnUUID: UInt64)
+    access(all) event Withdrawn(type: String, amount: UFix64, from: Address?, fromUUID: UInt64, withdrawnUUID: UInt64, balanceAfter: UFix64)
 
     /// The event that is emitted when tokens are deposited to a Vault
-    access(all) event Deposited(type: String, amount: UFix64, to: Address?, toUUID: UInt64, depositedUUID: UInt64)
+    access(all) event Deposited(type: String, amount: UFix64, to: Address?, toUUID: UInt64, depositedUUID: UInt64, balanceAfter: UFix64)
 
     /// Event that is emitted when the global burn method is called with a non-zero balance
     access(all) event Burned(type: String, amount: UFix64, fromUUID: UInt64)
@@ -96,8 +102,7 @@ access(all) contract interface FungibleToken: ViewResolver {
             post {
                 // `result` refers to the return value
                 result.balance == amount:
-                "Withdrawal amount must be the same as the balance of the withdrawn Vault"
-                emit Withdrawn(type: self.getType().identifier, amount: amount, from: self.owner?.address, fromUUID: self.uuid, withdrawnUUID: result.uuid)
+                    "Withdrawal amount must be the same as the balance of the withdrawn Vault"
             }
         }
     }
@@ -118,7 +123,8 @@ access(all) contract interface FungibleToken: ViewResolver {
         ///
         access(all) fun deposit(from: @{Vault})
 
-        /// getSupportedVaultTypes optionally returns a list of vault types that this receiver accepts
+        /// getSupportedVaultTypes returns a dictionary of Vault types
+        /// and whether the type is currently supported by this Receiver
         access(all) view fun getSupportedVaultTypes(): {Type: Bool}
 
         /// Returns whether or not the given type is accepted by the Receiver
@@ -150,9 +156,10 @@ access(all) contract interface FungibleToken: ViewResolver {
             post {
                 self.balance == 0.0: "The balance must be set to zero during the burnCallback method so that it cannot be spammed"
             }
+            self.balance = 0.0
         }
 
-        /// getSupportedVaultTypes optionally returns a list of vault types that this receiver accepts
+        /// getSupportedVaultTypes returns a dictionary of vault types and whether this receiver accepts the indexed type
         /// The default implementation is included here because vaults are expected
         /// to only accepted their own type, so they have no need to provide an implementation
         /// for this function
@@ -179,14 +186,23 @@ access(all) contract interface FungibleToken: ViewResolver {
         access(Withdraw) fun withdraw(amount: UFix64): @{Vault} {
             pre {
                 self.balance >= amount:
-                "Amount withdrawn must be less than or equal than the balance of the Vault"
+                    "Amount withdrawn must be less than or equal than the balance of the Vault"
             }
             post {
+                result.getType() == self.getType(): "Must return the same vault type as self"
                 // use the special function `before` to get the value of the `balance` field
                 // at the beginning of the function execution
                 //
                 self.balance == before(self.balance) - amount:
-                "New Vault balance must be the difference of the previous balance and the withdrawn Vault balance"
+                    "New Vault balance must be the difference of the previous balance and the withdrawn Vault balance"
+                emit Withdrawn(
+                        type: result.getType().identifier,
+                        amount: amount,
+                        from: self.owner?.address,
+                        fromUUID: self.uuid,
+                        withdrawnUUID: result.uuid,
+                        balanceAfter: self.balance
+                )
             }
         }
 
@@ -197,12 +213,19 @@ access(all) contract interface FungibleToken: ViewResolver {
             // as the vault that is accepting the deposit
             pre {
                 from.isInstance(self.getType()): 
-                "Cannot deposit an incompatible token type"
-                emit Deposited(type: from.getType().identifier, amount: from.balance, to: self.owner?.address, toUUID: self.uuid, depositedUUID: from.uuid)
+                    "Cannot deposit an incompatible token type"
             }
             post {
+                emit Deposited(
+                        type: before(from.getType().identifier),
+                        amount: before(from.balance),
+                        to: self.owner?.address,
+                        toUUID: self.uuid,
+                        depositedUUID: before(from.uuid),
+                        balanceAfter: self.balance
+                )
                 self.balance == before(self.balance) + before(from.balance):
-                "New Vault balance must be the sum of the previous balance and the deposited Vault"
+                    "New Vault balance must be the sum of the previous balance and the deposited Vault"
             }
         }
 
@@ -211,6 +234,7 @@ access(all) contract interface FungibleToken: ViewResolver {
         access(all) fun createEmptyVault(): @{Vault} {
             post {
                 result.balance == 0.0: "The newly created Vault must have zero balance"
+                result.getType() == self.getType(): "The newly created Vault must have the same type as the creating vault"
             }
         }
     }

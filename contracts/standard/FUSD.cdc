@@ -19,7 +19,7 @@ access(all) contract FUSD: FungibleToken {
     access(all) let MinterProxyPublicPath: PublicPath
 
     // Total supply of fusd in existence
-    access(all) var totalSupply: UFix64s
+    access(all) var totalSupply: UFix64
 
     // -------- ViewResolver Functions for MetadataViews --------
     access(all) view fun getContractViews(resourceType: Type?): [Type] {

@@ -135,7 +135,7 @@ func TestFindAirdropper(t *testing.T) {
 		}
 
 		for _, want := range wants {
-			res.AssertEvent(t, "FUSD.TokensDeposited", want)
+			res.AssertEvent(t, "FungibleToken.Deposited", want)
 		}
 	})
 
@@ -171,7 +171,7 @@ func TestFindAirdropper(t *testing.T) {
 			"ftType":    fusd,
 		})
 
-		res.AssertEvent(t, "FUSD.TokensDeposited", map[string]interface{}{
+		res.AssertEvent(t, "FungibleToken.Deposited", map[string]interface{}{
 			"to":     otu.O.Address("find"),
 			"amount": 10.0,
 		})
