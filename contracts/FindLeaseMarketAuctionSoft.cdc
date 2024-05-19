@@ -26,7 +26,7 @@ access(all) contract FindLeaseMarketAuctionSoft {
         access(contract) var auctionStartedAt: UFix64?
         access(contract) var auctionValidUntil: UFix64?
         access(contract) var auctionEndsAt: UFix64?
-        access(contract) var offerCallback: Capability<&{MarketBidCollectionPublic}>?
+        access(contract) var offerCallback: Capability<&MarketBidCollection>?
         access(contract) var saleItemExtraField: {String : AnyStruct}
 
         init(pointer: FindLeaseMarket.AuthLeasePointer, vaultType: Type, auctionStartPrice:UFix64, auctionReservePrice:UFix64, auctionValidUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
@@ -145,7 +145,7 @@ access(all) contract FindLeaseMarketAuctionSoft {
             self.auctionStartPrice=price
         }
 
-        access(contract) fun setCallback(_ callback: Capability<&{MarketBidCollectionPublic}>?) {
+        access(contract) fun setCallback(_ callback: Capability<&MarketBidCollection>?) {
             self.offerCallback=callback
         }
 
@@ -219,7 +219,7 @@ access(all) contract FindLeaseMarketAuctionSoft {
         access(contract) fun registerIncreasedBid(_ name: String, oldBalance: UFix64)
 
         //place a bid on a token
-        access(contract) fun registerBid(name: String, callback: Capability<&{MarketBidCollectionPublic}>, vaultType:Type)
+        access(contract) fun registerBid(name: String, callback: Capability<&MarketBidCollection>, vaultType:Type)
 
         //only buyer can fulfill auctions since he needs to send funds for this type
         access(contract) fun fulfillAuction(name: String, vault: @{FungibleToken.Vault})
@@ -229,14 +229,14 @@ access(all) contract FindLeaseMarketAuctionSoft {
         //is this the best approach now or just put the NFT inside the saleItem?
         access(contract) var items: @{String: SaleItem}
 
-        access(contract) let tenantCapability: Capability<&{FindMarket.TenantPublic}>
+        access(contract) let tenantCapability: Capability<&FindMarket.Tenant>
 
-        init (_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) {
+        init (_ tenantCapability: Capability<&FindMarket.Tenant>) {
             self.items <- {}
             self.tenantCapability=tenantCapability
         }
 
-        access(self) fun getTenant() : &{FindMarket.TenantPublic} {
+        access(self) fun getTenant() : &FindMarket.Tenant {
             pre{
                 self.tenantCapability.check() : "Tenant client is not linked anymore"
             }
@@ -274,7 +274,7 @@ access(all) contract FindLeaseMarketAuctionSoft {
             return Type<@SaleItem>()
         }
 
-        access(self) fun addBid(name:String, newOffer: Capability<&{MarketBidCollectionPublic}>, oldBalance: UFix64) {
+        access(self) fun addBid(name:String, newOffer: Capability<&MarketBidCollection>, oldBalance: UFix64) {
             let saleItem=self.borrowAuth(name)
 
             let actionResult=self.getTenant().allowedAction(listingType: self.getListingType(), nftType: saleItem.getItemType(), ftType: saleItem.getFtType(), action: FindMarket.MarketAction(listing:false, name:"add bit in soft-auction"), seller: self.owner!.address ,buyer: newOffer.address)
@@ -336,7 +336,7 @@ access(all) contract FindLeaseMarketAuctionSoft {
         }
 
         //This is a function that buyer will call (via his bid collection) to register the bicCallback with the seller
-        access(contract) fun registerBid(name: String, callback: Capability<&{MarketBidCollectionPublic}>, vaultType: Type) {
+        access(contract) fun registerBid(name: String, callback: Capability<&MarketBidCollection>, vaultType: Type) {
 
             let timestamp=Clock.time()
 
@@ -527,7 +527,7 @@ access(all) contract FindLeaseMarketAuctionSoft {
     }
 
     access(all) resource Bid : FindLeaseMarket.Bid {
-        access(contract) let from: Capability<&{SaleItemCollectionPublic}>
+        access(contract) let from: Capability<&SaleItemCollection>
         access(contract) let leaseName: String
 
         access(contract) let vaultType: Type
@@ -535,7 +535,7 @@ access(all) contract FindLeaseMarketAuctionSoft {
         access(contract) var balance: UFix64
         access(contract) let bidExtraField: {String : AnyStruct}
 
-        init(from: Capability<&{SaleItemCollectionPublic}>, leaseName: String, vaultType:Type,  balance:UFix64, bidExtraField: {String : AnyStruct}){
+        init(from: Capability<&SaleItemCollection>, leaseName: String, vaultType:Type,  balance:UFix64, bidExtraField: {String : AnyStruct}){
             self.vaultType= vaultType
             self.balance=balance
             self.leaseName=leaseName
@@ -579,16 +579,16 @@ access(all) contract FindLeaseMarketAuctionSoft {
     access(all) resource MarketBidCollection: MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic {
         access(contract) var bids : @{String: Bid}
         access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
-        access(contract) let tenantCapability: Capability<&{FindMarket.TenantPublic}>
+        access(contract) let tenantCapability: Capability<&FindMarket.Tenant>
 
         //not sure we can store this here anymore. think it needs to be in every bid
-        init(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&{FindMarket.TenantPublic}>) {
+        init(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&FindMarket.Tenant>) {
             self.bids <- {}
             self.receiver=receiver
             self.tenantCapability=tenantCapability
         }
 
-        access(self) fun getTenant() : &{FindMarket.TenantPublic} {
+        access(self) fun getTenant() : &FindMarket.Tenant {
             pre{
                 self.tenantCapability.check() : "Tenant client is not linked anymore"
             }
@@ -626,12 +626,12 @@ access(all) contract FindLeaseMarketAuctionSoft {
                 panic("You already have an bid for this item, use increaseBid on that bid")
             }
 
-            let from=getAccount(FIND.status(name).owner!).capabilities.get<&{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))
+            let from=getAccount(FIND.status(name).owner!).capabilities.get<&SaleItemCollection>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))
 
             let bid <- create Bid(from: from, leaseName:name, vaultType: vaultType, balance:amount, bidExtraField: bidExtraField)
             let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for lease name=".concat(name))
 
-            let callbackCapability =self.owner!.capabilities.get<&{MarketBidCollectionPublic}>(self.getTenant().getPublicPath(Type<@MarketBidCollection>()))
+            let callbackCapability =self.owner!.capabilities.get<&MarketBidCollection>(self.getTenant().getPublicPath(Type<@MarketBidCollection>()))
             let oldToken <- self.bids[name] <- bid
             saleItemCollection.registerBid(name: name, callback: callbackCapability, vaultType: vaultType)
             destroy oldToken
@@ -695,11 +695,11 @@ access(all) contract FindLeaseMarketAuctionSoft {
     }
 
     //Create an empty lease collection that store your leases to a name
-    access(all) fun createEmptySaleItemCollection(_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) : @SaleItemCollection {
+    access(all) fun createEmptySaleItemCollection(_ tenantCapability: Capability<&FindMarket.Tenant>) : @SaleItemCollection {
         return <- create SaleItemCollection(tenantCapability)
     }
 
-    access(all) fun createEmptyMarketBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&{FindMarket.TenantPublic}>) : @MarketBidCollection {
+    access(all) fun createEmptyMarketBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&FindMarket.Tenant>) : @MarketBidCollection {
         return <- create MarketBidCollection(receiver: receiver, tenantCapability:tenantCapability)
     }
 
