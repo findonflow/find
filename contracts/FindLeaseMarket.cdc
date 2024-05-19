@@ -323,18 +323,18 @@ access(all) contract FindLeaseMarket {
         access(all) fun getUUID() :UInt64
         access(all) fun getLease() : FIND.LeaseInformation
         access(all) fun owner() : Address
-        access(contract) fun borrow() : &{FIND.LeaseCollectionPublic}
+        access(contract) fun borrow() : &FIND.LeaseCollection
     }
 
     access(all) struct ReadLeasePointer : LeasePointer {
-        access(self) let cap: Capability<&{FIND.LeaseCollectionPublic}>
+        access(self) let cap: Capability<&FIND.LeaseCollection>
         access(all) let name: String
         access(all) let uuid: UInt64
 
         // Passing in the reference here to ensure that is the owner
         init(name: String) {
             let address = FIND.lookupAddress(name) ?? panic("This lease name is not owned")
-            self.cap=getAccount(address).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+            self.cap=getAccount(address).capabilities.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)
             self.name=name
 
             if !self.cap.check() {
@@ -344,7 +344,7 @@ access(all) contract FindLeaseMarket {
             self.uuid = self.cap.borrow()!.getLeaseUUID(name)
         }
 
-        access(contract) fun borrow() : &{FIND.LeaseCollectionPublic} {
+        access(contract) fun borrow() : &FIND.LeaseCollection {
             return self.cap.borrow() ?? panic("The capability of pointer is not linked.")
         }
 
@@ -393,7 +393,7 @@ access(all) contract FindLeaseMarket {
             self.uuid = self.cap.borrow()!.getLeaseUUID(name)
         }
 
-        access(contract) fun borrow() : auth(FIND.LeaseOwner) &{FIND.LeaseCollectionPublic} {
+        access(contract) fun borrow() : auth(FIND.LeaseOwner) &FIND.LeaseCollection {
             return self.cap.borrow() ?? panic("The capability of pointer is not linked.")
         }
 

@@ -165,14 +165,14 @@ access(all) contract FindMarketSale {
         access(contract) var items: @{UInt64: SaleItem}
 
         //Not sure if this should be the interface or the impl
-        access(contract) let tenantCapability: Capability<&{FindMarket.TenantPublic}>
+        access(contract) let tenantCapability: Capability<&FindMarket.Tenant>
 
-        init (_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) {
+        init (_ tenantCapability: Capability<&FindMarket.Tenant>) {
             self.items <- {}
             self.tenantCapability=tenantCapability
         }
 
-        access(self) fun getTenant() : &{FindMarket.TenantPublic} {
+        access(self) fun getTenant() : &FindMarket.Tenant {
             if !self.tenantCapability.check() {
                 panic("Tenant client is not linked anymore")
             }
@@ -366,7 +366,7 @@ access(all) contract FindMarketSale {
     }
 
     //Create an empty lease collection that store your leases to a name
-    access(all) fun createEmptySaleItemCollection(_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) : @SaleItemCollection {
+    access(all) fun createEmptySaleItemCollection(_ tenantCapability: Capability<&FindMarket.Tenant>) : @SaleItemCollection {
         return <- create SaleItemCollection(tenantCapability)
     }
 

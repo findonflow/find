@@ -23,7 +23,7 @@ access(all) contract FindForgeOrder {
     // contractName : Resource UUID
     access(all) let contractNames : {String : UInt64}
 
-    access(all) resource interface Order:  ViewResolver.Resolver {
+    access(all) resource interface OrderPublic {
         access(all) fun getID(): UInt64
         access(all) fun getLeaseName(): String
         access(all) fun getMintType(): String
@@ -32,7 +32,7 @@ access(all) contract FindForgeOrder {
         access(all) fun getCollectionDisplay(): MetadataViews.NFTCollectionDisplay
     }
 
-    access(all) resource OrderResource: Order {
+    access(all) resource Order: OrderPublic, ViewResolver.Resolver {
         access(all) let id: UInt64
         access(all) let leaseName: String 
         access(all) let mintType: String 
@@ -113,23 +113,23 @@ access(all) contract FindForgeOrder {
     }
 
     access(all) resource interface OrderCollection {
-        access(all) fun borrow(_ id: UInt64): &{FindForgeOrder.Order}?
+        access(all) fun borrow(_ id: UInt64): &FindForgeOrder.Order?
         access(all) fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}
         access(all) view fun getIDs(): [UInt64]
-        access(all) fun deposit(token: @{FindForgeOrder.Order})
+        access(all) fun deposit(token: @FindForgeOrder.Order)
     }
 
     access(all) entitlement Owner
 
     access(all) resource Collection : OrderCollection, ViewResolver.ResolverCollection {
-        access(all) let orders: @{UInt64: {FindForgeOrder.Order}}
+        access(all) let orders: @{UInt64: FindForgeOrder.Order}
 
         init () {
             self.orders <- {}
         }
 
         // withdraw removes an NFT from the collection and moves it to the caller
-        access(Owner) fun withdraw(withdrawID: UInt64): @{FindForgeOrder.Order} {
+        access(Owner) fun withdraw(withdrawID: UInt64): @FindForgeOrder.Order {
             let token <- self.orders.remove(key: withdrawID) ?? panic("missing Order : ".concat(withdrawID.toString()))
 
             emit Withdraw(id: token.getID(), from: self.owner?.address)
@@ -139,7 +139,7 @@ access(all) contract FindForgeOrder {
 
         // deposit takes a NFT and adds it to the collections dictionary
         // and adds the ID to the id array
-        access(all) fun deposit(token: @{FindForgeOrder.Order}) {
+        access(all) fun deposit(token: @FindForgeOrder.Order) {
 
             emit Deposit(id: token.getID(), to: self.owner?.address)
 
@@ -153,7 +153,7 @@ access(all) contract FindForgeOrder {
 
         // borrowNFT gets a reference to an NFT in the collection
         // so that the caller can read its metadata and call its methods
-        access(all) fun borrow(_ id: UInt64): &{FindForgeOrder.Order}? {
+        access(all) fun borrow(_ id: UInt64): &FindForgeOrder.Order? {
             return &self.orders[id]
         }
 
@@ -165,7 +165,7 @@ access(all) contract FindForgeOrder {
     }
 
     access(account) fun orderForge(leaseName: String, mintType: String, minterCut: UFix64?, collectionDisplay: MetadataViews.NFTCollectionDisplay) {
-        let order <- create FindForgeOrder.OrderResource(lease: leaseName, mintType: mintType, minterCut: minterCut, collectionDisplay: collectionDisplay)
+        let order <- create FindForgeOrder.Order(lease: leaseName, mintType: mintType, minterCut: minterCut, collectionDisplay: collectionDisplay)
         let c = collectionDisplay
         let s : {String : String} = {}
         for social in c.socials.keys {
@@ -191,7 +191,7 @@ access(all) contract FindForgeOrder {
         destroy order
     }
 
-    access(account) fun fulfillForgeOrder(_ contractName: String, forgeType: Type) : &{FindForgeOrder.Order} {
+    access(account) fun fulfillForgeOrder(_ contractName: String, forgeType: Type) : &FindForgeOrder.Order {
         let id = FindForgeOrder.contractNames[contractName] ?? panic("Forge is not ordered. identifier : ".concat(contractName))
         let queuedCol = FindForgeOrder.account.storage.borrow<auth(Owner) &FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
         let order <- queuedCol.withdraw(withdrawID: id) 
