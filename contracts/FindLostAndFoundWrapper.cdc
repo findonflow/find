@@ -36,7 +36,7 @@ access(all) contract FindLostAndFoundWrapper {
         item: FindViews.AuthNFTPointer,
         memo: String?,
         storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault},
-        flowTokenRepayment: Capability<&{FungibleToken.Receiver}> ,
+        flowTokenRepayment: Capability<&FlowToken.Vault> ,
         subsidizeReceiverStorage: Bool
     ) : UInt64? {
 

@@ -176,14 +176,14 @@ access(all) contract FindMarketDirectOfferEscrow {
         //is this the best approach now or just put the NFT inside the saleItem?
         access(contract) var items: @{UInt64: SaleItem}
 
-        access(contract) let tenantCapability: Capability<&{FindMarket.TenantPublic}>
+        access(contract) let tenantCapability: Capability<&FindMarket.Tenant>
 
-        init (_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) {
+        init (_ tenantCapability: Capability<&FindMarket.Tenant>) {
             self.items <- {}
             self.tenantCapability=tenantCapability
         }
 
-        access(self) fun getTenant() : &{FindMarket.TenantPublic} {
+        access(self) fun getTenant() : &FindMarket.Tenant {
             if !self.tenantCapability.check() {
                 panic("Tenant client is not linked anymore")
             }
@@ -450,7 +450,7 @@ access(all) contract FindMarketDirectOfferEscrow {
     }
 
     access(all) resource Bid : FindMarket.Bid {
-        access(contract) let from: Capability<&{SaleItemCollectionPublic}>
+        access(contract) let from: Capability<&SaleItemCollection>
         access(contract) let nftCap: Capability<&{NonFungibleToken.Receiver}>
         access(contract) let itemUUID: UInt64
 
@@ -460,7 +460,7 @@ access(all) contract FindMarketDirectOfferEscrow {
         access(contract) var bidAt: UFix64
         access(contract) let bidExtraField: {String : AnyStruct}
 
-        init(from: Capability<&{SaleItemCollectionPublic}>, itemUUID: UInt64, vault: @{FungibleToken.Vault}, nftCap: Capability<&{NonFungibleToken.Receiver}>, bidExtraField: {String : AnyStruct}) {
+        init(from: Capability<&SaleItemCollection>, itemUUID: UInt64, vault: @{FungibleToken.Vault}, nftCap: Capability<&{NonFungibleToken.Receiver}>, bidExtraField: {String : AnyStruct}) {
             self.vaultType=vault.getType()
             self.vault <- vault
             self.itemUUID=itemUUID
@@ -502,16 +502,16 @@ access(all) contract FindMarketDirectOfferEscrow {
 
         access(contract) var bids : @{UInt64: Bid}
         access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
-        access(contract) let tenantCapability: Capability<&{FindMarket.TenantPublic}>
+        access(contract) let tenantCapability: Capability<&FindMarket.Tenant>
 
         //not sure we can store this here anymore. think it needs to be in every bid
-        init(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&{FindMarket.TenantPublic}>) {
+        init(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&FindMarket.Tenant>) {
             self.bids <- {}
             self.receiver=receiver
             self.tenantCapability=tenantCapability
         }
 
-        access(self) fun getTenant() : &{FindMarket.TenantPublic} {
+        access(self) fun getTenant() : &FindMarket.Tenant {
             if !self.tenantCapability.check() {
                 panic("Tenant client is not linked anymore")
             }
@@ -591,7 +591,7 @@ access(all) contract FindMarketDirectOfferEscrow {
                     panic("Offer price should be greater than 0.65")
                 }
             }
-            let from=getAccount(item.owner()).capabilities.get<&{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))!
+            let from=getAccount(item.owner()).capabilities.get<&SaleItemCollection>(tenant.getPublicPath(Type<@SaleItemCollection>()))!
 
             let bid <- create Bid(from: from, itemUUID:item.getUUID(), vault: <- vault, nftCap: nftCap, bidExtraField: bidExtraField)
             let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for id=".concat(uuid.toString()))
@@ -649,20 +649,20 @@ access(all) contract FindMarketDirectOfferEscrow {
         }
     }
     //Create an empty lease collection that store your leases to a name
-    access(all)   fun createEmptySaleItemCollection(_ tenantCapability: Capability<&{FindMarket.TenantPublic}>): @SaleItemCollection {
+    access(all)   fun createEmptySaleItemCollection(_ tenantCapability: Capability<&FindMarket.Tenant>): @SaleItemCollection {
         return <- create SaleItemCollection(tenantCapability)
     }
 
-    access(all) fun createEmptyMarketBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&{FindMarket.TenantPublic}>) : @MarketBidCollection {
+    access(all) fun createEmptyMarketBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&FindMarket.Tenant>) : @MarketBidCollection {
         return <- create MarketBidCollection(receiver: receiver, tenantCapability:tenantCapability)
     }
 
-    access(all) fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&{SaleItemCollectionPublic}>? {
+    access(all) fun getSaleItemCapability(marketplace:Address, user:Address) : Capability<&SaleItemCollection>? {
         if FindMarket.getTenantCapability(marketplace) == nil {
             panic("Invalid tenant")
         }
         if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
-            return getAccount(user).capabilities.get<&{SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
+            return getAccount(user).capabilities.get<&SaleItemCollection>(tenant.getPublicPath(Type<@SaleItemCollection>()))
         }
         return nil
     }
