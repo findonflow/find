@@ -57,7 +57,7 @@ access(all) contract FindMarketAuctionEscrow {
             return self.pointer.getUUID()
         }
 
-        access(all) fun acceptEscrowedBid() : @{FungibleToken.Vault} {
+        access(Seller | contract) fun acceptEscrowedBid() : @{FungibleToken.Vault} {
             if !self.offerCallback!.check()  {
                 panic("bidder unlinked the bid collection capability. bidder address : ".concat(self.offerCallback!.address.toString()))
             }

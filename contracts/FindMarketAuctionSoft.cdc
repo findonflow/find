@@ -204,7 +204,7 @@ access(all) contract FindMarketAuctionSoft {
             return self.vaultType
         }
 
-        access(all) fun setValidUntil(_ time: UFix64?) {
+        access(Seller) fun setValidUntil(_ time: UFix64?) {
             self.auctionValidUntil=time
         }
 
