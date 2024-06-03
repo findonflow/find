@@ -61,7 +61,7 @@ access(all) contract FindAirdropper {
         pointer.deposit(<- item)
     }
 
-    access(all) fun forcedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault}, flowTokenRepayment: Capability<&{FungibleToken.Receiver}>, deepValidation: Bool) {
+    access(all) fun forcedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault}, flowTokenRepayment: Capability<&FlowToken.Vault>, deepValidation: Bool) {
 
         let toName = FIND.reverseLookup(receiver)
         let from = pointer.owner()
@@ -93,7 +93,7 @@ access(all) contract FindAirdropper {
         emit AirdroppedToLostAndFound(from: pointer.owner() , fromName: fromName, to: receiver, toName: toName, uuid: pointer.uuid, nftInfo: nftInfo, context: context, remark: nil, ticketID: ticketID!)
     }
 
-    access(all) fun subsidizedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault}, flowTokenRepayment: Capability<&{FungibleToken.Receiver}>, deepValidation: Bool) {
+    access(all) fun subsidizedAirdrop(pointer: FindViews.AuthNFTPointer, receiver: Address, path: PublicPath, context: {String : String}, storagePayment: auth(FungibleToken.Withdraw) &{FungibleToken.Vault}, flowTokenRepayment: Capability<&FlowToken.Vault>, deepValidation: Bool) {
 
         let toName = FIND.reverseLookup(receiver)
         let from = pointer.owner()
