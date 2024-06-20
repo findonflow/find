@@ -841,8 +841,6 @@ access(all) contract FIND {
             let offer=callback.borrow()!
             offer.setBidType(name: name, type: "auction")
 
-
-
             let bidder= callback.address
             let bidderProfile= getAccount(bidder).capabilities.borrow<&{Profile.Public}>(Profile.publicPath) ?? panic("Bidder unlinked the profile capability. bidder address : ".concat(bidder.toString()))
             let bidderName= bidderProfile.getName()
@@ -1207,7 +1205,6 @@ access(all) contract FIND {
 
         access(LeaseOwner) fun listForAuction(name :String, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64) {
 
-
             if !self.leases.containsKey(name) {
                 panic("Cannot list name for sale that is not registered to you name=".concat(name))
             }
@@ -1256,7 +1253,8 @@ access(all) contract FIND {
         }
 
 
-        access(AuctionOwner) fun delistAuction(_ name: String) {
+        //keep this
+        access(all) fun delistAuction(_ name: String) {
 
             if !self.leases.containsKey(name) {
                 panic("Cannot delist name for sale that is not registered to you name=".concat(name))
@@ -1269,7 +1267,8 @@ access(all) contract FIND {
         }
 
 
-        access(LeaseOwner) fun delistSale(_ name: String) {
+        //keep this
+        access(all) fun delistSale(_ name: String) {
             if !self.leases.containsKey(name) {
                 panic("Cannot list name for sale that is not registered to you name=".concat(name))
             }
@@ -1516,6 +1515,7 @@ access(all) contract FIND {
         }
 
 
+        //TODO: add support for Fiat
         //this method is only called from a lease, and only the owner has that capability
         access(contract) fun renew(name: String, vault: @FUSD.Vault) {
             if let lease= self.profiles[name] {
@@ -2105,7 +2105,7 @@ access(all) contract FIND {
 
             // Create a public capability for the vault
             let vaultCap = self.account.capabilities.storage.issue<&FUSD.Vault>(
-               /storage/fusdVault
+                /storage/fusdVault
             )
 
             let capb = self.account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/fusdVault)
