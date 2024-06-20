@@ -80,7 +80,7 @@ access(all) contract Dandy :NonFungibleToken{
             return self.id
         }
 
-        access(all) fun increaseNounce() {
+        access(contract) fun increaseNounce() {
             self.nounce=self.nounce+1
         }
 

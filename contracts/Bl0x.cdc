@@ -191,7 +191,7 @@ access(all) contract Bl0x: NonFungibleToken {
             return nil
         }
 
-        access(all) fun increaseNounce() {
+        access(contract) fun increaseNounce() {
             self.nounce=self.nounce+1
         }
 

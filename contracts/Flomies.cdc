@@ -155,7 +155,7 @@ access(all) contract Flomies: NonFungibleToken{
             return nil
         }
 
-        access(all) fun increaseNounce() {
+        access(contract) fun increaseNounce() {
             self.nounce=self.nounce+1
         }
 
@@ -228,14 +228,9 @@ access(all) contract Flomies: NonFungibleToken{
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
-        access(self) var storagePath: StoragePath
-        access(self) var publicPath: PublicPath
 
         init () {
             self.ownedNFTs <- {}
-            let identifier = "FlomiesNFTCollection"
-            self.storagePath = StoragePath(identifier: identifier)!
-            self.publicPath = PublicPath(identifier: identifier)!
         }
 
         // withdraw removes an NFT from the collection and moves it to the caller
@@ -293,15 +288,7 @@ access(all) contract Flomies: NonFungibleToken{
             return supportedTypes
         }
 
-        /// Return the default storage path for the collection
-        access(all) view fun getDefaultStoragePath(): StoragePath? {
-            return self.storagePath
-        }
-
-        /// Return the default public path for the collection
-        access(all) view fun getDefaultPublicPath(): PublicPath? {
-            return self.publicPath
-        }
+  
 
         /// Returns whether or not the given type is accepted by the collection
         /// A collection that can accept any type should just return true by default
