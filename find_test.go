@@ -570,6 +570,7 @@ access(all) fun main(name: String) :  Address? {
   "user1",
 }`))
 	})
+  /*
 
 	ot.Run(t, "Should not be able to list old leases for sale", func(t *testing.T) {
 		otu.expireLease().expireLease().tickClock(2.0)
@@ -631,6 +632,7 @@ access(all) fun main(name: String) :  Address? {
 			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
 	})
+  */
 
 	ot.Run(t, "Should be able to cleanup invalid leases", func(t *testing.T) {
 		otu.O.Tx("cleanUpInvalidatedLease",

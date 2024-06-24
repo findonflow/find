@@ -1,16 +1,12 @@
 package test_main
 
+/*
 import (
-	"testing"
-
 	. "github.com/bjartek/overflow/v2"
-	"github.com/stretchr/testify/assert"
 )
 
-/*
 Tests must be in the same folder as flow.json with contracts and transactions/scripts in subdirectories in order for the path resolver to work correctly
 this tests must be split up or rename, it could be called TestFindNativeMarket
-*/
 func TestAuction(t *testing.T) {
 	otu := &OverflowTestUtils{T: t, O: ot.O}
 
@@ -432,3 +428,4 @@ func TestAuction(t *testing.T) {
 			)
 	})
 }
+*/

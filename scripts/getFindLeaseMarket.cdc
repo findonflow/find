@@ -37,7 +37,7 @@ access(all) fun main(user: String) : FINDReport? {
     let leasesSale : {String : FindLeaseMarket.SaleItemCollectionReport} = FindLeaseMarket.getSaleItemReport(tenant:find, address: address, getLeaseInfo:true)
     let consolidatedLeasesSale = addLeasesSale([], leasesSale)
     let leasesBids : {String : FindLeaseMarket.BidItemCollectionReport} = FindLeaseMarket.getBidsReport(tenant:find, address: address, getLeaseInfo:true)
-    let consolidatedLeaseBid = addLeasesBid([], leasesBids)
+    let consolidatedLeaseBid = addLeasesBid(leasesBids)
 
     return FINDReport(
         leasesForSale: consolidatedLeasesSale,
@@ -423,117 +423,10 @@ access(all) fun BidReportFromFindLeaseMarket(_ s: FindLeaseMarket.BidItemCollect
 
 }
 
-access(all) fun transformLeaseBid(_ leases: [FIND.BidInfo]) : {String : BidItemCollectionReport} {
-    let output : {String : BidItemCollectionReport} = {}
-    let auctionCollection : [BidInfo] = []
-    let OfferCollection : [BidInfo] = []
-    for l in leases {
-        if l.type != "auction" {
 
-            var sellerName : String? = nil
-            if l.lease?.address != nil {
-                sellerName = FIND.reverseLookup(l.lease!.address)
-            }
 
-            var bidderName : String? = nil
-            if l.lease?.latestBidBy != nil {
-                bidderName = FIND.reverseLookup(l.lease!.latestBidBy!)
-            }
+access(all) fun addLeasesBid(_ sales : {String : FindLeaseMarket.BidItemCollectionReport}) : {String : BidItemCollectionReport} {
 
-            let saleInfo = SaleItemInformation(
-                leaseIdentifier: Type<@FIND.Lease>().identifier,
-                leaseName: l.name,
-                seller: l.lease?.address,
-                sellerName: sellerName,
-                amount: l.amount,
-                bidder: l.lease?.latestBidBy,
-                bidderName: bidderName,
-                listingId: nil,
-                saleType: Type<@FIND.Lease>().identifier,
-                listingTypeIdentifier: Type<@FIND.Lease>().identifier,
-                ftAlias: "FUSD",
-                ftTypeIdentifier: Type<@FUSD.Vault>().identifier,
-                listingValidUntil: nil,
-                lease: LeaseInfoFromFIND(l.lease),
-                auction: nil,
-                listingStatus:"active_ongoing",
-                saleItemExtraField: {},
-                market: "FIND"
-            )
-
-            let a = BidInfo(
-                name: l.name,
-                bidAmount: l.amount,
-                bidTypeIdentifier: Type<@FIND.Lease>().identifier,
-                timestamp: Clock.time(),
-                item: saleInfo,
-                market: "FIND"
-            )
-
-            auctionCollection.append(a)
-        } else if l.type != "blind" {
-
-            var sellerName : String? = nil
-            if l.lease?.address != nil {
-                sellerName = FIND.reverseLookup(l.lease!.address)
-            }
-
-            var bidderName : String? = nil
-            if l.lease?.latestBidBy != nil {
-                bidderName = FIND.reverseLookup(l.lease!.latestBidBy!)
-            }
-
-            let saleInfo = SaleItemInformation(
-                leaseIdentifier: Type<@FIND.Lease>().identifier,
-                leaseName: l.name,
-                seller: l.lease?.address,
-                sellerName: sellerName,
-                amount: l.amount,
-                bidder: l.lease?.latestBidBy,
-                bidderName: bidderName,
-                listingId: nil,
-                saleType: Type<@FIND.Lease>().identifier,
-                listingTypeIdentifier: Type<@FIND.Lease>().identifier,
-                ftAlias: "FUSD",
-                ftTypeIdentifier: Type<@FUSD.Vault>().identifier,
-                listingValidUntil: nil,
-                lease: LeaseInfoFromFIND(l.lease),
-                auction: nil,
-                listingStatus:"active_offered",
-                saleItemExtraField: {},
-                market: "FIND"
-            )
-
-            let a = BidInfo(
-                name: l.name,
-                bidAmount: l.amount,
-                bidTypeIdentifier: Type<@FIND.Lease>().identifier,
-                timestamp: Clock.time(),
-                item: saleInfo,
-                market: "FIND"
-            )
-
-            OfferCollection.append(a)
-        }
-
-    }
-
-    output["FindLeaseMarketAuctionEscrow"] = BidItemCollectionReport(
-        items: auctionCollection,
-        ghosts: []
-    )
-
-    output["FindLeaseMarketDirectOfferEscrow"] = BidItemCollectionReport(
-        items: OfferCollection,
-        ghosts: []
-    )
-
-    return output
-}
-
-access(all) fun addLeasesBid(_ leases: [FIND.BidInfo], _ sales : {String : FindLeaseMarket.BidItemCollectionReport}) : {String : BidItemCollectionReport} {
-
-    let FINDLeasesSale = transformLeaseBid(leases)
     let s : {String : BidItemCollectionReport} = {}
     for key in sales.keys {
         let val = sales[key]!
@@ -541,15 +434,12 @@ access(all) fun addLeasesBid(_ leases: [FIND.BidInfo], _ sales : {String : FindL
     }
 
     let findLeaseMarketSale = s["FindLeaseMarketSale"] ?? BidItemCollectionReport(items: [], ghosts: [])
-    findLeaseMarketSale.combine(FINDLeasesSale["FindLeaseMarketSale"])
     s["FindLeaseMarketSale"] = findLeaseMarketSale
 
     let FindLeaseMarketAuctionEscrow = s["FindLeaseMarketAuctionEscrow"] ?? BidItemCollectionReport(items: [], ghosts: [])
-    FindLeaseMarketAuctionEscrow.combine(FINDLeasesSale["FindLeaseMarketAuctionEscrow"])
     s["FindLeaseMarketAuctionEscrow"] = FindLeaseMarketAuctionEscrow
 
     let FindLeaseMarketDirectOfferEscrow = s["FindLeaseMarketDirectOfferEscrow"] ?? BidItemCollectionReport(items: [], ghosts: [])
-    FindLeaseMarketDirectOfferEscrow.combine(FINDLeasesSale["FindLeaseMarketDirectOfferEscrow"])
     s["FindLeaseMarketDirectOfferEscrow"] = FindLeaseMarketDirectOfferEscrow
     return s
 }

@@ -63,16 +63,6 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
             let cap = account.capabilities.storage.issue<&FIND.LeaseCollection>(FIND.LeaseStoragePath)
             account.capabilities.publish(cap, at: FIND.LeasePublicPath)
         }
-
-
-        let bidCollection = account.capabilities.get<&FIND.BidCollection>(FIND.BidPublicPath)
-        if !bidCollection.check() {
-            let fr = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-            let lc = account.capabilities.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)
-            account.storage.save(<- FIND.createEmptyBidCollection(receiver: fr, leases: lc), to: FIND.BidStoragePath)
-            let cap = account.capabilities.storage.issue<&FIND.BidCollection>(FIND.BidStoragePath)
-            account.capabilities.publish(cap, at: FIND.BidPublicPath)
-        }
     }
 
     execute{
