@@ -15,7 +15,7 @@ func TestFindAirdropper(t *testing.T) {
 
 	id := dandyIds[0]
 	dandyType := dandyNFTType(otu)
-	fusd := otu.identifier("FUSD", "Vault")
+	flowToken := otu.identifier("FlowToken", "Vault")
 
 	ot.Run(t, "Should be able to send Airdrop", func(t *testing.T) {
 		otu.O.Tx("sendNFTsSafe",
@@ -111,7 +111,7 @@ func TestFindAirdropper(t *testing.T) {
 			WithArg("nftIdentifiers", []string{dandyType}),
 			WithArg("ids", []uint64{id}),
 			WithArg("memos", []string{"Message 0"}),
-			WithArg("donationTypes", []string{fusd}),
+			WithArg("donationTypes", []string{flowToken}),
 			WithArg("donationAmounts", []float64{10.0}),
 			WithArg("findDonationType", nil),
 			WithArg("findDonationAmount", nil),
@@ -122,7 +122,7 @@ func TestFindAirdropper(t *testing.T) {
 				"fromName": "user1",
 				"to":       otu.O.Address("user2"),
 				"toName":   "user2",
-			})
+			}).Print()
 		wants := []map[string]interface{}{
 			{
 				"amount": 6.6666666,
@@ -135,12 +135,12 @@ func TestFindAirdropper(t *testing.T) {
 		}
 
 		for _, want := range wants {
-			res.AssertEvent(t, "FungibleToken.Deposited", want)
+			res.AssertEvent(t, ".FungibleToken.Deposited", want)
 		}
 	})
 
 	ot.Run(t, "Should be able to send Airdrop and donate funds to FIND!", func(t *testing.T) {
-		optional := cadence.NewOptional(cadence.String(fusd))
+		optional := cadence.NewOptional(cadence.String(flowToken))
 
 		res := otu.O.Tx("sendNFTs",
 			WithSigner("user1"),
@@ -168,10 +168,10 @@ func TestFindAirdropper(t *testing.T) {
 			"message":   "donation to .find",
 			"tag":       "donation",
 			"amount":    10.0,
-			"ftType":    fusd,
+			"ftType":    flowToken,
 		})
 
-		res.AssertEvent(t, "FungibleToken.Deposited", map[string]interface{}{
+		res.AssertEvent(t, ".FungibleToken.Deposited", map[string]interface{}{
 			"to":     otu.O.Address("find"),
 			"amount": 10.0,
 		})
