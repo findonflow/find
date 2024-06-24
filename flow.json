@@ -17,8 +17,8 @@
       "source": "./contracts/standard/FungibleTokenSwitchboard.cdc",
       "aliases": {
         "testnet": "9a0766d93b6608b7",
-        "previewnet": "0xa0225e7000ac82a9"
-        "emulator": "ee82856bf20e2aa6",
+        "previewnet": "0xa0225e7000ac82a9",
+        "emulator": "ee82856bf20e2aa6"
       }
     },
     "EmeraldIdentity": {
