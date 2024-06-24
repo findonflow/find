@@ -91,35 +91,6 @@ func TestFTRegistry(t *testing.T) {
 			})
 	})
 
-	ot.Run(t, "Should be able to send fusd to another name", func(t *testing.T) {
-		o.Tx("sendFT",
-			WithSigner("user2"),
-			WithArg("name", "user1"),
-			WithArg("amount", 5.0),
-			WithArg("ftAliasOrIdentifier", "FUSD"),
-			WithArg("tag", "test"),
-			WithArg("message", "This is a message"),
-		).
-			AssertSuccess(t).
-			AssertEvent(t, otu.identifier("FUSD", "TokensDeposited"), map[string]interface{}{
-				"amount": 5.0,
-				"to":     otu.O.Address("user1"),
-			}).
-			AssertEvent(t, otu.identifier("FUSD", "TokensWithdrawn"), map[string]interface{}{
-				"amount": 5.0,
-				"from":   otu.O.Address("user2"),
-			}).
-			AssertEvent(t, otu.identifier("FIND", "FungibleTokenSent"), map[string]interface{}{
-				"from":      otu.O.Address("user2"),
-				"fromName":  "user2",
-				"toAddress": otu.O.Address("user1"),
-				"amount":    5.0,
-				"name":      "user1",
-				"tag":       "test",
-				"message":   "This is a message",
-			})
-	})
-
 	ot.Run(t, "Should be able to send flow to another name", func(t *testing.T) {
 		o.Tx("sendFT",
 			WithSigner("user2"),

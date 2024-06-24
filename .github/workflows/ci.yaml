@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - main
+      - feat/stable-cadence
 
 name: ci
 jobs:
@@ -40,9 +41,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      TESTNET_ACCOUNT: '98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc'
-      MAINNET_FIND: '98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc'
-      MAINNET_FIND_ADMIN: '98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc'
+      TESTNET_ACCOUNT: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
+      MAINNET_FIND: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
+      MAINNET_FIND_ADMIN: "98ebfd2fa655cea228bd307e0e838cf3bdf08f8dde0b9baa6054c54b462b3acc"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

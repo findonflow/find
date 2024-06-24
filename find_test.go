@@ -647,6 +647,8 @@ access(all) fun main(name: String) :  Address? {
 		).AssertSuccess(t)
 	})
 
+  /*
+* commented out due to circle not staging
 	ot.Run(t, "Should be able to register a name with usdc", func(t *testing.T) {
 		otu.O.Tx("registerUSDC",
 			WithSigner("user1"),
@@ -661,4 +663,5 @@ access(all) fun main(name: String) :  Address? {
 				"to":     otu.O.Address("find-admin"),
 			})
 	})
+  */
 }

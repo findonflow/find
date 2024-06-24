@@ -45,8 +45,12 @@ access(all) contract LostAndFound {
     access(all) event DepositorTokensAdded(uuid: UInt64, tokens: UFix64, balance: UFix64)
     access(all) event DepositorTokensWithdrawn(uuid: UInt64, tokens: UFix64, balance: UFix64)
 
+    // Used by the @Depositor resource and controls whether the depositor can be used 
+    // or not to send resources to the LostAndFound
     access(all) entitlement Deposit
-    access(all) entitlement Withdraw
+
+    // Used by the @Depositor resource to manage settings such as low token threshold
+    access(all) entitlement Owner
 
     // Placeholder receiver so that any resource can be supported, not just FT and NFT Receivers
     access(all) resource interface AnyResourceReceiver {
@@ -54,7 +58,7 @@ access(all) contract LostAndFound {
     }
 
     access(all) resource DepositEstimate {
-        access(Withdraw) var item: @AnyResource?
+        access(self) var item: @AnyResource?
         access(all) let storageFee: UFix64
 
         init(item: @AnyResource, storageFee: UFix64) {
@@ -62,7 +66,7 @@ access(all) contract LostAndFound {
             self.storageFee = storageFee
         }
 
-        access(Withdraw) fun withdraw(): @AnyResource {
+        access(all) fun withdraw(): @AnyResource {
             let item <- self.item <- nil
             return <-item!
         }
@@ -140,7 +144,7 @@ access(all) contract LostAndFound {
             return nil
         }
 
-        access(Withdraw) fun withdraw(receiver: Capability) {
+        access(contract) fun withdraw(receiver: Capability) {
             pre {
                 receiver.address == self.redeemer: "receiver address and redeemer must match"
                 !self.redeemed: "already redeemed"
@@ -344,7 +348,7 @@ access(all) contract LostAndFound {
         }
 
         // Redeem a specific ticket instead of all of a certain type.
-        access(Withdraw) fun redeem(type: Type, ticketID: UInt64, receiver: Capability) {
+        access(all) fun redeem(type: Type, ticketID: UInt64, receiver: Capability) {
             pre {
                 receiver.address == self.redeemer: "receiver must match the redeemer of this shelf"
                 self.bins.containsKey(type.identifier): "no bin for provided type"
@@ -430,8 +434,8 @@ access(all) contract LostAndFound {
                 storagePayment.getType() == Type<@FlowToken.Vault>(): "storage payment must be in flow tokens"
             }
             let receiver = LostAndFound.account
-                .capabilities.get<&FlowToken.Vault>(/public/flowTokenReceiver)!
-                .borrow()!
+            .capabilities.get<&FlowToken.Vault>(/public/flowTokenReceiver)
+            .borrow()!
 
 
             let storageBeforeShelf = LostAndFound.account.storage.used
@@ -486,7 +490,7 @@ access(all) contract LostAndFound {
             destroy shelf
             emit ShelfDestroyed(redeemer: addr)
         }
-        
+
         access(contract) fun safeDestroy() {
             pre {
                 self.shelves.length == 0: "cannot destroy shelf manager when it has shelves"
@@ -513,11 +517,11 @@ access(all) contract LostAndFound {
             return false
         }
 
-        access(Mutate) fun setLowBalanceThreshold(threshold: UFix64?) {
+        access(Owner) fun setLowBalanceThreshold(threshold: UFix64?) {
             self.lowBalanceThreshold = threshold
         }
 
-        access(Mutate) fun getLowBalanceThreshold(): UFix64? {
+        access(Owner) fun getLowBalanceThreshold(): UFix64? {
             return self.lowBalanceThreshold
         }
 
@@ -528,8 +532,8 @@ access(all) contract LostAndFound {
             display: MetadataViews.Display?
         ) : UInt64 {
             let receiver = LostAndFound.account
-                .capabilities.get<&FlowToken.Vault>(/public/flowTokenReceiver)!
-                .borrow()!
+            .capabilities.get<&FlowToken.Vault>(/public/flowTokenReceiver)
+            .borrow()!
 
             let storageBeforeShelf = LostAndFound.account.storage.used
             let shelfManager = LostAndFound.borrowShelfManager()
@@ -550,7 +554,7 @@ access(all) contract LostAndFound {
             let flowTokenRepayment = ticket.flowTokenRepayment
             let uuid = ticket.uuid
             shelf.deposit(ticket: <-ticket, flowTokenRepayment: flowTokenRepayment)
-            
+
             let storageFee = FeeEstimator.storageUsedToFlowAmount(LostAndFound.account.storage.used - storageBefore)
             LostAndFound.storageFees[uuid] = storageFee
 
@@ -577,7 +581,7 @@ access(all) contract LostAndFound {
             }
         }
 
-        access(Mutate) fun withdrawTokens(amount: UFix64): @{FungibleToken.Vault} {
+        access(Owner) fun withdrawTokens(amount: UFix64): @{FungibleToken.Vault} {
             let tokens <-self.flowTokenVault.withdraw(amount: amount)
             emit DepositorTokensWithdrawn(uuid: self.uuid, tokens: amount, balance: self.flowTokenVault.balance)
             self.checkForLowBalance()
@@ -617,7 +621,7 @@ access(all) contract LostAndFound {
     }
 
     access(all) fun borrowShelfManager(): &LostAndFound.ShelfManager {
-        return self.account.capabilities.get<&LostAndFound.ShelfManager>(LostAndFound.LostAndFoundPublicPath)!.borrow()!
+        return self.account.capabilities.get<&LostAndFound.ShelfManager>(LostAndFound.LostAndFoundPublicPath).borrow()!
     }
 
     access(all) fun borrowAllTicketsByType(addr: Address, type: Type): [&LostAndFound.Ticket] {
@@ -763,4 +767,4 @@ access(all) contract LostAndFound {
         self.account.capabilities.publish(cap, at: self.LostAndFoundPublicPath)
     }
 }
- 
+
