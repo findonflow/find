@@ -25,10 +25,10 @@ transaction(leaseName: String, ftAliasOrIdentifier:String, amount: UFix64, valid
         let leaseDOSBidType= Type<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>()
         let leaseDOSBidPublicPath=leaseTenant.getPublicPath(leaseDOSBidType)
         let leaseDOSBidStoragePath= leaseTenant.getStoragePath(leaseDOSBidType)
-        let leaseDOSBidCap= account.capabilities.get<&{FindLeaseMarketDirectOfferSoft.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseDOSBidPublicPath)
+        let leaseDOSBidCap= account.capabilities.get<&FindLeaseMarketDirectOfferSoft.MarketBidCollection>(leaseDOSBidPublicPath)
         if !leaseDOSBidCap.check() {
             account.storage.save<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>(<- FindLeaseMarketDirectOfferSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:leaseTenantCapability), to: leaseDOSBidStoragePath)
-            let cap = account.capabilities.storage.issue<&{FindLeaseMarketDirectOfferSoft.MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(leaseDOSBidStoragePath)
+            let cap = account.capabilities.storage.issue<&FindLeaseMarketDirectOfferSoft.MarketBidCollection>(leaseDOSBidStoragePath)
             account.capabilities.publish(cap, at: leaseDOSBidPublicPath)
         }
 

@@ -101,6 +101,5 @@ transaction(name: String) {
             let leaseDOSSaleItemCap = account.capabilities.storage.issue<&FindLeaseMarketDirectOfferSoft.SaleItemCollection>(leaseDOSStoragePath)
             account.capabilities.publish(leaseDOSSaleItemCap, at: leaseDOSPublicPath)
         }
-
     }
 }
