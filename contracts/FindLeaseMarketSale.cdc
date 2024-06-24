@@ -133,14 +133,14 @@ access(all) contract FindLeaseMarketSale {
         //is this the best approach now or just put the NFT inside the saleItem?
         access(contract) var items: @{String: SaleItem}
 
-        access(contract) let tenantCapability: Capability<&{FindMarket.TenantPublic}>
+        access(contract) let tenantCapability: Capability<&FindMarket.Tenant>
 
-        init (_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) {
+        init (_ tenantCapability: Capability<&FindMarket.Tenant>) {
             self.items <- {}
             self.tenantCapability=tenantCapability
         }
 
-        access(self) fun getTenant() : &{FindMarket.TenantPublic} {
+        access(self) fun getTenant() : &FindMarket.Tenant {
             pre{
                 self.tenantCapability.check() : "Tenant client is not linked anymore"
             }
@@ -276,7 +276,7 @@ access(all) contract FindLeaseMarketSale {
     }
 
     //Create an empty lease collection that store your leases to a name
-    access(all) fun createEmptySaleItemCollection(_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) : @SaleItemCollection {
+    access(all) fun createEmptySaleItemCollection(_ tenantCapability: Capability<&FindMarket.Tenant>) : @SaleItemCollection {
         return <- create SaleItemCollection(tenantCapability)
     }
 

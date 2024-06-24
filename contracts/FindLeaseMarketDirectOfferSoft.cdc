@@ -18,13 +18,13 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
     access(all) resource SaleItem : FindLeaseMarket.SaleItem {
 
         access(contract) var pointer: {FindLeaseMarket.LeasePointer}
-        access(contract) var offerCallback: Capability<&{MarketBidCollectionPublic}>
+        access(contract) var offerCallback: Capability<&MarketBidCollection>
 
         access(contract) var directOfferAccepted:Bool
         access(contract) var validUntil: UFix64?
         access(contract) var saleItemExtraField: {String : AnyStruct}
 
-        init(pointer: FindLeaseMarket.ReadLeasePointer, callback: Capability<&{MarketBidCollectionPublic}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
+        init(pointer: FindLeaseMarket.ReadLeasePointer, callback: Capability<&MarketBidCollection>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
             self.offerCallback=callback
             self.directOfferAccepted=false
             self.validUntil=validUntil
@@ -132,7 +132,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
             self.pointer=pointer
         }
 
-        access(contract) fun setCallback(_ callback: Capability<&{MarketBidCollectionPublic}>) {
+        access(contract) fun setCallback(_ callback: Capability<&MarketBidCollection>) {
             self.offerCallback=callback
         }
 
@@ -158,7 +158,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
         access(contract) fun registerIncreasedBid(_ name: String)
 
         //place a bid on a token
-        access(contract) fun registerBid(name: String, callback: Capability<&{MarketBidCollectionPublic}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct})
+        access(contract) fun registerBid(name: String, callback: Capability<&MarketBidCollection>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct})
 
         access(contract) fun isAcceptedDirectOffer(_ name:String) : Bool
 
@@ -170,21 +170,21 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
         //is this the best approach now or just put the NFT inside the saleItem?
         access(contract) var items: @{String: SaleItem}
 
-        access(contract) let tenantCapability: Capability<&{FindMarket.TenantPublic}>
+        access(contract) let tenantCapability: Capability<&FindMarket.Tenant>
 
-        init (_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) {
+        init (_ tenantCapability: Capability<&FindMarket.Tenant>) {
             self.items <- {}
             self.tenantCapability=tenantCapability
         }
 
-        access(self) fun getTenant() : &{FindMarket.TenantPublic} {
+        access(self) fun getTenant() : &FindMarket.Tenant {
             pre{
                 self.tenantCapability.check() : "Tenant client is not linked anymore"
             }
             return self.tenantCapability.borrow()!
         }
 
-        access(all) fun isAcceptedDirectOffer(_ name:String) : Bool{
+        access(contract) fun isAcceptedDirectOffer(_ name:String) : Bool{
             pre {
                 self.items.containsKey(name) : "Invalid name sale=".concat(name)
             }
@@ -255,7 +255,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
 
 
         //This is a function that buyer will call (via his bid collection) to register the bicCallback with the seller
-        access(contract) fun registerBid(name: String, callback: Capability<&{MarketBidCollectionPublic}>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
+        access(contract) fun registerBid(name: String, callback: Capability<&MarketBidCollection>, validUntil: UFix64?, saleItemExtraField: {String : AnyStruct}) {
 
             //If there are no bids from anybody else before we need to make the item
             if !self.items.containsKey(name) {
@@ -416,7 +416,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
     */
 
     access(all) resource Bid : FindLeaseMarket.Bid {
-        access(contract) let from: Capability<&{SaleItemCollectionPublic}>
+        access(contract) let from: Capability<&SaleItemCollection>
         access(contract) let leaseName: String
 
         //this should reflect on what the above uuid is for
@@ -425,7 +425,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
         access(contract) var balance: UFix64 //This is what you bid for non escrowed bids
         access(contract) let bidExtraField: {String : AnyStruct}
 
-        init(from: Capability<&{SaleItemCollectionPublic}>, leaseName: String, vaultType:Type,  nonEscrowedBalance:UFix64, bidExtraField: {String : AnyStruct}){
+        init(from: Capability<&SaleItemCollection>, leaseName: String, vaultType:Type,  nonEscrowedBalance:UFix64, bidExtraField: {String : AnyStruct}){
             self.vaultType= vaultType
             self.balance=nonEscrowedBalance
             self.leaseName=leaseName
@@ -471,16 +471,16 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
 
         access(contract) var bids : @{String: Bid}
         access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
-        access(contract) let tenantCapability: Capability<&{FindMarket.TenantPublic}>
+        access(contract) let tenantCapability: Capability<&FindMarket.Tenant>
 
         //not sure we can store this here anymore. think it needs to be in every bid
-        init(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&{FindMarket.TenantPublic}>) {
+        init(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&FindMarket.Tenant>) {
             self.bids <- {}
             self.receiver=receiver
             self.tenantCapability=tenantCapability
         }
 
-        access(self) fun getTenant() : &{FindMarket.TenantPublic} {
+        access(self) fun getTenant() : &FindMarket.Tenant {
             pre{
                 self.tenantCapability.check() : "Tenant client is not linked anymore"
             }
@@ -529,11 +529,11 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
                 panic("Valid until is before current time")
             }
 
-            let from=getAccount(FIND.status(name).owner!).capabilities.get<&{SaleItemCollectionPublic}>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))!
+            let from=getAccount(FIND.status(name).owner!).capabilities.get<&SaleItemCollection>(self.getTenant().getPublicPath(Type<@SaleItemCollection>()))
 
             let bid <- create Bid(from: from, leaseName: name, vaultType: vaultType, nonEscrowedBalance:amount, bidExtraField: bidExtraField)
             let saleItemCollection= from.borrow() ?? panic("Could not borrow sale item for name=".concat(name))
-            let callbackCapability =self.owner!.capabilities.get<&{MarketBidCollectionPublic}>(self.getTenant().getPublicPath(Type<@MarketBidCollection>()))!
+            let callbackCapability =self.owner!.capabilities.get<&MarketBidCollection>(self.getTenant().getPublicPath(Type<@MarketBidCollection>()))
 
             let oldToken <- self.bids[name] <- bid
             saleItemCollection.registerBid(name: name, callback: callbackCapability, validUntil: validUntil, saleItemExtraField: saleItemExtraField)
@@ -603,11 +603,11 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
     }
 
     //Create an empty lease collection that store your leases to a name
-    access(all) fun createEmptySaleItemCollection(_ tenantCapability: Capability<&{FindMarket.TenantPublic}>) : @SaleItemCollection {
+    access(all) fun createEmptySaleItemCollection(_ tenantCapability: Capability<&FindMarket.Tenant>) : @SaleItemCollection {
         return <- create SaleItemCollection(tenantCapability)
     }
 
-    access(all) fun createEmptyMarketBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&{FindMarket.TenantPublic}>) : @MarketBidCollection {
+    access(all) fun createEmptyMarketBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, tenantCapability: Capability<&FindMarket.Tenant>) : @MarketBidCollection {
         return <- create MarketBidCollection(receiver: receiver, tenantCapability:tenantCapability)
     }
 
@@ -617,7 +617,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
         }
         if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
 
-            return getAccount(user).capabilities.get<&{SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))!
+            return getAccount(user).capabilities.get<&{SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(tenant.getPublicPath(Type<@SaleItemCollection>()))
         }
         return nil
     }
@@ -627,7 +627,7 @@ access(all) contract FindLeaseMarketDirectOfferSoft {
             panic("Invalid tenant")
         }
         if let tenant=FindMarket.getTenantCapability(marketplace)!.borrow() {
-            return getAccount(user).capabilities.get<&{MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))!
+            return getAccount(user).capabilities.get<&{MarketBidCollectionPublic, FindLeaseMarket.MarketBidCollectionPublic}>(tenant.getPublicPath(Type<@MarketBidCollection>()))
         }
         return nil
     }

@@ -23,8 +23,8 @@ transaction(dapperAddress: Address) {
 
         //FUSD
         var fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-        if fusdReceiver == nil {
-            let fusd <- FUSD.createEmptyVault()
+        if !fusdReceiver.check() {
+            let fusd <- FUSD.createEmptyVault(vaultType: Type<@FUSD.Vault>())
 
             account.storage.save(<- fusd, to: /storage/fusdVault)
             var cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/fusdVault)
@@ -36,7 +36,7 @@ transaction(dapperAddress: Address) {
 
 
         var usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
-        if usdcCap == nil {
+        if !usdcCap.check() {
             account.storage.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
             let cap = account.capabilities.storage.issue<&FiatToken.Vault>(FiatToken.VaultStoragePath)
             account.capabilities.publish(cap, at: FiatToken.VaultUUIDPubPath)
@@ -46,25 +46,24 @@ transaction(dapperAddress: Address) {
         }
 
 
-
         //Dapper utility token
-        let dapperDUCReceiver = dapper.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)!
-        let DUCReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-        if DUCReceiver == nil{
+        var DUCReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+        if !DUCReceiver.check(){
+            let dapperDUCReceiver = dapper.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
             let ducForwarder <- TokenForwarding.createNewForwarder(recipient: dapperDUCReceiver)
             account.storage.save(<-ducForwarder, to: /storage/dapperUtilityCoinReceiver)
-            let cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/dapperUtilityCoinReceiver)
-            account.capabilities.publish(cap, at: /public/dapperUtilityCoinReceiver)
+            DUCReceiver= account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/dapperUtilityCoinReceiver)
+            account.capabilities.publish(DUCReceiver, at: /public/dapperUtilityCoinReceiver)
         }
 
         //FlowUtility token
-        let dapperFUTReceiver = dapper.capabilities.get<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)!
-        let FUTReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-        if FUTReceiver ==nil{
+        var FUTReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+        if !FUTReceiver.check(){
+            let dapperFUTReceiver = dapper.capabilities.get<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
             let futForwarder <- TokenForwarding.createNewForwarder(recipient: dapperFUTReceiver)
             account.storage.save(<-futForwarder, to: /storage/flowUtilityTokenVault)
-            let cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/flowUtilityTokenVault)
-            account.capabilities.publish(cap, at: /public/flowUtilityTokenReceiver)
+            FUTReceiver= account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/flowUtilityTokenVault)
+            account.capabilities.publish(FUTReceiver, at: /public/flowUtilityTokenReceiver)
         }
 
         let switchboardRef = account.storage.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)
@@ -79,22 +78,22 @@ transaction(dapperAddress: Address) {
             account.capabilities.publish(capb, at: FungibleTokenSwitchboard.PublicPath)
         }
 
-        let switchboard = account.storage.borrow<&FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)!
-        let types = switchboard.getVaultTypes()
-        if !types.contains(Type<@DapperUtilityCoin.Vault>()) {
-            switchboard.addNewVaultWrapper(capability: dapperDUCReceiver, type: Type<@DapperUtilityCoin.Vault>())
+        let switchboard = account.storage.borrow<auth(FungibleTokenSwitchboard.Owner) &FungibleTokenSwitchboard.Switchboard>(from: FungibleTokenSwitchboard.StoragePath)!
+
+        if !switchboard.isSupportedVaultType(type:Type<@DapperUtilityCoin.Vault>()) {
+            switchboard.addNewVaultWrapper(capability: DUCReceiver, type: Type<@DapperUtilityCoin.Vault>())
         }
-        if !types.contains(Type<@FlowUtilityToken.Vault>()) {
-            switchboard.addNewVaultWrapper(capability: dapperFUTReceiver, type: Type<@FlowUtilityToken.Vault>())
+        if !switchboard.isSupportedVaultType(type: Type<@FlowUtilityToken.Vault>()) {
+            switchboard.addNewVaultWrapper(capability: FUTReceiver, type: Type<@FlowUtilityToken.Vault>())
         }
-        if !types.contains(usdcCap!.borrow()!.getType()) {
-            switchboard.addNewVault(capability: usdcCap!)
+        if !switchboard.isSupportedVaultType(type: usdcCap.borrow()!.getType()) {
+            switchboard.addNewVault(capability: usdcCap)
         }
-        if !types.contains(fusdReceiver!.borrow()!.getType()) {
-            switchboard.addNewVault(capability: fusdReceiver!)
+        if !switchboard.isSupportedVaultType(type: fusdReceiver.borrow()!.getType()) {
+            switchboard.addNewVault(capability: fusdReceiver)
         }
-        let flowTokenCap = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
-        if !types.contains(flowTokenCap.borrow()!.getType()) {
+        let flowTokenCap = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+        if !switchboard.isSupportedVaultType(type: flowTokenCap.borrow()!.getType()) {
             switchboard.addNewVault(capability: flowTokenCap)
         }
 

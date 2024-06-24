@@ -17,8 +17,8 @@
       "source": "./contracts/standard/FungibleTokenSwitchboard.cdc",
       "aliases": {
         "testnet": "9a0766d93b6608b7",
-        "mainnet": "0xf233dcee88fe0abe",
         "previewnet": "0xa0225e7000ac82a9"
+        "emulator": "ee82856bf20e2aa6",
       }
     },
     "EmeraldIdentity": {
@@ -133,8 +133,9 @@
       "source": "./contracts/standard/FungibleTokenMetadataViews.cdc",
       "aliases": {
         "mainnet": "0xf233dcee88fe0abe",
-        "testnet": "0x9a0766d93b6608b7",
-        "previewnet": "0xa0225e7000ac82a9"
+        "previewnet": "0xa0225e7000ac82a9",
+        "emulator": "ee82856bf20e2aa6",
+        "testnet": "0x9a0766d93b6608b7"
       }
     },
     "NFTCatalog": {
@@ -323,8 +324,6 @@
   "deployments": {
     "emulator": {
       "emulator-account": [
-        "FungibleTokenSwitchboard",
-        "FungibleTokenMetadataViews",
         "FUSD",
         "FiatToken",
         "TokenForwarding",
@@ -344,6 +343,7 @@
         "FlowUtilityToken"
       ],
       "emulator-find": [
+        "FIND",
         "Profile",
         "FindThoughts",
         "Clock",
@@ -391,8 +391,7 @@
         "FindMarketAuctionSoft",
         "FindLeaseMarketDirectOfferSoft",
         "FindMarketDirectOfferSoft",
-        "FindMarketDirectOfferEscrow",
-        "FIND"
+        "FindMarketDirectOfferEscrow"
       ],
       "emulator-find-admin": [],
       "emulator-find-forge": [
@@ -446,7 +445,6 @@
         "FindFurnace",
         "FindThoughts",
         "FindUtils",
-        "FindUserStatus",
         "FindLostAndFoundWrapper",
         "FindMarketCut",
         "FindMarketCutStruct",

@@ -4,9 +4,6 @@ import "FindRelatedAccounts"
 import "NonFungibleToken"
 import "MetadataViews"
 import "EmeraldIdentity"
-//TODO:Fix
-//import "EmeraldIdentityDapper"
-//import "EmeraldIdentityLilico"
 import "TokenForwarding"
 import "FungibleToken"
 //import "Wearables"
@@ -79,17 +76,17 @@ fun main(user: String) : FINDReport? {
 
 
     var isDapper=false
-    if let receiver =account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)?.borrow() {
+    if let receiver =account.capabilities.borrow<&{FungibleToken.Receiver}>(/public/flowTokenReceiver) {
         isDapper=receiver.isInstance(Type<@TokenForwarding.Forwarder>())
     } else {
-        if let duc = account.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)?.borrow() {
+        if let duc = account.capabilities.borrow<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver){
             isDapper = duc.isInstance(Type<@TokenForwarding.Forwarder>())
         } else {
             isDapper = false
         }
     }
 
-    let profile=account.capabilities.get<&{Profile.Public}>(Profile.publicPath)!.borrow()
+    let profile=account.capabilities.borrow<&{Profile.Public}>(Profile.publicPath)
     var profileReport = profile?.asReport()
     if profileReport != nil && profileReport!.findName != FIND.reverseLookup(address) {
         profileReport = Profile.UserReport(
@@ -167,7 +164,7 @@ fun main(user: String) : FINDReport? {
             readyForWearables = false
         }
 
-        let wearablesCap= account.capabilities.get<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(Wearables.CollectionPublicPath)
+        let wearablesCap= account.capabilities.borrow<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(Wearables.CollectionPublicPath)
         if wearablesCap == nil {
             readyForWearables = false
         }

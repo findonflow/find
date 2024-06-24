@@ -19,7 +19,7 @@ transaction(name: String, amount: UFix64) {
     }
 
     execute {
-        let vault <- self.vaultRef!.withdraw(amount: amount) 
+        let vault <- self.vaultRef!.withdraw(amount: amount) as! @FUSD.Vault
         self.bidRef!.bid(name: name, vault: <- vault)
     }
 }

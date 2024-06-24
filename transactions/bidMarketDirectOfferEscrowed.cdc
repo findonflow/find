@@ -36,12 +36,12 @@ transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIde
         let tenantCapability= FindMarket.getTenantCapability(marketplace)!
         let tenant = tenantCapability.borrow()!
         self.saleItemsCap= FindMarketDirectOfferEscrow.getSaleItemCapability(marketplace:marketplace, user:address) ?? panic("cannot find sale item cap")
-        let receiverCap=account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
+        let receiverCap=account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
         let doeBidType= Type<@FindMarketDirectOfferEscrow.MarketBidCollection>()
         let doeBidPublicPath=FindMarket.getPublicPath(doeBidType, name: tenant.name)
         let doeBidStoragePath= FindMarket.getStoragePath(doeBidType, name:tenant.name)
         let doeBidCap= account.capabilities.get<&FindMarketDirectOfferEscrow.MarketBidCollection>(doeBidPublicPath)
-        if doeBidCap == nil {
+        if !doeBidCap.check(){
             account.storage.save<@FindMarketDirectOfferEscrow.MarketBidCollection>(<- FindMarketDirectOfferEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: doeBidStoragePath)
             let doeCap = account.capabilities.storage.issue<&FindMarketDirectOfferEscrow.MarketBidCollection>(doeBidStoragePath)
             account.capabilities.publish(doeCap, at: doeBidPublicPath)
@@ -61,15 +61,15 @@ transaction(user: String, nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIde
             self.targetCapability=cap
         } else {
             //TODO: I do not think this works as intended
-            var targetCapability= account.capabilities.get<&AnyResource>(nft.publicPath) as? Capability<&{NonFungibleToken.Collection}>
-            if targetCapability == nil || !targetCapability!.check() {
+            var targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath) 
+            if !targetCapability.check() {
                 let cd = self.pointer.getNFTCollectionData()
                 let cap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(cd.storagePath)
                 account.capabilities.unpublish(cd.publicPath)
                 account.capabilities.publish(cap, at: cd.publicPath)
                 targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
             }
-            self.targetCapability=targetCapability!
+            self.targetCapability=targetCapability
         }
     }
 

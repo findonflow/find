@@ -348,7 +348,7 @@ access(all) contract FindViews {
     }
 
     access(all) fun createViewReadPointer(address:Address, path:PublicPath, id:UInt64) : ViewReadPointer {
-        let cap=	getAccount(address).capabilities.get<&{ViewResolver.ResolverCollection}>(path)!
+        let cap=	getAccount(address).capabilities.get<&{ViewResolver.ResolverCollection}>(path)
         let pointer= FindViews.ViewReadPointer(cap: cap, id: id)
         return pointer
     }

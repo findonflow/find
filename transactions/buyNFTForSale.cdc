@@ -26,7 +26,7 @@ transaction(user: String, id: UInt64, amount: UFix64) {
         let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
 
         let saleItemCap= account.capabilities.get<&{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath)
-        if saleItemCap==nil {
+        if !saleItemCap.check() {
             account.storage.save(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
             let cap = account.capabilities.storage.issue<&{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(storagePath)
             account.capabilities.publish(cap, at: publicPath)
@@ -64,14 +64,14 @@ transaction(user: String, id: UInt64, amount: UFix64) {
             //var targetCapability= account.capabilities.get<&AnyResource>(nft.publicPath) as? Capability<&{NonFungibleToken.Collection}>
             //this works
             var targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
-            if targetCapability == nil || !targetCapability!.check() {
+            if !targetCapability.check() {
                 let cd = item.getNFTCollectionData()
                 let cap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(cd.storagePath)
                 account.capabilities.unpublish(cd.publicPath)
                 account.capabilities.publish(cap, at: cd.publicPath)
                 targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
             }
-            self.targetCapability=targetCapability!
+            self.targetCapability=targetCapability
         }
 
         self.walletReference = account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")

@@ -17,7 +17,7 @@ transaction(name: String, network: String, address: String) {
         }
 
         let cap = account.capabilities.get<&{FindRelatedAccounts.Public}>(FindRelatedAccounts.publicPath)
-        if cap == nil {
+        if !cap.check() {
             account.capabilities.unpublish(FindRelatedAccounts.publicPath)
             let cap = account.capabilities.storage.issue<&{FindRelatedAccounts.Public}>(FindRelatedAccounts.storagePath)
             account.capabilities.publish(cap, at: FindRelatedAccounts.publicPath)

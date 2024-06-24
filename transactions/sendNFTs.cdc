@@ -17,7 +17,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
     let authPointers : [FindViews.AuthNFTPointer]
     let paths : [PublicPath]
     let flowVault : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
-    let flowTokenRepayment : Capability<&{FungibleToken.Receiver}>
+    let flowTokenRepayment : Capability<&FlowToken.Vault>
     let defaultTokenAvailableBalance : UFix64
 
     let royalties: [MetadataViews.Royalties?]
@@ -87,7 +87,7 @@ transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], mem
         }
 
         self.flowVault = account.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Cannot borrow reference to sender's flow vault")
-        self.flowTokenRepayment = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
+        self.flowTokenRepayment = account.capabilities.get<&FlowToken.Vault>(/public/flowTokenReceiver)
         self.defaultTokenAvailableBalance = FlowStorageFees.defaultTokenAvailableBalance(account.address)
 
         // get the vault for find donation

@@ -260,7 +260,7 @@ access(all) fun main(user: String, project:String, id: UInt64, views: [String]) 
 
     if account.balance > 0.0 {
         // check link for market
-        let linkedForMarket = account.capabilities.get<&{NonFungibleToken.Collection}>(getPublicPath(project))?.check()
+        let linkedForMarket = account.capabilities.get<&{NonFungibleToken.Collection}>(getPublicPath(project)).check()
 
         let storagePath = getStoragePath(project)
         let cap= account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(storagePath)

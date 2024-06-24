@@ -17,7 +17,7 @@ func TestAuction(t *testing.T) {
 	findSaleEvent, err := otu.O.QualifiedIdentifier("FIND", "Sale")
 	assert.NoError(t, err)
 
-	FUSDDepositEvent, err := otu.O.QualifiedIdentifier("FUSD", "TokensDeposited")
+	ftDeposit, err := otu.O.QualifiedIdentifier("FungibleToken", "Deposited")
 	assert.NoError(t, err)
 
 	// TODO: Why is this test in auction test?
@@ -73,14 +73,14 @@ func TestAuction(t *testing.T) {
 				"buyerName": "user2",
 				"status":    "sold",
 			}).
-			AssertEvent(t, FUSDDepositEvent, map[string]interface{}{
-				"amount": 3.8,
-				"to":     otu.O.Address("user1"),
-			}).
-			AssertEvent(t, FUSDDepositEvent, map[string]interface{}{
-				"amount": 0.2,
-				"to":     otu.O.Address("find-admin"),
-			})
+      AssertEvent(t, ftDeposit, map[string]interface{}{
+              "amount": 3.8,
+              "to":     otu.O.Address("user1"),
+      }).
+      AssertEvent(t, ftDeposit, map[string]interface{}{
+              "amount": 0.2,
+              "to":     otu.O.Address("find-admin"),
+       })
 	})
 
 	ot.Run(t, "Should be able to sell lease from auction buyer can fulfill auction", func(t *testing.T) {
@@ -103,11 +103,11 @@ func TestAuction(t *testing.T) {
 				"buyerAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
 				"buyerName":   "user2",
 			}).
-			AssertEvent(t, FUSDDepositEvent, map[string]interface{}{
+			AssertEvent(t, ftDeposit, map[string]interface{}{
 				"amount": 19.0,
 				"to":     otu.O.Address("user1"),
 			}).
-			AssertEvent(t, FUSDDepositEvent, map[string]interface{}{
+			AssertEvent(t, ftDeposit, map[string]interface{}{
 				"amount": 1.0,
 				"to":     otu.O.Address("find-admin"),
 			})
@@ -278,7 +278,7 @@ func TestAuction(t *testing.T) {
 			WithArg("amount", 15.0),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, FUSDDepositEvent, map[string]interface{}{
+			AssertEvent(t, ftDeposit, map[string]interface{}{
 				"amount": 5.0,
 				"to":     otu.O.Address("user2"),
 			})
@@ -310,7 +310,7 @@ func TestAuction(t *testing.T) {
 			WithArg("names", `["user1"]`),
 		).
 			AssertSuccess(t).
-			AssertEvent(t, FUSDDepositEvent, map[string]interface{}{
+			AssertEvent(t, ftDeposit, map[string]interface{}{
 				"amount": 5.0,
 				"to":     otu.O.Address("user2"),
 			}).

@@ -4,12 +4,11 @@ import "FIND"
 
 transaction(name: String, receiver:String) {
 
-
     let receiverAddress:Address?
-    let sender : &FIND.LeaseCollection
+    let sender : auth(FIND.LeaseOwner) &FIND.LeaseCollection
 
     prepare(acct: auth(BorrowValue) &Account) {
-        self.sender= acct.storage.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath) ?? panic("You do not have a profile set up, initialize the user first")
+        self.sender= acct.storage.borrow<auth (FIND.LeaseOwner) &FIND.LeaseCollection>(from:FIND.LeaseStoragePath) ?? panic("You do not have a profile set up, initialize the user first")
         self.receiverAddress=FIND.resolve(receiver)
     } 
 
@@ -19,8 +18,8 @@ transaction(name: String, receiver:String) {
 
     execute {
         let receiver=getAccount(self.receiverAddress!)
-        let receiverLease = receiver.capabilities.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)!
-        let receiverProfile = receiver.capabilities.get<&{Profile.Public}>(Profile.publicPath)!
+        let receiverLease = receiver.capabilities.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)
+        let receiverProfile = receiver.capabilities.get<&{Profile.Public}>(Profile.publicPath)
 
         if !receiverLease.check() || !receiverProfile.check() {
             panic("Not a valid FIND user")

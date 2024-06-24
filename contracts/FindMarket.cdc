@@ -100,7 +100,7 @@ access(all) contract FindMarket {
         var caps : [Capability<&{FindMarket.SaleItemCollectionPublic}>] = []
         for type in self.getSaleItemCollectionTypes() {
             if type != nil {
-                let cap = getAccount(address).capabilities.get<&{FindMarket.SaleItemCollectionPublic}>(tenantRef.getPublicPath(type))!
+                let cap = getAccount(address).capabilities.get<&{FindMarket.SaleItemCollectionPublic}>(tenantRef.getPublicPath(type))
                 if cap.check() {
                     caps.append(cap)
                 }
@@ -313,8 +313,8 @@ access(all) contract FindMarket {
         var caps : [Capability<&{FindMarket.MarketBidCollectionPublic}>] = []
         for type in self.getMarketBidCollectionTypes() {
             let cap = getAccount(address).capabilities.get<&{FindMarket.MarketBidCollectionPublic}>(tenantRef.getPublicPath(type))
-            if cap != nil {
-                caps.append(cap!)
+            if cap.check() {
+                caps.append(cap)
             }
         }
         return caps
@@ -673,7 +673,7 @@ access(all) contract FindMarket {
             for key in self.findSaleItems.keys {
                 let val = self.findSaleItems[key]!
                 if val.cut != nil {
-                    let newReceiver = getAccount(val.cut!.receiver.address).capabilities.get<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)!
+                    let newReceiver = getAccount(val.cut!.receiver.address).capabilities.get<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)
                     let newCut = MetadataViews.Royalty(
                         receiver: newReceiver,
                         cut: val.cut!.cut,
@@ -692,7 +692,7 @@ access(all) contract FindMarket {
             for key in self.tenantSaleItems.keys {
                 let val = self.tenantSaleItems[key]!
                 if val.cut != nil {
-                    let newReceiver = getAccount(val.cut!.receiver.address).capabilities.get<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)!
+                    let newReceiver = getAccount(val.cut!.receiver.address).capabilities.get<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)
                     let newCut = MetadataViews.Royalty(
                         receiver: newReceiver,
                         cut: val.cut!.cut,
@@ -711,7 +711,7 @@ access(all) contract FindMarket {
             for key in self.findCuts.keys {
                 let val = self.findCuts[key]!
                 if val.cut != nil {
-                    let newReceiver = getAccount(val.cut!.receiver.address).capabilities.get<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)!
+                    let newReceiver = getAccount(val.cut!.receiver.address).capabilities.get<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)
                     let newCut = MetadataViews.Royalty(
                         receiver: newReceiver,
                         cut: val.cut!.cut,
@@ -1289,13 +1289,17 @@ access(all) contract FindMarket {
         return self.getTenantPathForName(self.tenantAddressName[address]!)
     }
 
-    access(all) fun getTenantCapability(_ marketplace:Address) : Capability<&{TenantPublic}>? {
+    access(all) fun getTenantCapability(_ marketplace:Address) : Capability<&Tenant>? {
 
         if !self.tenantAddressName.containsKey(marketplace)  {
             "tenant is not registered in registry"
         }
 
-        return FindMarket.account.capabilities.get<&{TenantPublic}>(PublicPath(identifier:self.getTenantPathForAddress(marketplace))!)!
+        let cap= FindMarket.account.capabilities.get<&Tenant>(PublicPath(identifier:self.getTenantPathForAddress(marketplace))!)
+        if !cap.check() {
+            return nil
+        }
+        return cap
     }
 
 
@@ -1330,7 +1334,7 @@ access(all) contract FindMarket {
         var payInFUT = false
         var payInDUC = false
         let ftInfo = FTRegistry.getFTInfoByTypeIdentifier(ftType.identifier)! // If this panic, there is sth wrong in FT set up
-        let oldProfileCap= getAccount(seller).capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
+        let oldProfileCap= getAccount(seller).capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
         let oldProfile = self.getPaymentWallet(oldProfileCap, ftInfo, panicOnFailCheck: true)
 
         /* Check the total royalty to prevent changing of royalties */
@@ -1409,7 +1413,7 @@ access(all) contract FindMarket {
                 // If it is not registered, it falls through and be handled by residual
             case Type<@FungibleTokenSwitchboard.Switchboard>() :
                 if let sbRef = getAccount(cap.address).capabilities.borrow<&{FungibleTokenSwitchboard.SwitchboardPublic}>(FungibleTokenSwitchboard.PublicPath) {
-                    if sbRef.isSupportedVaultType(ftInfo.type) {
+                    if sbRef.isSupportedVaultType(type: ftInfo.type) {
                         return ref
                     }
                 }
@@ -1620,7 +1624,7 @@ access(all) contract FindMarket {
         access(all) fun getIds(): [UInt64]
         access(all) fun getRoyaltyChangedIds(): [UInt64]
         access(all) fun containsId(_ id: UInt64): Bool
-        access(account) fun borrowSaleItem(_ id: UInt64) : &{SaleItem}?
+        access(all) fun borrowSaleItem(_ id: UInt64) : &{SaleItem}?
         access(all) fun getListingType() : Type
     }
 
@@ -1638,7 +1642,8 @@ access(all) contract FindMarket {
         access(all) fun getIds() : [UInt64]
         access(all) fun containsId(_ id: UInt64): Bool
         access(all) fun getBidType() : Type
-        access(account) fun borrowBidItem(_ id: UInt64) : &{Bid}
+        //TODO: this used to be access account, look ino this, because now we can downcast
+        access(all) fun borrowBidItem(_ id: UInt64) : &{Bid}
     }
 
     access(all) struct BidItemCollectionReport {

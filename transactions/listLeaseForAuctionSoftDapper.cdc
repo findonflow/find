@@ -23,7 +23,7 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, price:UFix64, auctio
         let leaseASPublicPath=leaseTenant.getPublicPath(leaseASSaleItemType)
         let leaseASStoragePath= leaseTenant.getStoragePath(leaseASSaleItemType)
         let leaseASSaleItemCap= account.capabilities.get<&FindLeaseMarketAuctionSoft.SaleItemCollection>(leaseASPublicPath)
-        if leaseASSaleItemCap == nil {
+        if !leaseASSaleItemCap.check() {
             //The link here has to be a capability not a tenant, because it can change.
             account.storage.save<@FindLeaseMarketAuctionSoft.SaleItemCollection>(<- FindLeaseMarketAuctionSoft.createEmptySaleItemCollection(leaseTenantCapability), to: leaseASStoragePath)
             let saleColCap = account.capabilities.storage.issue<&FindLeaseMarketAuctionSoft.SaleItemCollection>(leaseASStoragePath)
@@ -36,9 +36,9 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, price:UFix64, auctio
         let providerIdentifier = storagePathIdentifer.concat("Provider")
         let providerStoragePath = StoragePath(identifier: providerIdentifier)!
 
-        var existingProvider= account.storage.copy<Capability<auth(FIND.Leasee) &FIND.LeaseCollection>>(from: providerStoragePath) 
+        var existingProvider= account.storage.copy<Capability<auth(FIND.LeaseOwner) &FIND.LeaseCollection>>(from: providerStoragePath) 
         if existingProvider==nil {
-            existingProvider=account.capabilities.storage.issue<auth(FIND.Leasee) &FIND.LeaseCollection>(FIND.LeaseStoragePath) 
+            existingProvider=account.capabilities.storage.issue<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(FIND.LeaseStoragePath) 
             account.storage.save(existingProvider!, to: providerStoragePath)
         }
         var cap = existingProvider!

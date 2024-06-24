@@ -438,7 +438,7 @@ access(all) contract FLOAT {
         // A function every verifier must implement. 
         // Will have `assert`s in it to make sure
         // the user fits some criteria.
-        access(account) fun verify(_ params: {String: AnyStruct})
+        access(all) fun verify(_ params: {String: AnyStruct})
     }
 
     // A public interface to read the FLOATEvent

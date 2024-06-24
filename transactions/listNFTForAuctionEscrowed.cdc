@@ -23,7 +23,7 @@ transaction(nftAliasOrIdentifier:String, id: UInt64, ftAliasOrIdentifier:String,
         let aeSalePublicPath=FindMarket.getPublicPath(aeSaleType, name: tenant.name)
         let aeSaleStoragePath= FindMarket.getStoragePath(aeSaleType, name:tenant.name)
         let aeSaleCap= account.capabilities.get<&{FindMarketAuctionEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(aeSalePublicPath)
-        if aeSaleCap==nil {
+        if !aeSaleCap.check(){
             account.storage.save<@FindMarketAuctionEscrow.SaleItemCollection>(<- FindMarketAuctionEscrow.createEmptySaleItemCollection(tenantCapability), to: aeSaleStoragePath)
 
             let cap = account.capabilities.storage.issue<&{FindMarketAuctionEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(aeSaleStoragePath)

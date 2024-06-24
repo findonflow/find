@@ -21,11 +21,11 @@ access(all) contract FindThoughts {
     access(all) let CollectionPublicPath : PublicPath 
 
     access(all) struct ThoughtPointer {
-        access(all) let cap: Capability<&{FindThoughts.CollectionPublic}>
+        access(all) let cap: Capability<&FindThoughts.Collection>
         access(all) let id: UInt64 
 
         init(creator: Address, id: UInt64) {
-            let cap = getAccount(creator).capabilities.get<&{FindThoughts.CollectionPublic}>(FindThoughts.CollectionPublicPath)
+            let cap = getAccount(creator).capabilities.get<&FindThoughts.Collection>(FindThoughts.CollectionPublicPath)
             if cap !=nil && !cap!.check() {
                 panic("creator's find thought capability is not valid. Creator : ".concat(creator.toString()))
             }

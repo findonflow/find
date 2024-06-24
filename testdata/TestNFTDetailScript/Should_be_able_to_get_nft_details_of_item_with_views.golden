@@ -134,16 +134,18 @@ test_main.NFTDetailsReturnData{
 					"cut":         0.05,
 					"description": "creator",
 					"receiver": map[string]interface{}{
-						"address": "0x192440c99cb17282",
-						"id":      10,
+						"address":    "0x192440c99cb17282",
+						"borrowType": "&{A.ee82856bf20e2aa6.FungibleToken.Receiver}",
+						"id":         10,
 					},
 				},
 				map[string]interface{}{
 					"cut":         0.025,
 					"description": "find forge",
 					"receiver": map[string]interface{}{
-						"address": "0xf3fcd2c1a78f5eee",
-						"id":      33,
+						"address":    "0xf3fcd2c1a78f5eee",
+						"borrowType": "&{A.ee82856bf20e2aa6.FungibleToken.Receiver}",
+						"id":         33,
 					},
 				},
 			}},

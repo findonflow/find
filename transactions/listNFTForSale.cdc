@@ -22,7 +22,7 @@ transaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: Strin
         let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
         let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
         let saleItemCap= account.capabilities.get<&FindMarketSale.SaleItemCollection>(publicPath)
-        if saleItemCap==nil {
+        if !saleItemCap.check(){
             account.storage.save(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
             let cap = account.capabilities.storage.issue<&FindMarketSale.SaleItemCollection>(storagePath)
             account.capabilities.publish(cap, at: publicPath)

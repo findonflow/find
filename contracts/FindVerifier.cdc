@@ -78,7 +78,7 @@ access(all) contract FindVerifier {
             }
 
             let user : Address = param["address"]! as! Address 
-            let float = getAccount(user).capabilities.get<&FLOAT.Collection>(FLOAT.FLOATCollectionPublicPath)!.borrow() 
+            let float = getAccount(user).capabilities.borrow<&FLOAT.Collection>(FLOAT.FLOATCollectionPublicPath)
 
             if float == nil {
                 return false
@@ -150,7 +150,7 @@ access(all) contract FindVerifier {
 
             let user : Address = param["address"]! as! Address 
 
-            let cap = getAccount(user).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)!
+            let cap = getAccount(user).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
             if !cap.check() {
                 return false
             }
