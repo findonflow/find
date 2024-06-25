@@ -8,7 +8,6 @@ import (
 	"github.com/hexops/autogold"
 )
 
-var forge = "user1"
 
 func TestGeneratedExperiences(t *testing.T) {
 	otu := &OverflowTestUtils{T: t, O: ot.O}
