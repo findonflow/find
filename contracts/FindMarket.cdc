@@ -1289,13 +1289,13 @@ access(all) contract FindMarket {
         return self.getTenantPathForName(self.tenantAddressName[address]!)
     }
 
-    access(all) fun getTenantCapability(_ marketplace:Address) : Capability<&{TenantPublic}>? {
+    access(all) fun getTenantCapability(_ marketplace:Address) : Capability<&Tenant>? {
 
         if !self.tenantAddressName.containsKey(marketplace)  {
             "tenant is not registered in registry"
         }
 
-        let cap= FindMarket.account.capabilities.get<&{TenantPublic}>(PublicPath(identifier:self.getTenantPathForAddress(marketplace))!)
+        let cap= FindMarket.account.capabilities.get<&Tenant>(PublicPath(identifier:self.getTenantPathForAddress(marketplace))!)
         if !cap.check() {
             return nil
         }

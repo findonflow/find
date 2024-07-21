@@ -233,7 +233,8 @@ access(all) contract FIND {
             path ="flowTokenReceiver"
         } 
         else if vault.getType() == Type<@FiatToken.Vault>() {
-            path=FiatkToken.VaultReceiverPubPath
+            // TODO: this should be the correct path
+            path ="fiatTokenReceiver"
         }
         if path != "" {
             emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: "", toAddress: address, message:message, tag:tag, amount:vault.balance, ftType:vault.getType().identifier)
@@ -1359,18 +1360,18 @@ access(all) contract FIND {
 
 
         //This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
-        // access(LeaseOwner) fun register(name: String, vault: @FUSD.Vault){
-        //     let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)
-        //     let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+        access(LeaseOwner) fun register(name: String, vault: @FiatToken.Vault){
+            let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)
+            let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
-        //     let network=FIND.account.storage.borrow<&Network>(from: FIND.NetworkStoragePath)!
+            let network=FIND.account.storage.borrow<&Network>(from: FIND.NetworkStoragePath)!
 
-        //     if !network.publicEnabled {
-        //         panic("Public registration is not enabled yet")
-        //     }
+            if !network.publicEnabled {
+                panic("Public registration is not enabled yet")
+            }
 
-        //     network.register(name:name, vault: <- vault, profile: profileCap, leases: leases)
-        // }
+            network.register(name:name, vault: <- vault, profile: profileCap, leases: leases)
+        }
 
         //This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
         access(LeaseOwner) fun registerDapper(merchAccount: Address, name: String, vault: @DapperUtilityCoin.Vault){
@@ -1497,13 +1498,17 @@ access(all) contract FIND {
             self.defaultPrice=defaultPrice
             self.lengthPrices=lengthPrices
             self.profiles={}
-            self.wallet=wallet
+            self.wallet=    
             self.pricesChangedAt= Clock.time()
             self.publicEnabled=publicEnabled
         }
 
         access(all) fun getLease(_ name: String) : NetworkLease? {
             return self.profiles[name]
+        }
+
+        access(account) fun setWallet(wallet: Capability<&{FungibleToken.Receiver}>) {
+            self.wallet=wallet
         }
 
         access(account) fun setAddonPrice(name:String, price:UFix64) {
@@ -1518,7 +1523,7 @@ access(all) contract FIND {
 
         //TODO: add support for Fiat
         //this method is only called from a lease, and only the owner has that capability
-        access(contract) fun renew(name: String, vault: @FiatkToken.Vault) {
+        access(contract) fun renew(name: String, vault: @FiatToken.Vault) {
             if let lease= self.profiles[name] {
                 let cost= self.calculateCost(name)
                 if vault.balance != cost {
@@ -1625,30 +1630,30 @@ access(all) contract FIND {
         }
 
         //everybody can call register, normally done through the convenience method in the contract
-        // access(all) fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
+        access(all) fun register(name: String, vault: @FiatToken.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
 
-        //     if name.length < 3 {
-        //         panic( "A FIND name has to be minimum 3 letters long")
-        //     }
+            if name.length < 3 {
+                panic( "A FIND name has to be minimum 3 letters long")
+            }
 
-        //     let nameStatus=self.readStatus(name)
-        //     if nameStatus.status == LeaseStatus.TAKEN {
-        //         panic("Name already registered")
-        //     }
+            let nameStatus=self.readStatus(name)
+            if nameStatus.status == LeaseStatus.TAKEN {
+                panic("Name already registered")
+            }
 
-        //     //if we have a locked profile that is not owned by the same identity then panic
-        //     if nameStatus.status == LeaseStatus.LOCKED {
-        //         panic("Name is locked")
-        //     }
+            //if we have a locked profile that is not owned by the same identity then panic
+            if nameStatus.status == LeaseStatus.LOCKED {
+                panic("Name is locked")
+            }   
 
-        //     let cost= self.calculateCost(name)
-        //     if vault.balance != cost {
-        //         panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
-        //     }
-        //     self.wallet.borrow()!.deposit(from: <- vault)
+            let cost= self.calculateCost(name)
+            if vault.balance != cost {
+                panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
+            }
+            self.wallet.borrow()!.deposit(from: <- vault)
 
-        //     self.internal_register(name: name, profile: profile, leases: leases)
-        // }
+            self.internal_register(name: name, profile: profile, leases: leases)
+        }
 
         //everybody can call register, normally done through the convenience method in the contract
         access(all) fun registerDapper(merchAccount: Address, name: String, vault: @DapperUtilityCoin.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&{LeaseCollectionPublic}>) {

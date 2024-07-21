@@ -344,7 +344,7 @@ access(all) contract LostAndFound {
         }
 
         // Redeem a specific ticket instead of all of a certain type.
-        access(Withdraw) fun redeem(type: Type, ticketID: UInt64, receiver: Capability) {
+        access(all) fun redeem(type: Type, ticketID: UInt64, receiver: Capability) {
             pre {
                 receiver.address == self.redeemer: "receiver must match the redeemer of this shelf"
                 self.bins.containsKey(type.identifier): "no bin for provided type"
