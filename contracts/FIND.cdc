@@ -1,7 +1,7 @@
 import "FungibleToken"
-import "FUSD"
+// import "FUSD"
 import "FlowToken"
-// import "FiatToken"
+import "FiatToken"
 import "DapperUtilityCoin"
 import "Profile"
 import "Debug"
@@ -231,9 +231,10 @@ access(all) contract FIND {
         var path = ""
         if vault.getType() == Type<@FlowToken.Vault>() {
             path ="flowTokenReceiver"
-        } else if vault.getType() == Type<@FUSD.Vault>() {
-            path="fusdReceiver"
-        }
+        } 
+        // else if vault.getType() == Type<@FUSD.Vault>() {
+        //     path="fusdReceiver"
+        // }
         if path != "" {
             emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: "", toAddress: address, message:message, tag:tag, amount:vault.balance, ftType:vault.getType().identifier)
             account.capabilities.borrow<&{FungibleToken.Receiver}>(PublicPath(identifier: path)!)!.deposit(from: <- vault)
@@ -373,7 +374,7 @@ access(all) contract FIND {
             self.offerCallback=callback
         }
 
-        access(LeaseOwner) fun extendLease(_ vault: @FUSD.Vault) {
+        access(LeaseOwner) fun extendLease(_ vault: @FiatToken.Vault) {
             let network= self.networkCap.borrow() ?? panic("The network is not up")
             network.renew(name: self.name, vault:<-  vault)
         }
@@ -606,7 +607,7 @@ access(all) contract FIND {
 
         //anybody should be able to fulfill an auction as long as it is done
         access(all) fun fulfillAuction(_ name: String)
-        access(all) fun buyAddon(name:String, addon: String, vault: @FUSD.Vault)
+        // access(all) fun buyAddon(name:String, addon: String, vault: @FUSD.Vault)
         access(all) fun buyAddonDapper(merchAccount: Address, name:String, addon:String, vault: @DapperUtilityCoin.Vault)
         access(account) fun adminAddAddon(name:String, addon: String)
         access(all) fun getAddon(name:String) : [String]
@@ -636,43 +637,43 @@ access(all) contract FIND {
             self.networkWallet=networkWallet
         }
 
-        access(all) fun buyAddon(name:String, addon:String, vault: @FUSD.Vault)  {
-            if !self.leases.containsKey(name) {
-                panic("Invalid name=".concat(name))
-            }
+        // access(all) fun buyAddon(name:String, addon:String, vault: @FUSD.Vault)  {
+        //     if !self.leases.containsKey(name) {
+        //         panic("Invalid name=".concat(name))
+        //     }
 
-            let network=FIND.account.storage.borrow<&Network>(from: FIND.NetworkStoragePath)!
+        //     let network=FIND.account.storage.borrow<&Network>(from: FIND.NetworkStoragePath)!
 
-            if !network.publicEnabled {
-                panic("Public registration is not enabled yet")
-            }
+        //     if !network.publicEnabled {
+        //         panic("Public registration is not enabled yet")
+        //     }
 
-            if network.addonPrices[addon] == nil {
-                panic("This addon is not available. addon : ".concat(addon))
-            }
-            let addonPrice = network.addonPrices[addon]!
+        //     if network.addonPrices[addon] == nil {
+        //         panic("This addon is not available. addon : ".concat(addon))
+        //     }
+        //     let addonPrice = network.addonPrices[addon]!
 
-            let lease = self.borrowAuth(name)
+        //     let lease = self.borrowAuth(name)
 
-            if !lease.validate() {
-                panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
-            }
+        //     if !lease.validate() {
+        //         panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
+        //     }
 
-            if lease.addons.containsKey(addon) {
-                panic("You already have this addon : ".concat(addon))
-            }
+        //     if lease.addons.containsKey(addon) {
+        //         panic("You already have this addon : ".concat(addon))
+        //     }
 
-            if vault.balance != addonPrice {
-                panic("Expect ".concat(addonPrice.toString()).concat(" FUSD for ").concat(addon).concat(" addon"))
-            }
+        //     if vault.balance != addonPrice {
+        //         panic("Expect ".concat(addonPrice.toString()).concat(" FUSD for ").concat(addon).concat(" addon"))
+        //     }
 
-            lease.addAddon(addon)
+        //     lease.addAddon(addon)
 
-            //put something in your storage
-            emit AddonActivated(name: name, addon: addon)
-            let networkWallet = self.networkWallet.borrow() ?? panic("The network is not up")
-            networkWallet.deposit(from: <- vault)
-        }
+        //     //put something in your storage
+        //     emit AddonActivated(name: name, addon: addon)
+        //     let networkWallet = self.networkWallet.borrow() ?? panic("The network is not up")
+        //     networkWallet.deposit(from: <- vault)
+        // }
 
         access(all) fun buyAddonDapper(merchAccount: Address, name:String, addon:String, vault: @DapperUtilityCoin.Vault)  {
             FIND.checkMerchantAddress(merchAccount)
@@ -1358,18 +1359,18 @@ access(all) contract FIND {
 
 
         //This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
-        access(LeaseOwner) fun register(name: String, vault: @FUSD.Vault){
-            let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)
-            let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+        // access(LeaseOwner) fun register(name: String, vault: @FUSD.Vault){
+        //     let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)
+        //     let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
-            let network=FIND.account.storage.borrow<&Network>(from: FIND.NetworkStoragePath)!
+        //     let network=FIND.account.storage.borrow<&Network>(from: FIND.NetworkStoragePath)!
 
-            if !network.publicEnabled {
-                panic("Public registration is not enabled yet")
-            }
+        //     if !network.publicEnabled {
+        //         panic("Public registration is not enabled yet")
+        //     }
 
-            network.register(name:name, vault: <- vault, profile: profileCap, leases: leases)
-        }
+        //     network.register(name:name, vault: <- vault, profile: profileCap, leases: leases)
+        // }
 
         //This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
         access(LeaseOwner) fun registerDapper(merchAccount: Address, name: String, vault: @DapperUtilityCoin.Vault){
@@ -1517,7 +1518,7 @@ access(all) contract FIND {
 
         //TODO: add support for Fiat
         //this method is only called from a lease, and only the owner has that capability
-        access(contract) fun renew(name: String, vault: @FUSD.Vault) {
+        access(contract) fun renew(name: String, vault: @FiatkToken.Vault) {
             if let lease= self.profiles[name] {
                 let cost= self.calculateCost(name)
                 if vault.balance != cost {
@@ -1593,38 +1594,7 @@ access(all) contract FIND {
         }
 
         //TODO test
-        // access(all) fun registerUSDC(name: String, vault: @FiatToken.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
-
-        //     if name.length < 3 {
-        //         panic( "A FIND name has to be minimum 3 letters long")
-        //     }
-
-        //     let nameStatus=self.readStatus(name)
-        //     if nameStatus.status == LeaseStatus.TAKEN {
-        //         panic("Name already registered")
-        //     }
-
-        //     //if we have a locked profile that is not owned by the same identity then panic
-        //     if nameStatus.status == LeaseStatus.LOCKED {
-        //         panic("Name is locked")
-        //     }
-
-        //     let cost= self.calculateCost(name)
-        //     if vault.balance != cost {
-        //         panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
-        //     }
-
-        //     let address=self.wallet.address
-        //     let account=getAccount(address)
-        //     let usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
-        //     let usdcReceiver = usdcCap.borrow() ?? panic("cound not find usdc vault receiver for address".concat(self.wallet.address.toString()))
-        //     usdcReceiver.deposit(from: <- vault)
-
-        //     self.internal_register(name: name, profile: profile, leases: leases)
-        // }
-
-        //everybody can call register, normally done through the convenience method in the contract
-        access(all) fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
+        access(all) fun registerUSDC(name: String, vault: @FiatToken.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
 
             if name.length < 3 {
                 panic( "A FIND name has to be minimum 3 letters long")
@@ -1644,10 +1614,41 @@ access(all) contract FIND {
             if vault.balance != cost {
                 panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
             }
-            self.wallet.borrow()!.deposit(from: <- vault)
+
+            let address=self.wallet.address
+            let account=getAccount(address)
+            let usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
+            let usdcReceiver = usdcCap.borrow() ?? panic("cound not find usdc vault receiver for address".concat(self.wallet.address.toString()))
+            usdcReceiver.deposit(from: <- vault)
 
             self.internal_register(name: name, profile: profile, leases: leases)
         }
+
+        //everybody can call register, normally done through the convenience method in the contract
+        // access(all) fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
+
+        //     if name.length < 3 {
+        //         panic( "A FIND name has to be minimum 3 letters long")
+        //     }
+
+        //     let nameStatus=self.readStatus(name)
+        //     if nameStatus.status == LeaseStatus.TAKEN {
+        //         panic("Name already registered")
+        //     }
+
+        //     //if we have a locked profile that is not owned by the same identity then panic
+        //     if nameStatus.status == LeaseStatus.LOCKED {
+        //         panic("Name is locked")
+        //     }
+
+        //     let cost= self.calculateCost(name)
+        //     if vault.balance != cost {
+        //         panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
+        //     }
+        //     self.wallet.borrow()!.deposit(from: <- vault)
+
+        //     self.internal_register(name: name, profile: profile, leases: leases)
+        // }
 
         //everybody can call register, normally done through the convenience method in the contract
         access(all) fun registerDapper(merchAccount: Address, name: String, vault: @DapperUtilityCoin.Vault, profile: Capability<&{Profile.Public}>, leases: Capability<&{LeaseCollectionPublic}>) {
@@ -1898,28 +1899,28 @@ access(all) contract FIND {
         }
 
         //make a bid on a name
-        access(all) fun bid(name: String, vault: @FUSD.Vault) {
-            let nameStatus=FIND.status(name)
-            if nameStatus.status ==  LeaseStatus.FREE {
-                panic("cannot bid on name that is free")
-            }
+        // access(all) fun bid(name: String, vault: @FUSD.Vault) {
+        //     let nameStatus=FIND.status(name)
+        //     if nameStatus.status ==  LeaseStatus.FREE {
+        //         panic("cannot bid on name that is free")
+        //     }
 
-            if self.owner!.address == nameStatus.owner {
-                panic("cannot bid on your own name")
-            }
+        //     if self.owner!.address == nameStatus.owner {
+        //         panic("cannot bid on your own name")
+        //     }
 
-            let fromCap=getAccount(nameStatus.owner!).capabilities.get<&LeaseCollection>(FIND.LeasePublicPath)
+        //     let fromCap=getAccount(nameStatus.owner!).capabilities.get<&LeaseCollection>(FIND.LeasePublicPath)
 
-            let bid <- create Bid(from: fromCap, name:name, vault: <- vault)
-            let leaseCollection= fromCap.borrow() ?? panic("Could not borrow lease bid from owner of name=".concat(name))
+        //     let bid <- create Bid(from: fromCap, name:name, vault: <- vault)
+        //     let leaseCollection= fromCap.borrow() ?? panic("Could not borrow lease bid from owner of name=".concat(name))
 
 
-            let callbackCapability =self.owner!.capabilities.get<&BidCollection>(FIND.BidPublicPath)
-            let oldToken <- self.bids[bid.name] <- bid
-            //send info to leaseCollection
-            destroy oldToken
-            leaseCollection.registerBid(name: name, callback: callbackCapability)
-        }
+        //     let callbackCapability =self.owner!.capabilities.get<&BidCollection>(FIND.BidPublicPath)
+        //     let oldToken <- self.bids[bid.name] <- bid
+        //     //send info to leaseCollection
+        //     destroy oldToken
+        //     leaseCollection.registerBid(name: name, callback: callbackCapability)
+        // }
 
         //increase a bid, will not work if the auction has already started
         access(all) fun increaseBid(name: String, vault: @{FungibleToken.Vault}) {
