@@ -1,5 +1,5 @@
 import "FungibleToken"
-// import "FUSD"
+import "FUSD"
 import "FlowToken"
 import "FiatToken"
 import "DapperUtilityCoin"
