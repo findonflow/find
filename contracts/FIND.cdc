@@ -232,9 +232,9 @@ access(all) contract FIND {
         if vault.getType() == Type<@FlowToken.Vault>() {
             path ="flowTokenReceiver"
         } 
-        // else if vault.getType() == Type<@FUSD.Vault>() {
-        //     path="fusdReceiver"
-        // }
+        else if vault.getType() == Type<@FiatToken.Vault>() {
+            path=FiatkToken.VaultReceiverPubPath
+        }
         if path != "" {
             emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: "", toAddress: address, message:message, tag:tag, amount:vault.balance, ftType:vault.getType().identifier)
             account.capabilities.borrow<&{FungibleToken.Receiver}>(PublicPath(identifier: path)!)!.deposit(from: <- vault)
