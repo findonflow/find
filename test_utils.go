@@ -1835,7 +1835,7 @@ func (otu *OverflowTestUtils) postExampleThought() uint64 {
 			},
 			"tags": []interface{}{"tag1", "tag2", "@find"},
 		}).
-		GetIdFromEvent("Published", "id")
+		GetIdFromEvent("FindThoughts.Published", "id")
 	return thoughtId
 }
 

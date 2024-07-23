@@ -36,10 +36,10 @@ transaction(user: String, id: UInt64, amount: UFix64) {
         let aeBidPublicPath=FindMarket.getPublicPath(aeBidType, name: tenant.name)
         let aeBidStoragePath= FindMarket.getStoragePath(aeBidType, name:tenant.name)
 
-        let aeBidCap= account.capabilities.get<&{FindMarketAuctionEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aeBidPublicPath)
+        let aeBidCap= account.capabilities.get<&FindMarketAuctionEscrow.MarketBidCollection>(aeBidPublicPath)
         if !aeBidCap.check(){
             account.storage.save<@FindMarketAuctionEscrow.MarketBidCollection>(<- FindMarketAuctionEscrow.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:tenantCapability), to: aeBidStoragePath)
-            let cap = account.capabilities.storage.issue<&{FindMarketAuctionEscrow.MarketBidCollectionPublic, FindMarket.MarketBidCollectionPublic}>(aeBidStoragePath)
+            let cap = account.capabilities.storage.issue<&FindMarketAuctionEscrow.MarketBidCollection>(aeBidStoragePath)
             account.capabilities.publish(cap, at: aeBidPublicPath)
         }
 

@@ -14,7 +14,7 @@ transaction(users: [Address], minCharLength: UInt64) {
 
         let vaultRef = account.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(from: /storage/flowTokenVault)!
         let paymentVault <- vaultRef.withdraw(amount: 0.01 * UFix64(users.length)) 
-        let repayment = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
+        let repayment = account.capabilities.get<&FlowToken.Vault>(/public/flowTokenReceiver)
 
         let paymentVaultRef = &paymentVault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
         for user in users {

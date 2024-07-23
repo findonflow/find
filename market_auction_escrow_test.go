@@ -49,6 +49,16 @@ func TestMarketAuctionEscrow(t *testing.T) {
 			fulfillMarketAuctionEscrow("user1", id, "user2", price+5.0)
 	})
 
+	ot.Run(t, "Should be able to sell at auction with two bids", func(t *testing.T) {
+		otu.listNFTForEscrowedAuction("user1", id, price).
+			saleItemListed("user1", "active_listed", price).
+			auctionBidMarketEscrow("user2", "user1", id, price+5.0).
+			auctionBidMarketEscrow("user3", "user1", id, price+10.0).
+			tickClock(400.0).
+			saleItemListed("user1", "finished_completed", price+10.0).
+			fulfillMarketAuctionEscrow("user1", id, "user3", price+10.0)
+	})
+
 	ot.Run(t, "Should not be able to list an item for auction twice, and will give error message.", func(t *testing.T) {
 		otu.listNFTForEscrowedAuction("user1", id, price).
 			saleItemListed("user1", "active_listed", price)
