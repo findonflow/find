@@ -1,7 +1,7 @@
 {
-  "name": "@findonflow/find-flow-contracts",
-  "version": "3.6.1",
-  "description": "Cadence transactions and scripts to work with https://find.xyz ",
+  "name": "@findonflow/find-flow-contracts-1.0",
+  "version": "1.0.0",
+  "description": "Cadence transactions and scripts to work with https://find.xyz for cadence 1.0",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
