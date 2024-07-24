@@ -18,6 +18,7 @@
       "source": "./contracts/standard/FungibleTokenSwitchboard.cdc",
       "aliases": {
         "testnet": "9a0766d93b6608b7",
+        "migrationnet": "9a0766d93b6608b7",
         "previewnet": "0xa0225e7000ac82a9",
         "emulator": "ee82856bf20e2aa6"
       }
@@ -26,7 +27,8 @@
       "source": "./contracts/standard/EmeraldIdentity.cdc",
       "aliases": {
         "mainnet": "0x39e42c67cc851cfb",
-        "testnet": "0xfe433270356d985c"
+        "testnet": "0xfe433270356d985c",
+        "migrationnet": "0xfe433270356d985c"
       }
     },
     "NonFungibleToken": {
@@ -210,6 +212,14 @@
         "mainnet": "0xa6850776a94e6551",
         "testnet": "0x2f8af5ed05bbde0d",
         "migrationnet": "0x2f8af5ed05bbde0d"
+      }
+    },
+    "PublicPriceOracle": {
+      "source": "./contracts/community/PublicPriceOracle.cdc",
+      "aliases": {
+        "mainnet": "0xec67451f8a58216a",
+        "testnet": "0x8232ce4a3aff4e94",
+        "migrationnet": "0x8232ce4a3aff4e94"
       }
     },
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
