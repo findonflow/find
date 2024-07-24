@@ -338,12 +338,20 @@
       "address": "35717efbbce11c74",
       "key": "${TESTNET_ACCOUNT}"
     },
+    "testnet-find-admin": {
+      "address": "d116c726ad1b1cab",
+      "key": "${TESTNET_ACCOUNT}"
+    },
     "testnet-find-forge": {
       "address": "3e5b4c627064625d",
       "key": "${TESTNET_ACCOUNT}"
     },
     "migrationnet-find": {
       "address": "35717efbbce11c74",
+      "key": "${TESTNET_ACCOUNT}"
+    },
+    "migrationnet-find-admin": {
+      "address": "d116c726ad1b1cab",
       "key": "${TESTNET_ACCOUNT}"
     },
     "migrationnet-find-forge": {
