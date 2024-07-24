@@ -23,7 +23,7 @@ transaction(packTypeName: String, packTypeId:UInt64, numberOfPacks:UInt64, total
 
         let col = account.storage.borrow<&FindPack.Collection>(from: FindPack.CollectionStoragePath)
         if col == nil {
-            account.storage.save( <- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)
+            account.storage.save( <- FindPack.createEmptyCollection(nftType:Type<@FindPack.NFT>()), to: FindPack.CollectionStoragePath)
             let cap = account.capabilities.storage.issue<&FindPack.Collection>(FindPack.CollectionStoragePath)
             account.capabilities.publish(cap, at: FindPack.CollectionPublicPath)
         }

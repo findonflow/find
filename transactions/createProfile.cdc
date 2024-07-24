@@ -67,7 +67,7 @@ transaction(name: String) {
 
         let findPackCap= account.capabilities.get<&{NonFungibleToken.Collection}>(FindPack.CollectionPublicPath)
         if !findPackCap.check() {
-            account.storage.save( <- FindPack.createEmptyCollection(), to: FindPack.CollectionStoragePath)
+            account.storage.save( <- FindPack.createEmptyCollection(nftType: Type<@FindPack.NFT>()), to: FindPack.CollectionStoragePath)
 
             let cap = account.capabilities.storage.issue<&FindPack.Collection>(FindPack.CollectionStoragePath)
             account.capabilities.publish(cap, at: FindPack.CollectionPublicPath)
