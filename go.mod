@@ -5,7 +5,7 @@ go 1.22
 toolchain go1.22.4
 
 require (
-	github.com/bjartek/overflow/v2 v2.0.0-stable-cadence-beta.16
+	github.com/bjartek/overflow/v2 v2.0.0-stable-cadence-beta.17
 	github.com/bjartek/underflow v1.6.0
 	github.com/hexops/autogold v1.3.1
 	github.com/onflow/cadence v1.0.0-preview.38
