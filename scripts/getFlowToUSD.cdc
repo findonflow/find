@@ -6,7 +6,6 @@ access(all) fun main():UFix64? {
     for address in feeds.keys {
 
         let name= feeds[address]
-        //        let name = feeds[address]
         if name=="FLOW/USD" {
             return PublicPriceOracle.getLatestPrice(oracleAddr: address)
         }
