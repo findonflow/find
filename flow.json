@@ -10,7 +10,8 @@
       "source": "./contracts/standard/FLOAT.cdc",
       "aliases": {
         "mainnet": "0x2d4c3caffbeab845",
-        "testnet": "0x857dc34d5e1631d3"
+        "testnet": "0x857dc34d5e1631d3",
+        "migrationnet": "0x857dc34d5e1631d3"
       }
     },
     "FungibleTokenSwitchboard": {
@@ -32,6 +33,7 @@
       "source": "./contracts/standard/NonFungibleToken.cdc",
       "aliases": {
         "testnet": "0x631e88ae7f1d7c20",
+        "migrationnet": "0x631e88ae7f1d7c20",
         "mainnet": "0x1d7e57aa55817448",
         "emulator": "0xf8d6e0586b0a20c7",
         "previewnet": "0xb6763b4399a888c8"
@@ -42,6 +44,7 @@
       "aliases": {
         "mainnet": "0x1d7e57aa55817448",
         "testnet": "0x631e88ae7f1d7c20",
+        "migrationnet": "0x631e88ae7f1d7c20",
         "emulator": "0xf8d6e0586b0a20c7",
         "previewnet": "0xb6763b4399a888c8"
       }
@@ -51,6 +54,7 @@
       "aliases": {
         "mainnet": "0xe544175ee0461c4b",
         "testnet": "0x51ea0e37c27a1f1a",
+        "migrationnet": "0x51ea0e37c27a1f1a",
         "previewnet": "0xcbc6dbbfcc60e595"
       }
     },
@@ -58,6 +62,7 @@
       "source": "./contracts/standard/FUSD.cdc",
       "aliases": {
         "testnet": "0xe223d8a629e49c68",
+        "migrationnet": "0xe223d8a629e49c68",
         "mainnet": "0x3c5959b568896393",
         "previewnet": "0x7e3499582a06616f"
       }
@@ -66,6 +71,7 @@
       "source": "./contracts/standard/FiatToken.cdc",
       "aliases": {
         "testnet": "0xa983fecbed621163",
+        "migrationnet": "0xa983fecbed621163",
         "mainnet": "0xb19436aae4d94622",
         "previewnet": "0x7e3499582a06616f"
       }
@@ -74,6 +80,7 @@
       "source": "./contracts/standard/DapperStorageRent.cdc",
       "aliases": {
         "testnet": "0x43ee8c22fcf94ea3",
+        "migrationnet": "0x43ee8c22fcf94ea3",
         "mainnet": "0xa08e88e23f332538",
         "previewnet": "0xcbc6dbbfcc60e595"
       }
@@ -82,6 +89,7 @@
       "source": "./contracts/standard/FungibleToken.cdc",
       "aliases": {
         "testnet": "9a0766d93b6608b7",
+        "migrationnet": "9a0766d93b6608b7",
         "emulator": "ee82856bf20e2aa6",
         "mainnet": "0xf233dcee88fe0abe",
         "previewnet": "0xa0225e7000ac82a9"
@@ -91,6 +99,7 @@
       "source": "./contracts/standard/FlowToken.cdc",
       "aliases": {
         "testnet": "0x7e60df042a9c0868",
+        "migrationnet": "0x7e60df042a9c0868",
         "emulator": "0x0ae53cb6e3f42a79",
         "mainnet": "0x1654653399040a61",
         "previewnet": "0x4445e7ad11568276"
@@ -102,6 +111,7 @@
         "emulator": "0xf8d6e0586b0a20c7",
         "mainnet": "0xf233dcee88fe0abe",
         "testnet": "0x631e88ae7f1d7c20",
+        "migrationnet": "0x631e88ae7f1d7c20",
         "previewnet": "0xb6763b4399a888c8"
       }
     },
@@ -111,6 +121,7 @@
         "emulator": "0xf8d6e0586b0a20c7",
         "mainnet": "0xf233dcee88fe0abe",
         "testnet": "0x9a0766d93b6608b7",
+        "migrationnet": "0x9a0766d93b6608b7",
         "previewnet": "0xb6763b4399a888c8"
       }
     },
@@ -119,6 +130,7 @@
       "aliases": {
         "mainnet": "0xead892083b3e2c6c",
         "testnet": "0x82ec283f88a62e65",
+        "migrationnet": "0x82ec283f88a62e65",
         "previewnet": "0xcbc6dbbfcc60e595"
       }
     },
@@ -126,7 +138,8 @@
       "source": "./contracts/standard/FlowUtilityToken.cdc",
       "aliases": {
         "mainnet": "0xead892083b3e2c6c",
-        "testnet": "0x82ec283f88a62e65"
+        "testnet": "0x82ec283f88a62e65",
+        "migrationnet": "0x82ec283f88a62e65"
       }
     },
     "FungibleTokenMetadataViews": {
@@ -135,7 +148,8 @@
         "mainnet": "0xf233dcee88fe0abe",
         "previewnet": "0xa0225e7000ac82a9",
         "emulator": "ee82856bf20e2aa6",
-        "testnet": "0x9a0766d93b6608b7"
+        "testnet": "0x9a0766d93b6608b7",
+        "migrationnet": "0x9a0766d93b6608b7"
       }
     },
     "NFTCatalog": {
@@ -143,6 +157,7 @@
       "aliases": {
         "mainnet": "0x49a7cda3a1eecc29",
         "testnet": "0x324c34e1c517e4db",
+        "migrationnet": "0x324c34e1c517e4db",
         "previewnet": "0xd5a5e5c94f9cdb36"
       }
     },
@@ -151,6 +166,7 @@
       "aliases": {
         "mainnet": "0x49a7cda3a1eecc29",
         "testnet": "0x324c34e1c517e4db",
+        "migrationnet": "0x324c34e1c517e4db",
         "previewnet": "0xd5a5e5c94f9cdb36"
       }
     },
@@ -158,6 +174,7 @@
       "source": "./contracts/standard/LostAndFound.cdc",
       "aliases": {
         "testnet": "0xbe4635353f55bbd4",
+        "migrationnet": "0xbe4635353f55bbd4",
         "mainnet": "0x473d6a2c37eab5be"
       }
     },
@@ -165,6 +182,7 @@
       "source": "./contracts/standard/LostAndFoundHelper.cdc",
       "aliases": {
         "testnet": "0xbe4635353f55bbd4",
+        "migrationnet": "0xbe4635353f55bbd4",
         "mainnet": "0x473d6a2c37eab5be"
       }
     },
@@ -172,6 +190,7 @@
       "source": "./contracts/standard/FeeEstimator.cdc",
       "aliases": {
         "testnet": "0xbe4635353f55bbd4",
+        "migrationnet": "0xbe4635353f55bbd4",
         "mainnet": "0x473d6a2c37eab5be"
       }
     },
@@ -180,6 +199,7 @@
       "aliases": {
         "emulator": "0xf8d6e0586b0a20c7",
         "testnet": "0x8c5303eaa26202d6",
+        "migrationnet": "0x8c5303eaa26202d6",
         "mainnet": "0xe467b9dd11fa00df",
         "previewnet": "0xb6763b4399a888c8"
       }
@@ -188,7 +208,8 @@
       "source": "./contracts/community/SwapRouter.cdc",
       "aliases": {
         "mainnet": "0xa6850776a94e6551",
-        "testnet": "0x2f8af5ed05bbde0d"
+        "testnet": "0x2f8af5ed05bbde0d",
+        "migrationnet": "0x2f8af5ed05bbde0d"
       }
     },
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
@@ -248,6 +269,7 @@
   "networks": {
     "emulator": "127.0.0.1:3569",
     "previewnet": "access.previewnet.nodes.onflow.org:9000",
+    "migrationnet": "access-001.migrationtestnet1.nodes.onflow.org:9000",
     "mainnet": "access.mainnet.nodes.onflow.org:9000",
     "testnet": "access.devnet.nodes.onflow.org:9000"
   },
@@ -317,6 +339,14 @@
       "key": "${TESTNET_ACCOUNT}"
     },
     "testnet-find-forge": {
+      "address": "3e5b4c627064625d",
+      "key": "${TESTNET_ACCOUNT}"
+    },
+    "migrationnet-find": {
+      "address": "35717efbbce11c74",
+      "key": "${TESTNET_ACCOUNT}"
+    },
+    "migrationnet-find-forge": {
       "address": "3e5b4c627064625d",
       "key": "${TESTNET_ACCOUNT}"
     }
@@ -453,6 +483,58 @@
         "NameVoucher"
       ],
       "testnet-find-forge": [
+        "NFGv3",
+        "PartyFavorz",
+        "PartyFavorzExtraData",
+        "Flomies",
+        "GeneratedExperiences"
+      ]
+    },
+    "migrationnet": {
+      "migrationnet-find": [
+        "FIND",
+        "Clock",
+        "Profile",
+        "Debug",
+        "Admin",
+        "FindMarketAdmin",
+        "CharityNFT",
+        "FindViews",
+        "Dandy",
+        "FindMarket",
+        "FindMarketSale",
+        "FindMarketDirectOfferEscrow",
+        "FindMarketDirectOfferSoft",
+        "FindMarketAuctionEscrow",
+        "FindMarketAuctionSoft",
+        "Sender",
+        "FindRelatedAccounts",
+        "FTRegistry",
+        "FindForge",
+        "FindForgeOrder",
+        "FindForgeStruct",
+        "FindLeaseMarket",
+        "FindLeaseMarketSale",
+        "FindLeaseMarketAuctionSoft",
+        "FindLeaseMarketDirectOfferSoft",
+        "ProfileCache",
+        "FindRulesCache",
+        "FINDNFTCatalog",
+        "FINDNFTCatalogAdmin",
+        "FindPack",
+        "FindVerifier",
+        "FindAirdropper",
+        "FindFurnace",
+        "FindThoughts",
+        "FindUtils",
+        "FindLostAndFoundWrapper",
+        "FindMarketCut",
+        "FindMarketCutStruct",
+        "FindMarketCutInterface",
+        "FindMarketInfrastructureCut",
+        "NameVoucher"
+      ],
+      "migrationnet-find-forge": [
         "NFGv3",
         "PartyFavorz",
         "PartyFavorzExtraData",
