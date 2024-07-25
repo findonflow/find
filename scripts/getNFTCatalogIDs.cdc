@@ -23,28 +23,6 @@ access(all) struct ItemReport {
     }
 }
 
-access(all) struct NFTView {
-    access(all) let id: UInt64
-    access(all) let display: MetadataViews.Display?
-    access(all) let editions: MetadataViews.Editions?
-    access(all) let collectionDisplay: MetadataViews.NFTCollectionDisplay?
-    access(all) let nftType: Type
-
-    init(
-        id : UInt64,
-        display : MetadataViews.Display?,
-        editions : MetadataViews.Editions?,
-        collectionDisplay: MetadataViews.NFTCollectionDisplay?,
-        nftType: Type
-    ) {
-        self.id = id
-        self.display = display
-        self.editions = editions
-        self.collectionDisplay = collectionDisplay
-        self.nftType = nftType
-    }
-}
-
 access(all) struct NFTIDs {
     access(all) let ids: [UInt64]
     access(all) let collectionName: String 
@@ -63,6 +41,8 @@ access(all) fun resolveAddress(user: String) : Address? {
 
 access(all) fun getNFTIDs(ownerAddress: Address) : {String : NFTIDs} {
 
+    let bannList = [ "PartyFavorz"]
+
     let account = getAuthAccount<auth(BorrowValue) &Account>(ownerAddress)
 
     if account.balance == 0.0 {
@@ -73,8 +53,12 @@ access(all) fun getNFTIDs(ownerAddress: Address) : {String : NFTIDs} {
     let types = FINDNFTCatalog.getCatalogTypeData()
     for nftType in types.keys {
 
+
         let typeData=types[nftType]!
         let collectionKey=typeData.keys[0]
+        if bannList.contains(collectionKey) {
+            continue
+        }
         let catalogEntry = FINDNFTCatalog.getCatalogEntry(collectionIdentifier:collectionKey)!
 
         var collectionName = collectionKey
@@ -83,6 +67,8 @@ access(all) fun getNFTIDs(ownerAddress: Address) : {String : NFTIDs} {
         }
 
         let storagePath = catalogEntry.collectionData.storagePath
+
+        //TODO: checkif this exists here
         let ref= account.storage.borrow<&{ViewResolver.ResolverCollection}>(from: storagePath)
         if ref != nil {
             inventory[collectionKey] = NFTIDs(ids: ref!.getIDs(), collectionName: collectionName)
