@@ -3,7 +3,6 @@ import "Profile"
 import "FindRelatedAccounts"
 import "NonFungibleToken"
 import "MetadataViews"
-import "EmeraldIdentity"
 import "TokenForwarding"
 import "FungibleToken"
 import "FindUtils"
@@ -105,13 +104,10 @@ fun main(user: String) : FINDReport? {
         )
     }
 
-    let discordID = EmeraldIdentity.getDiscordFromAccount(account: address) ?? ""
-    //?? EmeraldIdentityDapper.getDiscordFromAccount(account: address)
-    //?? EmeraldIdentityLilico.getDiscordFromAccount(account: address)
-    //    ?? ""
+    let discordID = ""//EmeraldIdentity.getDiscordFromAccount(account: address) ?? ""
 
     let emeraldIDAccounts : {String : Address} = {}
-    emeraldIDAccounts["blocto"] = EmeraldIdentity.getAccountFromDiscord(discordID: discordID)
+    //emeraldIDAccounts["blocto"] = EmeraldIdentity.getAccountFromDiscord(discordID: discordID)
     //   emeraldIDAccounts["lilico"] = EmeraldIdentityLilico.getAccountFromDiscord(discordID: discordID)
     //   emeraldIDAccounts["dapper"] = EmeraldIdentityDapper.getAccountFromDiscord(discordID: discordID)
 
