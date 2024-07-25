@@ -6,10 +6,10 @@ import "MetadataViews"
 import "EmeraldIdentity"
 import "TokenForwarding"
 import "FungibleToken"
-//import "Wearables"
+import "Wearables"
 import "FindUtils"
 import "Clock"
-//import "LostAndFound"
+import "LostAndFound"
 
 access(all) 
 struct FINDReport{
@@ -158,7 +158,6 @@ fun main(user: String) : FINDReport? {
 
         var readyForWearables = false
         var hasLostAndFoundItem : Bool = false
-        /*
         let wearablesRef= account.storage.borrow<&Wearables.Collection>(from: Wearables.CollectionStoragePath)
         if wearablesRef == nil {
             readyForWearables = false
@@ -175,12 +174,11 @@ fun main(user: String) : FINDReport? {
         }
 
         for t in LostAndFound.getRedeemableTypes(address) {
-            if t.isSubtype(of: Type<@NonFungibleToken.NFT>()) {
+            if t.isSubtype(of: Type<@{NonFungibleToken.NFT}>()) {
                 hasLostAndFoundItem = true
                 break
             }
         }
-        */
 
         return FINDReport(
             profile: profileReport,
