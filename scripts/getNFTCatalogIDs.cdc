@@ -106,7 +106,7 @@ access(all) fun fetchNFTCatalog(user: String, targetCollections: [String]) : {St
             continue
         }
 
-        inventory[catalogEntry.contractName] = ItemReport(length : collectionLength, extraIDs :extraIDs[project]?.ids ?? [] , shard: source, extraIDsIdentifier: project, collectionName: extraIDs[project]!.collectionName)
+        inventory[project] = ItemReport(length : collectionLength, extraIDs :extraIDs[project]?.ids ?? [] , shard: source, extraIDsIdentifier: project, collectionName: extraIDs[project]!.collectionName)
 
     }
 
