@@ -620,7 +620,7 @@ pub contract FIND {
             }
 
             if vault.balance != addonPrice {
-                panic("Expect ".concat(addonPrice.toString()).concat(" FUSD for ").concat(addon).concat(" addon"))
+                panic("Expect ".concat(addonPrice.toString()).concat(" FLOW for ").concat(addon).concat(" addon"))
             }
 
             lease.addAddon(addon)
@@ -1470,7 +1470,7 @@ pub contract FIND {
             if let lease= self.profiles[name] {
                 let cost= FIND.convertFLOWToUSD(self.calculateCost(name))
                 if vault.balance != cost {
-                    panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
+                    panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FLOW"))
                 }
                 let walletRef = self.wallet.borrow() ?? panic("The receiver capability is invalid. Wallet address : ".concat(self.wallet.address.toString()))
                 walletRef.deposit(from: <- vault)
@@ -1596,7 +1596,7 @@ pub contract FIND {
             let cost= FIND.convertFLOWToUSD(self.calculateCost(name))
 
             if vault.balance != cost {
-                panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
+                panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FLOW"))
             }
             self.wallet.borrow()!.deposit(from: <- vault)
 
