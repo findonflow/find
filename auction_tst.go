@@ -10,8 +10,8 @@ import (
 /*
 Tests must be in the same folder as flow.json with contracts and transactions/scripts in subdirectories in order for the path resolver to work correctly
 */
-func TestAuction(t *testing.T) {
 
+func TestAuction(t *testing.T) {
 	otu := NewOverflowTest(t).
 		setupFIND().
 		createUser(100.0, "user1").
@@ -32,13 +32,10 @@ func TestAuction(t *testing.T) {
 	assert.NoError(t, err)
 
 	t.Run("Should list a name for sale", func(t *testing.T) {
-
 		otu.listForSale("user1")
-
 	})
 
 	t.Run("Should be able list names for sale and delist some", func(t *testing.T) {
-
 		otu.registerUserWithName("user1", "name1").
 			registerUserWithName("user1", "name2").
 			listForSale("user1").
@@ -68,7 +65,6 @@ func TestAuction(t *testing.T) {
 	})
 
 	t.Run("Should be able list names for sale and delist them ALL", func(t *testing.T) {
-
 		otu.listForSale("user1").
 			listNameForSale("user1", "name1").
 			listNameForSale("user1", "name2")
@@ -101,7 +97,6 @@ func TestAuction(t *testing.T) {
 	})
 
 	t.Run("Should be able to direct offer on name for sale", func(t *testing.T) {
-
 		otu.createUser(100.0, "user2").
 			registerUser("user2").
 			listForSale("user1").
@@ -109,7 +104,6 @@ func TestAuction(t *testing.T) {
 	})
 
 	t.Run("Should be able to direct offer on name for sale and fulfill it", func(t *testing.T) {
-
 		otu.setProfile("user2")
 
 		otu.O.Tx("fulfillName",
@@ -133,11 +127,9 @@ func TestAuction(t *testing.T) {
 				"amount": 0.2,
 				"to":     otu.O.Address("find-admin"),
 			})
-
 	})
 
 	t.Run("Should be able to sell lease from auction buyer can fulfill auction", func(t *testing.T) {
-
 		otu.moveNameTo("user2", "user1", "user1").
 			createUser(100.0, "user3").
 			registerUser("user3").
@@ -171,11 +163,9 @@ func TestAuction(t *testing.T) {
 				"amount": 1.0,
 				"to":     otu.O.Address("find-admin"),
 			})
-
 	})
 
 	t.Run("Should not allow auction bid lower then the current one", func(t *testing.T) {
-
 		otu.moveNameTo("user3", "user1", "user1").
 			listForAuction("user1").
 			bid("user2", "user1", 8.0).
@@ -187,11 +177,9 @@ func TestAuction(t *testing.T) {
 			WithArg("amount", 10.0),
 		).
 			AssertFailure(t, "bid must be larger then current bid. Current bid is : 20.00000000. New bid is at : 10.00000000")
-
 	})
 
 	t.Run("Should be able to sell lease from offer directly", func(t *testing.T) {
-
 		otu.cancelNameAuction("user1", "user1").
 			listForSale("user1").
 			setProfile("user2")
@@ -226,11 +214,9 @@ func TestAuction(t *testing.T) {
 			})
 
 		otu.moveNameTo(buyer, name, name)
-
 	})
 
 	t.Run("Should not start auction if bid lower then sale price", func(t *testing.T) {
-
 		otu.listForAuction("user1").
 			directOffer("user2", "user1", 4.0)
 
@@ -243,11 +229,9 @@ func TestAuction(t *testing.T) {
 			WithSigner("user1"),
 			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
-
 	})
 
 	t.Run("Should not accept direct offer bid less then current one", func(t *testing.T) {
-
 		otu.directOffer("user2", "user1", 10.0)
 
 		otu.O.Tx("bidName",
@@ -261,11 +245,9 @@ func TestAuction(t *testing.T) {
 			WithSigner("user2"),
 			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
-
 	})
 
 	t.Run("Should not be able to increase direct offer price less than increment", func(t *testing.T) {
-
 		otu.directOffer("user2", "user1", 10.0)
 
 		otu.O.Tx("increaseNameBid",
@@ -279,11 +261,9 @@ func TestAuction(t *testing.T) {
 			WithSigner("user2"),
 			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
-
 	})
 
 	t.Run("Should start auction if we start out with smaller bid and then increase it with locked user", func(t *testing.T) {
-
 		otu.expireLease().
 			listForAuction("user1").
 			directOffer("user2", "user1", 4.0)
@@ -306,11 +286,9 @@ func TestAuction(t *testing.T) {
 			WithSigner("user1"),
 			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
-
 	})
 
 	t.Run("Should be able to sell locked name at auction", func(t *testing.T) {
-
 		otu.listForAuction("user1").
 			auctionBid("user2", "user1", 20.0).
 			expireAuction().
@@ -329,11 +307,9 @@ func TestAuction(t *testing.T) {
 					"seller":              otu.O.Address("user1"),
 				},
 			)
-
 	})
 
 	t.Run("Should not allow double bid from same author", func(t *testing.T) {
-
 		otu.moveNameTo("user2", "user1", "user1").
 			renewUserWithName("user1", "user1").
 			renewUserWithName("user2", "user2").
@@ -354,11 +330,9 @@ func TestAuction(t *testing.T) {
 			WithSigner("user1"),
 			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
-
 	})
 
 	t.Run("Should start auction if we start out with smaller bid and then increase it", func(t *testing.T) {
-
 		otu.listForAuction("user1").
 			directOffer("user2", "user1", 4.0)
 
@@ -375,22 +349,18 @@ func TestAuction(t *testing.T) {
 				"status":    "active_ongoing",
 				"buyerName": "user2",
 			})
-
 	})
 
 	t.Run("Should not be able to increase bid less than increment", func(t *testing.T) {
-
 		otu.O.Tx("increaseNameBid",
 			WithSigner("user2"),
 			WithArg("name", "user1"),
 			WithArg("amount", 0.0),
 		).
 			AssertFailure(t, "Increment should be greater than 10.00000000")
-
 	})
 
 	t.Run("Should be able to increase auction bid", func(t *testing.T) {
-
 		otu.O.Tx("increaseNameBid",
 			WithSigner("user2"),
 			WithArg("name", "user1"),
@@ -404,11 +374,9 @@ func TestAuction(t *testing.T) {
 				"status":     "active_ongoing",
 				"buyerName":  "user2",
 			})
-
 	})
 
 	t.Run("Should be able to manually start auction with lower bid", func(t *testing.T) {
-
 		otu.cancelNameAuction("user1", "user1").
 			listForAuction("user1").
 			directOffer("user2", "user1", 4.0)
@@ -425,12 +393,10 @@ func TestAuction(t *testing.T) {
 				"status":    "active_ongoing",
 				"buyerName": "user2",
 			})
-
 	})
 
-	//todo test when user is locked
+	// todo test when user is locked
 	t.Run("Should be able to cancel blind bid", func(t *testing.T) {
-
 		otu.cancelNameAuction("user1", "user1").
 			listForSale("user1").
 			directOffer("user2", "user1", 4.0)
@@ -448,11 +414,9 @@ func TestAuction(t *testing.T) {
 				"status":     "cancel_rejected",
 				"buyerName":  "user2",
 			})
-
 	})
 
 	t.Run("Should be able to cancel blind bid when user locked", func(t *testing.T) {
-
 		otu.listForSale("user1").
 			directOffer("user2", "user1", 4.0).
 			expireLease()
@@ -472,11 +436,9 @@ func TestAuction(t *testing.T) {
 				"status":     "cancel_rejected",
 				"buyerName":  "user2",
 			})
-
 	})
 
 	t.Run("Should not be able to cancel bid when auction has started", func(t *testing.T) {
-
 		otu.listForAuction("user1").
 			bid("user2", "user1", 5.0)
 
@@ -490,11 +452,9 @@ func TestAuction(t *testing.T) {
 			WithSigner("user1"),
 			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
-
 	})
 
 	t.Run("Should return money if outbid", func(t *testing.T) {
-
 		otu.listForAuction("user1").
 			bid("user2", "user1", 5.0)
 
@@ -517,11 +477,9 @@ func TestAuction(t *testing.T) {
 				"buyerName":     "user3",
 				"previousBuyer": otu.O.Address("user2"),
 			})
-
 	})
 
 	t.Run("Should extend auction on late bid", func(t *testing.T) {
-
 		otu.cancelNameAuction("user1", "user1").
 			listForAuction("user1").
 			bid("user2", "user1", 5.0)
@@ -548,11 +506,9 @@ func TestAuction(t *testing.T) {
 			})
 
 		otu.cancelNameAuction("user1", "user1")
-
 	})
 
 	t.Run("Should be able to cancel unfinished auction", func(t *testing.T) {
-
 		otu.listForAuction("user1").
 			bid("user2", "user1", 5.0)
 
@@ -573,11 +529,9 @@ func TestAuction(t *testing.T) {
 				"status":     "cancel_listing",
 				"buyerName":  "user2",
 			})
-
 	})
 
 	t.Run("Should not be able to bid on lease that is free, and not cleaned up", func(t *testing.T) {
-
 		otu.listForSale("user1")
 
 		otu.expireLease().tickClock(2.0)
@@ -589,11 +543,9 @@ func TestAuction(t *testing.T) {
 			WithArg("amount", 10.0),
 		).
 			AssertFailure(t, "cannot bid on name that is free")
-
 	})
 
 	t.Run("Should be able to cancel finished auction that did not meet reserve price", func(t *testing.T) {
-
 		otu.registerUser("user1").
 			listForAuction("user1").
 			bid("user2", "user1", 15.0).
@@ -612,11 +564,9 @@ func TestAuction(t *testing.T) {
 					"seller":              otu.O.Address("user1"),
 				},
 			)
-
 	})
 
 	t.Run("Should not be able to cancel finished auction", func(t *testing.T) {
-
 		otu.listForAuction("user1").
 			bid("user2", "user1", 25.0).
 			expireAuction().tickClock(2.0)
@@ -634,22 +584,18 @@ func TestAuction(t *testing.T) {
 		).AssertSuccess(t)
 
 		otu.moveNameTo("user2", "user1", "user1")
-
 	})
 
 	t.Run("Should not be able to direct offer on your own name", func(t *testing.T) {
-
 		otu.O.Tx("bidName",
 			WithSigner("user1"),
 			WithArg("name", "user1"),
 			WithArg("amount", 5.0),
 		).
 			AssertFailure(t, "cannot bid on your own name")
-
 	})
 
 	t.Run("Should cancel previous bid if put for auction", func(t *testing.T) {
-
 		otu.directOffer("user2", "user1", 5.0)
 
 		name := "user1"
@@ -680,11 +626,9 @@ func TestAuction(t *testing.T) {
 			})
 
 		otu.cancelNameAuction("user1", "user1")
-
 	})
 
 	t.Run("Should register previousBuyer if direct offer outbid", func(t *testing.T) {
-
 		otu.directOffer("user2", "user1", 4.0).
 			setProfile("user3")
 
@@ -705,6 +649,5 @@ func TestAuction(t *testing.T) {
 			WithSigner("user3"),
 			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
-
 	})
 }

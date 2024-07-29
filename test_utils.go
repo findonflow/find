@@ -361,7 +361,7 @@ func (otu *OverflowTestUtils) registerFIND() *OverflowTestUtils {
 	otu.O.Tx("register",
 		WithSigner("find-admin"),
 		WithArg("name", "find"),
-		WithArg("amount", 100.0),
+		WithArg("amount", 100.0*0.42),
 	).AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
 			"validUntil":  expireTime,
@@ -382,7 +382,7 @@ func (otu *OverflowTestUtils) registerUserTransaction(name string) OverflowResul
 	return otu.O.Tx("register",
 		WithSigner(name),
 		WithArg("name", name),
-		WithArg("amount", 5.0),
+		WithArg("amount", 5.0*0.42),
 	).AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
 			"validUntil":  expireTime,
@@ -494,7 +494,7 @@ func (otu *OverflowTestUtils) registerUserWithNameTransaction(buyer, name string
 	return otu.O.Tx("register",
 		WithSigner(buyer),
 		WithArg("name", name),
-		WithArg("amount", 5.0),
+		WithArg("amount", 5.0*0.42),
 	).AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
 			"validUntil":  expireTime,
@@ -664,7 +664,7 @@ func (otu *OverflowTestUtils) buyForge(user string) *OverflowTestUtils {
 		WithSigner(user),
 		WithArg("name", user),
 		WithArg("addon", "forge"),
-		WithArg("amount", 50.0),
+		WithArg("amount", 50.0*0.42),
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FIND.AddonActivated", map[string]interface{}{
@@ -698,7 +698,7 @@ func (otu *OverflowTestUtils) buyForgeForName(user, name string) *OverflowTestUt
 		WithSigner(user),
 		WithArg("name", name),
 		WithArg("addon", "forge"),
-		WithArg("amount", 50.0),
+		WithArg("amount", 50.0*0.42),
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FIND.AddonActivated", map[string]interface{}{
