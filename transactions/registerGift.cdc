@@ -1,45 +1,42 @@
-import FUSD from "../contracts/standard/FUSD.cdc"
+import FlowToken from "../contracts/standard/FlowToken.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FIND from "../contracts/FIND.cdc"
 
 transaction(name: String, amount: UFix64, recipient: String) {
 
-	let price : UFix64 
-	let vaultRef : &FUSD.Vault? 
-	let receiverLease : Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>
-	let receiverProfile : Capability<&{Profile.Public}>
-	let leases : &FIND.LeaseCollection?
+    let vaultRef : &FlowToken.Vault? 
+    let receiverLease : Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>
+    let receiverProfile : Capability<&{Profile.Public}>
+    let leases : &FIND.LeaseCollection?
 
-	prepare(acct: AuthAccount) {
+    prepare(acct: AuthAccount) {
 
-		let resolveAddress = FIND.resolve(recipient)
-		if resolveAddress == nil {panic("The input pass in is not a valid name or address. Input : ".concat(recipient))}
-		let address = resolveAddress!
+        let resolveAddress = FIND.resolve(recipient)
+        if resolveAddress == nil {panic("The input pass in is not a valid name or address. Input : ".concat(recipient))}
+        let address = resolveAddress!
 
-		self.price=FIND.calculateCost(name)
-		log("The cost for registering this name is ".concat(self.price.toString()))
 
-		self.vaultRef = acct.borrow<&FUSD.Vault>(from: /storage/fusdVault)
+        self.vaultRef = acct.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault)
 
-		self.leases=acct.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)
+        self.leases=acct.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)
 
-		let receiver = getAccount(address)
-		self.receiverLease = receiver.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-		self.receiverProfile = receiver.getCapability<&{Profile.Public}>(Profile.publicPath)
+        let receiver = getAccount(address)
+        self.receiverLease = receiver.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+        self.receiverProfile = receiver.getCapability<&{Profile.Public}>(Profile.publicPath)
+        FIND.validateCostInFlow(name: name, flow: amount)
 
-	}
+    }
 
-	pre{
-		self.price == amount : "Calculated cost : ".concat(self.price.toString()).concat(" does not match expected cost").concat(amount.toString())
-		self.vaultRef != nil : "Cannot borrow reference to fusd Vault!"
-		self.receiverLease.check() : "Lease capability is invalid"
-		self.receiverProfile.check() : "Profile capability is invalid"
-		self.leases != nil : "Cannot borrow refernce to find lease collection"
-	}
+    pre{
+        self.vaultRef != nil : "Cannot borrow reference to fusd Vault!"
+        self.receiverLease.check() : "Lease capability is invalid"
+        self.receiverProfile.check() : "Profile capability is invalid"
+        self.leases != nil : "Cannot borrow refernce to find lease collection"
+    }
 
-	execute{
-		let payVault <- self.vaultRef!.withdraw(amount: self.price) as! @FUSD.Vault
-		self.leases!.register(name: name, vault: <- payVault)
-		self.leases!.move(name: name, profile: self.receiverProfile, to: self.receiverLease)
-	}
+    execute{
+        let payVault <- self.vaultRef!.withdraw(amount: amount) as! @FlowToken.Vault
+        self.leases!.register(name: name, vault: <- payVault)
+        self.leases!.move(name: name, profile: self.receiverProfile, to: self.receiverLease)
+    }
 }

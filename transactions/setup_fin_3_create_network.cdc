@@ -7,14 +7,8 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 transaction() {
 
     prepare(account: AuthAccount) {
-        let wallet=account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-        if !wallet.check() {
-            let fusd <- FUSD.createEmptyVault()
-            account.save(<- fusd, to: /storage/fusdVault)
-            account.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
-            account.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
-        }
-
+        //TODO: we have to remember to relink this wallet on testnet/mainnet
+        let wallet=account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
         let adminClient=account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
         adminClient.setPublicEnabled(true)
         adminClient.setWallet(wallet)

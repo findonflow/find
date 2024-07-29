@@ -95,18 +95,60 @@ pub contract FIND {
 
     /// Calculate the cost of an name
     /// @param _ the name to calculate the cost for
-    pub fun calculateCost(_ name:String) : UFix64 {
+    pub fun calculateCostInFlow(_ name:String) : UFix64 {
         if !FIND.validateFindName(name) {
             panic("A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
         }
 
         if let network = self.account.borrow<&Network>(from: FIND.NetworkStoragePath) {
             return self.convertUSDToFLOW(network.calculateCost(name))
-        }
+        } 
         panic("Network is not set up")
     }
 
-    pub fun calculateCostDapper(_ name:String) : UFix64 {
+
+    pub fun validateAddonPrice(addon:String, flow:UFix64) {
+        let network=FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath)!
+
+        if !network.publicEnabled {
+            panic("Public registration is not enabled yet")
+        }
+
+        if network.addonPrices[addon] == nil {
+            panic("This addon is not available. addon : ".concat(addon))
+        }
+
+        var addonPrice = network.addonPrices[addon]!
+        let cost = FIND.convertUSDToFLOW(addonPrice)
+        let upper =  cost * 1.10
+        let lower =  cost * 0.90
+
+        if flow < lower {
+            panic("Cost of addon in flow is ".concat(cost.toString()).concat (" you sent in ").concat(flow.toString()).concat( " lower ").concat(lower.toString()).concat(" higher ").concat(upper.toString()))
+        }
+
+        if flow > upper {
+            panic("Cost of addon in flow is ".concat(cost.toString()).concat (" you sent in ").concat(flow.toString()).concat( " lower ").concat(lower.toString()).concat(" higher ").concat(upper.toString()))
+        }
+
+
+    }
+    pub fun validateCostInFlow(name:String, flow:UFix64) {
+        //TODO slippage is 10% either way here, not sure if that is too much
+        let cost = self.calculateCostInFlow(name)
+        let upper =  cost * 1.10
+        let lower =  cost * 0.90
+
+        if flow < lower {
+            panic("Cost of name in flow is ".concat(cost.toString()).concat (" you sent in ").concat(flow.toString()).concat( " lower ").concat(lower.toString()).concat(" higher ").concat(upper.toString()))
+        }
+
+        if flow > upper {
+            panic("Cost of name in flow is ".concat(cost.toString()).concat (" you sent in ").concat(flow.toString()).concat( " lower ").concat(lower.toString()).concat(" higher ").concat(upper.toString()))
+        }
+    }
+
+    pub fun calculateCost(_ name:String) : UFix64 {
         if !FIND.validateFindName(name) {
             panic("A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
         }
@@ -579,22 +621,8 @@ pub contract FIND {
                 panic("Invalid name=".concat(name))
             }
 
-            let network=FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath)!
 
-            if !network.publicEnabled {
-                panic("Public registration is not enabled yet")
-            }
-
-            if network.addonPrices[addon] == nil {
-                panic("This addon is not available. addon : ".concat(addon))
-            }
-
-            // Get addon price in USD
-            var addonPrice = network.addonPrices[addon]!
-
-            // Convert USD to FLOW
-            addonPrice = FIND.convertUSDToFLOW(addonPrice)
-
+            FIND.validateAddonPrice(addon: addon, flow:vault.balance)
             let lease = self.borrow(name)
 
             if !lease.validate() {
@@ -603,10 +631,6 @@ pub contract FIND {
 
             if lease.addons.containsKey(addon) {
                 panic("You already have this addon : ".concat(addon))
-            }
-
-            if vault.balance != addonPrice {
-                panic("Expect ".concat(addonPrice.toString()).concat(" FLOW for ").concat(addon).concat(" addon"))
             }
 
             lease.addAddon(addon)
@@ -977,11 +1001,8 @@ pub contract FIND {
         //this method is only called from a lease, and only the owner has that capability
         access(contract) fun renew(name: String, vault: @FlowToken.Vault) {
             if let lease= self.profiles[name] {
-                //TODO: i think we need some sllippage here
-                let cost= FIND.convertFLOWToUSD(self.calculateCost(name))
-                if vault.balance != cost {
-                    panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FLOW"))
-                }
+
+                FIND.validateCostInFlow(name: name, flow: vault.balance)
                 let walletRef = self.wallet.borrow() ?? panic("The receiver capability is invalid. Wallet address : ".concat(self.wallet.address.toString()))
                 walletRef.deposit(from: <- vault)
                 self.internal_renew(name: name)
@@ -1070,12 +1091,7 @@ pub contract FIND {
                 panic("Name is locked")
             }
 
-            //TODO: slippage
-            let cost= FIND.convertFLOWToUSD(self.calculateCost(name))
-
-            if vault.balance != cost {
-                panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FLOW"))
-            }
+            FIND.validateCostInFlow(name: name, flow: vault.balance)
             self.wallet.borrow()!.deposit(from: <- vault)
 
             self.internal_register(name: name, profile: profile, leases: leases)

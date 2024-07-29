@@ -11,12 +11,14 @@ transaction(name: String, addon:String, amount:UFix64) {
 
         self.leases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
         self.vaultRef = account.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault)
+        FIND.validateAddonPrice(addon: addon, flow: amount)
 
     }
 
     pre{
         self.leases != nil : "Could not borrow reference to the leases collection"
         self.vaultRef != nil : "Could not borrow reference to the fusdVault!"
+        self.vaultRef!.balance > amount : "Balance of vault is not high enough ".concat(self.vaultRef!.balance.toString())
     }
 
     execute {
