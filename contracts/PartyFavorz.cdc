@@ -246,14 +246,9 @@ access(all) contract PartyFavorz: NonFungibleToken {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
-        access(self) var storagePath: StoragePath
-        access(self) var publicPath: PublicPath
 
         init () {
             self.ownedNFTs <- {}
-            let identifier = "PartyFavorzNFTCollection"
-            self.storagePath = StoragePath(identifier: identifier)!
-            self.publicPath = PublicPath(identifier: identifier)!
         }
 
         // withdraw removes an NFT from the collection and moves it to the caller
@@ -314,12 +309,13 @@ access(all) contract PartyFavorz: NonFungibleToken {
 
         /// Return the default storage path for the collection
         access(all) view fun getDefaultStoragePath(): StoragePath? {
-            return self.storagePath
+            return PartyFavorz.CollectionStoragePath
+
         }
 
         /// Return the default public path for the collection
         access(all) view fun getDefaultPublicPath(): PublicPath? {
-            return self.publicPath
+            return PartyFavorz.CollectionPublicPath
         }
 
         /// Returns whether or not the given type is accepted by the collection
@@ -379,8 +375,8 @@ access(all) contract PartyFavorz: NonFungibleToken {
         self.MinterStoragePath = /storage/PartyFavorzMinter
 
         // TODO: Fix this to run on tests
-        let partyFavorz = self.account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
-        let artist = self.account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
+        let partyFavorz = self.account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+        let artist = self.account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 
         self.royalties = [
         MetadataViews.Royalty(receiver: partyFavorz, cut: 0.03, description: "Party Favorz"), 
