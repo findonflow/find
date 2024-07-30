@@ -329,6 +329,28 @@
         "testnet": "0x1c5033ad60821c97"
       }
     },
+    "PublicPriceOracle": {
+      "source": "./contracts/community/PublicPriceOracle.cdc",
+      "aliases": {
+        "mainnet": "0xec67451f8a58216a",
+        "testnet": "0x8232ce4a3aff4e94"
+      }
+    },
+    "OracleInterface": {
+      "source": "./contracts/community/OracleInterface.cdc",
+      "aliases": {
+        "mainnet": "0xcec15c814971c1dc",
+        "testnet": "0x2a9b59c3e2b72ee0"
+      }
+    },
+    "OracleConfig": {
+      "source": "./contracts/community/OracleConfig.cdc",
+      "aliases": {
+        "mainnet": "0xcec15c814971c1dc",
+        "testnet": "0x2a9b59c3e2b72ee0"
+      }
+    },
+    "PriceOracle": "./contracts/PriceOracle.cdc",
     "ProfileCache": "./contracts/ProfileCache.cdc",
     "FIND": "./contracts/FIND.cdc",
     "Giefts": "./contracts/Giefts.cdc",
@@ -664,13 +686,17 @@
         "Templates",
         "Wearables",
         "WearablesDev",
-        "TopShot"
+        "TopShot",
+        "PublicPriceOracle",
+        "OracleInterface",
+        "OracleConfig"
       ],
       "emulator-dapper": [
         "DapperUtilityCoin",
         "FlowUtilityToken"
       ],
       "emulator-find": [
+        "PriceOracle",
         "ExampleNFT",
         "FIND",
         "Clock",

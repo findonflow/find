@@ -16,7 +16,7 @@ import OracleConfig from "./OracleConfig.cdc"
 pub contract PublicPriceOracle {
     /// {OracleAddr: PriceIdentifier}
     access(self) let oracleAddrToPriceIdentifier: {Address: String}
-    
+
     /// The storage path for the Admin resource
     pub let OracleAdminStoragePath: StoragePath
 
@@ -35,26 +35,36 @@ pub contract PublicPriceOracle {
     /// Note: It is recommended to check the updated block height of this data with getLatestBlockHeight(), and handle the extreme condition if this data is too old.
     ///
     pub fun getLatestPrice(oracleAddr: Address): UFix64 {
+
+        //TODO: maybe fix this
+        return 0.42
+        /*
         let oraclePublicInterface_ReaderRef = getAccount(oracleAddr).getCapability<&{OracleInterface.OraclePublicInterface_Reader}>(OracleConfig.OraclePublicInterface_ReaderPath).borrow()
-                                                    ?? panic("Lost oracle public capability at ".concat(oracleAddr.toString()))
+        ?? panic("Lost oracle public capability at ".concat(oracleAddr.toString()))
         let priceReaderSuggestedPath = oraclePublicInterface_ReaderRef.getPriceReaderStoragePath()
         let priceReaderRef = PublicPriceOracle.account.borrow<&OracleInterface.PriceReader>(from: priceReaderSuggestedPath)
-                                ?? panic("Lost local price reader resource.")
+        ?? panic("Lost local price reader resource.")
         let medianPrice = priceReaderRef.getRawMedianPrice()
         return medianPrice
+        */
     }
-    
+
     /// Get the block height at the time of the latest update.
     ///
     pub fun getLatestBlockHeight(oracleAddr: Address): UInt64 {
+        //TODO: maybe fix this
+        return getCurrentBlock().height
+        /*
+
         let oraclePublicInterface_ReaderRef = getAccount(oracleAddr).getCapability<&{OracleInterface.OraclePublicInterface_Reader}>(OracleConfig.OraclePublicInterface_ReaderPath).borrow()
-                                                    ?? panic("Lost oracle public capability at ".concat(oracleAddr.toString()))
+        ?? panic("Lost oracle public capability at ".concat(oracleAddr.toString()))
         let priceReaderSuggestedPath = oraclePublicInterface_ReaderRef.getPriceReaderStoragePath()
         let priceReaderRef = PublicPriceOracle.account.borrow<&OracleInterface.PriceReader>(from: priceReaderSuggestedPath)
-                                ?? panic("Lost local price reader resource.")
-        
+        ?? panic("Lost local price reader resource.")
+
         let medianBlockHeight: UInt64 = priceReaderRef.getRawMedianBlockHeight()
         return medianBlockHeight
+        */
     }
 
     pub fun getAllSupportedOracles(): {Address: String} {
@@ -67,7 +77,7 @@ pub contract PublicPriceOracle {
             if (!PublicPriceOracle.oracleAddrToPriceIdentifier.containsKey(oracleAddr)) {
                 /// Mint oracle reader
                 let oraclePublicInterface_ReaderRef = getAccount(oracleAddr).getCapability<&{OracleInterface.OraclePublicInterface_Reader}>(OracleConfig.OraclePublicInterface_ReaderPath).borrow()
-                                                        ?? panic("Lost oracle public capability at ".concat(oracleAddr.toString()))
+                ?? panic("Lost oracle public capability at ".concat(oracleAddr.toString()))
                 let priceReaderSuggestedPath = oraclePublicInterface_ReaderRef.getPriceReaderStoragePath()
 
                 if (PublicPriceOracle.account.borrow<&OracleInterface.PriceReader>(from: priceReaderSuggestedPath) == nil) {
@@ -87,10 +97,10 @@ pub contract PublicPriceOracle {
             PublicPriceOracle.oracleAddrToPriceIdentifier.remove(key: oracleAddr)
             /// Remove local oracle reader resource
             let oraclePublicInterface_ReaderRef = getAccount(oracleAddr).getCapability<&{OracleInterface.OraclePublicInterface_Reader}>(OracleConfig.OraclePublicInterface_ReaderPath).borrow()
-                                                    ?? panic("Lost oracle public capability at ".concat(oracleAddr.toString()))
+            ?? panic("Lost oracle public capability at ".concat(oracleAddr.toString()))
             let priceReaderSuggestedPath = oraclePublicInterface_ReaderRef.getPriceReaderStoragePath()
             destroy <- PublicPriceOracle.account.load<@AnyResource>(from: priceReaderSuggestedPath)
-            
+
             emit OracleRemoved(oracleAddr: oracleAddr)
         }
     }
@@ -99,7 +109,7 @@ pub contract PublicPriceOracle {
         self.OracleAdminStoragePath = /storage/publicOracleAdmin
         self.oracleAddrToPriceIdentifier = {}
         self._reservedFields = {}
-        
+
         destroy <-self.account.load<@AnyResource>(from: self.OracleAdminStoragePath)
         self.account.save(<-create Admin(), to: self.OracleAdminStoragePath)
     }

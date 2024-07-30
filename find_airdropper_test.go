@@ -12,7 +12,6 @@ import (
 )
 
 func TestFindAirdropper(t *testing.T) {
-
 	otu := NewOverflowTest(t).
 		setupFIND().
 		createUser(1000.0, "user1").
@@ -27,12 +26,13 @@ func TestFindAirdropper(t *testing.T) {
 		registerFIND()
 
 	dandyType := dandyNFTType(otu)
-	fusd := otu.identifier("FUSD", "Vault")
+	//	fusd := otu.identifier("FUSD", "Vault")
+	flowToken := otu.identifier("FlowToken", "Vault")
+
 	otu.mintThreeExampleDandies()
 	otu.registerDandyInNFTRegistry()
 
 	t.Run("Should be able to send Airdrop", func(t *testing.T) {
-
 		ids := otu.mintThreeExampleDandies()
 
 		res := otu.O.Tx("sendNFTsSafe",
@@ -85,7 +85,6 @@ func TestFindAirdropper(t *testing.T) {
 	singleType := []string{exampleNFTType(otu)}
 
 	t.Run("Should be able to send packs thru airdropper with struct", func(t *testing.T) {
-
 		type FindPack_AirdropInfo struct {
 			PackTypeName string `cadence:"packTypeName"`
 			PackTypeId   uint64 `cadence:"packTypeId"`
@@ -129,11 +128,9 @@ func TestFindAirdropper(t *testing.T) {
 			},
 			"nftInfo": mockField,
 		})
-
 	})
 
 	t.Run("Should be able to send Airdrop with only collection public linked", func(t *testing.T) {
-
 		ids := otu.mintThreeExampleDandies()
 		otu.O.Tx("devUnlinkDandyReceiver",
 			WithSigner("user2"),
@@ -186,7 +183,6 @@ func TestFindAirdropper(t *testing.T) {
 	})
 
 	t.Run("Should not be able to send Airdrop without collection, good events will be emitted", func(t *testing.T) {
-
 		ids := otu.mintThreeExampleDandies()
 		user3 := otu.O.Address("user3")
 
@@ -204,7 +200,6 @@ func TestFindAirdropper(t *testing.T) {
 			AssertSuccess(t)
 
 		for i, id := range ids {
-
 			res.AssertEvent(t, "FindAirdropper.AirdropFailed", map[string]interface{}{
 				"fromName": "user1",
 				"from":     otu.O.Address("user1"),
@@ -218,12 +213,10 @@ func TestFindAirdropper(t *testing.T) {
 				},
 				"reason": "Invalid Receiver Capability",
 			})
-
 		}
 	})
 
 	t.Run("Should be able to get Airdrop details with a script", func(t *testing.T) {
-
 		ids := otu.mintThreeExampleDandies()
 		user3 := otu.O.Address("user3")
 
@@ -291,7 +284,6 @@ func TestFindAirdropper(t *testing.T) {
 		user3Res := makeResult(false, false, ids[2], 2, true, false, otu.O.Address("user3"), otu.O.Address("user3"), false, dandyType, false)
 
 		res.AssertWant(t, autogold.Want("sendNFTs", litter.Sdump([]interface{}{user1Res, user2Res, user3Res})))
-
 	})
 
 	trxns := []string{
@@ -302,7 +294,6 @@ func TestFindAirdropper(t *testing.T) {
 
 	for _, trxn := range trxns {
 		t.Run(fmt.Sprintf("Should be able to send Airdrop with sending funds to royalty holders %s", trxn), func(t *testing.T) {
-
 			ids := otu.mintThreeExampleDandies()
 
 			res := otu.O.Tx(trxn,
@@ -311,7 +302,7 @@ func TestFindAirdropper(t *testing.T) {
 				WithArg("nftIdentifiers", []string{dandyType, dandyType, dandyType}),
 				WithArg("ids", ids),
 				WithArg("memos", []string{"Message 0", "Message 1", "Message 2"}),
-				WithArg("donationTypes", fmt.Sprintf(`["%s" , nil, nil]`, fusd)),
+				WithArg("donationTypes", fmt.Sprintf(`["%s" , nil, nil]`, flowToken)),
 				WithArg("donationAmounts", fmt.Sprintf(`[%2f , nil, nil]`, 10.0)),
 				WithArg("findDonationType", nil),
 				WithArg("findDonationAmount", nil),
@@ -361,14 +352,13 @@ func TestFindAirdropper(t *testing.T) {
 			}
 
 			for _, want := range wants {
-				res.AssertEvent(t, "FUSD.TokensDeposited", want)
+				res.AssertEvent(t, ".FlowToken.TokensDeposited", want)
 			}
 		})
 
 		t.Run(fmt.Sprintf("Should be able to send Airdrop and donate funds to FIND! %s", trxn), func(t *testing.T) {
-
 			ids := otu.mintThreeExampleDandies()
-			optional := cadence.NewOptional(cadence.String(fusd))
+			optional := cadence.NewOptional(cadence.String(flowToken))
 
 			res := otu.O.Tx(trxn,
 				WithSigner("user1"),
@@ -385,7 +375,7 @@ func TestFindAirdropper(t *testing.T) {
 
 			for i, id := range ids {
 
-				events := res.GetEventsWithName("FindAirdropper.Airdropped")
+				events := res.GetEventsWithName(".FindAirdropper.Airdropped")
 				mockField := map[string]interface{}{}
 				for _, e := range events {
 					field, exist := e.Fields["nftInfo"].(map[string]interface{})
@@ -399,7 +389,7 @@ func TestFindAirdropper(t *testing.T) {
 					}
 				}
 
-				res.AssertEvent(t, "FindAirdropper.Airdropped", map[string]interface{}{
+				res.AssertEvent(t, ".FindAirdropper.Airdropped", map[string]interface{}{
 					"from":     otu.O.Address("user1"),
 					"fromName": "user1",
 					"to":       otu.O.Address("user2"),
@@ -421,10 +411,10 @@ func TestFindAirdropper(t *testing.T) {
 				"message":   "donation to .find",
 				"tag":       "donation",
 				"amount":    10.0,
-				"ftType":    fusd,
+				"ftType":    flowToken,
 			})
 
-			res.AssertEvent(t, "FUSD.TokensDeposited", map[string]interface{}{
+			res.AssertEvent(t, ".FlowToken.TokensDeposited", map[string]interface{}{
 				"to":     otu.O.Address("find-admin"),
 				"amount": 10.0,
 			})
@@ -432,10 +422,9 @@ func TestFindAirdropper(t *testing.T) {
 	}
 
 	t.Run("Should be able to send Airdrop if royalty is not there, donate to find", func(t *testing.T) {
-
 		id, err := otu.mintRoyaltylessNFT("user1")
 		require.NoError(t, err)
-		optional := cadence.NewOptional(cadence.String(fusd))
+		optional := cadence.NewOptional(cadence.String(flowToken))
 		fusdAmount := 11.0
 
 		res := otu.O.Tx("sendNFTs",
@@ -444,7 +433,7 @@ func TestFindAirdropper(t *testing.T) {
 			WithArg("nftIdentifiers", []string{exampleNFTType(otu)}),
 			WithArg("ids", []uint64{id}),
 			WithArg("memos", []string{"Message 0"}),
-			WithArg("donationTypes", []*string{&fusd}),
+			WithArg("donationTypes", []*string{&flowToken}),
 			WithArg("donationAmounts", []*float64{&fusdAmount}),
 			WithArg("findDonationType", optional),
 			WithArg("findDonationAmount", "10.0"),
@@ -458,10 +447,10 @@ func TestFindAirdropper(t *testing.T) {
 			"message":   "donation to .find",
 			"tag":       "donation",
 			"amount":    21.0,
-			"ftType":    fusd,
+			"ftType":    flowToken,
 		})
 
-		res.AssertEvent(t, "FUSD.TokensDeposited", map[string]interface{}{
+		res.AssertEvent(t, ".FlowToken.TokensDeposited", map[string]interface{}{
 			"to":     otu.O.Address("find-admin"),
 			"amount": 21.0,
 		})
