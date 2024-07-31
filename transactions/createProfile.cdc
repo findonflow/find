@@ -11,6 +11,8 @@ import FindMarket from "../contracts/FindMarket.cdc"
 import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
 import Dandy from "../contracts/Dandy.cdc"
 import FindThoughts from "../contracts/FindThoughts.cdc"
+import FindLeaseMarketDirectOfferSoft from "../contracts/FindLeaseMarketDirectOfferSoft.cdc"
+import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
 
 transaction(name: String) {
     prepare(account: AuthAccount) {
@@ -138,6 +140,21 @@ transaction(name: String) {
             account.save<@FindMarketDirectOfferEscrow.SaleItemCollection>(<- FindMarketDirectOfferEscrow.createEmptySaleItemCollection(tenantCapability), to: doeSaleStoragePath)
             account.link<&FindMarketDirectOfferEscrow.SaleItemCollection{FindMarketDirectOfferEscrow.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(doeSalePublicPath, target: doeSaleStoragePath)
         }
+
+        //TODO: we might need to create a transactions users run before people can bid on their leases?
+        let leaseTenant=tenant
+        let leaseTenantCapability=tenantCapability
+        let leaseDOSSaleItemType= Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>()
+        let leaseDOSPublicPath=leaseTenant.getPublicPath(leaseDOSSaleItemType)
+        let leaseDOSStoragePath= leaseTenant.getStoragePath(leaseDOSSaleItemType)
+        let leaseDOSSaleItemCap= account.getCapability<&FindLeaseMarketDirectOfferSoft.SaleItemCollection{FindLeaseMarketDirectOfferSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseDOSPublicPath)
+        if !leaseDOSSaleItemCap.check() {
+            //The link here has to be a capability not a tenant, because it can change.
+            account.save<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>(<- FindLeaseMarketDirectOfferSoft.createEmptySaleItemCollection(leaseTenantCapability), to: leaseDOSStoragePath)
+            account.link<&FindLeaseMarketDirectOfferSoft.SaleItemCollection{FindLeaseMarketDirectOfferSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseDOSPublicPath, target: leaseDOSStoragePath)
+        }
+
+
         //SYNC with register
 
     }

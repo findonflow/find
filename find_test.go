@@ -237,6 +237,7 @@ func TestFIND(t *testing.T) {
 				"findDandy",
 				"A_179b6b1cb6755e31_FindMarketDirectOfferEscrow_SaleItemCollection_find",
 				"FindPackCollection",
+				"A_179b6b1cb6755e31_FindLeaseMarketDirectOfferSoft_SaleItemCollection_find",
 			}}),
 		)
 	})
