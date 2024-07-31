@@ -67,7 +67,7 @@ func (otu *OverflowTestUtils) AutoGold(classifier string, value interface{}) *Ov
 
 func (otu *OverflowTestUtils) AutoGoldRename(fullname string, value interface{}) *OverflowTestUtils {
 	otu.T.Helper()
-	fullname = strings.Replace(fullname, " ", "_", -1)
+	fullname = strings.ReplaceAll(fullname, " ", "_")
 	autogold.Equal(otu.T, value, autogold.Name(otu.T.Name()+"/"+fullname))
 	return otu
 }
@@ -512,116 +512,8 @@ pub fun main() :  UFix64 {
 	return res
 }
 
-func (otu *OverflowTestUtils) listForSale(name string) *OverflowTestUtils {
-	otu.O.Tx("listNameForSale",
-		WithSigner(name),
-		WithArg("name", name),
-		WithArg("directSellPrice", 10.0),
-	).AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.Sale", map[string]interface{}{
-			"amount": 10.0,
-			"status": "active_listed",
-			"name":   name,
-			"seller": otu.O.Address(name),
-		})
-	return otu
-}
-
-func (otu *OverflowTestUtils) listNameForSale(seller, name string) *OverflowTestUtils {
-	otu.O.Tx("listNameForSale",
-		WithSigner(seller),
-		WithArg("name", name),
-		WithArg("directSellPrice", 10.0),
-	).AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.Sale", map[string]interface{}{
-			"amount":     10.0,
-			"status":     "active_listed",
-			"seller":     otu.O.Address(seller),
-			"sellerName": seller,
-		})
-	return otu
-}
-
-func (otu *OverflowTestUtils) directOffer(buyer, name string, amount float64) *OverflowTestUtils {
-	otu.O.Tx("bidName",
-		WithSigner(buyer),
-		WithArg("name", name),
-		WithArg("amount", amount),
-	).AssertSuccess(otu.T).AssertEvent(otu.T, "FIND.DirectOffer", map[string]interface{}{
-		"amount": amount,
-		"buyer":  otu.O.Address(buyer),
-		"name":   name,
-		"status": "active_offered",
-	})
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) listForAuction(name string) *OverflowTestUtils {
-	otu.O.Tx("listNameForAuction",
-		WithSigner(name),
-		WithArg("name", name),
-		WithArg("auctionStartPrice", 5.0),
-		WithArg("auctionReservePrice", 20.0),
-		WithArg("auctionDuration", auctionDurationFloat),
-		WithArg("auctionExtensionOnLateBid", 300.0),
-	).AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.EnglishAuction", map[string]interface{}{
-			"amount":              5.0,
-			"auctionReservePrice": 20.0,
-			"status":              "active_listed",
-			"name":                name,
-			"seller":              otu.O.Address(name),
-		})
-	return otu
-}
-
-func (otu *OverflowTestUtils) bid(buyer, name string, amount float64) *OverflowTestUtils {
-	endTime := otu.currentTime() + auctionDurationFloat
-	otu.O.Tx("bidName",
-		WithSigner(buyer),
-		WithArg("name", name),
-		WithArg("amount", amount),
-	).AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.EnglishAuction", map[string]interface{}{
-			"amount":    amount,
-			"endsAt":    endTime,
-			"buyer":     otu.O.Address(buyer),
-			"buyerName": buyer,
-			"name":      name,
-			"status":    "active_ongoing",
-		})
-	return otu
-}
-
-func (otu *OverflowTestUtils) auctionBid(buyer, name string, amount float64) *OverflowTestUtils {
-	endTime := otu.currentTime() + auctionDurationFloat
-	otu.O.Tx("bidName",
-		WithSigner(buyer),
-		WithArg("name", name),
-		WithArg("amount", amount),
-	).AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.EnglishAuction", map[string]interface{}{
-			"amount":    amount,
-			"endsAt":    endTime,
-			"buyer":     otu.O.Address(buyer),
-			"buyerName": buyer,
-			"name":      name,
-			"status":    "active_ongoing",
-		})
-	return otu
-}
-
-func (otu *OverflowTestUtils) expireAuction() *OverflowTestUtils {
-	return otu.tickClock(auctionDurationFloat)
-}
-
 func (otu *OverflowTestUtils) expireLease() *OverflowTestUtils {
 	return otu.tickClock(leaseDurationFloat)
-}
-
-func (otu *OverflowTestUtils) expireLock() *OverflowTestUtils {
-	return otu.tickClock(lockDurationFloat)
 }
 
 func (otu *OverflowTestUtils) mintThreeExampleDandies() []uint64 {
@@ -2096,7 +1988,7 @@ func (otu *OverflowTestUtils) removeLeaseProfileBan(user string) *OverflowTestUt
 func (otu *OverflowTestUtils) replaceID(result string, dandyIds []uint64) string {
 	counter := 0
 	for _, id := range dandyIds {
-		result = strings.Replace(result, fmt.Sprint(id)+`"`, "ID"+fmt.Sprint(counter)+`"`, -1)
+		result = strings.ReplaceAll(result, fmt.Sprint(id)+`"`, "ID"+fmt.Sprint(counter)+`"`)
 		counter = counter + 1
 	}
 	return result
@@ -2111,21 +2003,6 @@ func (otu *OverflowTestUtils) moveNameTo(owner, receiver, name string) *Overflow
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FIND.Moved", map[string]interface{}{
 			"name": name,
-		})
-
-	return otu
-}
-
-func (otu *OverflowTestUtils) cancelNameAuction(owner, name string) *OverflowTestUtils {
-	otu.O.Tx("cancelNameAuction",
-		WithSigner(owner),
-		WithArg("names", []string{name}),
-	).
-		AssertSuccess(otu.T).
-		AssertEvent(otu.T, "FIND.EnglishAuction", map[string]interface{}{
-			"name":       name,
-			"sellerName": owner,
-			"status":     "cancel_listing",
 		})
 
 	return otu
