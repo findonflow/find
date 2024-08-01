@@ -224,9 +224,10 @@ func TestFIND(t *testing.T) {
 		).AssertWant(t,
 			autogold.Want("getFindStatus", map[string]interface{}{
 				"activatedAccount": true, "hasLostAndFoundItem": false,
-				"isDapper":          false,
-				"privateMode":       false,
-				"readyForWearables": false,
+				"isDapper":            false,
+				"privateMode":         false,
+				"isReadyForNameOffer": false,
+				"readyForWearables":   false,
 			}),
 		)
 	})
@@ -316,7 +317,7 @@ func TestFIND(t *testing.T) {
 			WithArg("addon", "forge"),
 			WithArg("maxAmount", 10.0/0.42),
 		).
-			AssertFailure(t, "Cost of addon in flow")
+			AssertFailure(t, "You have not sent in enough max flow")
 	})
 
 	t.Run("Should be able to fund users without profile", func(t *testing.T) {

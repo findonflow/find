@@ -454,8 +454,8 @@ func (otu *OverflowTestUtils) renewUserWithName(user, name string) *OverflowTest
 	otu.O.Tx("renewName",
 		WithSigner(user),
 		WithArg("name", name),
-		WithArg("maxAamount", amount),
-	)
+		WithArg("maxAmount", amount),
+	).AssertSuccess(otu.T)
 	return otu
 }
 
