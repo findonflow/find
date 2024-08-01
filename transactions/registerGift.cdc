@@ -2,12 +2,13 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 import Profile from "../contracts/Profile.cdc"
 import FIND from "../contracts/FIND.cdc"
 
-transaction(name: String, amount: UFix64, recipient: String) {
+transaction(name: String, maxAmount: UFix64, recipient: String) {
 
     let vaultRef : &FlowToken.Vault? 
     let receiverLease : Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>
     let receiverProfile : Capability<&{Profile.Public}>
     let leases : &FIND.LeaseCollection?
+    let cost : UFix64
 
     prepare(acct: AuthAccount) {
 
@@ -23,7 +24,8 @@ transaction(name: String, amount: UFix64, recipient: String) {
         let receiver = getAccount(address)
         self.receiverLease = receiver.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
         self.receiverProfile = receiver.getCapability<&{Profile.Public}>(Profile.publicPath)
-        FIND.validateCostInFlow(name: name, flow: amount)
+
+        self.cost = FIND.calculateCostInFlow(name)
 
     }
 
@@ -32,10 +34,11 @@ transaction(name: String, amount: UFix64, recipient: String) {
         self.receiverLease.check() : "Lease capability is invalid"
         self.receiverProfile.check() : "Profile capability is invalid"
         self.leases != nil : "Cannot borrow refernce to find lease collection"
+        self.cost < maxAmount : "You have not sent in enough max flow, the cost is ".concat(self.cost.toString())
     }
 
     execute{
-        let payVault <- self.vaultRef!.withdraw(amount: amount) as! @FlowToken.Vault
+        let payVault <- self.vaultRef!.withdraw(amount: self.cost) as! @FlowToken.Vault
         self.leases!.register(name: name, vault: <- payVault)
         self.leases!.move(name: name, profile: self.receiverProfile, to: self.receiverLease)
     }

@@ -7,7 +7,6 @@ import FungibleToken from "../contracts/standard/FungibleToken.cdc"
 transaction() {
 
     prepare(account: AuthAccount) {
-        //TODO: we have to remember to relink this wallet on testnet/mainnet
         let wallet=account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
         let adminClient=account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
         adminClient.setPublicEnabled(true)

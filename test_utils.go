@@ -44,7 +44,7 @@ type FindMarket_TenantRule struct {
 func NewOverflowTest(t *testing.T) *OverflowTestUtils {
 	o := Overflow(
 		WithNetwork("testing"),
-		WithFlowForNewUsers(1000.0),
+		WithFlowForNewUsers(100.0),
 	)
 	require.NoError(t, o.Error)
 	return &OverflowTestUtils{
@@ -362,7 +362,7 @@ func (otu *OverflowTestUtils) registerFIND() *OverflowTestUtils {
 	otu.O.Tx("register",
 		WithSigner("find-admin"),
 		WithArg("name", "find"),
-		WithArg("amount", 100.0/0.42),
+		WithArg("maxAmount", 100.0/0.42),
 	).AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
 			"validUntil":  expireTime,
@@ -385,7 +385,7 @@ func (otu *OverflowTestUtils) registerUserTransaction(name string) OverflowResul
 	return otu.O.Tx("register",
 		WithSigner(name),
 		WithArg("name", name),
-		WithArg("amount", amount),
+		WithArg("maxAmount", amount),
 	).AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
 			"validUntil":  expireTime,
@@ -454,7 +454,7 @@ func (otu *OverflowTestUtils) renewUserWithName(user, name string) *OverflowTest
 	otu.O.Tx("renewName",
 		WithSigner(user),
 		WithArg("name", name),
-		WithArg("amount", amount),
+		WithArg("maxAamount", amount),
 	)
 	return otu
 }
@@ -492,7 +492,7 @@ func (otu *OverflowTestUtils) registerUserWithNameTransaction(buyer, name string
 	return otu.O.Tx("register",
 		WithSigner(buyer),
 		WithArg("name", name),
-		WithArg("amount", amount),
+		WithArg("maxAmount", amount),
 	).AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
 			"validUntil":  expireTime,
@@ -542,12 +542,12 @@ func (otu *OverflowTestUtils) mintThreeExampleDandies() []uint64 {
 }
 
 func (otu *OverflowTestUtils) buyForge(user string) *OverflowTestUtils {
-	amount := 119.0476 // 50.0 / 0.42
+	amount := 101.0
 	otu.O.Tx("buyAddon",
 		WithSigner(user),
 		WithArg("name", user),
 		WithArg("addon", "forge"),
-		WithArg("amount", amount),
+		WithArg("maxAmount", amount),
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FIND.AddonActivated", map[string]interface{}{
@@ -581,7 +581,7 @@ func (otu *OverflowTestUtils) buyForgeForName(user, name string) *OverflowTestUt
 		WithSigner(user),
 		WithArg("name", name),
 		WithArg("addon", "forge"),
-		WithArg("amount", 50.0/0.42),
+		WithArg("maxAmount", 50.0/0.42),
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FIND.AddonActivated", map[string]interface{}{

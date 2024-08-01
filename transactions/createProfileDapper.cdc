@@ -73,9 +73,8 @@ transaction(name: String) {
             account.link<&FindMarketDirectOfferSoft.SaleItemCollection{FindMarketDirectOfferSoft.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(dosSalePublicPath, target: dosSaleStoragePath)
         }
 
-        let leaseTenantCapability= FindMarket.getTenantCapability(FindMarket.getFindTenantAddress())!
+        let leaseTenantCapability= FindMarket.getTenantCapability(FindMarket.getFindTenantAddress())! 
         let leaseTenant = leaseTenantCapability.borrow()!
-
         let leaseDOSSaleItemType= Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>()
         let leaseDOSPublicPath=leaseTenant.getPublicPath(leaseDOSSaleItemType)
         let leaseDOSStoragePath= leaseTenant.getStoragePath(leaseDOSSaleItemType)
