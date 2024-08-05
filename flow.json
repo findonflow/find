@@ -384,7 +384,8 @@
         "NFTCatalogAdmin",
         "LostAndFound",
         "LostAndFoundHelper",
-        "FeeEstimator"
+        "FeeEstimator",
+        "PublicPriceOracle"
       ],
       "emulator-dapper": [
         "DapperUtilityCoin",
