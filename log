@@ -17,68 +17,61 @@ EMPTY tasks/setup
 EMPTY tasks/testnetMarket
 EMPTY tasks/testnetUser
 EMPTY utils
-PASS TestCollectionScripts/Should_be_able_to_get_dandies_by_script (0.13s)
-PASS TestCollectionScripts (0.13s)
-PASS TestDandy/Should_be_able_to_mint_3_dandy_nfts_and_display_them (0.11s)
-PASS TestDandy/Should_be_able_to_return_the_correct_minter_and_dandies_list (0.17s)
-PASS TestDandy (0.29s)
+PASS TestCollectionScripts/Should_be_able_to_get_dandies_by_script (0.14s)
+PASS TestCollectionScripts (0.14s)
+PASS TestDandy/Should_be_able_to_mint_3_dandy_nfts_and_display_them (0.13s)
+PASS TestDandy/Should_be_able_to_return_the_correct_minter_and_dandies_list (0.19s)
+PASS TestDandy (0.33s)
 PASS TestEntitlments/Should_not_be_able_to_change_the_name_of_another_user (0.03s)
 PASS TestEntitlments (0.03s)
 PASS TestFindAirdropper/Should_be_able_to_send_Airdrop (0.09s)
-PASS TestFindAirdropper/Should_be_able_to_send_packs_thru_airdropper_with_struct (0.10s)
-PASS TestFindAirdropper/Should_not_be_able_to_send_Airdrop_without_collection,_good_events_will_be_emitted (0.09s)
-PASS TestFindAirdropper/Should_be_able_to_get_Airdrop_details_with_a_script (0.18s)
-PASS TestFindAirdropper/Should_be_able_to_send_Airdrop_with_sending_funds_to_royalty_holders (0.11s)
-PASS TestFindAirdropper/Should_be_able_to_send_Airdrop_and_donate_funds_to_FIND! (0.10s)
-PASS TestFindAirdropper (0.68s)
-PASS TestFINDDapper/Should_get_expected_output_for_register_script (0.03s)
-PASS TestFINDDapper/Should_get_error_if_you_try_to_register_a_name_that_is_too_short (0.05s)
-PASS TestFINDDapper/Should_get_error_if_you_try_to_register_a_name_that_is_already_claimed (0.05s)
-PASS TestFINDDapper/Should_be_able_to_send_lease_to_another_name (0.05s)
-PASS TestFINDDapper (0.18s)
-PASS TestFindFurnace/Should_be_able_to_burn_Dandy (0.08s)
-PASS TestFindFurnace (0.09s)
-PASS TestFindLostAndFound/Should_be_able_to_send_thru_sendNFT_transaction_without_initialized_collection (0.11s)
-PASS TestFindLostAndFound/Should_be_able_to_get_all_Lost_And_Found_NFT_with_script (0.05s)
-PASS TestFindLostAndFound/Should_not_be_able_to_redeem_NFT_on_behalf_of_without_suitable_collection._But_tx_will_still_run_thru_and_events_will_be_emitted (0.23s)
-PASS TestFindLostAndFound/Should_be_able_to_send_thru_sendNFT_transaction_with_account_initiated (0.16s)
-PASS TestFindLostAndFound (0.56s)
-PASS TestFindPack/Should_be_able_to_buy_pack (0.09s)
-PASS TestFindPack/Should_be_able_to_buy_pack_and_open_pack (0.17s)
-PASS TestFindPack/Should_be_able_to_buy,__open_and_fulfill (0.25s)
-PASS TestFindPack/Should_be_able_to_buy,__open_and_fulfill_with_no_collection_setup (0.25s)
-PASS TestFindPack/Should_get_transferred_to_DLQ_if_try_to_open_with_wrong_salt (0.26s)
-PASS TestFindPack/Should_not_be_able_to_buy_pack_before_drop_is_open (0.31s)
-PASS TestFindPack/Should_not_be_able_to_open_pack_before_drop_is_available (0.42s)
-PASS TestFindPack/Should_be_able_to_buy_nft_if_the_user_has_the_float_and_with_a_whitelist. (0.40s)
-PASS TestFindPack (2.18s)
-PASS TestRelatedAccounts/Should_be_able_to_get_identifier (0.03s)
-PASS TestRelatedAccounts/Should_be_able_to_get_Related_wallet_in_network (0.03s)
-PASS TestRelatedAccounts/Should_be_able_to_get_Related_wallet_in_Flow (0.13s)
-PASS TestRelatedAccounts/Should_be_able_to_get_all_Related_wallet_in_network (0.27s)
-PASS TestRelatedAccounts/Should_be_able_to_update_wallet (0.07s)
-PASS TestRelatedAccounts (0.55s)
+PASS TestFindAirdropper/Should_be_able_to_send_packs_thru_airdropper_with_struct (0.09s)
+PASS TestFindAirdropper/Should_not_be_able_to_send_Airdrop_without_collection,_good_events_will_be_emitted (0.08s)
+PASS TestFindAirdropper/Should_be_able_to_get_Airdrop_details_with_a_script (0.15s)
+PASS TestFindAirdropper/Should_be_able_to_send_Airdrop_with_sending_funds_to_royalty_holders (0.09s)
+PASS TestFindAirdropper/Should_be_able_to_send_Airdrop_and_donate_funds_to_FIND! (0.08s)
+PASS TestFindAirdropper (0.58s)
+PASS TestFINDDapper/Should_get_expected_output_for_register_script (0.02s)
+PASS TestFINDDapper/Should_get_error_if_you_try_to_register_a_name_that_is_too_short (0.04s)
+PASS TestFINDDapper/Should_get_error_if_you_try_to_register_a_name_that_is_already_claimed (0.04s)
+PASS TestFINDDapper/Should_be_able_to_send_lease_to_another_name (0.04s)
+PASS TestFINDDapper (0.15s)
+PASS TestFindFurnace/Should_be_able_to_burn_Dandy (0.07s)
+PASS TestFindFurnace (0.07s)
+PASS TestFindLostAndFound/Should_be_able_to_send_thru_sendNFT_transaction_without_initialized_collection (0.08s)
+PASS TestFindLostAndFound/Should_be_able_to_get_all_Lost_And_Found_NFT_with_script (0.03s)
+PASS TestFindLostAndFound/Should_not_be_able_to_redeem_NFT_on_behalf_of_without_suitable_collection._But_tx_will_still_run_thru_and_events_will_be_emitted (0.14s)
+PASS TestFindLostAndFound/Should_be_able_to_send_thru_sendNFT_transaction_with_account_initiated (0.08s)
+PASS TestFindLostAndFound (0.34s)
+PASS TestFindPack/Should_be_able_to_buy_pack (0.06s)
+PASS TestFindPack/Should_be_able_to_buy_pack_and_open_pack (0.13s)
+PASS TestFindPack/Should_be_able_to_buy,__open_and_fulfill (0.22s)
+PASS TestFindPack/Should_be_able_to_buy,__open_and_fulfill_with_no_collection_setup (0.21s)
+PASS TestFindPack/Should_get_transferred_to_DLQ_if_try_to_open_with_wrong_salt (0.22s)
+PASS TestFindPack/Should_not_be_able_to_buy_pack_before_drop_is_open (0.33s)
+PASS TestFindPack/Should_not_be_able_to_open_pack_before_drop_is_available (0.46s)
+PASS TestFindPack/Should_be_able_to_buy_nft_if_the_user_has_the_float_and_with_a_whitelist. (0.44s)
+PASS TestFindPack (2.09s)
+PASS TestRelatedAccounts/Should_be_able_to_get_identifier (0.04s)
+PASS TestRelatedAccounts/Should_be_able_to_get_Related_wallet_in_network (0.04s)
+PASS TestRelatedAccounts/Should_be_able_to_get_Related_wallet_in_Flow (0.11s)
+PASS TestRelatedAccounts/Should_be_able_to_get_all_Related_wallet_in_network (0.25s)
+PASS TestRelatedAccounts/Should_be_able_to_update_wallet (0.06s)
+PASS TestRelatedAccounts (0.51s)
 PASS TestFindStruct/Should_be_able_to_pass_in_Royalty_Struct (0.06s)
 PASS TestFindStruct/Should_be_able_to_pass_in_Verifier_Struct (0.05s)
-PASS TestFindStruct/Should_be_able_to_pass_in_PackRegisterSaleInfo_Struct (0.06s)
-PASS TestFindStruct/Should_be_able_to_pass_in_PackRegisterInfo_Struct (0.09s)
-PASS TestFindStruct (0.26s)
-=== RUN   TestFIND/Should_get_error_if_you_try_to_register_a_name_and_dont_have_enough_money
-    find_test.go:32: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:167
-        	            				/Users/bjartek/dev/find/find_test.go:32
-        	Error:      	"transaction=./transactions/register.cdc: execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:\n\t* transaction execute failed: [Error Code: 1101] cadence runtime error: Execution failed:\nerror: pre-condition failed: Balance of vault is not high enough 1000.00000000 total balance is 390.00088000\n  --> 1dd8f4d07842555c7622389593e9190ec3352d2f1acb150ac3bb5e23e9f9a654:25:8\n   |\n25 |         self.vaultRef!.balance > self.cost : \"Balance of vault is not high enough \".concat(self.cost.toString()).concat(\" total balance is \").concat(self.vaultRef!.balance.toString())\n   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n\n" does not contain "Amount withdrawn must be less than or equal than the balance of the Vault"
-        	Test:       	TestFIND/Should_get_error_if_you_try_to_register_a_name_and_dont_have_enough_money
---- FAIL: TestFIND/Should_get_error_if_you_try_to_register_a_name_and_dont_have_enough_money (0.05s)
-FAIL TestFIND/Should_get_error_if_you_try_to_register_a_name_and_dont_have_enough_money (0.05s)
+PASS TestFindStruct/Should_be_able_to_pass_in_PackRegisterSaleInfo_Struct (0.07s)
+PASS TestFindStruct/Should_be_able_to_pass_in_PackRegisterInfo_Struct (0.07s)
+PASS TestFindStruct (0.25s)
+PASS TestFIND/Should_get_error_if_you_try_to_register_a_name_and_dont_have_enough_money (0.04s)
 PASS TestFIND/Should_get_error_if_you_try_to_register_a_name_that_is_too_short (0.04s)
-PASS TestFIND/Should_get_error_if_you_try_to_register_a_name_that_is_already_claimed (0.05s)
+PASS TestFIND/Should_get_error_if_you_try_to_register_a_name_that_is_already_claimed (0.04s)
 PASS TestFIND/Should_allow_registering_a_lease_after_it_is_freed (0.23s)
-PASS TestFIND/Should_be_able_to_lookup_address (0.03s)
-PASS TestFIND/Should_not_be_able_to_lookup_lease_after_expired (0.22s)
-PASS TestFIND/Admin_should_be_able_to_register_without_paying_FUSD (0.10s)
-PASS TestFIND/Should_automatically_set_Find_name_to_empty_if_sender_have_none (0.03s)
-PASS TestFIND/Should_automatically_set_Find_Name_if_sender_have_one (0.16s)
+PASS TestFIND/Should_be_able_to_lookup_address (0.02s)
+PASS TestFIND/Should_not_be_able_to_lookup_lease_after_expired (0.18s)
+PASS TestFIND/Admin_should_be_able_to_register_without_paying_FUSD (0.08s)
+PASS TestFIND/Should_automatically_set_Find_name_to_empty_if_sender_have_none (0.02s)
+PASS TestFIND/Should_automatically_set_Find_Name_if_sender_have_one (0.13s)
 === RUN   TestFIND/Should_be_able_to_register_related_account_and_remove_it
     find_test.go:134: 
         	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/script.go:194
@@ -99,8 +92,8 @@ PASS TestFIND/Should_automatically_set_Find_Name_if_sender_have_one (0.16s)
         +nil
         \ No newline at end of file
         
---- FAIL: TestFIND/Should_be_able_to_register_related_account_and_remove_it (0.12s)
-FAIL TestFIND/Should_be_able_to_register_related_account_and_remove_it (0.12s)
+--- FAIL: TestFIND/Should_be_able_to_register_related_account_and_remove_it (0.16s)
+FAIL TestFIND/Should_be_able_to_register_related_account_and_remove_it (0.16s)
 === RUN   TestFIND/Should_be_able_to_set_private_mode
     find_test.go:173: 
         	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/script.go:194
@@ -126,8 +119,8 @@ FAIL TestFIND/Should_be_able_to_set_private_mode (0.10s)
         	Error:      	Error "Invalid token reference 'profile'" does not contain "Object has no key 'findName'"
         	Test:       	TestFIND/If_a_user_holds_an_invalid_find_name,_get_status_should_not_return_it
         	Messages:   	output%!(EXTRA string=nil)
---- FAIL: TestFIND/If_a_user_holds_an_invalid_find_name,_get_status_should_not_return_it (0.13s)
-FAIL TestFIND/If_a_user_holds_an_invalid_find_name,_get_status_should_not_return_it (0.13s)
+--- FAIL: TestFIND/If_a_user_holds_an_invalid_find_name,_get_status_should_not_return_it (0.14s)
+FAIL TestFIND/If_a_user_holds_an_invalid_find_name,_get_status_should_not_return_it (0.14s)
 === RUN   TestFIND/Should_be_able_to_create_and_edit_the_social_link
     find_test.go:217: 
         	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/script.go:194
@@ -144,8 +137,8 @@ FAIL TestFIND/If_a_user_holds_an_invalid_find_name,_get_status_should_not_return
         +nil
         \ No newline at end of file
         
---- FAIL: TestFIND/Should_be_able_to_create_and_edit_the_social_link (0.25s)
-FAIL TestFIND/Should_be_able_to_create_and_edit_the_social_link (0.25s)
+--- FAIL: TestFIND/Should_be_able_to_create_and_edit_the_social_link (0.14s)
+FAIL TestFIND/Should_be_able_to_create_and_edit_the_social_link (0.14s)
 === RUN   TestFIND/Should_not_be_able_to_buy_forge_for_less_then_amount
     find_test.go:255: 
         	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:167
@@ -163,14 +156,14 @@ PASS TestFIND/Should_be_able_to_buy_addons_that_are_on_Network (0.00s)
         	Test:       	TestFIND/Should_not_be_able_to_buy_unavaialbe_addon
 --- FAIL: TestFIND/Should_not_be_able_to_buy_unavaialbe_addon (0.00s)
 FAIL TestFIND/Should_not_be_able_to_buy_unavaialbe_addon (0.00s)
-PASS TestFIND/Should_be_able_to_fund_users_without_profile (0.05s)
+PASS TestFIND/Should_be_able_to_fund_users_without_profile (0.06s)
 PASS TestFIND/Should_be_able_to_fund_users_with_profile_but_without_find_name (0.05s)
-PASS TestFIND/Should_be_able_to_resolve_find_name_with_.find (0.02s)
-PASS TestFIND/Should_panic_if_user_pass_in_invalid_character_'.' (0.02s)
-PASS TestFIND/Should_be_able_to_getFindStatus_of_an_FREE_lease (0.02s)
-PASS TestFIND/Should_be_able_to_getFindStatus_of_an_TAKEN_lease (0.08s)
+PASS TestFIND/Should_be_able_to_resolve_find_name_with_.find (0.03s)
+PASS TestFIND/Should_panic_if_user_pass_in_invalid_character_'.' (0.03s)
+PASS TestFIND/Should_be_able_to_getFindStatus_of_an_FREE_lease (0.03s)
+PASS TestFIND/Should_be_able_to_getFindStatus_of_an_TAKEN_lease (0.10s)
 PASS TestFIND/Should_be_able_to_getFindStatus_of_an_LOCKED_lease (0.19s)
-PASS TestFIND/Should_be_able_to_register_related_account_and_mutually_link_it_for_trust (0.24s)
+PASS TestFIND/Should_be_able_to_register_related_account_and_mutually_link_it_for_trust (0.28s)
 === RUN   TestFIND/Should_be_able_to_getFindStatus_for_trusted_accounts
 [31mscript: getFindStatus: scriptFileName:getFindStatus: [Error Code: 1101] error caused by: 1 error occurred:
 	* [Error Code: 1101] cadence runtime error: Execution failed:
@@ -211,176 +204,15 @@ error: cannot find type in this scope: `bool`
         +nil
         \ No newline at end of file
         
---- FAIL: TestFIND/Should_be_able_to_getFindStatus_for_trusted_accounts (0.18s)
-FAIL TestFIND/Should_be_able_to_getFindStatus_for_trusted_accounts (0.18s)
-PASS TestFIND/Should_be_able_to_follow_someone (0.05s)
-PASS TestFIND/Should_be_able_to_unfollow_someone (0.04s)
-PASS TestFIND/Should_not_be_able_to_move_old_leases (0.32s)
-PASS TestFIND/Should_not_be_able_to_get_old_leases_information (0.27s)
-PASS TestFIND/Should_not_be_able_to_get_old_leases (0.34s)
+--- FAIL: TestFIND/Should_be_able_to_getFindStatus_for_trusted_accounts (0.22s)
+FAIL TestFIND/Should_be_able_to_getFindStatus_for_trusted_accounts (0.22s)
+PASS TestFIND/Should_be_able_to_follow_someone (0.07s)
+PASS TestFIND/Should_be_able_to_unfollow_someone (0.05s)
+PASS TestFIND/Should_not_be_able_to_move_old_leases (0.33s)
+PASS TestFIND/Should_not_be_able_to_get_old_leases_information (0.29s)
+PASS TestFIND/Should_not_be_able_to_get_old_leases (0.31s)
 PASS TestFIND/Should_be_able_to_get_old_leases_in_getInvalidatedLeases (0.30s)
-=== RUN   TestFIND/Should_not_be_able_to_list_old_leases_for_sale
-    find_test.go:581: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:167
-        	            				/Users/bjartek/dev/find/find_test.go:581
-        	Error:      	"transaction=./transactions/listNameForSale.cdc: execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:\n\t* transaction preprocess failed: [Error Code: 1101] cadence runtime error: Execution failed:\nerror: value of type `auth(FIND.LeaseOwner) &FIND.LeaseCollection` has no member `listForSale`\n  --> 16c2a69b4f132b07003f96c8db07716143db11597ed25c2654daecd1b576365d:16:24\n   |\n16 |         self.finLeases!.listForSale(name: name,  directSellPrice:directSellPrice)\n   |                         ^^^^^^^^^^^ unknown member\n\n\n" does not contain "This is not a valid lease"
-        	Test:       	TestFIND/Should_not_be_able_to_list_old_leases_for_sale
---- FAIL: TestFIND/Should_not_be_able_to_list_old_leases_for_sale (0.35s)
-FAIL TestFIND/Should_not_be_able_to_list_old_leases_for_sale (0.35s)
-=== RUN   TestFIND/Should_be_able_to_list_lease_for_auction
-    find_test.go:592: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:182
-        	            				/Users/bjartek/dev/find/find_test.go:592
-        	Error:      	Received unexpected error:
-        	            	execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:
-        	            		* transaction preprocess failed: [Error Code: 1101] cadence runtime error: Execution failed:
-        	            	error: value of type `auth(FIND.LeaseOwner) &FIND.LeaseCollection` has no member `listForAuction`
-        	            	  --> cf4a697142832122da1bac5101de01f9f57c667281a4e9f88e50270ba86e23cb:16:24
-        	            	   |
-        	            	16 |         self.finLeases!.listForAuction(name: name, auctionStartPrice: auctionStartPrice, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration,  auctionExtensionOnLateBid: auctionExtensionOnLateBid)
-        	            	   |                         ^^^^^^^^^^^^^^ unknown member
-        	            	
-        	            	
-        	            	
-        	            	transaction=./transactions/listNameForAuction.cdc
-        	            	github.com/bjartek/overflow/v2.OverflowInteractionBuilder.Send
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/interaction_builder.go:639
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).sendTx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:563
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).Tx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:559
-        	            	github.com/findonflow/find.TestFIND.func33
-        	            		/Users/bjartek/dev/find/find_test.go:585
-        	            	testing.tRunner
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/testing/testing.go:1689
-        	            	runtime.goexit
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/runtime/asm_arm64.s:1222
-        	Test:       	TestFIND/Should_be_able_to_list_lease_for_auction
---- FAIL: TestFIND/Should_be_able_to_list_lease_for_auction (0.04s)
-FAIL TestFIND/Should_be_able_to_list_lease_for_auction (0.04s)
-=== RUN   TestFIND/Should_not_be_able_to_list_old_lease_for_auction
-    find_test.go:604: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:167
-        	            				/Users/bjartek/dev/find/find_test.go:604
-        	Error:      	"transaction=./transactions/listNameForAuction.cdc: execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:\n\t* transaction preprocess failed: [Error Code: 1101] cadence runtime error: Execution failed:\nerror: value of type `auth(FIND.LeaseOwner) &FIND.LeaseCollection` has no member `listForAuction`\n  --> d21c852ee940555fc6f0857b041875f7562b9e832d1ebac8c12eb2baf4401980:16:24\n   |\n16 |         self.finLeases!.listForAuction(name: name, auctionStartPrice: auctionStartPrice, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration,  auctionExtensionOnLateBid: auctionExtensionOnLateBid)\n   |                         ^^^^^^^^^^^^^^ unknown member\n\n\n" does not contain "This is not a valid lease"
-        	Test:       	TestFIND/Should_not_be_able_to_list_old_lease_for_auction
---- FAIL: TestFIND/Should_not_be_able_to_list_old_lease_for_auction (0.31s)
-FAIL TestFIND/Should_not_be_able_to_list_old_lease_for_auction (0.31s)
-=== RUN   TestFIND/Should_be_able_to_delist_old_leases_for_sale
-    find_test.go:615: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:182
-        	            				/Users/bjartek/dev/find/find_test.go:615
-        	Error:      	Received unexpected error:
-        	            	execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:
-        	            		* transaction preprocess failed: [Error Code: 1101] cadence runtime error: Execution failed:
-        	            	error: value of type `auth(FIND.LeaseOwner) &FIND.LeaseCollection` has no member `delistSale`
-        	            	  --> b532dfd69913b7f66643c0ed836c858a9edfe2eea7ac26205cdffde54a7c86e4:17:28
-        	            	   |
-        	            	17 |             self.finLeases!.delistSale(name)
-        	            	   |                             ^^^^^^^^^^ unknown member
-        	            	
-        	            	
-        	            	
-        	            	transaction=./transactions/delistNameSale.cdc
-        	            	github.com/bjartek/overflow/v2.OverflowInteractionBuilder.Send
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/interaction_builder.go:639
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).sendTx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:563
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).Tx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:559
-        	            	github.com/findonflow/find.TestFIND.func35
-        	            		/Users/bjartek/dev/find/find_test.go:611
-        	            	testing.tRunner
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/testing/testing.go:1689
-        	            	runtime.goexit
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/runtime/asm_arm64.s:1222
-        	Test:       	TestFIND/Should_be_able_to_delist_old_leases_for_sale
---- FAIL: TestFIND/Should_be_able_to_delist_old_leases_for_sale (0.35s)
-FAIL TestFIND/Should_be_able_to_delist_old_leases_for_sale (0.35s)
-=== RUN   TestFIND/Should_be_able_to_delist_old_leases_for_auction
-    find_test.go:626: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:182
-        	            				/Users/bjartek/dev/find/find_test.go:626
-        	Error:      	Received unexpected error:
-        	            	execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:
-        	            		* transaction preprocess failed: [Error Code: 1101] cadence runtime error: Execution failed:
-        	            	error: value of type `auth(FIND.LeaseOwner) &FIND.LeaseCollection` has no member `listForAuction`
-        	            	  --> 34e0457c03591525944e29569778861a9a8cd67483a4a3d17acbe9dd087d8ca7:16:24
-        	            	   |
-        	            	16 |         self.finLeases!.listForAuction(name: name, auctionStartPrice: auctionStartPrice, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration,  auctionExtensionOnLateBid: auctionExtensionOnLateBid)
-        	            	   |                         ^^^^^^^^^^^^^^ unknown member
-        	            	
-        	            	
-        	            	
-        	            	transaction=./transactions/listNameForAuction.cdc
-        	            	github.com/bjartek/overflow/v2.OverflowInteractionBuilder.Send
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/interaction_builder.go:639
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).sendTx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:563
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).Tx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:559
-        	            	github.com/findonflow/find.TestFIND.func36
-        	            		/Users/bjartek/dev/find/find_test.go:619
-        	            	testing.tRunner
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/testing/testing.go:1689
-        	            	runtime.goexit
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/runtime/asm_arm64.s:1222
-        	Test:       	TestFIND/Should_be_able_to_delist_old_leases_for_auction
-    find_test.go:632: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:182
-        	            				/Users/bjartek/dev/find/find_test.go:632
-        	Error:      	Received unexpected error:
-        	            	execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:
-        	            		* transaction preprocess failed: [Error Code: 1101] cadence runtime error: Execution failed:
-        	            	error: cannot find type in this scope: `FIND.AuctionOwner`
-        	            	 --> 3ba3dc053ca05a8644938e6eb3a343a91cc5d80a8e533460e307e029e721af38:5:22
-        	            	  |
-        	            	5 | 	let finLeases : auth(FIND.AuctionOwner, FIND.LeaseOwner) &FIND.LeaseCollection?
-        	            	  | 	                     ^^^^^^^^^^^^^^^^^ not found in this scope
-        	            	
-        	            	error: cannot find type in this scope: `FIND.AuctionOwner`
-        	            	 --> 3ba3dc053ca05a8644938e6eb3a343a91cc5d80a8e533460e307e029e721af38:8:46
-        	            	  |
-        	            	8 | 		self.finLeases= account.storage.borrow<auth(FIND.AuctionOwner, FIND.LeaseOwner) &FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
-        	            	  | 		                                            ^^^^^^^^^^^^^^^^^ not found in this scope
-        	            	
-        	            	error: mismatched types
-        	            	 --> 3ba3dc053ca05a8644938e6eb3a343a91cc5d80a8e533460e307e029e721af38:8:18
-        	            	  |
-        	            	8 | 		self.finLeases= account.storage.borrow<auth(FIND.AuctionOwner, FIND.LeaseOwner) &FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
-        	            	  | 		                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `(auth(A.f3fcd2c1a78f5eee.FIND.LeaseOwner,t.3ba3dc053ca05a8644938e6eb3a343a91cc5d80a8e533460e307e029e721af38.FIND)&A.f3fcd2c1a78f5eee.FIND.LeaseCollection)?`, got `(auth(A.f3fcd2c1a78f5eee.FIND.LeaseOwner,t.3ba3dc053ca05a8644938e6eb3a343a91cc5d80a8e533460e307e029e721af38.FIND)&A.f3fcd2c1a78f5eee.FIND.LeaseCollection)?`
-        	            	
-        	            	error: value of type `auth(FIND, FIND.LeaseOwner) &FIND.LeaseCollection` has no member `cancel`
-        	            	  --> 3ba3dc053ca05a8644938e6eb3a343a91cc5d80a8e533460e307e029e721af38:17:19
-        	            	   |
-        	            	17 | 			self.finLeases!.cancel(name)
-        	            	   | 			                ^^^^^^ unknown member
-        	            	
-        	            	error: value of type `auth(FIND, FIND.LeaseOwner) &FIND.LeaseCollection` has no member `delistAuction`
-        	            	  --> 3ba3dc053ca05a8644938e6eb3a343a91cc5d80a8e533460e307e029e721af38:18:19
-        	            	   |
-        	            	18 | 			self.finLeases!.delistAuction(name)
-        	            	   | 			                ^^^^^^^^^^^^^ unknown member
-        	            	
-        	            	
-        	            	
-        	            	transaction=./transactions/cancelNameAuction.cdc
-        	            	github.com/bjartek/overflow/v2.OverflowInteractionBuilder.Send
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/interaction_builder.go:639
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).sendTx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:563
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).Tx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:559
-        	            	github.com/findonflow/find.TestFIND.func36
-        	            		/Users/bjartek/dev/find/find_test.go:629
-        	            	testing.tRunner
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/testing/testing.go:1689
-        	            	runtime.goexit
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/runtime/asm_arm64.s:1222
-        	Test:       	TestFIND/Should_be_able_to_delist_old_leases_for_auction
---- FAIL: TestFIND/Should_be_able_to_delist_old_leases_for_auction (0.36s)
-FAIL TestFIND/Should_be_able_to_delist_old_leases_for_auction (0.36s)
-PASS TestFIND/Should_be_able_to_cleanup_invalid_leases (0.43s)
+PASS TestFIND/Should_be_able_to_cleanup_invalid_leases (0.35s)
 === RUN   TestFIND
     test_utils.go:224: 
         	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:182
@@ -424,77 +256,24 @@ PASS TestFIND/Should_be_able_to_cleanup_invalid_leases (0.43s)
         	            	}
         	Test:       	TestFIND
     event.go:336: === Events ===
-    test_utils.go:143: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:182
-        	            				/Users/bjartek/dev/find/test_utils.go:143
-        	            				/Users/bjartek/dev/find/find_test.go:608
-        	Error:      	Received unexpected error:
-        	            	execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:
-        	            		* transaction preprocess failed: [Error Code: 1101] cadence runtime error: Execution failed:
-        	            	error: value of type `auth(FIND.LeaseOwner) &FIND.LeaseCollection` has no member `listForSale`
-        	            	  --> 71bf5eedd365a1fc420bf1ce0612c6b2e0fc22aa88ae8c6d63b2858e1223d370:16:24
-        	            	   |
-        	            	16 |         self.finLeases!.listForSale(name: name,  directSellPrice:directSellPrice)
-        	            	   |                         ^^^^^^^^^^^ unknown member
-        	            	
-        	            	
-        	            	
-        	            	transaction=./transactions/listNameForSale.cdc
-        	            	github.com/bjartek/overflow/v2.OverflowInteractionBuilder.Send
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/interaction_builder.go:639
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).sendTx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:563
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).Tx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:559
-        	            	github.com/findonflow/find.(*OverflowTestUtils).listNameForSale
-        	            		/Users/bjartek/dev/find/test_utils.go:139
-        	            	github.com/findonflow/find.TestFIND.func35
-        	            		/Users/bjartek/dev/find/find_test.go:608
-        	            	testing.tRunner
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/testing/testing.go:1689
-        	            	runtime.goexit
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/runtime/asm_arm64.s:1222
-        	Test:       	TestFIND
-    test_utils.go:144: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:223
-        	            				/Users/bjartek/dev/find/test_utils.go:144
-        	            				/Users/bjartek/dev/find/find_test.go:608
-        	Error:      	event not found FIND.Sale, overflow.OverflowEvent{
-        	            	  Fields: map[string]interface {}{
-        	            	    "amount": 10.0,
-        	            	    "seller": "0x192440c99cb17282",
-        	            	    "sellerName": "user1",
-        	            	    "status": "active_listed",
-        	            	  },
-        	            	  Addresses: map[string][]string(nil),
-        	            	  Id: "",
-        	            	  TransactionId: "",
-        	            	  Name: "",
-        	            	  RawEvent: cadence.Event{
-        	            	    EventType: nil,
-        	            	  },
-        	            	  EventIndex: 0,
-        	            	}
-        	Test:       	TestFIND
-    test_utils.go:144: === Events ===
---- FAIL: TestFIND (5.61s)
-FAIL TestFIND (5.61s)
-PASS TestFindThought/Should_be_able_to_post_a_thought (0.21s)
-PASS TestFindThought/Should_be_able_to_edit_a_thought (0.13s)
-PASS TestFindThought/Should_be_able_to_react_to_a_thought (0.18s)
-PASS TestFindThought/Should_be_able_to_get_a_list_of_different_thoguhts_by_a_script_with_reacted_list (0.40s)
-PASS TestFindThought/Should_be_able_to_undo_reaction_to_a_thought (0.19s)
+--- FAIL: TestFIND (4.06s)
+FAIL TestFIND (4.06s)
+PASS TestFindThought/Should_be_able_to_post_a_thought (0.27s)
+PASS TestFindThought/Should_be_able_to_edit_a_thought (0.19s)
+PASS TestFindThought/Should_be_able_to_react_to_a_thought (0.14s)
+PASS TestFindThought/Should_be_able_to_get_a_list_of_different_thoguhts_by_a_script_with_reacted_list (0.34s)
+PASS TestFindThought/Should_be_able_to_undo_reaction_to_a_thought (0.27s)
 PASS TestFindThought/Should_be_able_to_delete_a_thought (0.13s)
-PASS TestFindThought/Should_be_able_to_post_a_thought_with_NFT (0.44s)
-PASS TestFindThought/Should_be_able_to_post_a_thought_with_quote (0.48s)
-PASS TestFindThought/Should_be_able_to_hide_thoughts (0.50s)
-PASS TestFindThought (2.70s)
+PASS TestFindThought/Should_be_able_to_post_a_thought_with_NFT (0.40s)
+PASS TestFindThought/Should_be_able_to_post_a_thought_with_quote (0.30s)
+PASS TestFindThought/Should_be_able_to_hide_thoughts (0.27s)
+PASS TestFindThought (2.34s)
 PASS TestFindUtils/containsChar_should_return_false_if_string_does_not_contain (0.00s)
 PASS TestFindUtils/containsChar_should_return_true_if_string_contains (0.00s)
 PASS TestFindUtils/contains_should_be_able_to_check_contains (0.00s)
 PASS TestFindUtils/contains_should_return_false_if_string_does_not_contain (0.00s)
 PASS TestFindUtils/contains_should_return_true_if_string_partially_contains (0.00s)
-PASS TestFindUtils/contains_should_return_false_if_element_is_longer_than_string (0.01s)
+PASS TestFindUtils/contains_should_return_false_if_element_is_longer_than_string (0.00s)
 PASS TestFindUtils/contains_should_return_true_if_element_is_empty_string (0.00s)
 PASS TestFindUtils/contains_should_return_false_if_string_is_empty_string (0.00s)
 PASS TestFindUtils/hasSuffix_should_return_true_if_suffix_is_valid (0.00s)
@@ -513,7 +292,7 @@ PASS TestFindUtils/toUpper_should_return_upper_cases_if_they_are_already_upper_c
 PASS TestFindUtils/firstUpperLetter_should_return_upper_case_for_first_letter (0.00s)
 PASS TestFindUtils/firstUpperLetter_should_returns_same_if_first_letter_is_already_upper_case (0.00s)
 PASS TestFindUtils/firstUpperLetter_should_returns_same_if_first_letter_is_not_alphabet (0.00s)
-PASS TestFindUtils/to_snake_case_should_returns_snake_case_CamelCase (0.01s)
+PASS TestFindUtils/to_snake_case_should_returns_snake_case_CamelCase (0.00s)
 PASS TestFindUtils/to_snake_case_should_returns_snake_case_Camel_Case (0.00s)
 PASS TestFindUtils/to_snake_case_should_returns_snake_case_Camel_case (0.00s)
 PASS TestFindUtils/toCamelCase_should_returns_camel_case_Camel_case (0.00s)
@@ -523,22 +302,22 @@ PASS TestFindUtils/toCamelCase_should_returns_camel_case_Camel_Case#01 (0.00s)
 PASS TestFindUtils/trimSuffix_should_trim_bam.find (0.00s)
 PASS TestFindUtils/trimSuffix_should_not_trim_christian.fine (0.00s)
 PASS TestFindUtils/trimSuffix_should_not_trim_bam (0.00s)
-PASS TestFindUtils/trimFindSuffix_should_trim_bam.find (0.03s)
-PASS TestFindUtils/trimFindSuffix_should_return_bam (0.03s)
-PASS TestFindUtils/splitString_should_split_Hello_World_And_All (0.00s)
+PASS TestFindUtils/trimFindSuffix_should_trim_bam.find (0.02s)
+PASS TestFindUtils/trimFindSuffix_should_return_bam (0.02s)
+PASS TestFindUtils/splitString_should_split_Hello_World_And_All (0.01s)
 PASS TestFindUtils/splitString_should_split_Hello_World.And_All (0.00s)
 PASS TestFindUtils/splitString_should_not_split_Hello.World.And.All (0.00s)
 PASS TestFindUtils/splitString_should_not_split_HelloWorldAndAll (0.00s)
 PASS TestFindUtils/joinMapToString_should_join_the_map_and_return_as_expected (0.00s)
 PASS TestFindUtils/devJoinString_should_join_the_string_with_sep_and_return_as_expected (0.00s)
-PASS TestFindUtils/deDupTypeArray_should_dedup_duplicated_as_expected (0.04s)
-PASS TestFindUtils (0.24s)
-PASS TestFindVerifier/Should_return_false_if_user_have_no_float (0.08s)
+PASS TestFindUtils/deDupTypeArray_should_dedup_duplicated_as_expected (0.03s)
+PASS TestFindUtils (0.19s)
+PASS TestFindVerifier/Should_return_false_if_user_have_no_float (0.07s)
 PASS TestFindVerifier/Should_panic_if_no_float_is_specified (0.03s)
 PASS TestFindVerifier/Should_return_true_if_user_has_one_of_the_float (0.11s)
-PASS TestFindVerifier/Should_return_false_if_user_doesn't_have_float_contained (0.14s)
-PASS TestFindVerifier/Should_return_true_if_user_has_all_of_the_float (0.26s)
-PASS TestFindVerifier/Should_return_false_if_user_doesn't_have_all_float_contained (0.23s)
+PASS TestFindVerifier/Should_return_false_if_user_doesn't_have_float_contained (0.17s)
+PASS TestFindVerifier/Should_return_true_if_user_has_all_of_the_float (0.22s)
+PASS TestFindVerifier/Should_return_false_if_user_doesn't_have_all_float_contained (0.19s)
 PASS TestFindVerifier/Should_panic_if_no_float_is_specified#01 (0.03s)
 PASS TestFindVerifier/Should_return_true_if_user_is_in_whiteLabel (0.03s)
 PASS TestFindVerifier/Should_return_true_if_user_is_not_in_whiteLabel (0.03s)
@@ -547,18 +326,18 @@ PASS TestFindVerifier/Should_return_true_if_user_has_the_find_name (0.03s)
 PASS TestFindVerifier/Should_return_false_if_user_does_not_have_the_find_name (0.03s)
 PASS TestFindVerifier/Should_panic_if_no_find_name_is_specified (0.03s)
 PASS TestFindVerifier/Should_return_false_if_user_has_no_lease_collection (0.03s)
-PASS TestFindVerifier/Should_return_true_if_user_has_no_of_NFTs_equal_to_threshold (0.04s)
-PASS TestFindVerifier/Should_return_true_if_user_has_no_of_NFTs_more_than_threshold (0.04s)
-PASS TestFindVerifier/Should_return_false_if_user_has_no_of_NFTs_less_than_threshold (0.04s)
-PASS TestFindVerifier/Should_panic_if_0_threshold_is_specified (0.03s)
-PASS TestFindVerifier/Should_return_false_if_user_has_no_collection (0.04s)
-PASS TestFindVerifier/Should_return_true_if_user_has_nft_with_specified_rarity (0.06s)
-PASS TestFindVerifier/Should_return_false_if_user_does_not_have_nft_with_specified_rarity (0.04s)
+PASS TestFindVerifier/Should_return_true_if_user_has_no_of_NFTs_equal_to_threshold (0.03s)
+PASS TestFindVerifier/Should_return_true_if_user_has_no_of_NFTs_more_than_threshold (0.03s)
+PASS TestFindVerifier/Should_return_false_if_user_has_no_of_NFTs_less_than_threshold (0.03s)
+PASS TestFindVerifier/Should_panic_if_0_threshold_is_specified (0.02s)
+PASS TestFindVerifier/Should_return_false_if_user_has_no_collection (0.03s)
+PASS TestFindVerifier/Should_return_true_if_user_has_nft_with_specified_rarity (0.03s)
+PASS TestFindVerifier/Should_return_false_if_user_does_not_have_nft_with_specified_rarity (0.03s)
 PASS TestFindVerifier/Should_panic_if_no_rarity_is_specified (0.03s)
 PASS TestFindVerifier/Should_return_false_if_user_has_no_collection_specified_for_rarity (0.03s)
-PASS TestFindVerifier (1.45s)
+PASS TestFindVerifier (1.27s)
 PASS TestFTRegistry/Should_be_able_to_registry_flow_token_and_get_it (0.02s)
-PASS TestFTRegistry/Should_not_be_able_to_overrride_a_ft_without_removing_it_first (0.09s)
+PASS TestFTRegistry/Should_not_be_able_to_overrride_a_ft_without_removing_it_first (0.08s)
 === RUN   TestFTRegistry/Should_be_able_to_registry_flow_token,_fusd_token_and_get_list_from_it
     testing.go:1576: test executed panic(nil) or runtime.Goexit: subtest may have called FailNow on a parent test
 --- FAIL: TestFTRegistry/Should_be_able_to_registry_flow_token,_fusd_token_and_get_list_from_it (0.01s)
@@ -604,357 +383,18 @@ FAIL TestFTRegistry/Should_be_able_to_registry_flow_token,_fusd_token_and_get_li
             }
         }`
         
---- FAIL: TestFTRegistry (0.12s)
-FAIL TestFTRegistry (0.12s)
-PASS TestGeneratedExperiences/Should_be_able_to_add_season (0.10s)
-=== RUN   TestGeneratedExperiences/Should_be_able_to_add_mint_token
-    generated_experiences_test.go:188: mismatch (-want +got):
-        --- want
-        +++ got
-        @@ -1,5 +1,5 @@
-         map[string]interface{}{"cutInfos": []interface{}{map[string]interface{}{"cut": 0.1, "description": "Royalty", "receiver": map[string]interface{}{
-         	"address":    "0x192440c99cb17282",
-         	"borrowType": "&{A.ee82856bf20e2aa6.FungibleToken.Receiver}",
-        -	"id":         10,
-        +	"id":         9,
-         }}}}
-        \ No newline at end of file
-        
---- FAIL: TestGeneratedExperiences/Should_be_able_to_add_mint_token (0.30s)
-FAIL TestGeneratedExperiences/Should_be_able_to_add_mint_token (0.30s)
-=== RUN   TestGeneratedExperiences
---- FAIL: TestGeneratedExperiences (0.41s)
-FAIL TestGeneratedExperiences (0.41s)
-PASS TestLeaseMarketAuctionSoft/Should_not_be_able_to_list_an_item_for_auction_twice,_and_will_give_error_message. (0.24s)
-PASS TestLeaseMarketAuctionSoft/Should_be_able_to_sell_at_auction (0.56s)
-PASS TestLeaseMarketAuctionSoft/Should_be_able_to_cancel_listing_if_the_pointer_is_no_longer_valid (0.55s)
-PASS TestLeaseMarketAuctionSoft/Should_not_be_able_to_list_with_price_0 (0.07s)
-PASS TestLeaseMarketAuctionSoft/Should_not_be_able_to_list_with_invalid_reserve_price (0.06s)
-PASS TestLeaseMarketAuctionSoft/Should_not_be_able_to_list_with_invalid_time (0.07s)
-PASS TestLeaseMarketAuctionSoft/Should_be_able_to_add_bid_at_auction (0.48s)
-PASS TestLeaseMarketAuctionSoft/Should_not_be_able_to_bid_expired_auction_listing (0.26s)
-PASS TestLeaseMarketAuctionSoft/Should_not_be_able_to_bid_your_own_listing (0.19s)
-PASS TestLeaseMarketAuctionSoft/Should_be_able_to_cancel_an_auction (0.18s)
-PASS TestLeaseMarketAuctionSoft/Should_not_be_able_to_cancel_an_ended_auction (0.46s)
-PASS TestLeaseMarketAuctionSoft/Cannot_fulfill_a_not_yet_ended_auction (0.32s)
-PASS TestLeaseMarketAuctionSoft/Should_allow_seller_to_cancel_auction_if_it_failed_to_meet_reserve_price (0.39s)
-PASS TestLeaseMarketAuctionSoft/Should_be_able_to_bid_and_increase_bid_by_same_user (0.31s)
-PASS TestLeaseMarketAuctionSoft/Should_not_be_able_to_list_after_deprecated (0.11s)
-PASS TestLeaseMarketAuctionSoft/Should_not_be_able_to_bid_below_listing_price (0.19s)
-PASS TestLeaseMarketAuctionSoft/Royalties_should_be_sent_to_correspondence_upon_fulfill_action (0.33s)
-PASS TestLeaseMarketAuctionSoft/Should_emit_previous_bidder_if_outbid (0.32s)
-PASS TestLeaseMarketAuctionSoft/Should_be_able_to_list_an_NFT_for_auction_and_bid_it_with_DUC (0.46s)
-PASS TestLeaseMarketAuctionSoft (5.58s)
-PASS TestLeaseMarketDirectOfferSoft/Should_be_able_to_add_direct_offer_and_then_sell (0.31s)
-PASS TestLeaseMarketDirectOfferSoft/Should_not_be_able_to_offer_with_price_0 (0.06s)
-PASS TestLeaseMarketDirectOfferSoft/Should_not_be_able_to_offer_with_invalid_time (0.06s)
-PASS TestLeaseMarketDirectOfferSoft/Should_be_able_to_reject_offer_if_the_pointer_is_no_longer_valid (0.23s)
-PASS TestLeaseMarketDirectOfferSoft/Should_be_able_to_retract_offer_if_the_pointer_is_no_longer_valid (0.22s)
-PASS TestLeaseMarketDirectOfferSoft/Should_be_able_to_increase_offer (0.24s)
-PASS TestLeaseMarketDirectOfferSoft/Should_be_able_to_reject_offer (0.18s)
-PASS TestLeaseMarketDirectOfferSoft/Should_be_able_to_retract_offer (0.18s)
-PASS TestLeaseMarketDirectOfferSoft/Should_not_be_able_to_offer_your_own_NFT (0.06s)
-PASS TestLeaseMarketDirectOfferSoft/Should_not_be_able_to_accept_expired_offer (0.26s)
-PASS TestLeaseMarketDirectOfferSoft/Should_not_be_able_to_add_direct_offer_when_deprecated (0.11s)
-PASS TestLeaseMarketDirectOfferSoft/Should_not_be_able_to_increase_bid_but_able_to_fulfill_offer_when_deprecated (0.41s)
-PASS TestLeaseMarketDirectOfferSoft/Should_be_able_to_reject_offer_when_deprecated (0.23s)
-PASS TestLeaseMarketDirectOfferSoft/Should_not_be_able_to_add_direct_offer_after_stopped (0.11s)
-PASS TestLeaseMarketDirectOfferSoft/Should_not_be_able_to_increase_bid_nor_accept_offer_after_stopped (0.29s)
-PASS TestLeaseMarketDirectOfferSoft/Should_not_be_able_to_fulfill_offer_after_stopped (0.34s)
-PASS TestLeaseMarketDirectOfferSoft/Should_not_be_able_to_reject_offer_after_stopped (0.23s)
-PASS TestLeaseMarketDirectOfferSoft/Should_be_able_to_direct_offer,_increase_offer_and_fulfill_offer_after_enabled (0.44s)
-PASS TestLeaseMarketDirectOfferSoft/Should_be_able_to_reject_offer_after_enabled (0.27s)
-PASS TestLeaseMarketDirectOfferSoft/Should_not_be_able_to_make_offer_by_user3_when_deprecated_or_stopped (0.34s)
-PASS TestLeaseMarketDirectOfferSoft/Should_be_able_to_retract_offer_when_deprecated_,_but_not_when_stopped (0.33s)
-PASS TestLeaseMarketDirectOfferSoft/Royalties_should_be_sent_to_correspondence_upon_accept_offer_action (0.25s)
-PASS TestLeaseMarketDirectOfferSoft/Should_be_able_to_ban_user,_user_is_only_allowed_to_cancel_listing. (0.42s)
-PASS TestLeaseMarketDirectOfferSoft/Should_be_able_to_ban_user,_user_can_only_retract_offer (0.70s)
-PASS TestLeaseMarketDirectOfferSoft/Should_return_money_when_outbid (0.19s)
-PASS TestLeaseMarketDirectOfferSoft/Should_be_able_to_list_an_NFT_for_sale_and_buy_it_with_DUC (0.37s)
-PASS TestLeaseMarketDirectOfferSoft (6.87s)
-PASS TestLeaseMarketSale/Should_be_able_to_list_a_lease_for_sale_and_buy_it (0.19s)
-PASS TestLeaseMarketSale/Should_not_be_able_to_list_with_price_$0 (0.06s)
-PASS TestLeaseMarketSale/Should_not_be_able_to_list_with_invalid_time (0.06s)
-PASS TestLeaseMarketSale/Should_be_able_to_cancel_listing_if_the_pointer_is_no_longer_valid (0.17s)
-PASS TestLeaseMarketSale/Should_be_able_to_change_price_of_lease (0.19s)
-PASS TestLeaseMarketSale/Should_not_be_able_to_buy_your_own_listing (0.13s)
-PASS TestLeaseMarketSale/Should_not_be_able_to_buy_expired_listing (0.23s)
-PASS TestLeaseMarketSale/Should_be_able_to_cancel_sale (0.20s)
-PASS TestLeaseMarketSale/Should_not_be_able_to_buy_if_too_low_price (0.16s)
-PASS TestLeaseMarketSale/Royalties_should_be_sent_to_correspondence_upon_buy_action (0.15s)
-PASS TestLeaseMarketSale/Royalties_should_be_sent_to_correspondence_upon_buy_action,_if_royalty_is_higher_than_0.44 (0.17s)
-PASS TestLeaseMarketSale/Should_be_able_to_ban_user,_user_is_only_allowed_to_cancel_listing. (0.27s)
-PASS TestLeaseMarketSale (1.99s)
-PASS TestMarketAuctionEscrow/Should_be_able_to_sell_at_auction (0.42s)
-PASS TestMarketAuctionEscrow/Should_be_able_to_sell_at_auction_with_two_bids (0.48s)
-PASS TestMarketAuctionEscrow/Should_not_be_able_to_list_an_item_for_auction_twice,_and_will_give_error_message. (0.20s)
-PASS TestMarketAuctionEscrow/Should_be_able_to_cancel_listing_if_the_pointer_is_no_longer_valid (0.34s)
-PASS TestMarketAuctionEscrow/Should_not_be_able_to_list_with_price_0 (0.07s)
-PASS TestMarketAuctionEscrow/Should_not_be_able_to_list_with_invalid_reserve_price (0.07s)
-PASS TestMarketAuctionEscrow/Should_not_be_able_to_list_with_invalid_time (0.07s)
-PASS TestMarketAuctionEscrow/Should_be_able_to_sell_at_auction,_buyer_fulfill (0.41s)
-PASS TestMarketAuctionEscrow/Should_not_be_able_to_bid_expired_auction_listing (0.27s)
-PASS TestMarketAuctionEscrow/Should_not_be_able_to_bid_your_own_listing (0.24s)
-PASS TestMarketAuctionEscrow/Should_return_funds_if_auction_does_not_meet_reserve_price (0.43s)
-PASS TestMarketAuctionEscrow/Should_be_able_to_cancel_the_auction (0.21s)
-PASS TestMarketAuctionEscrow/Should_not_be_able_to_cancel_the_auction_if_it_is_ended (0.54s)
-PASS TestMarketAuctionEscrow/Should_not_be_able_to_fulfill_a_not_yet_live_/_ended_auction (0.45s)
-PASS TestMarketAuctionEscrow/Should_return_funds_if_auction_is_cancelled (0.41s)
-PASS TestMarketAuctionEscrow/Should_be_able_to_bid_and_increase_bid_by_same_user (0.38s)
-PASS TestMarketAuctionEscrow/Should_not_be_able_to_add_bid_that_is_not_above_minimumBidIncrement (0.37s)
-PASS TestMarketAuctionEscrow/Should_not_be_able_to_list_after_deprecated (0.14s)
-PASS TestMarketAuctionEscrow/Should_be_able_to_bid,_add_bid_,_fulfill_auction_and_delist_after_deprecated (0.83s)
-PASS TestMarketAuctionEscrow/Should_no_be_able_to_list,_bid,_add_bid_,_fulfill_auction_after_stopped (1.17s)
-PASS TestMarketAuctionEscrow/Should_not_be_able_to_bid_below_listing_price (0.27s)
-PASS TestMarketAuctionEscrow/Should_not_be_able_to_bid_less_the_previous_bidder (0.35s)
-PASS TestMarketAuctionEscrow/Royalties_should_be_sent_to_correspondence_upon_fulfill_action (0.53s)
-PASS TestMarketAuctionEscrow/Royalties_of_find_platform_should_be_able_to_change (0.48s)
-PASS TestMarketAuctionEscrow/Should_be_able_to_ban_user,_user_is_only_allowed_to_cancel_listing. (0.78s)
-PASS TestMarketAuctionEscrow/Should_emit_previous_bidder_if_outbid (0.24s)
-PASS TestMarketAuctionEscrow/Should_be_able_to_list_a_timed_auction_with_future_start_time (0.08s)
-PASS TestMarketAuctionEscrow/Should_be_able_to_list_a_timed_auction_with_current_start_time (0.07s)
-PASS TestMarketAuctionEscrow/Should_be_able_to_list_a_timed_auction_with_previous_start_time (0.07s)
-PASS TestMarketAuctionEscrow/Should_be_able_to_bid_a_timed_auction_that_is_started (0.15s)
-PASS TestMarketAuctionEscrow/Should_not_be_able_to_bid_a_timed_auction_that_is_not_yet_started (0.15s)
-PASS TestMarketAuctionEscrow/Should_be_able_to_sell_and_buy_at_auction_even_the_buyer_didn't_link_receiver_correctly (0.41s)
-PASS TestMarketAuctionEscrow (11.16s)
-PASS TestMarketAuctionSoft/Should_be_able_to_sell_at_auction (0.41s)
-PASS TestMarketAuctionSoft/Should_not_be_able_to_list_an_item_for_auction_twice,_and_will_give_error_message. (0.23s)
-PASS TestMarketAuctionSoft/Should_be_able_to_sell_and_buy_at_auction_even_buyer_is_without_the_collection. (0.64s)
-PASS TestMarketAuctionSoft/Should_be_able_to_cancel_listing_if_the_pointer_is_no_longer_valid (0.47s)
-PASS TestMarketAuctionSoft/Should_not_be_able_to_list_with_price_0 (0.07s)
-PASS TestMarketAuctionSoft/Should_not_be_able_to_list_with_invalid_reserve_price (0.07s)
-PASS TestMarketAuctionSoft/Should_not_be_able_to_list_with_invalid_time (0.16s)
-PASS TestMarketAuctionSoft/Should_be_able_to_add_bid_at_auction (0.49s)
-PASS TestMarketAuctionSoft/Should_not_be_able_to_bid_expired_auction_listing (0.27s)
-PASS TestMarketAuctionSoft/Should_not_be_able_to_bid_your_own_listing (0.20s)
-PASS TestMarketAuctionSoft/Should_be_able_to_cancel_an_auction (0.19s)
-PASS TestMarketAuctionSoft/Should_not_be_able_to_cancel_an_ended_auction (0.48s)
-PASS TestMarketAuctionSoft/Cannot_fulfill_a_not_yet_ended_auction (0.35s)
-PASS TestMarketAuctionSoft/Should_allow_seller_to_cancel_auction_if_it_failed_to_meet_reserve_price (0.40s)
-PASS TestMarketAuctionSoft/Should_be_able_to_bid_and_increase_bid_by_same_user (0.32s)
-PASS TestMarketAuctionSoft/Should_not_be_able_to_list_after_deprecated (0.12s)
-PASS TestMarketAuctionSoft/Should_not_be_able_to_bid_below_listing_price (0.21s)
-PASS TestMarketAuctionSoft/Should_not_be_able_to_bid_less_the_previous_bidder (0.31s)
-PASS TestMarketAuctionSoft/Royalties_should_be_sent_to_correspondence_upon_fulfill_action (0.41s)
-PASS TestMarketAuctionSoft/Should_emit_previous_bidder_if_outbid (0.34s)
-PASS TestMarketAuctionSoft/Should_be_able_to_list_an_NFT_for_auction_and_bid_it_with_DUC (0.41s)
-PASS TestMarketAuctionSoft (6.61s)
-PASS TestDapperMarketSale/Should_be_able_to_list_an_NFT_for_sale_and_buy_it_with_DUC (0.26s)
-PASS TestDapperMarketSale/Should_be_able_to_list_an_NFT_for_sale_and_buy_it_with_DUC,_royalties_should_be_paid_to_merch_account_if_royalty_is_higher_than_0.44 (0.18s)
-PASS TestDapperMarketSale (0.45s)
-PASS TestMarketDirectOfferEscrow/Should_be_able_to_add_direct_offer_and_then_sell (0.21s)
-PASS TestMarketDirectOfferEscrow/Should_be_able_to_add_direct_offer_and_then_sell_even_the_seller_didn't_link_provider_correctly (0.25s)
-PASS TestMarketDirectOfferEscrow/Should_be_able_to_add_direct_offer_and_then_sell_even_the_buyer_didn't_link_receiver_correctly (0.28s)
-PASS TestMarketDirectOfferEscrow/Should_not_be_able_to_offer_with_price_0 (0.07s)
-PASS TestMarketDirectOfferEscrow/Should_not_be_able_to_offer_with_invalid_time (0.07s)
-PASS TestMarketDirectOfferEscrow/Should_be_able_to_reject_offer_if_the_pointer_is_no_longer_valid (0.19s)
-PASS TestMarketDirectOfferEscrow/Should_be_able_to_retract_offer_if_the_pointer_is_no_longer_valid (0.19s)
-PASS TestMarketDirectOfferEscrow/Should_be_able_to_increase_offer (0.32s)
-PASS TestMarketDirectOfferEscrow/Should_be_able_to_reject_offer (0.19s)
-PASS TestMarketDirectOfferEscrow/Should_be_able_to_retract_offer (0.22s)
-PASS TestMarketDirectOfferEscrow/Should_not_be_able_to_offer_your_own_NFT (0.08s)
-PASS TestMarketDirectOfferEscrow/Should_not_be_able_to_accept_expired_offers (0.42s)
-PASS TestMarketDirectOfferEscrow/Should_return_money_when_outbid (0.20s)
-PASS TestMarketDirectOfferEscrow/Should_not_be_able_to_direct_offer_after_deprecated (0.12s)
-PASS TestMarketDirectOfferEscrow/Should_not_be_able_to_increase_offer_if_deprecated_but_able_to_accept_offer (0.37s)
-PASS TestMarketDirectOfferEscrow/Should_be_able_to_reject_offer_when_deprecated (0.23s)
-PASS TestMarketDirectOfferEscrow/Should_not_be_able_to_direct_offer_after_stopped (0.12s)
-PASS TestMarketDirectOfferEscrow/Should_not_be_able_to_increase_offer_nor_buy_if_stopped (0.35s)
-PASS TestMarketDirectOfferEscrow/Should_be_able_to_able_to_direct_offer,_add_bit_and_accept_offer_after_enabled (0.41s)
-PASS TestMarketDirectOfferEscrow/Should_be_able_to_able_to_direct_offerand_reject_after_enabled (0.29s)
-PASS TestMarketDirectOfferEscrow/Should_not_be_able_to_make_offer_by_user3_when_deprecated_or_stopped (0.36s)
-PASS TestMarketDirectOfferEscrow/Should_be_able_to_retract_offer_when_deprecated_and_stopped (0.29s)
-PASS TestMarketDirectOfferEscrow/Royalties_should_be_sent_to_correspondence_upon_accept_offer_action (0.21s)
-PASS TestMarketDirectOfferEscrow/Royalties_of_find_platform_should_be_able_to_change (0.26s)
-PASS TestMarketDirectOfferEscrow (5.75s)
-PASS TestMarketDirectOfferSoft/Should_be_able_to_add_direct_offer_and_then_sell (0.32s)
-PASS TestMarketDirectOfferSoft/Should_be_able_to_add_direct_offer_and_then_sell_even_the_buyer_is_without_collection (0.37s)
-PASS TestMarketDirectOfferSoft/Should_not_be_able_to_offer_with_price_0 (0.06s)
-PASS TestMarketDirectOfferSoft/Should_not_be_able_to_offer_with_invalid_time (0.07s)
-PASS TestMarketDirectOfferSoft/Should_be_able_to_reject_offer_if_the_pointer_is_no_longer_valid (0.24s)
-PASS TestMarketDirectOfferSoft/Should_be_able_to_retract_offer_if_the_pointer_is_no_longer_valid (0.24s)
-PASS TestMarketDirectOfferSoft/Should_be_able_to_increase_offer (0.25s)
-PASS TestMarketDirectOfferSoft/Should_be_able_to_reject_offer (0.19s)
-PASS TestMarketDirectOfferSoft/Should_be_able_to_retract_offer (0.19s)
-PASS TestMarketDirectOfferSoft/Should_not_be_able_to_offer_your_own_NFT (0.07s)
-PASS TestMarketDirectOfferSoft/Should_not_be_able_to_accept_expired_offer (0.32s)
-PASS TestMarketDirectOfferSoft/Should_not_be_able_to_add_direct_offer_when_deprecated (0.17s)
-PASS TestMarketDirectOfferSoft/Should_not_be_able_to_increase_bid_but_able_to_fulfill_offer_when_deprecated (0.57s)
-PASS TestMarketDirectOfferSoft/Should_be_able_to_reject_offer_when_deprecated (0.29s)
-PASS TestMarketDirectOfferSoft/Should_not_be_able_to_add_direct_offer_after_stopped (0.16s)
-PASS TestMarketDirectOfferSoft/Should_not_be_able_to_increase_bid_nor_accept_offer_after_stopped (0.35s)
-PASS TestMarketDirectOfferSoft/Should_not_be_able_to_fulfill_offer_after_stopped (0.61s)
-PASS TestMarketDirectOfferSoft/Should_be_able_to_direct_offer,_increase_offer_and_fulfill_offer_after_enabled (0.51s)
-PASS TestMarketDirectOfferSoft/Should_be_able_to_reject_offer_after_enabled (0.31s)
-PASS TestMarketDirectOfferSoft/Should_not_be_able_to_make_offer_by_user3_when_deprecated_or_stopped (0.45s)
-PASS TestMarketDirectOfferSoft/Should_be_able_to_retract_offer_when_deprecated_or_stopped (0.30s)
-PASS TestMarketDirectOfferSoft/Royalties_should_be_sent_to_correspondence_upon_accept_offer_action (0.33s)
-PASS TestMarketDirectOfferSoft/Should_return_money_when_outbid (0.20s)
-PASS TestMarketDirectOfferSoft/Should_be_able_to_list_an_NFT_for_sale_and_buy_it_with_DUC (0.33s)
-PASS TestMarketDirectOfferSoft (6.94s)
-PASS TestMarketSale/Should_be_able_to_list_a_dandy_for_sale_and_buy_it (0.23s)
-PASS TestMarketSale/Should_be_able_to_list_a_dandy_for_sale_and_buy_it_if_buyer_didn't_receiver_that_correctly (0.19s)
-PASS TestMarketSale/Should_be_able_to_list_a_dandy_for_sale_and_buy_it_without_the_collection (0.20s)
-PASS TestMarketSale/Should_not_be_able_to_list_with_price_$0 (0.07s)
-PASS TestMarketSale/Should_not_be_able_to_list_with_invalid_time (0.06s)
-PASS TestMarketSale/Should_be_able_to_cancel_listing_if_the_pointer_is_no_longer_valid (0.18s)
-PASS TestMarketSale/Should_be_able_to_change_price_of_dandy (0.19s)
-PASS TestMarketSale/Should_not_be_able_to_buy_your_own_listing (0.14s)
-PASS TestMarketSale/Should_not_be_able_to_buy_expired_listing (0.22s)
-PASS TestMarketSale/Should_be_able_to_cancel_sale (0.17s)
-PASS TestMarketSale/Should_not_be_able_to_buy_if_too_low_price (0.14s)
-=== RUN   TestMarketSale/Should_be_able_to_list_it_in_Flow_but_not_FUSD.
-    market_sale_test.go:135: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:167
-        	            				/Users/bjartek/dev/find/market_sale_test.go:135
-        	Error:      	"transaction=./transactions/listNFTForSale.cdc: execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:\n\t* transaction execute failed: [Error Code: 1101] cadence runtime error: Execution failed:\nerror: panic: This FT is not supported by the Find Market yet. Type : FUSD\n  --> aad201ac2fcf4c5fc8958ab9e839f8c028682c5916e77a72e3d72082793e4e5e:36:62\n   |\n36 |         let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(ftAliasOrIdentifier))\n   |                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n\n" does not contain "Nothing matches"
-        	Test:       	TestMarketSale/Should_be_able_to_list_it_in_Flow_but_not_FUSD.
---- FAIL: TestMarketSale/Should_be_able_to_list_it_in_Flow_but_not_FUSD. (0.06s)
-FAIL TestMarketSale/Should_be_able_to_list_it_in_Flow_but_not_FUSD. (0.06s)
-PASS TestMarketSale/Should_be_able_cancel_all_listing (0.40s)
-PASS TestMarketSale/Should_be_able_to_list_it,_deprecate_it_and_cannot_list_another_again,_but_able_to_buy_and_delist. (0.62s)
-PASS TestMarketSale/Should_be_able_to_list_it,_stop_it_and_cannot_list_another_again,_buy,_nor_delist. (0.31s)
-PASS TestMarketSale/Royalties_should_be_sent_to_correspondence_upon_buy_action (0.15s)
-PASS TestMarketSale/Royalties_of_find_platform_should_be_able_to_change (0.20s)
-PASS TestMarketSale/Should_be_able_to_ban_user,_user_is_only_allowed_to_cancel_listing. (0.31s)
-PASS TestMarketSale/Should_be_able_to_ban_user,_user_cannot_buy_NFT. (0.18s)
-PASS TestMarketSale/Royalties_should_try_to_borrow_vault_in_standard_way_if_profile_wallet_does_not_exist (0.27s)
-=== RUN   TestMarketSale/Royalties_should_be_sent_to_residual_account_if_royalty_receiver_is_not_working
-    market_sale_test.go:390: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:182
-        	            				/Users/bjartek/dev/find/market_sale_test.go:390
-        	Error:      	Received unexpected error:
-        	            	execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:
-        	            		* transaction execute failed: [Error Code: 1101] cadence runtime error: Execution failed:
-        	            	error: panic: This FT is not supported by the Find Market yet. Type : FUSD
-        	            	  --> ca175b9a09d3341fc8812f777380bfca74ad36bf89e94da28089baedfdb84983:36:62
-        	            	   |
-        	            	36 |         let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
-        	            	   |                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        	            	
-        	            	
-        	            	
-        	            	transaction=./transactions/listNFTForSale.cdc
-        	            	github.com/bjartek/overflow/v2.OverflowInteractionBuilder.Send
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/interaction_builder.go:639
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).sendTx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:563
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).Tx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:559
-        	            	github.com/findonflow/find.TestMarketSale.(*OverflowState).TxFN.func29
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:543
-        	            	github.com/findonflow/find.TestMarketSale.func21
-        	            		/Users/bjartek/dev/find/market_sale_test.go:386
-        	            	testing.tRunner
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/testing/testing.go:1689
-        	            	runtime.goexit
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/runtime/asm_arm64.s:1222
-        	Test:       	TestMarketSale/Royalties_should_be_sent_to_residual_account_if_royalty_receiver_is_not_working
-    market_sale_test.go:400: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:182
-        	            				/Users/bjartek/dev/find/market_sale_test.go:400
-        	Error:      	Received unexpected error:
-        	            	execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:
-        	            		* transaction execute failed: [Error Code: 1101] cadence runtime error: Execution failed:
-        	            	  --> 4b613181aef6f0479d6926e61243381b987e6a04282a6ed5f5be3bb06b82170c:43:18
-        	            	   |
-        	            	43 |         let item= FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: id)
-        	            	   |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        	            	
-        	            	error: panic: Account not properly set up, cannot borrow sale item collection
-        	            	   --> f3fcd2c1a78f5eee.FindMarket:134:12
-        	            	    |
-        	            	134 |             panic("Account not properly set up, cannot borrow sale item collection")
-        	            	    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        	            	
-        	            	
-        	            	
-        	            	transaction=./transactions/buyNFTForSale.cdc
-        	            	github.com/bjartek/overflow/v2.OverflowInteractionBuilder.Send
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/interaction_builder.go:639
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).sendTx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:563
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).Tx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:559
-        	            	github.com/findonflow/find.TestMarketSale.func21
-        	            		/Users/bjartek/dev/find/market_sale_test.go:394
-        	            	testing.tRunner
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/testing/testing.go:1689
-        	            	runtime.goexit
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/runtime/asm_arm64.s:1222
-        	Test:       	TestMarketSale/Royalties_should_be_sent_to_residual_account_if_royalty_receiver_is_not_working
-    market_sale_test.go:401: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:223
-        	            				/Users/bjartek/dev/find/market_sale_test.go:401
-        	Error:      	event not found FindMarket.RoyaltyCouldNotBePaid, overflow.OverflowEvent{
-        	            	  Fields: map[string]interface {}{
-        	            	    "address": "0x192440c99cb17282",
-        	            	    "amount": 0.5,
-        	            	    "findName": "user1",
-        	            	    "residualAddress": "0xf669cb8d41ce0c74",
-        	            	    "royaltyName": "creator",
-        	            	  },
-        	            	  Addresses: map[string][]string(nil),
-        	            	  Id: "",
-        	            	  TransactionId: "",
-        	            	  Name: "",
-        	            	  RawEvent: cadence.Event{
-        	            	    EventType: nil,
-        	            	  },
-        	            	  EventIndex: 0,
-        	            	}
-        	Test:       	TestMarketSale/Royalties_should_be_sent_to_residual_account_if_royalty_receiver_is_not_working
-    event.go:336: === Events ===
---- FAIL: TestMarketSale/Royalties_should_be_sent_to_residual_account_if_royalty_receiver_is_not_working (0.30s)
-FAIL TestMarketSale/Royalties_should_be_sent_to_residual_account_if_royalty_receiver_is_not_working (0.30s)
-=== RUN   TestMarketSale
---- FAIL: TestMarketSale (4.65s)
-FAIL TestMarketSale (4.65s)
-PASS TestNameVoucher/Should_be_able_to_mint_NFT_to_User_1_with_collection (0.14s)
-PASS TestNameVoucher/Should_be_able_to_use_the_voucher_to_register_new_name (0.21s)
-PASS TestNameVoucher/Should_be_able_to_mint_NFT_directly_from_lost_and_found (0.15s)
-PASS TestNameVoucher (0.50s)
-PASS TestNFTDetailScript/Should_be_able_to_get_nft_details_of_item_with_script (0.70s)
-=== RUN   TestNFTDetailScript/Should_be_able_to_get_nft_details_of_item_with_views
-    autogold.go:146: mismatch (-want +got):
-        [31m-- want[0m
-        [32m++ got[0m
-        @@ -136,7 +136,7 @@
-        					"receiver": map[string]interface{}{
-        						"address":    "0x192440c99cb17282",
-        						"borrowType": "&{A.ee82856bf20e2aa6.FungibleToken.Receiver}",
-        [31m						"id":         10,[0m
-        [32m						"id":         9,[0m
-        					},
-        				},
-        				map[string]interface{}{
-        @@ -145,7 +145,7 @@
-        					"receiver": map[string]interface{}{
-        						"address":    "0xf3fcd2c1a78f5eee",
-        						"borrowType": "&{A.ee82856bf20e2aa6.FungibleToken.Receiver}",
-        [31m						"id":         33,[0m
-        [32m						"id":         32,[0m
-        					},
-        				},
-        			}},
-        
---- FAIL: TestNFTDetailScript/Should_be_able_to_get_nft_details_of_item_with_views (0.63s)
-FAIL TestNFTDetailScript/Should_be_able_to_get_nft_details_of_item_with_views (0.63s)
-=== RUN   TestNFTDetailScript
---- FAIL: TestNFTDetailScript (1.33s)
-FAIL TestNFTDetailScript (1.33s)
+--- FAIL: TestFTRegistry (0.11s)
+FAIL TestFTRegistry (0.11s)
+PASS TestGeneratedExperiences/Should_be_able_to_add_season (0.09s)
 FAIL .
+=== RUN   TestGeneratedExperiences
+FAIL TestGeneratedExperiences (-1.00s)
+=== RUN   TestGeneratedExperiences/Should_be_able_to_add_mint_token
+signal: interrupt
+FAIL TestGeneratedExperiences/Should_be_able_to_add_mint_token (-1.00s)
 
 === Failed
-=== FAIL: . TestFIND/Should_get_error_if_you_try_to_register_a_name_and_dont_have_enough_money (0.05s)
-    find_test.go:32: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:167
-        	            				/Users/bjartek/dev/find/find_test.go:32
-        	Error:      	"transaction=./transactions/register.cdc: execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:\n\t* transaction execute failed: [Error Code: 1101] cadence runtime error: Execution failed:\nerror: pre-condition failed: Balance of vault is not high enough 1000.00000000 total balance is 390.00088000\n  --> 1dd8f4d07842555c7622389593e9190ec3352d2f1acb150ac3bb5e23e9f9a654:25:8\n   |\n25 |         self.vaultRef!.balance > self.cost : \"Balance of vault is not high enough \".concat(self.cost.toString()).concat(\" total balance is \").concat(self.vaultRef!.balance.toString())\n   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n\n" does not contain "Amount withdrawn must be less than or equal than the balance of the Vault"
-        	Test:       	TestFIND/Should_get_error_if_you_try_to_register_a_name_and_dont_have_enough_money
-
-=== FAIL: . TestFIND/Should_be_able_to_register_related_account_and_remove_it (0.12s)
+=== FAIL: . TestFIND/Should_be_able_to_register_related_account_and_remove_it (0.16s)
     find_test.go:134: 
         	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/script.go:194
         	            				/Users/bjartek/dev/find/find_test.go:134
@@ -992,7 +432,7 @@ FAIL .
         \ No newline at end of file
         
 
-=== FAIL: . TestFIND/If_a_user_holds_an_invalid_find_name,_get_status_should_not_return_it (0.13s)
+=== FAIL: . TestFIND/If_a_user_holds_an_invalid_find_name,_get_status_should_not_return_it (0.14s)
     find_test.go:194: 
         	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/script.go:174
         	            				/Users/bjartek/dev/find/find_test.go:194
@@ -1000,7 +440,7 @@ FAIL .
         	Test:       	TestFIND/If_a_user_holds_an_invalid_find_name,_get_status_should_not_return_it
         	Messages:   	output%!(EXTRA string=nil)
 
-=== FAIL: . TestFIND/Should_be_able_to_create_and_edit_the_social_link (0.25s)
+=== FAIL: . TestFIND/Should_be_able_to_create_and_edit_the_social_link (0.14s)
     find_test.go:217: 
         	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/script.go:194
         	            				/Users/bjartek/dev/find/find_test.go:217
@@ -1031,7 +471,7 @@ FAIL .
         	Error:      	"extracting arguments: the interaction 'buyAddon' is missing [maxAmount]" does not contain "This addon is not available."
         	Test:       	TestFIND/Should_not_be_able_to_buy_unavaialbe_addon
 
-=== FAIL: . TestFIND/Should_be_able_to_getFindStatus_for_trusted_accounts (0.18s)
+=== FAIL: . TestFIND/Should_be_able_to_getFindStatus_for_trusted_accounts (0.22s)
 [31mscript: getFindStatus: scriptFileName:getFindStatus: [Error Code: 1101] error caused by: 1 error occurred:
 	* [Error Code: 1101] cadence runtime error: Execution failed:
 error: cannot find type in this scope: `bool`
@@ -1072,163 +512,7 @@ error: cannot find type in this scope: `bool`
         \ No newline at end of file
         
 
-=== FAIL: . TestFIND/Should_not_be_able_to_list_old_leases_for_sale (0.35s)
-    find_test.go:581: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:167
-        	            				/Users/bjartek/dev/find/find_test.go:581
-        	Error:      	"transaction=./transactions/listNameForSale.cdc: execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:\n\t* transaction preprocess failed: [Error Code: 1101] cadence runtime error: Execution failed:\nerror: value of type `auth(FIND.LeaseOwner) &FIND.LeaseCollection` has no member `listForSale`\n  --> 16c2a69b4f132b07003f96c8db07716143db11597ed25c2654daecd1b576365d:16:24\n   |\n16 |         self.finLeases!.listForSale(name: name,  directSellPrice:directSellPrice)\n   |                         ^^^^^^^^^^^ unknown member\n\n\n" does not contain "This is not a valid lease"
-        	Test:       	TestFIND/Should_not_be_able_to_list_old_leases_for_sale
-
-=== FAIL: . TestFIND/Should_be_able_to_list_lease_for_auction (0.04s)
-    find_test.go:592: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:182
-        	            				/Users/bjartek/dev/find/find_test.go:592
-        	Error:      	Received unexpected error:
-        	            	execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:
-        	            		* transaction preprocess failed: [Error Code: 1101] cadence runtime error: Execution failed:
-        	            	error: value of type `auth(FIND.LeaseOwner) &FIND.LeaseCollection` has no member `listForAuction`
-        	            	  --> cf4a697142832122da1bac5101de01f9f57c667281a4e9f88e50270ba86e23cb:16:24
-        	            	   |
-        	            	16 |         self.finLeases!.listForAuction(name: name, auctionStartPrice: auctionStartPrice, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration,  auctionExtensionOnLateBid: auctionExtensionOnLateBid)
-        	            	   |                         ^^^^^^^^^^^^^^ unknown member
-        	            	
-        	            	
-        	            	
-        	            	transaction=./transactions/listNameForAuction.cdc
-        	            	github.com/bjartek/overflow/v2.OverflowInteractionBuilder.Send
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/interaction_builder.go:639
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).sendTx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:563
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).Tx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:559
-        	            	github.com/findonflow/find.TestFIND.func33
-        	            		/Users/bjartek/dev/find/find_test.go:585
-        	            	testing.tRunner
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/testing/testing.go:1689
-        	            	runtime.goexit
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/runtime/asm_arm64.s:1222
-        	Test:       	TestFIND/Should_be_able_to_list_lease_for_auction
-
-=== FAIL: . TestFIND/Should_not_be_able_to_list_old_lease_for_auction (0.31s)
-    find_test.go:604: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:167
-        	            				/Users/bjartek/dev/find/find_test.go:604
-        	Error:      	"transaction=./transactions/listNameForAuction.cdc: execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:\n\t* transaction preprocess failed: [Error Code: 1101] cadence runtime error: Execution failed:\nerror: value of type `auth(FIND.LeaseOwner) &FIND.LeaseCollection` has no member `listForAuction`\n  --> d21c852ee940555fc6f0857b041875f7562b9e832d1ebac8c12eb2baf4401980:16:24\n   |\n16 |         self.finLeases!.listForAuction(name: name, auctionStartPrice: auctionStartPrice, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration,  auctionExtensionOnLateBid: auctionExtensionOnLateBid)\n   |                         ^^^^^^^^^^^^^^ unknown member\n\n\n" does not contain "This is not a valid lease"
-        	Test:       	TestFIND/Should_not_be_able_to_list_old_lease_for_auction
-
-=== FAIL: . TestFIND/Should_be_able_to_delist_old_leases_for_sale (0.35s)
-    find_test.go:615: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:182
-        	            				/Users/bjartek/dev/find/find_test.go:615
-        	Error:      	Received unexpected error:
-        	            	execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:
-        	            		* transaction preprocess failed: [Error Code: 1101] cadence runtime error: Execution failed:
-        	            	error: value of type `auth(FIND.LeaseOwner) &FIND.LeaseCollection` has no member `delistSale`
-        	            	  --> b532dfd69913b7f66643c0ed836c858a9edfe2eea7ac26205cdffde54a7c86e4:17:28
-        	            	   |
-        	            	17 |             self.finLeases!.delistSale(name)
-        	            	   |                             ^^^^^^^^^^ unknown member
-        	            	
-        	            	
-        	            	
-        	            	transaction=./transactions/delistNameSale.cdc
-        	            	github.com/bjartek/overflow/v2.OverflowInteractionBuilder.Send
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/interaction_builder.go:639
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).sendTx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:563
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).Tx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:559
-        	            	github.com/findonflow/find.TestFIND.func35
-        	            		/Users/bjartek/dev/find/find_test.go:611
-        	            	testing.tRunner
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/testing/testing.go:1689
-        	            	runtime.goexit
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/runtime/asm_arm64.s:1222
-        	Test:       	TestFIND/Should_be_able_to_delist_old_leases_for_sale
-
-=== FAIL: . TestFIND/Should_be_able_to_delist_old_leases_for_auction (0.36s)
-    find_test.go:626: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:182
-        	            				/Users/bjartek/dev/find/find_test.go:626
-        	Error:      	Received unexpected error:
-        	            	execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:
-        	            		* transaction preprocess failed: [Error Code: 1101] cadence runtime error: Execution failed:
-        	            	error: value of type `auth(FIND.LeaseOwner) &FIND.LeaseCollection` has no member `listForAuction`
-        	            	  --> 34e0457c03591525944e29569778861a9a8cd67483a4a3d17acbe9dd087d8ca7:16:24
-        	            	   |
-        	            	16 |         self.finLeases!.listForAuction(name: name, auctionStartPrice: auctionStartPrice, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration,  auctionExtensionOnLateBid: auctionExtensionOnLateBid)
-        	            	   |                         ^^^^^^^^^^^^^^ unknown member
-        	            	
-        	            	
-        	            	
-        	            	transaction=./transactions/listNameForAuction.cdc
-        	            	github.com/bjartek/overflow/v2.OverflowInteractionBuilder.Send
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/interaction_builder.go:639
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).sendTx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:563
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).Tx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:559
-        	            	github.com/findonflow/find.TestFIND.func36
-        	            		/Users/bjartek/dev/find/find_test.go:619
-        	            	testing.tRunner
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/testing/testing.go:1689
-        	            	runtime.goexit
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/runtime/asm_arm64.s:1222
-        	Test:       	TestFIND/Should_be_able_to_delist_old_leases_for_auction
-    find_test.go:632: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:182
-        	            				/Users/bjartek/dev/find/find_test.go:632
-        	Error:      	Received unexpected error:
-        	            	execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:
-        	            		* transaction preprocess failed: [Error Code: 1101] cadence runtime error: Execution failed:
-        	            	error: cannot find type in this scope: `FIND.AuctionOwner`
-        	            	 --> 3ba3dc053ca05a8644938e6eb3a343a91cc5d80a8e533460e307e029e721af38:5:22
-        	            	  |
-        	            	5 | 	let finLeases : auth(FIND.AuctionOwner, FIND.LeaseOwner) &FIND.LeaseCollection?
-        	            	  | 	                     ^^^^^^^^^^^^^^^^^ not found in this scope
-        	            	
-        	            	error: cannot find type in this scope: `FIND.AuctionOwner`
-        	            	 --> 3ba3dc053ca05a8644938e6eb3a343a91cc5d80a8e533460e307e029e721af38:8:46
-        	            	  |
-        	            	8 | 		self.finLeases= account.storage.borrow<auth(FIND.AuctionOwner, FIND.LeaseOwner) &FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
-        	            	  | 		                                            ^^^^^^^^^^^^^^^^^ not found in this scope
-        	            	
-        	            	error: mismatched types
-        	            	 --> 3ba3dc053ca05a8644938e6eb3a343a91cc5d80a8e533460e307e029e721af38:8:18
-        	            	  |
-        	            	8 | 		self.finLeases= account.storage.borrow<auth(FIND.AuctionOwner, FIND.LeaseOwner) &FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
-        	            	  | 		                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `(auth(A.f3fcd2c1a78f5eee.FIND.LeaseOwner,t.3ba3dc053ca05a8644938e6eb3a343a91cc5d80a8e533460e307e029e721af38.FIND)&A.f3fcd2c1a78f5eee.FIND.LeaseCollection)?`, got `(auth(A.f3fcd2c1a78f5eee.FIND.LeaseOwner,t.3ba3dc053ca05a8644938e6eb3a343a91cc5d80a8e533460e307e029e721af38.FIND)&A.f3fcd2c1a78f5eee.FIND.LeaseCollection)?`
-        	            	
-        	            	error: value of type `auth(FIND, FIND.LeaseOwner) &FIND.LeaseCollection` has no member `cancel`
-        	            	  --> 3ba3dc053ca05a8644938e6eb3a343a91cc5d80a8e533460e307e029e721af38:17:19
-        	            	   |
-        	            	17 | 			self.finLeases!.cancel(name)
-        	            	   | 			                ^^^^^^ unknown member
-        	            	
-        	            	error: value of type `auth(FIND, FIND.LeaseOwner) &FIND.LeaseCollection` has no member `delistAuction`
-        	            	  --> 3ba3dc053ca05a8644938e6eb3a343a91cc5d80a8e533460e307e029e721af38:18:19
-        	            	   |
-        	            	18 | 			self.finLeases!.delistAuction(name)
-        	            	   | 			                ^^^^^^^^^^^^^ unknown member
-        	            	
-        	            	
-        	            	
-        	            	transaction=./transactions/cancelNameAuction.cdc
-        	            	github.com/bjartek/overflow/v2.OverflowInteractionBuilder.Send
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/interaction_builder.go:639
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).sendTx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:563
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).Tx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:559
-        	            	github.com/findonflow/find.TestFIND.func36
-        	            		/Users/bjartek/dev/find/find_test.go:629
-        	            	testing.tRunner
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/testing/testing.go:1689
-        	            	runtime.goexit
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/runtime/asm_arm64.s:1222
-        	Test:       	TestFIND/Should_be_able_to_delist_old_leases_for_auction
-
-=== FAIL: . TestFIND (5.61s)
+=== FAIL: . TestFIND (4.06s)
     test_utils.go:224: 
         	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:182
         	            				/Users/bjartek/dev/find/test_utils.go:224
@@ -1271,64 +555,11 @@ error: cannot find type in this scope: `bool`
         	            	}
         	Test:       	TestFIND
     event.go:336: === Events ===
-    test_utils.go:143: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:182
-        	            				/Users/bjartek/dev/find/test_utils.go:143
-        	            				/Users/bjartek/dev/find/find_test.go:608
-        	Error:      	Received unexpected error:
-        	            	execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:
-        	            		* transaction preprocess failed: [Error Code: 1101] cadence runtime error: Execution failed:
-        	            	error: value of type `auth(FIND.LeaseOwner) &FIND.LeaseCollection` has no member `listForSale`
-        	            	  --> 71bf5eedd365a1fc420bf1ce0612c6b2e0fc22aa88ae8c6d63b2858e1223d370:16:24
-        	            	   |
-        	            	16 |         self.finLeases!.listForSale(name: name,  directSellPrice:directSellPrice)
-        	            	   |                         ^^^^^^^^^^^ unknown member
-        	            	
-        	            	
-        	            	
-        	            	transaction=./transactions/listNameForSale.cdc
-        	            	github.com/bjartek/overflow/v2.OverflowInteractionBuilder.Send
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/interaction_builder.go:639
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).sendTx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:563
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).Tx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:559
-        	            	github.com/findonflow/find.(*OverflowTestUtils).listNameForSale
-        	            		/Users/bjartek/dev/find/test_utils.go:139
-        	            	github.com/findonflow/find.TestFIND.func35
-        	            		/Users/bjartek/dev/find/find_test.go:608
-        	            	testing.tRunner
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/testing/testing.go:1689
-        	            	runtime.goexit
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/runtime/asm_arm64.s:1222
-        	Test:       	TestFIND
-    test_utils.go:144: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:223
-        	            				/Users/bjartek/dev/find/test_utils.go:144
-        	            				/Users/bjartek/dev/find/find_test.go:608
-        	Error:      	event not found FIND.Sale, overflow.OverflowEvent{
-        	            	  Fields: map[string]interface {}{
-        	            	    "amount": 10.0,
-        	            	    "seller": "0x192440c99cb17282",
-        	            	    "sellerName": "user1",
-        	            	    "status": "active_listed",
-        	            	  },
-        	            	  Addresses: map[string][]string(nil),
-        	            	  Id: "",
-        	            	  TransactionId: "",
-        	            	  Name: "",
-        	            	  RawEvent: cadence.Event{
-        	            	    EventType: nil,
-        	            	  },
-        	            	  EventIndex: 0,
-        	            	}
-        	Test:       	TestFIND
-    test_utils.go:144: === Events ===
 
 === FAIL: . TestFTRegistry/Should_be_able_to_registry_flow_token,_fusd_token_and_get_list_from_it (0.01s)
     testing.go:1576: test executed panic(nil) or runtime.Goexit: subtest may have called FailNow on a parent test
 
-=== FAIL: . TestFTRegistry (0.12s)
+=== FAIL: . TestFTRegistry (0.11s)
     autogold.go:146: mismatch (-want +got):
         [31m-- want[0m
         [32m++ got[0m
@@ -1370,142 +601,11 @@ error: cannot find type in this scope: `bool`
         }`
         
 
-=== FAIL: . TestGeneratedExperiences/Should_be_able_to_add_mint_token (0.30s)
-    generated_experiences_test.go:188: mismatch (-want +got):
-        --- want
-        +++ got
-        @@ -1,5 +1,5 @@
-         map[string]interface{}{"cutInfos": []interface{}{map[string]interface{}{"cut": 0.1, "description": "Royalty", "receiver": map[string]interface{}{
-         	"address":    "0x192440c99cb17282",
-         	"borrowType": "&{A.ee82856bf20e2aa6.FungibleToken.Receiver}",
-        -	"id":         10,
-        +	"id":         9,
-         }}}}
-        \ No newline at end of file
-        
+=== FAIL: . TestGeneratedExperiences (unknown)
+--- PASS: TestGeneratedExperiences/Should_be_able_to_add_season (0.09s)
+signal: interrupt
 
-=== FAIL: . TestGeneratedExperiences (0.41s)
+=== FAIL: . TestGeneratedExperiences/Should_be_able_to_add_mint_token (unknown)
+signal: interrupt
 
-=== FAIL: . TestMarketSale/Should_be_able_to_list_it_in_Flow_but_not_FUSD. (0.06s)
-    market_sale_test.go:135: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:167
-        	            				/Users/bjartek/dev/find/market_sale_test.go:135
-        	Error:      	"transaction=./transactions/listNFTForSale.cdc: execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:\n\t* transaction execute failed: [Error Code: 1101] cadence runtime error: Execution failed:\nerror: panic: This FT is not supported by the Find Market yet. Type : FUSD\n  --> aad201ac2fcf4c5fc8958ab9e839f8c028682c5916e77a72e3d72082793e4e5e:36:62\n   |\n36 |         let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(ftAliasOrIdentifier))\n   |                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n\n" does not contain "Nothing matches"
-        	Test:       	TestMarketSale/Should_be_able_to_list_it_in_Flow_but_not_FUSD.
-
-=== FAIL: . TestMarketSale/Royalties_should_be_sent_to_residual_account_if_royalty_receiver_is_not_working (0.30s)
-    market_sale_test.go:390: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:182
-        	            				/Users/bjartek/dev/find/market_sale_test.go:390
-        	Error:      	Received unexpected error:
-        	            	execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:
-        	            		* transaction execute failed: [Error Code: 1101] cadence runtime error: Execution failed:
-        	            	error: panic: This FT is not supported by the Find Market yet. Type : FUSD
-        	            	  --> ca175b9a09d3341fc8812f777380bfca74ad36bf89e94da28089baedfdb84983:36:62
-        	            	   |
-        	            	36 |         let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
-        	            	   |                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        	            	
-        	            	
-        	            	
-        	            	transaction=./transactions/listNFTForSale.cdc
-        	            	github.com/bjartek/overflow/v2.OverflowInteractionBuilder.Send
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/interaction_builder.go:639
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).sendTx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:563
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).Tx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:559
-        	            	github.com/findonflow/find.TestMarketSale.(*OverflowState).TxFN.func29
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:543
-        	            	github.com/findonflow/find.TestMarketSale.func21
-        	            		/Users/bjartek/dev/find/market_sale_test.go:386
-        	            	testing.tRunner
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/testing/testing.go:1689
-        	            	runtime.goexit
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/runtime/asm_arm64.s:1222
-        	Test:       	TestMarketSale/Royalties_should_be_sent_to_residual_account_if_royalty_receiver_is_not_working
-    market_sale_test.go:400: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:182
-        	            				/Users/bjartek/dev/find/market_sale_test.go:400
-        	Error:      	Received unexpected error:
-        	            	execution error code 1: [Error Code: 1101] error caused by: 1 error occurred:
-        	            		* transaction execute failed: [Error Code: 1101] cadence runtime error: Execution failed:
-        	            	  --> 4b613181aef6f0479d6926e61243381b987e6a04282a6ed5f5be3bb06b82170c:43:18
-        	            	   |
-        	            	43 |         let item= FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: id)
-        	            	   |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        	            	
-        	            	error: panic: Account not properly set up, cannot borrow sale item collection
-        	            	   --> f3fcd2c1a78f5eee.FindMarket:134:12
-        	            	    |
-        	            	134 |             panic("Account not properly set up, cannot borrow sale item collection")
-        	            	    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        	            	
-        	            	
-        	            	
-        	            	transaction=./transactions/buyNFTForSale.cdc
-        	            	github.com/bjartek/overflow/v2.OverflowInteractionBuilder.Send
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/interaction_builder.go:639
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).sendTx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:563
-        	            	github.com/bjartek/overflow/v2.(*OverflowState).Tx
-        	            		/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/state.go:559
-        	            	github.com/findonflow/find.TestMarketSale.func21
-        	            		/Users/bjartek/dev/find/market_sale_test.go:394
-        	            	testing.tRunner
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/testing/testing.go:1689
-        	            	runtime.goexit
-        	            		/opt/homebrew/Cellar/go/1.22.5/libexec/src/runtime/asm_arm64.s:1222
-        	Test:       	TestMarketSale/Royalties_should_be_sent_to_residual_account_if_royalty_receiver_is_not_working
-    market_sale_test.go:401: 
-        	Error Trace:	/Users/bjartek/go/pkg/mod/github.com/bjartek/overflow/v2@v2.0.0-stable-cadence-beta.17/result.go:223
-        	            				/Users/bjartek/dev/find/market_sale_test.go:401
-        	Error:      	event not found FindMarket.RoyaltyCouldNotBePaid, overflow.OverflowEvent{
-        	            	  Fields: map[string]interface {}{
-        	            	    "address": "0x192440c99cb17282",
-        	            	    "amount": 0.5,
-        	            	    "findName": "user1",
-        	            	    "residualAddress": "0xf669cb8d41ce0c74",
-        	            	    "royaltyName": "creator",
-        	            	  },
-        	            	  Addresses: map[string][]string(nil),
-        	            	  Id: "",
-        	            	  TransactionId: "",
-        	            	  Name: "",
-        	            	  RawEvent: cadence.Event{
-        	            	    EventType: nil,
-        	            	  },
-        	            	  EventIndex: 0,
-        	            	}
-        	Test:       	TestMarketSale/Royalties_should_be_sent_to_residual_account_if_royalty_receiver_is_not_working
-    event.go:336: === Events ===
-
-=== FAIL: . TestMarketSale (4.65s)
-
-=== FAIL: . TestNFTDetailScript/Should_be_able_to_get_nft_details_of_item_with_views (0.63s)
-    autogold.go:146: mismatch (-want +got):
-        [31m-- want[0m
-        [32m++ got[0m
-        @@ -136,7 +136,7 @@
-        					"receiver": map[string]interface{}{
-        						"address":    "0x192440c99cb17282",
-        						"borrowType": "&{A.ee82856bf20e2aa6.FungibleToken.Receiver}",
-        [31m						"id":         10,[0m
-        [32m						"id":         9,[0m
-        					},
-        				},
-        				map[string]interface{}{
-        @@ -145,7 +145,7 @@
-        					"receiver": map[string]interface{}{
-        						"address":    "0xf3fcd2c1a78f5eee",
-        						"borrowType": "&{A.ee82856bf20e2aa6.FungibleToken.Receiver}",
-        [31m						"id":         33,[0m
-        [32m						"id":         32,[0m
-        					},
-        				},
-        			}},
-        
-
-=== FAIL: . TestNFTDetailScript (1.33s)
-
-DONE 366 tests, 23 failures in 82.421s
+DONE 164 tests, 12 failures in 25.532s

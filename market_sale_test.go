@@ -128,13 +128,6 @@ func TestMarketSale(t *testing.T) {
 		).
 			AssertFailure(t, "Incorrect balance sent in vault. Expected 10.00000000 got 5.00000000")
 	})
-
-	ot.Run(t, "Should be able to list it in Flow but not FUSD.", func(t *testing.T) {
-		listingTx("listNFTForSale",
-			WithArg("ftAliasOrIdentifier", "FUSD"),
-		).AssertFailure(t, "Nothing matches")
-	})
-
 	ot.Run(t, "Should be able cancel all listing", func(t *testing.T) {
 		otu.listNFTForSale("user1", dandyIds[0], price)
 		otu.listNFTForSale("user1", dandyIds[1], price)

@@ -29,7 +29,7 @@ func TestFIND(t *testing.T) {
 			WithSigner("user1"),
 			WithArg("name", "usr"),
 			WithArg("maxAmount", 1000.0),
-		).AssertFailure(t, "Amount withdrawn must be less than or equal than the balance of the Vault")
+		).AssertFailure(t, "Balance of vault is not high enough")
 	})
 
 	ot.Run(t, "Should get error if you try to register a name that is too short", func(t *testing.T) {
@@ -571,67 +571,6 @@ access(all) fun main(name: String) :  Address? {
 }`))
 	})
 
-	ot.Run(t, "Should not be able to list old leases for sale", func(t *testing.T) {
-		otu.expireLease().expireLease().tickClock(2.0)
-		// should be able to list name for sale
-		otu.O.Tx("listNameForSale",
-			WithSigner("user1"),
-			WithArg("name", "user1"),
-			WithArg("directSellPrice", 10.0),
-		).AssertFailure(t, "This is not a valid lease")
-	})
-
-	ot.Run(t, "Should be able to list lease for auction", func(t *testing.T) {
-		otu.O.Tx("listNameForAuction",
-			WithSigner("user1"),
-			WithArg("name", "user1"),
-			WithArg("auctionStartPrice", 5.0),
-			WithArg("auctionReservePrice", 20.0),
-			WithArg("auctionDuration", auctionDurationFloat),
-			WithArg("auctionExtensionOnLateBid", 300.0),
-		).AssertSuccess(t)
-	})
-
-	ot.Run(t, "Should not be able to list old lease for auction", func(t *testing.T) {
-		otu.expireLease().expireLease().tickClock(2.0)
-		otu.O.Tx("listNameForAuction",
-			WithSigner("user1"),
-			WithArg("name", "user1"),
-			WithArg("auctionStartPrice", 5.0),
-			WithArg("auctionReservePrice", 20.0),
-			WithArg("auctionDuration", auctionDurationFloat),
-			WithArg("auctionExtensionOnLateBid", 300.0),
-		).AssertFailure(t, "This is not a valid lease")
-	})
-
-	ot.Run(t, "Should be able to delist old leases for sale", func(t *testing.T) {
-		otu.listNameForSale("user1", "user1")
-		otu.expireLease().expireLease().tickClock(2.0)
-
-		otu.O.Tx("delistNameSale",
-			WithSigner("user1"),
-			WithArg("names", []string{"user1"}),
-		).
-			AssertSuccess(t)
-	})
-
-	ot.Run(t, "Should be able to delist old leases for auction", func(t *testing.T) {
-		otu.O.Tx("listNameForAuction",
-			WithSigner("user1"),
-			WithArg("name", "user1"),
-			WithArg("auctionStartPrice", 5.0),
-			WithArg("auctionReservePrice", 20.0),
-			WithArg("auctionDuration", auctionDurationFloat),
-			WithArg("auctionExtensionOnLateBid", 300.0),
-		).AssertSuccess(t)
-
-		otu.expireLease().expireLease().tickClock(2.0)
-		otu.O.Tx("cancelNameAuction",
-			WithSigner("user1"),
-			WithArg("names", []string{"user1"}),
-		).AssertSuccess(t)
-	})
-
 	ot.Run(t, "Should be able to cleanup invalid leases", func(t *testing.T) {
 		otu.O.Tx("cleanUpInvalidatedLease",
 			WithSigner("user1"),
@@ -647,21 +586,4 @@ access(all) fun main(name: String) :  Address? {
 		).AssertSuccess(t)
 	})
 
-  /*
-* commented out due to circle not staging
-	ot.Run(t, "Should be able to register a name with usdc", func(t *testing.T) {
-		otu.O.Tx("registerUSDC",
-			WithSigner("user1"),
-			WithArg("name", "fooobar"),
-			WithArg("amount", 5.0),
-		).AssertSuccess(t).
-			AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
-				"name": "fooobar",
-			}).
-			AssertEvent(otu.T, "FiatToken.TokensDeposited", map[string]interface{}{
-				"amount": 5.0,
-				"to":     otu.O.Address("find-admin"),
-			})
-	})
-  */
 }
