@@ -1,7 +1,6 @@
 import "FungibleToken"
 import "FUSD"
 import "FlowToken"
-// import "FiatToken"
 import "DapperUtilityCoin"
 import "Profile"
 import "Debug"
@@ -9,14 +8,14 @@ import "Clock"
 import "Sender"
 import "ProfileCache"
 import "FindUtils"
+import "PublicPriceOracle"
 
 /*
-
 ///FIND
 
 ///Flow Integrated Name Directory - A naming service on flow,
 
-/// Lease a name in the network for as little as 5 FUSD a year, (4 characters cost 100, 3 cost 500)
+/// Lease a name in the network for as little as 5 USD a year, (4 characters cost 100, 3 cost 500)
 
 Taxonomy:
 
@@ -27,22 +26,6 @@ Taxonomy:
 - leaseStatus: FREE|TAKEN|LOCKED, a LOCKED lease can be reopend by the owner. A lease will be locked for 90 days before it is freed
 */
 access(all) contract FIND {
-    //Old events not in use anymore we cannot remove
-    access(all) event Sold()
-    access(all) event SoldAuction()
-    access(all) event DirectOfferRejected()
-    access(all) event DirectOfferCanceled()
-    access(all) event AuctionStarted()
-    access(all) event AuctionCanceled()
-    access(all) event AuctionBid()
-    access(all) event AuctionCanceledReservePrice()
-    access(all) event ForSale() 
-    access(all) event ForAuction()
-
-    // Deprecated in testnet
-    access(all) event TokensRewarded()
-    access(all) event TokensCanNotBeRewarded()
-
     //event when FT is sent
     access(all) event FungibleTokenSent(from:Address, fromName:String?, name:String, toAddress:Address, message:String, tag:String, amount: UFix64, ftType:String)
 
@@ -56,21 +39,6 @@ access(all) contract FIND {
 
     /// Emitted when a name is moved to a new owner
     access(all) event Moved(name: String, previousOwner: Address, newOwner: Address, validUntil: UFix64, lockedUntil: UFix64)
-
-    /// Emitted when a name is explicistly put up for sale
-    access(all) event Sale(name: String, uuid:UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, buyer:Address?, buyerName:String?, buyerAvatar: String?, validUntil: UFix64, lockedUntil: UFix64)
-
-    /// Emitted when an name is put up for on-demand auction
-    access(all) event EnglishAuction(name: String, uuid:UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt: UFix64?, validUntil: UFix64, lockedUntil: UFix64, previousBuyer:Address?, previousBuyerName:String?)
-
-    /// Emitted if a bid occurs at a name that is too low or not for sale
-    access(all) event DirectOffer(name: String, uuid:UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, buyer:Address?, buyerName:String?, buyerAvatar: String?, validUntil: UFix64, lockedUntil: UFix64, previousBuyer:Address?, previousBuyerName:String?)
-
-    access(all) event RoyaltyPaid(name: String, uuid: UInt64, address: Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, saleType: String)
-
-    //store bids made by a bidder to somebody elses leases
-    access(all) let BidPublicPath: PublicPath
-    access(all) let BidStoragePath: StoragePath
 
     //store the network itself
     access(all) let NetworkStoragePath: StoragePath
@@ -86,8 +54,64 @@ access(all) contract FIND {
         panic("Network is not set up")
     }
 
+    //////////////////////////////////////////
+    // ORACLE
+    //////////////////////////////////////////
+    // Get the latest FLOW/USD price
+    //This uses the FLOW/USD increment.fi oracle
+    access(all) fun getLatestPrice(): UFix64 {
+        let lastResult = PublicPriceOracle.getLatestPrice(oracleAddr: self.getFlowUSDOracleAddress())
+        let lastBlockNum = PublicPriceOracle.getLatestBlockHeight(oracleAddr: self.getFlowUSDOracleAddress())
+
+        // Make sure the price is not expired
+        if getCurrentBlock().height - lastBlockNum > 2000 {
+            panic("Price is expired")
+        }
+
+        return lastResult
+    }
+
+
+    access(all) fun convertFLOWToUSD(_ amount: UFix64): UFix64 {
+        return amount * self.getLatestPrice()
+    }
+
+    access(all) fun convertUSDToFLOW(_ amount: UFix64): UFix64 {
+        return amount / self.getLatestPrice()
+    }
+
+    //////////////////////////////////////////
+    // HELPER FUNCTIONS
+    //////////////////////////////////////////
 
     //These methods are basically just here for convenience
+    //
+
+    access(all) fun calculateCostInFlow(_ name:String) : UFix64 {
+        if !FIND.validateFindName(name) {
+            panic("A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
+        }
+
+        if let network = FIND.account.storage.borrow<&Network>(from: FIND.NetworkStoragePath) {
+            return self.convertUSDToFLOW(network.calculateCost(name))
+        } 
+        panic("Network is not set up")
+    }
+
+    access(all) fun calculateAddonCostInFlow(_ addon: String) : UFix64 {
+        let network=FIND.account.storage.borrow<&Network>(from: FIND.NetworkStoragePath)!
+
+        if !network.publicEnabled {
+            panic("Public registration is not enabled yet")
+        }
+
+        if network.addonPrices[addon] == nil {
+            panic("This addon is not available. addon : ".concat(addon))
+        }
+        var addonPrice = network.addonPrices[addon]!
+        let cost= FIND.convertUSDToFLOW(addonPrice)
+        return cost
+    }
 
     /// Calculate the cost of an name
     /// @param _ the name to calculate the cost for
@@ -231,8 +255,8 @@ access(all) contract FIND {
         var path = ""
         if vault.getType() == Type<@FlowToken.Vault>() {
             path ="flowTokenReceiver"
-        } else if vault.getType() == Type<@FUSD.Vault>() {
-            path="fusdReceiver"
+        } else {
+            panic("Could not find a valid receiver for this vault type")
         }
         if path != "" {
             emit FungibleTokenSent(from: fromAddress, fromName: FIND.reverseLookup(fromAddress), name: "", toAddress: address, message:message, tag:tag, amount:vault.balance, ftType:vault.getType().identifier)
@@ -304,6 +328,9 @@ access(all) contract FIND {
     access(all) resource Lease {
         access(contract) let name: String
         access(contract) let networkCap: Capability<&Network>
+        access(contract) var addons: {String: Bool}
+
+        //These fields are here, but they are not in use anymore
         access(contract) var salePrice: UFix64?
         access(contract) var auctionStartPrice: UFix64?
         access(contract) var auctionReservePrice: UFix64?
@@ -311,7 +338,6 @@ access(all) contract FIND {
         access(contract) var auctionMinBidIncrement: UFix64
         access(contract) var auctionExtensionOnLateBid: UFix64
         access(contract) var offerCallback: Capability<&BidCollection>?
-        access(contract) var addons: {String: Bool}
 
         init(name:String, networkCap: Capability<&Network>) {
             self.name=name
@@ -345,35 +371,7 @@ access(all) contract FIND {
             self.addons[addon]=true
         }
 
-        access(LeaseOwner) fun setExtentionOnLateBid(_ time: UFix64) {
-            self.auctionExtensionOnLateBid=time
-        }
-
-        access(LeaseOwner) fun setAuctionDuration(_ duration: UFix64) {
-            self.auctionDuration=duration
-        }
-
-        access(LeaseOwner) fun setSalePrice(_ price: UFix64?) {
-            self.salePrice=price
-        }
-
-        access(LeaseOwner) fun setReservePrice(_ price: UFix64?) {
-            self.auctionReservePrice=price
-        }
-
-        access(LeaseOwner) fun setMinBidIncrement(_ price: UFix64) {
-            self.auctionMinBidIncrement=price
-        }
-
-        access(LeaseOwner) fun setStartAuctionPrice(_ price: UFix64?) {
-            self.auctionStartPrice=price
-        }
-
-        access(LeaseOwner) fun setCallback(_ callback: Capability<&BidCollection>?) {
-            self.offerCallback=callback
-        }
-
-        access(LeaseOwner) fun extendLease(_ vault: @FUSD.Vault) {
+        access(LeaseOwner) fun extendLease(_ vault: @FlowToken.Vault) {
             let network= self.networkCap.borrow() ?? panic("The network is not up")
             network.renew(name: self.name, vault:<-  vault)
         }
@@ -467,73 +465,7 @@ access(all) contract FIND {
         }
     }
 
-    access(all) entitlement AuctionOwner
 
-    /* An Auction for a lease */
-    access(all) resource Auction {
-        access(contract) var endsAt: UFix64
-        access(contract) var startedAt: UFix64
-        access(contract) let extendOnLateBid: UFix64
-        access(contract) var latestBidCallback: Capability<&BidCollection>
-        access(contract) let name: String
-
-        init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&BidCollection>, name: String) {
-
-            if startedAt >= endsAt {
-                panic("Cannot start before it will end")
-            }
-            if extendOnLateBid == 0.0 {
-                panic("Extends on late bid must be a non zero value")
-            }
-            self.endsAt=endsAt
-            self.startedAt=startedAt
-            self.extendOnLateBid=extendOnLateBid
-            self.latestBidCallback=latestBidCallback
-            self.name=name
-        }
-
-        access(all) fun getBalance() : UFix64 {
-            let cb = self.latestBidCallback.borrow() ?? panic("The bidder has unlinked the capability. bidder address: ".concat(self.latestBidCallback.address.toString()))
-            return cb.getBalance(self.name)
-        }
-
-        access(account) fun addBid(callback: Capability<&BidCollection>, timestamp: UFix64, lease: &Lease) {
-            let offer=callback.borrow()!
-            offer.setBidType(name: self.name, type: "auction")
-
-            var previousBuyer: Address?=nil
-            if callback.address != self.latestBidCallback.address {
-                if offer.getBalance(self.name) <= self.getBalance() {
-                    panic("bid must be larger then current bid. Current bid is : ".concat(self.getBalance().toString()).concat(". New bid is at : ").concat(offer.getBalance(self.name).toString()))
-                }
-                previousBuyer=self.latestBidCallback.address
-                //we send the money back
-                self.latestBidCallback.borrow()!.cancel(self.name)
-            }
-            self.latestBidCallback=callback
-            let suggestedEndTime=timestamp+self.extendOnLateBid
-            if suggestedEndTime > self.endsAt {
-                self.endsAt=suggestedEndTime
-            }
-
-            let bidder= callback.address
-            let profile=getAccount(bidder).capabilities.borrow<&{Profile.Public}>(Profile.publicPath)
-            if profile == nil {
-                panic("Create a profile before you make a bid")
-            }
-            let bidderName= profile!.getName()
-            let bidderAvatar= profile!.getAvatar()
-            let owner=lease.owner!.address
-            let ownerName=self.name
-
-            var previousBuyerName:String?=nil
-            if let pb = previousBuyer {
-                previousBuyerName=FIND.reverseLookup(pb)
-            }
-
-            emit EnglishAuction(name: self.name, uuid: lease.uuid, seller: owner, sellerName:ownerName, amount: offer.getBalance(self.name), auctionReservePrice: lease.auctionReservePrice!, status: "active_ongoing", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, buyerAvatar:bidderAvatar, endsAt: self.endsAt ,validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:previousBuyer, previousBuyerName:previousBuyerName)
-        }
-    }
 
     //struct to expose information about leases
     access(all) struct LeaseInformation {
@@ -598,15 +530,7 @@ access(all) contract FIND {
         //add a new lease token to the collection, can only be called in this contract
         access(contract) fun deposit(token: @FIND.Lease)
 
-        access(contract)fun cancelUserBid(_ name: String)
-        access(contract) fun increaseBid(_ name: String, balance: UFix64)
-
-        //place a bid on a token
-        access(contract) fun registerBid(name: String, callback: Capability<&BidCollection>)
-
-        //anybody should be able to fulfill an auction as long as it is done
-        access(all) fun fulfillAuction(_ name: String)
-        access(all) fun buyAddon(name:String, addon: String, vault: @FUSD.Vault)
+        access(all) fun buyAddon(name:String, addon: String, vault: @FlowToken.Vault)
         access(all) fun buyAddonDapper(merchAccount: Address, name:String, addon:String, vault: @DapperUtilityCoin.Vault)
         access(account) fun adminAddAddon(name:String, addon: String)
         access(all) fun getAddon(name:String) : [String]
@@ -636,21 +560,11 @@ access(all) contract FIND {
             self.networkWallet=networkWallet
         }
 
-        access(all) fun buyAddon(name:String, addon:String, vault: @FUSD.Vault)  {
+        access(all) fun buyAddon(name:String, addon:String, vault: @FlowToken.Vault)  {
             if !self.leases.containsKey(name) {
                 panic("Invalid name=".concat(name))
             }
-
-            let network=FIND.account.storage.borrow<&Network>(from: FIND.NetworkStoragePath)!
-
-            if !network.publicEnabled {
-                panic("Public registration is not enabled yet")
-            }
-
-            if network.addonPrices[addon] == nil {
-                panic("This addon is not available. addon : ".concat(addon))
-            }
-            let addonPrice = network.addonPrices[addon]!
+            let cost=FIND.calculateAddonCostInFlow(addon)
 
             let lease = self.borrowAuth(name)
 
@@ -662,8 +576,8 @@ access(all) contract FIND {
                 panic("You already have this addon : ".concat(addon))
             }
 
-            if vault.balance != addonPrice {
-                panic("Expect ".concat(addonPrice.toString()).concat(" FUSD for ").concat(addon).concat(" addon"))
+            if vault.balance != cost {
+                panic("Expect ".concat(cost.toString()).concat(" FLOW for ").concat(addon).concat(" addon"))
             }
 
             lease.addAddon(addon)
@@ -785,18 +699,6 @@ access(all) contract FIND {
             var auctionEnds: UFix64?= nil
             var latestBidBy: Address?=nil
 
-            if self.auctions.containsKey(name) {
-                let auction = self.borrowAuction(name)
-                auctionEnds= auction.endsAt
-                latestBid= auction.getBalance()
-                latestBidBy= auction.latestBidCallback.address
-            } else {
-                if let callback = token.offerCallback {
-                    latestBid= callback.borrow()!.getBalance(name)
-                    latestBidBy=callback.address
-                }
-            }
-
             return LeaseInformation(name:  name, status: token.getLeaseStatus(), validUntil: token.getLeaseExpireTime(), lockedUntil: token.getLeaseLockedUntil(), latestBid: latestBid, auctionEnds: auctionEnds, salePrice: token.salePrice, latestBidBy: latestBidBy, auctionStartPrice: token.auctionStartPrice, auctionReservePrice: token.auctionReservePrice, extensionOnLateBid: token.auctionExtensionOnLateBid, address: token.owner!.address, addons: token.getAddon())
         }
 
@@ -822,461 +724,6 @@ access(all) contract FIND {
             return info
         }
 
-        //call this to start an auction for this lease
-        access(LeaseOwner) fun startAuction(_ name: String) {
-            let timestamp=Clock.time()
-            let lease = self.borrowAuth(name)
-
-            if !lease.validate() {
-                panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
-            }
-
-            let duration=lease.auctionDuration
-            let extensionOnLateBid=lease.auctionExtensionOnLateBid
-            if lease.offerCallback == nil {
-                panic("cannot start an auction on a name without a bid, set salePrice")
-            }
-
-            let callback=lease.offerCallback!
-            let offer=callback.borrow()!
-            offer.setBidType(name: name, type: "auction")
-
-            let bidder= callback.address
-            let bidderProfile= getAccount(bidder).capabilities.borrow<&{Profile.Public}>(Profile.publicPath) ?? panic("Bidder unlinked the profile capability. bidder address : ".concat(bidder.toString()))
-            let bidderName= bidderProfile.getName()
-            let bidderAvatar= bidderProfile.getAvatar()
-            let owner=lease.owner!.address
-            let ownerName=lease.name
-
-            let endsAt=timestamp + duration
-            emit EnglishAuction(name: name, uuid:lease.uuid, seller: owner, sellerName:FIND.reverseLookup(owner), amount: offer.getBalance(name), auctionReservePrice: lease.auctionReservePrice!, status: "active_ongoing", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, buyerAvatar:bidderAvatar, endsAt: endsAt, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
-
-            let oldAuction <- self.auctions[name] <- create Auction(endsAt:endsAt, startedAt: timestamp, extendOnLateBid: extensionOnLateBid, latestBidCallback: callback, name: name)
-            lease.setCallback(nil)
-
-            if lease.offerCallback == nil {
-                Debug.log("offer callback is empty")
-            }else {
-                Debug.log("offer callback is NOT empty")
-            }
-
-            destroy oldAuction
-        }
-
-        access(contract) fun cancelUserBid(_ name: String) {
-
-            if !self.leases.containsKey(name) {
-                panic("Invalid name=".concat(name))
-            }
-
-            if self.auctions.containsKey(name) {
-                panic("Cannot cancel a bid that is in an auction=".concat(name))
-            }
-
-            let lease= self.borrowAuth(name)
-
-            if let callback = lease.offerCallback {
-
-                let bidder= callback.address
-                let bidderProfile= getAccount(bidder).capabilities.borrow<&{Profile.Public}>(Profile.publicPath)
-                let bidderName=bidderProfile?.getName()
-                let bidderAvatar=bidderProfile?.getAvatar()
-                let owner=lease.owner!.address
-                let ownerName=lease.name
-                var amount : UFix64 = 0.0
-                if callback.check() {
-                    amount = callback.borrow()!.getBalance(name)
-                }
-                emit DirectOffer(name: name, uuid: lease.uuid, seller: owner, sellerName: ownerName, amount: amount, status: "cancel_rejected", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, buyerAvatar: bidderAvatar, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
-            }
-
-            lease.setCallback(nil)
-        }
-
-        access(contract) fun increaseBid(_ name: String, balance: UFix64) {
-            if !self.leases.containsKey(name) {
-                panic("Invalid name=".concat(name))
-            }
-
-            let lease = self.borrowAuth(name)
-
-            if !lease.validate() {
-                panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
-            }
-
-            let timestamp=Clock.time()
-
-            if balance < lease.auctionMinBidIncrement {
-                panic("Increment should be greater than ".concat(lease.auctionMinBidIncrement.toString()))
-            }
-            if self.auctions.containsKey(name) {
-                let auction = self.borrowAuction(name)
-                if auction.endsAt < timestamp {
-                    panic("Auction has ended")
-                }
-                auction.addBid(callback:auction.latestBidCallback, timestamp:timestamp, lease: lease)
-                return
-            }
-
-
-            let bidder= lease.offerCallback!.address
-            let bidderProfile= getAccount(bidder).capabilities.borrow<&{Profile.Public}>(Profile.publicPath) ?? panic("Create a profile before you make a bid")
-            let bidderName= bidderProfile.getName()
-            let bidderAvatar= bidderProfile.getAvatar()
-            let owner=lease.owner!.address
-            let ownerName=lease.name
-
-            let balance=lease.offerCallback!.borrow()?.getBalance(name) ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(bidder.toString()))
-            Debug.log("Offer is at ".concat(balance.toString()))
-            if lease.salePrice == nil  && lease.auctionStartPrice == nil{
-
-                emit DirectOffer(name: name, uuid: lease.uuid, seller: owner, sellerName: ownerName, amount: balance, status: "active_offered", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, buyerAvatar: bidderAvatar, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
-                return
-            }
-
-
-            if lease.salePrice != nil && lease.salePrice != nil && balance >= lease.salePrice! {
-                self.fulfill(name)
-            } else if lease.auctionStartPrice != nil && balance >= lease.auctionStartPrice! {
-                self.startAuction(name)
-            } else {
-                emit DirectOffer(name: name, uuid: lease.uuid, seller: owner, sellerName: ownerName, amount: balance, status: "active_offered", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName,  buyerAvatar: bidderAvatar, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
-            }
-
-        }
-
-        access(contract) fun registerBid(name: String, callback: Capability<&BidCollection>) {
-
-            if !self.leases.containsKey(name) {
-                panic("Invalid name=".concat(name))
-            }
-
-            let timestamp=Clock.time()
-            let lease = self.borrowAuth(name)
-
-            if !lease.validate() {
-                panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
-            }
-
-            if self.auctions.containsKey(name) {
-                let auction = self.borrowAuction(name)
-
-                if auction.latestBidCallback.address == callback.address {
-                    panic("You already have the latest bid on this item, use the incraseBid transaction")
-                }
-                if auction.endsAt < timestamp {
-                    panic("Auction has ended")
-                }
-                auction.addBid(callback:callback, timestamp:timestamp, lease: lease)
-                return
-            }
-
-            let balance=callback.borrow()?.getBalance(name) ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(callback.address.toString()))
-            var previousBuyer:Address?=nil
-            if let cb= lease.offerCallback {
-                if cb.address == callback.address {
-                    panic("You already have the latest bid on this item, use the incraseBid transaction")
-                }
-                let cbRef = cb.borrow() ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(cb.address.toString()))
-                let currentBalance=cbRef.getBalance(name)
-
-                Debug.log("currentBalance=".concat(currentBalance.toString()).concat(" new bid is at=").concat(balance.toString()))
-                if currentBalance >= balance {
-                    panic("There is already a higher bid on this lease. Current bid is : ".concat(currentBalance.toString()).concat(" New bid is at : ").concat(balance.toString()))
-                }
-                previousBuyer=cb.address
-                cbRef.cancel(name)
-            }
-
-            lease.setCallback(callback)
-
-
-
-            let bidder= callback.address
-            let profile=getAccount(bidder).capabilities.borrow<&{Profile.Public}>(Profile.publicPath)
-            if profile == nil {
-                panic("Create a profile before you make a bid")
-            }
-            let bidderName= profile!.getName()
-            let bidderAvatar= profile!.getAvatar()
-            let owner=lease.owner!.address
-            let ownerName=lease.name
-
-            var previousBuyerName:String?=nil
-            if let pb=previousBuyer {
-                previousBuyerName=FIND.reverseLookup(pb)
-            }
-            Debug.log("Balance of lease is at ".concat(balance.toString()))
-            if lease.salePrice == nil && lease.auctionStartPrice == nil {
-                Debug.log("Sale price not set")
-                emit DirectOffer(name: name, uuid:lease.uuid, seller: owner, sellerName: ownerName, amount: balance, status: "active_offered", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName,  buyerAvatar: bidderAvatar, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:previousBuyer, previousBuyerName:previousBuyerName)
-                return
-            }
-
-            if lease.salePrice != nil && balance >= lease.salePrice! {
-                Debug.log("Direct sale!")
-                self.fulfill(name)
-            }	 else if lease.auctionStartPrice != nil && balance >= lease.auctionStartPrice! {
-                self.startAuction(name)
-            } else {
-                emit DirectOffer(name: name, uuid: lease.uuid, seller: owner, sellerName: ownerName, amount: balance, status: "active_offered", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName,  buyerAvatar: bidderAvatar, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:previousBuyer, previousBuyerName:previousBuyerName)
-            }
-        }
-
-        //cancel will cancel and auction or reject a bid if no auction has started
-        access(AuctionOwner) fun cancel(_ name: String) {
-
-            if !self.leases.containsKey(name) {
-                panic("Invalid name=".concat(name))
-            }
-
-            let lease = self.borrowAuth(name)
-            //if we have a callback there is no auction and it is a blind bid
-            if let cb= lease.offerCallback {
-
-                let bidder= cb.address
-                let bidderProfile= getAccount(bidder).capabilities.borrow<&{Profile.Public}>(Profile.publicPath)
-                let bidderName= bidderProfile?.getName()
-                let bidderAvatar= bidderProfile?.getAvatar()
-                let owner=lease.owner!.address
-                let ownerName=lease.name
-                Debug.log("we have a blind bid so we cancel that")
-                let cbRef = cb.borrow() ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(cb.address.toString()))
-                emit DirectOffer(name: name, uuid:lease.uuid, seller: owner, sellerName: ownerName, amount: cbRef.getBalance(name), status: "rejected", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, buyerAvatar: bidderAvatar, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
-
-                cbRef.cancel(name)
-                lease.setCallback(nil)
-            }
-
-            if self.auctions.containsKey(name) {
-
-                let auction=self.borrowAuction(name)
-                let balance=auction.getBalance()
-
-                let auctionEnded= auction.endsAt <= Clock.time()
-                var hasMetReservePrice= false
-                if lease.auctionReservePrice != nil && lease.auctionReservePrice! <= balance {
-                    hasMetReservePrice=true
-                }
-                let price= lease.auctionReservePrice?.toString() ?? ""
-                //the auction has ended
-                Debug.log("Latest bid is ".concat(balance.toString()).concat(" reserve price is ").concat(price))
-                if auctionEnded && hasMetReservePrice {
-                    //&& lease.auctionReservePrice != nil && lease.auctionReservePrice! < balance {
-                    panic("Cannot cancel finished auction, fulfill it instead")
-                }
-
-                let bidder= auction.latestBidCallback.address
-                let bidderProfile= getAccount(bidder).capabilities.borrow<&{Profile.Public}>(Profile.publicPath)
-                let bidderName= bidderProfile?.getName()
-                let bidderAvatar= bidderProfile?.getAvatar()
-                let owner=lease.owner!.address
-                let ownerName=lease.name
-
-
-                let leaseInfo = self.getLease(name)!
-
-                if auctionEnded {
-                    emit EnglishAuction(name: name, uuid:lease.uuid, seller: owner, sellerName:ownerName, amount: balance, auctionReservePrice: lease.auctionReservePrice!, status: "cancel_reserved_not_met", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, buyerAvatar: bidderAvatar, endsAt: auction.endsAt, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
-                } else {
-                    emit EnglishAuction(name: name, uuid:lease.uuid, seller: owner, sellerName:ownerName, amount: balance, auctionReservePrice: lease.auctionReservePrice!, status: "cancel_listing", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, buyerAvatar: bidderAvatar, endsAt: auction.endsAt, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
-                }
-                let cbRef = auction.latestBidCallback.borrow() ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(bidder.toString()))
-                cbRef.cancel(name)
-                destroy <- self.auctions.remove(key: name)!
-                return
-            }
-            let owner=lease.owner!.address
-            let ownerName=lease.name
-            emit EnglishAuction(name: name, uuid:lease.uuid, seller: owner, sellerName:ownerName, amount: 0.0, auctionReservePrice: lease.auctionReservePrice!, status: "cancel_listing", vaultType:Type<@FUSD.Vault>().identifier, buyer:nil, buyerName:nil, buyerAvatar: nil, endsAt: nil, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
-
-        }
-
-        /// fulfillAuction wraps the fulfill method and ensure that only a finished auction can be fulfilled by anybody
-        access(all) fun fulfillAuction(_ name: String) {
-            if !self.leases.containsKey(name) {
-                panic("Invalid name=".concat(name))
-            }
-
-            if !self.auctions.containsKey(name) {
-                panic("Cannot fulfill sale that is not an auction=".concat(name))
-            }
-
-            return self.fulfill(name)
-        }
-
-        access(LeaseOwner) fun fulfill(_ name: String) {
-            if !self.leases.containsKey(name) {
-                panic( "Invalid name=".concat(name))
-            }
-
-            let lease = self.borrowAuth(name)
-
-            if !lease.validate() {
-                panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
-            }
-
-            if lease.getLeaseStatus() == LeaseStatus.FREE {
-                panic("cannot fulfill sale name is now free")
-            }
-
-            let oldProfile=lease.getProfile()!
-
-            if let cb= lease.offerCallback {
-                let salePrice=lease.salePrice
-                let uuid=lease.uuid
-                let offer= cb.borrow()!
-                let newProfile= getAccount(cb.address).capabilities.get<&{Profile.Public}>(Profile.publicPath)
-                let avatar= newProfile.borrow()?.getAvatar() ?? panic("Create a profile before you fulfill a bid")
-                let soldFor=offer.getBalance(name)
-
-                //move the token to the new profile
-                lease.move(profile: newProfile)
-
-                if lease.salePrice == nil || lease.salePrice != soldFor {
-                    emit DirectOffer(name: name, uuid: lease.uuid, seller: lease.owner!.address, sellerName: FIND.reverseLookup(lease.owner!.address), amount: soldFor, status: "sold", vaultType:Type<@FUSD.Vault>().identifier, buyer:newProfile.address, buyerName:FIND.reverseLookup(newProfile.address), buyerAvatar: avatar, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
-                } else {
-                    emit Sale(name: name, uuid: lease.uuid, seller: lease.owner!.address, sellerName: FIND.reverseLookup(lease.owner!.address), amount: soldFor, status: "sold", vaultType:Type<@FUSD.Vault>().identifier, buyer:newProfile.address, buyerName:FIND.reverseLookup(newProfile.address), buyerAvatar: avatar, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil())
-                }
-
-                let token <- self.leases.remove(key: name)!
-                let vault <- offer.fulfillLease(<- token)
-                if self.networkCut != 0.0 {
-                    let cutAmount= soldFor * self.networkCut
-                    let networkWallet = self.networkWallet.borrow() ?? panic("The network wallet is not set up properly. Wallet address : ".concat(self.networkWallet.address.toString()))
-                    networkWallet.deposit(from: <- vault.withdraw(amount: cutAmount))
-                    if salePrice == nil || salePrice != soldFor {
-                        emit RoyaltyPaid(name: name, uuid: uuid, address: self.networkWallet.address, findName:FIND.reverseLookup(self.networkWallet.address), royaltyName:"Network", amount: cutAmount, vaultType:vault.getType().identifier, saleType: "DirectOffer")
-                    } else {
-                        emit RoyaltyPaid(name: name, uuid: uuid, address: self.networkWallet.address, findName:FIND.reverseLookup(self.networkWallet.address), royaltyName:"Network", amount: cutAmount, vaultType:vault.getType().identifier, saleType: "Sale")
-                    }
-                }
-
-                //why not use Profile to send money :P
-                oldProfile.deposit(from: <- vault)
-                return
-            }
-
-            if !self.auctions.containsKey(name) {
-                panic("Name is not for auction name=".concat(name))
-            }
-
-            if self.borrowAuction(name).endsAt > Clock.time() {
-                panic("Auction has not ended yet")
-            }
-
-
-            let auctionRef=self.borrowAuction(name)
-            let soldFor=auctionRef.getBalance()
-            let reservePrice=lease.auctionReservePrice ?? 0.0
-
-            if reservePrice > soldFor {
-                self.cancel(name)
-                return
-            }
-            let newProfile= getAccount(auctionRef.latestBidCallback.address).capabilities.get<&{Profile.Public}>(Profile.publicPath)
-            let avatar= newProfile.borrow()?.getAvatar() ?? panic("Create a profile before you fulfill a bid")
-
-
-
-            let uuid=lease.uuid
-            //move the token to the new profile
-            lease.move(profile: newProfile)
-            emit EnglishAuction(name: name, uuid:lease.uuid, seller: lease.owner!.address, sellerName:FIND.reverseLookup(lease.owner!.address), amount: soldFor, auctionReservePrice: lease.auctionReservePrice!, status: "sold", vaultType:Type<@FUSD.Vault>().identifier, buyer:newProfile.address, buyerName:FIND.reverseLookup(newProfile.address), buyerAvatar: avatar, endsAt: self.borrowAuction(name).endsAt, validUntil: lease.getLeaseExpireTime(), lockedUntil: lease.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
-            let auction <- self.auctions.remove(key: name)!
-
-            let token <- self.leases.remove(key: name)!
-
-            let cbRef = auction.latestBidCallback.borrow() ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(auction.latestBidCallback.address.toString()))
-
-            let vault <- cbRef.fulfillLease(<- token)
-            if self.networkCut != 0.0 {
-                let cutAmount= soldFor * self.networkCut
-                let networkWallet = self.networkWallet.borrow() ?? panic("The network wallet is not set up properly. Wallet address : ".concat(self.networkWallet.address.toString()))
-                networkWallet.deposit(from: <- vault.withdraw(amount: cutAmount))
-                emit RoyaltyPaid(name: name, uuid: uuid, address: self.networkWallet.address, findName:FIND.reverseLookup(self.networkWallet.address), royaltyName:"Network", amount: cutAmount, vaultType:vault.getType().identifier, saleType: "EnglishAuction")
-            }
-
-            //why not use FIND to send money :P
-            oldProfile.deposit(from: <- vault)
-            destroy auction
-
-        }
-
-        access(LeaseOwner) fun listForAuction(name :String, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64) {
-
-            if !self.leases.containsKey(name) {
-                panic("Cannot list name for sale that is not registered to you name=".concat(name))
-            }
-
-            let tokenRef = self.borrowAuth(name)
-
-            if !tokenRef.validate() {
-                panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
-            }
-
-            //if we have a callback there is no auction and it is a blind bid
-            if let cb= tokenRef.offerCallback {
-                let bidder= cb.address
-                let bidderProfile= getAccount(bidder).capabilities.get<&{Profile.Public}>(Profile.publicPath).borrow()
-                let bidderName= bidderProfile?.getName()
-                let bidderAvatar= bidderProfile?.getAvatar()
-                let owner=tokenRef.owner!.address
-                let ownerName=tokenRef.name
-                Debug.log("we have a blind bid so we cancel that")
-                let cbRef = cb.borrow() ?? panic("Bidder unlinked the bid collection capability. bidder address : ".concat(bidder.toString()))
-                emit DirectOffer(name: name, uuid:tokenRef.uuid, seller: owner, sellerName: ownerName, amount: cbRef.getBalance(name), status: "rejected", vaultType:Type<@FUSD.Vault>().identifier, buyer:bidder, buyerName:bidderName, buyerAvatar: bidderAvatar, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
-                cbRef.cancel(name)
-                tokenRef.setCallback(nil)
-            }
-
-            tokenRef.setStartAuctionPrice(auctionStartPrice)
-            tokenRef.setReservePrice(auctionReservePrice)
-            tokenRef.setAuctionDuration(auctionDuration)
-            tokenRef.setExtentionOnLateBid(auctionExtensionOnLateBid)
-            emit EnglishAuction(name: name, uuid: tokenRef.uuid, seller: self.owner!.address, sellerName:FIND.reverseLookup(self.owner!.address), amount: tokenRef.auctionStartPrice!, auctionReservePrice: tokenRef.auctionReservePrice!, status: "active_listed", vaultType:Type<@FUSD.Vault>().identifier, buyer:nil, buyerName:nil, buyerAvatar: nil, endsAt: nil, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil(), previousBuyer:nil, previousBuyerName:nil)
-        }
-
-        access(LeaseOwner) fun listForSale(name :String, directSellPrice:UFix64) {
-            if !self.leases.containsKey(name) {
-                panic("Cannot list name for sale that is not registered to you name=".concat(name))
-            }
-
-            let tokenRef = self.borrowAuth(name)
-
-            if !tokenRef.validate() {
-                panic("This is not a valid lease. Lease already expires and some other user registered it. Lease : ".concat(name))
-            }
-
-            tokenRef.setSalePrice(directSellPrice)
-            emit Sale(name: name, uuid: tokenRef.uuid, seller: self.owner!.address, sellerName: FIND.reverseLookup(self.owner!.address), amount: tokenRef.salePrice!, status: "active_listed", vaultType:Type<@FUSD.Vault>().identifier, buyer:nil, buyerName:nil, buyerAvatar: nil, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil())
-        }
-
-
-        //keep this
-        access(all) fun delistAuction(_ name: String) {
-
-            if !self.leases.containsKey(name) {
-                panic("Cannot delist name for sale that is not registered to you name=".concat(name))
-            }
-
-            let tokenRef = self.borrowAuth(name)
-
-            tokenRef.setStartAuctionPrice(nil)
-            tokenRef.setReservePrice(nil)
-        }
-
-
-        //keep this
-        access(all) fun delistSale(_ name: String) {
-            if !self.leases.containsKey(name) {
-                panic("Cannot list name for sale that is not registered to you name=".concat(name))
-            }
-
-            let tokenRef = self.borrowAuth(name)
-            emit Sale(name: name, uuid:tokenRef.uuid, seller: self.owner!.address, sellerName: FIND.reverseLookup(self.owner!.address), amount: tokenRef.salePrice!, status: "cancel", vaultType:Type<@FUSD.Vault>().identifier, buyer:nil, buyerName:nil, buyerAvatar: nil, validUntil: tokenRef.getLeaseExpireTime(), lockedUntil: tokenRef.getLeaseLockedUntil())
-            tokenRef.setSalePrice(nil)
-        }
 
         access(LeaseOwner) fun move(name: String, profile: Capability<&{Profile.Public}>, to: Capability<&LeaseCollection>) {
 
@@ -1342,23 +789,8 @@ access(all) contract FIND {
         }
 
 
-        // //TODO test
-        // access(LeaseOwner) fun registerUSDC(name: String, vault: @FiatToken.Vault){
-        //     let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)
-        //     let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-
-        //     let network=FIND.account.storage.borrow<&Network>(from: FIND.NetworkStoragePath)!
-
-        //     if !network.publicEnabled {
-        //         panic("Public registration is not enabled yet")
-        //     }
-
-        //     network.registerUSDC(name:name, vault: <- vault, profile: profileCap, leases: leases)
-        // }
-
-
         //This has to be here since you can only get this from a auth account and thus we ensure that you cannot use wrong paths
-        access(LeaseOwner) fun register(name: String, vault: @FUSD.Vault){
+        access(LeaseOwner) fun register(name: String, vault: @FlowToken.Vault){
             let profileCap = self.owner!.capabilities.get<&{Profile.Public}>(Profile.publicPath)
             let leases= self.owner!.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
 
@@ -1514,14 +946,11 @@ access(all) contract FIND {
             self.lengthPrices=additionalPrices
         }
 
-
-        //TODO: add support for Fiat
-        //this method is only called from a lease, and only the owner has that capability
-        access(contract) fun renew(name: String, vault: @FUSD.Vault) {
+        access(contract) fun renew(name: String, vault: @FlowToken.Vault) {
             if let lease= self.profiles[name] {
-                let cost= self.calculateCost(name)
+                let cost= FIND.calculateCostInFlow(name) 
                 if vault.balance != cost {
-                    panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
+                    panic("Vault did not contain ".concat(cost.toString()).concat(" amount of Flow"))
                 }
                 let walletRef = self.wallet.borrow() ?? panic("The receiver capability is invalid. Wallet address : ".concat(self.wallet.address.toString()))
                 walletRef.deposit(from: <- vault)
@@ -1592,39 +1021,8 @@ access(all) contract FIND {
             panic("Could not find profile with name=".concat(name))
         }
 
-        //TODO test
-        // access(all) fun registerUSDC(name: String, vault: @FiatToken.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
-
-        //     if name.length < 3 {
-        //         panic( "A FIND name has to be minimum 3 letters long")
-        //     }
-
-        //     let nameStatus=self.readStatus(name)
-        //     if nameStatus.status == LeaseStatus.TAKEN {
-        //         panic("Name already registered")
-        //     }
-
-        //     //if we have a locked profile that is not owned by the same identity then panic
-        //     if nameStatus.status == LeaseStatus.LOCKED {
-        //         panic("Name is locked")
-        //     }
-
-        //     let cost= self.calculateCost(name)
-        //     if vault.balance != cost {
-        //         panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
-        //     }
-
-        //     let address=self.wallet.address
-        //     let account=getAccount(address)
-        //     let usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
-        //     let usdcReceiver = usdcCap.borrow() ?? panic("cound not find usdc vault receiver for address".concat(self.wallet.address.toString()))
-        //     usdcReceiver.deposit(from: <- vault)
-
-        //     self.internal_register(name: name, profile: profile, leases: leases)
-        // }
-
         //everybody can call register, normally done through the convenience method in the contract
-        access(all) fun register(name: String, vault: @FUSD.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
+        access(all) fun register(name: String, vault: @FlowToken.Vault, profile: Capability<&{Profile.Public}>,  leases: Capability<&{LeaseCollectionPublic}>) {
 
             if name.length < 3 {
                 panic( "A FIND name has to be minimum 3 letters long")
@@ -1640,9 +1038,9 @@ access(all) contract FIND {
                 panic("Name is locked")
             }
 
-            let cost= self.calculateCost(name)
+            let cost= FIND.calculateCostInFlow(name)
             if vault.balance != cost {
-                panic("Vault did not contain ".concat(cost.toString()).concat(" amount of FUSD"))
+                panic("Vault did not contain ".concat(cost.toString()).concat(" amount of Flow"))
             }
             self.wallet.borrow()!.deposit(from: <- vault)
 
@@ -1788,192 +1186,6 @@ access(all) contract FIND {
     }
 
 
-    /*
-    ==========================================================================
-    Bids are a collection/resource for storing the bids bidder made on leases
-    ==========================================================================
-    */
-
-    //Struct that is used to return information about bids
-    access(all) struct BidInfo{
-        access(all) let name: String
-        access(all) let type: String
-        access(all) let amount: UFix64
-        access(all) let timestamp: UFix64
-        access(all) let lease: LeaseInformation?
-
-        init(name: String, amount: UFix64, timestamp: UFix64, type: String, lease: LeaseInformation?) {
-            self.name=name
-            self.amount=amount
-            self.timestamp=timestamp
-            self.type=type
-            self.lease=lease
-        }
-    }
-
-    access(all) resource Bid {
-        access(contract) let from: Capability<&LeaseCollection>
-        access(contract) let name: String
-        access(contract) var type: String
-        access(contract) let vault: @FUSD.Vault
-        access(contract) var bidAt: UFix64
-
-        init(from: Capability<&LeaseCollection>, name: String, vault: @FUSD.Vault){
-            self.vault <- vault
-            self.name=name
-            self.from=from
-            self.type="blind"
-            self.bidAt=Clock.time()
-        }
-
-        access(contract) fun setType(_ type: String) {
-            self.type=type
-        }
-        access(contract) fun setBidAt(_ time: UFix64) {
-            self.bidAt=time
-        }
-
-    }
-
-    access(all) resource interface BidCollectionPublic {
-        access(all) fun getBids() : [BidInfo]
-        access(all) fun getBalance(_ name: String) : UFix64
-        access(contract) fun fulfillLease(_ token: @FIND.Lease) : @{FungibleToken.Vault}
-        access(contract) fun cancel(_ name: String)
-        access(contract) fun setBidType(name: String, type: String)
-    }
-
-    //A collection stored for bidders/buyers
-    access(all) resource BidCollection: BidCollectionPublic {
-
-        access(contract) var bids : @{String: Bid}
-        access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
-        access(contract) let leases: Capability<&LeaseCollection>
-
-        init(receiver: Capability<&{FungibleToken.Receiver}>, leases: Capability<&LeaseCollection>) {
-            self.bids <- {}
-            self.receiver=receiver
-            self.leases=leases
-        }
-
-        //called from lease when auction is ended
-        //if purchase if fulfilled then we deposit money back into vault we get passed along and token into your own leases collection
-        access(contract) fun fulfillLease(_ token: @FIND.Lease) : @{FungibleToken.Vault}{
-            if !self.leases.check() {
-                panic("The lease collection capability is invalid.")
-            }
-            let bid <- self.bids.remove(key: token.name) ?? panic("missing bid")
-
-            let vaultRef = &bid.vault as auth (FungibleToken.Withdraw) &{FungibleToken.Vault}
-            token.setSalePrice(nil)
-            token.setCallback(nil)
-            token.setReservePrice(nil)
-            token.setStartAuctionPrice(nil)
-            self.leases.borrow()!.deposit(token: <- token)
-            let vault  <- vaultRef.withdraw(amount: vaultRef.balance)
-            destroy bid
-            return <- vault
-        }
-
-        //called from lease when things are canceled
-        //if the bid is canceled from seller then we move the vault tokens back into your vault
-        access(contract) fun cancel(_ name: String) {
-            if !self.receiver.check() {
-                panic("This user does not have receiving vault set up. User: ".concat(self.owner!.address.toString()))
-            }
-            let bid <- self.bids.remove(key: name) ?? panic("missing bid")
-            let vaultRef = &bid.vault as auth (FungibleToken.Withdraw) &{FungibleToken.Vault}
-            self.receiver.borrow()!.deposit(from: <- vaultRef.withdraw(amount: vaultRef.balance))
-            destroy bid
-        }
-
-        access(all) fun getBids() : [BidInfo] {
-            var bidInfo: [BidInfo] = []
-            for id in self.bids.keys {
-                let bid = self.borrowBid(id)
-                let leaseCollection= bid.from.borrow() ?? panic("Could not borrow lease bid from owner of name=".concat(bid.name))
-                bidInfo.append(BidInfo(name: bid.name, amount: bid.vault.balance, timestamp: bid.bidAt, type: bid.type, lease: leaseCollection.getLease(bid.name)))
-            }
-            return bidInfo
-        }
-
-        //make a bid on a name
-        access(all) fun bid(name: String, vault: @FUSD.Vault) {
-            let nameStatus=FIND.status(name)
-            if nameStatus.status ==  LeaseStatus.FREE {
-                panic("cannot bid on name that is free")
-            }
-
-            if self.owner!.address == nameStatus.owner {
-                panic("cannot bid on your own name")
-            }
-
-            let fromCap=getAccount(nameStatus.owner!).capabilities.get<&LeaseCollection>(FIND.LeasePublicPath)
-
-            let bid <- create Bid(from: fromCap, name:name, vault: <- vault)
-            let leaseCollection= fromCap.borrow() ?? panic("Could not borrow lease bid from owner of name=".concat(name))
-
-
-            let callbackCapability =self.owner!.capabilities.get<&BidCollection>(FIND.BidPublicPath)
-            let oldToken <- self.bids[bid.name] <- bid
-            //send info to leaseCollection
-            destroy oldToken
-            leaseCollection.registerBid(name: name, callback: callbackCapability)
-        }
-
-        //increase a bid, will not work if the auction has already started
-        access(all) fun increaseBid(name: String, vault: @{FungibleToken.Vault}) {
-            let nameStatus=FIND.status(name)
-            if nameStatus.status ==  LeaseStatus.FREE {
-                panic("cannot increaseBid on name that is free")
-            }
-            let seller=getAccount(nameStatus.owner!).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-            let balance = vault.balance
-            let bid =self.borrowBid(name)
-            bid.setBidAt(Clock.time())
-            bid.vault.deposit(from: <- vault)
-
-            let from=getAccount(nameStatus.owner!).capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow()
-            if from == nil {
-                panic("The seller unlinked the lease collection capability. seller address : ".concat(nameStatus.owner!.toString()))
-            }
-            from!.increaseBid(name, balance: balance)
-        }
-
-        //cancel a bid, will panic if called after auction has started
-        access(all) fun cancelBid(_ name: String) {
-
-            let nameStatus=FIND.status(name)
-            if nameStatus.status == LeaseStatus.FREE {
-                self.cancel(name)
-                return
-            }
-            let from=getAccount(nameStatus.owner!).capabilities.borrow<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-            if from == nil {
-                panic("The seller unlinked the lease collection capability. seller address : ".concat(nameStatus.owner!.toString()))
-            }
-            from!.cancelUserBid(name)
-            self.cancel(name)
-        }
-
-        access(all) fun borrowBid(_ name: String): &Bid {
-            return (&self.bids[name])!
-        }
-
-        access(contract) fun setBidType(name: String, type: String) {
-            let bid= self.borrowBid(name)
-            bid.setType(type)
-        }
-
-        access(all) fun getBalance(_ name: String) : UFix64 {
-            let bid= self.borrowBid(name)
-            return bid.vault.balance
-        }
-    }
-
-    access(all) fun createEmptyBidCollection(receiver: Capability<&{FungibleToken.Receiver}>, leases: Capability<&LeaseCollection>) : @BidCollection {
-        return <- create BidCollection(receiver: receiver,  leases: leases)
-    }
 
     access(all) fun validateFindName(_ value: String) : Bool {
         if value.length < 3 || value.length > 16 {
@@ -2065,6 +1277,22 @@ access(all) contract FIND {
         }
     }
 
+
+    access(account) fun getFlowUSDOracleAddress() : Address {
+        // If only find can sign the trxns and call this function, then we do not have to check the address passed in.
+        // Otherwise, would it be wiser if we hard code the address here?
+        if FIND.account.address == 0x097bafa4e0b48eef {
+            // This is for mainnet
+            return 0xe385412159992e11
+        } else if FIND.account.address == 0x35717efbbce11c74 {
+            // This is for testnet
+            return 0xcbdb5a7b89c3c844
+        } else {
+            //otherwise on emulator we use same account as FIND
+            return self.account.address
+        }
+    }
+
     access(account) fun getMerchantAddress() : Address {
         // If only find can sign the trxns and call this function, then we do not have to check the address passed in.
         // Otherwise, would it be wiser if we hard code the address here?
@@ -2134,4 +1362,125 @@ access(all) contract FIND {
         )
         self.account.storage.save(<-network, to: FIND.NetworkStoragePath)
     }
+
+
+    //////////////////////////////////////////////////////////////////////
+    // DEPRECATED
+    //////////////////////////////////////////////////////////////////////
+
+
+    /* This code is dead, it still needs to be here, but it is not in use anymore */
+    access(all) event Sold()
+    access(all) event SoldAuction()
+    access(all) event DirectOfferRejected()
+    access(all) event DirectOfferCanceled()
+    access(all) event AuctionStarted()
+    access(all) event AuctionCanceled()
+    access(all) event AuctionBid()
+    access(all) event AuctionCanceledReservePrice()
+    access(all) event ForSale() 
+    access(all) event ForAuction()
+
+    // Deprecated in testnet
+    access(all) event TokensRewarded()
+    access(all) event TokensCanNotBeRewarded()
+
+    /// Emitted when a name is explicistly put up for sale
+    access(all) event Sale(name: String, uuid:UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, buyer:Address?, buyerName:String?, buyerAvatar: String?, validUntil: UFix64, lockedUntil: UFix64)
+
+    /// Emitted when an name is put up for on-demand auction
+    access(all) event EnglishAuction(name: String, uuid:UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt: UFix64?, validUntil: UFix64, lockedUntil: UFix64, previousBuyer:Address?, previousBuyerName:String?)
+
+    /// Emitted if a bid occurs at a name that is too low or not for sale
+    access(all) event DirectOffer(name: String, uuid:UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, buyer:Address?, buyerName:String?, buyerAvatar: String?, validUntil: UFix64, lockedUntil: UFix64, previousBuyer:Address?, previousBuyerName:String?)
+
+    access(all) event RoyaltyPaid(name: String, uuid: UInt64, address: Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, saleType: String)
+
+    //store bids made by a bidder to somebody elses leases
+    access(all) let BidPublicPath: PublicPath
+    access(all) let BidStoragePath: StoragePath
+
+    /* An Auction for a lease */
+    access(all) resource Auction {
+        access(contract) var endsAt: UFix64
+        access(contract) var startedAt: UFix64
+        access(contract) let extendOnLateBid: UFix64
+        access(contract) var latestBidCallback: Capability<&BidCollection>
+        access(contract) let name: String
+
+        init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&BidCollection>, name: String) {
+
+            if startedAt >= endsAt {
+                panic("Cannot start before it will end")
+            }
+            if extendOnLateBid == 0.0 {
+                panic("Extends on late bid must be a non zero value")
+            }
+            self.endsAt=endsAt
+            self.startedAt=startedAt
+            self.extendOnLateBid=extendOnLateBid
+            self.latestBidCallback=latestBidCallback
+            self.name=name
+        }
+
+    }
+
+
+    /*
+    ==========================================================================
+    Bids are a collection/resource for storing the bids bidder made on leases
+    ==========================================================================
+    */
+
+    //Struct that is used to return information about bids
+    access(all) struct BidInfo{
+        access(all) let name: String
+        access(all) let type: String
+        access(all) let amount: UFix64
+        access(all) let timestamp: UFix64
+        access(all) let lease: LeaseInformation?
+
+        init(name: String, amount: UFix64, timestamp: UFix64, type: String, lease: LeaseInformation?) {
+            self.name=name
+            self.amount=amount
+            self.timestamp=timestamp
+            self.type=type
+            self.lease=lease
+        }
+    }
+
+    access(all) resource Bid {
+        access(contract) let from: Capability<&LeaseCollection>
+        access(contract) let name: String
+        access(contract) var type: String
+        access(contract) let vault: @FUSD.Vault
+        access(contract) var bidAt: UFix64
+
+        init(from: Capability<&LeaseCollection>, name: String, vault: @FUSD.Vault){
+            self.vault <- vault
+            self.name=name
+            self.from=from
+            self.type="blind"
+            self.bidAt=Clock.time()
+        }
+    }
+
+    access(all) resource interface BidCollectionPublic {
+    }
+
+    //A collection stored for bidders/buyers
+    access(all) resource BidCollection: BidCollectionPublic {
+
+        access(contract) var bids : @{String: Bid}
+        access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
+        access(contract) let leases: Capability<&LeaseCollection>
+
+        init(receiver: Capability<&{FungibleToken.Receiver}>, leases: Capability<&LeaseCollection>) {
+            self.bids <- {}
+            self.receiver=receiver
+            self.leases=leases
+        }
+
+    }
+
 }
