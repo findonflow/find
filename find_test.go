@@ -250,9 +250,9 @@ access(all) fun main(name: String) :  Address? {
 			WithSigner("user2"),
 			WithArg("name", "user2"),
 			WithArg("addon", "forge"),
-			WithArg("amount", 10.0),
+			WithArg("maxAmount", 10.0),
 		).
-			AssertFailure(t, "Expect 50.00000000 FUSD for forge addon")
+			AssertFailure(t, "You have not sent in enough max flow")
 	})
 
 	ot.Run(t, "Should be able to buy addons that are on Network", func(t *testing.T) {
@@ -264,7 +264,7 @@ access(all) fun main(name: String) :  Address? {
 			WithSigner("user1"),
 			WithArg("name", "user1"),
 			WithArg("addon", "foo"),
-			WithArg("amount", 10.0),
+			WithArg("maxAmount", 10.0),
 		).
 			AssertFailure(t, "This addon is not available.")
 	})

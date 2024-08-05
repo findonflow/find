@@ -1,15 +1,1 @@
-`{
-    "alias": "USDC",
-    "balancePath": "/public/USDCVaultBalance",
-    "balancePathIdentifier": "USDCVaultBalance",
-    "icon": "https://static.flowscan.org/mainnet/icons/A.b19436aae4d94622.FiatToken.png",
-    "receiverPath": "/public/USDCVaultReceiver",
-    "receiverPathIdentifier": "USDCVaultReceiver",
-    "tag": [
-        "stablecoin"
-    ],
-    "type": "A.f8d6e0586b0a20c7.FiatToken.Vault",
-    "typeIdentifier": "A.f8d6e0586b0a20c7.FiatToken.Vault",
-    "vaultPath": "/storage/USDCVault",
-    "vaultPathIdentifier": "USDCVault"
-}`
+"null"

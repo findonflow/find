@@ -18,7 +18,7 @@ access(all) struct FINDReport{
     access(all) let privateMode: Bool
     access(all) let activatedAccount: Bool
     access(all) let hasLostAndFoundItem: Bool
-    access(all) let isReadyForNameOffer: bool
+    access(all) let isReadyForNameOffer: Bool
     access(all) let accounts : [AccountInformation]?
     //not sure
     access(all) let readyForWearables : Bool?

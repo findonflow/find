@@ -136,7 +136,7 @@ test_main.NFTDetailsReturnData{
 					"receiver": map[string]interface{}{
 						"address":    "0x192440c99cb17282",
 						"borrowType": "&{A.ee82856bf20e2aa6.FungibleToken.Receiver}",
-						"id":         10,
+						"id":         9,
 					},
 				},
 				map[string]interface{}{
@@ -145,7 +145,7 @@ test_main.NFTDetailsReturnData{
 					"receiver": map[string]interface{}{
 						"address":    "0xf3fcd2c1a78f5eee",
 						"borrowType": "&{A.ee82856bf20e2aa6.FungibleToken.Receiver}",
-						"id":         33,
+						"id":         32,
 					},
 				},
 			}},

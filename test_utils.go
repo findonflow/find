@@ -219,7 +219,7 @@ func (otu *OverflowTestUtils) buyForge(user string) *OverflowTestUtils {
 		WithSigner(user),
 		WithArg("name", user),
 		WithArg("addon", "forge"),
-		WithArg("amount", 50.0),
+		WithArg("maxAmount", 100.0),
 	).
 		AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FIND.AddonActivated", map[string]interface{}{
