@@ -8,14 +8,17 @@ import "FungibleToken"
 import "FindUtils"
 import "Clock"
 import "LostAndFound"
+import "FindMarket"
+import "FindLeaseMarket"
+import "FindLeaseMarketDirectOfferSoft"
 
-access(all) 
-struct FINDReport{
+access(all) struct FINDReport{
     access(all) let isDapper: Bool
     access(all) let profile:Profile.UserReport?
     access(all) let privateMode: Bool
     access(all) let activatedAccount: Bool
     access(all) let hasLostAndFoundItem: Bool
+    access(all) let isReadyForNameOffer: bool
     access(all) let accounts : [AccountInformation]?
     //not sure
     access(all) let readyForWearables : Bool?
@@ -26,17 +29,18 @@ struct FINDReport{
     isDapper: Bool,
     hasLostAndFoundItem: Bool,
     accounts: [AccountInformation]?,
-    readyForWearables: Bool?
-) {
+    readyForWearables: Bool?,
+    isReadyForNameOffer: Bool) {
 
-    self.hasLostAndFoundItem=hasLostAndFoundItem
-    self.profile=profile
-    self.privateMode=privateMode
-    self.activatedAccount=activatedAccount
-    self.isDapper=isDapper
-    self.accounts=accounts
-    self.readyForWearables=readyForWearables
-}
+        self.hasLostAndFoundItem=hasLostAndFoundItem
+        self.profile=profile
+        self.privateMode=privateMode
+        self.activatedAccount=activatedAccount
+        self.isDapper=isDapper
+        self.accounts=accounts
+        self.readyForWearables=readyForWearables
+        self.isReadyForNameOffer=isReadyForNameOffer
+    }
 }
 
 access(all) struct AccountInformation {
@@ -161,6 +165,14 @@ fun main(user: String) : FINDReport? {
             }
         }
 
+        let leaseTenantCapability= FindMarket.getTenantCapability(FindMarket.getFindTenantAddress())!
+        let leaseTenant = leaseTenantCapability.borrow()!
+
+        let leaseDOSSaleItemType= Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>()
+        let leaseDOSPublicPath=leaseTenant.getPublicPath(leaseDOSSaleItemType)
+        let leaseDOSSaleItemCap= account.capabilities.get<&FindLeaseMarketDirectOfferSoft.SaleItemCollection>(leaseDOSPublicPath)
+        let readyForLeaseOffer =leaseDOSSaleItemCap.check()
+
         return FINDReport(
             profile: profileReport,
             privateMode: profile?.isPrivateModeEnabled() ?? false,
@@ -169,6 +181,7 @@ fun main(user: String) : FINDReport? {
             hasLostAndFoundItem: hasLostAndFoundItem,
             accounts: accounts,
             readyForWearables: readyForWearables,
+            isReadyForNameOffer: readyForLeaseOffer
         )
     }
 

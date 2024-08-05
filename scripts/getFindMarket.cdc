@@ -41,20 +41,16 @@ access(all) fun main(user: String) : FINDReport? {
     }
 
 
-    let bidCap=account.capabilities.borrow<&FIND.BidCollection>(FIND.BidPublicPath)
     let leaseCap = account.capabilities.borrow<&FIND.LeaseCollection>(FIND.LeasePublicPath)
-
     let leases = leaseCap?.getLeaseInformation() ?? []
-    let oldLeaseBid = bidCap?.getBids() ?? []
-
     let find= FindMarket.getFindTenantAddress()
     var items : {String : FindMarket.SaleItemCollectionReport} = FindMarket.getSaleItemReport(tenant:find, address: address, getNFTInfo:true)
     var marketBids : {String : FindMarket.BidItemCollectionReport} = FindMarket.getBidsReport(tenant:find, address: address, getNFTInfo:true)
 
     return FINDReport(
-        bids: oldLeaseBid,
+        bids: [],
         leases: leases,
-        leasesBids: oldLeaseBid,
+        leasesBids: [],
         itemsForSale: items,
         marketBids: marketBids,
     )
