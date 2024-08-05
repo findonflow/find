@@ -106,8 +106,7 @@ pub contract FIND {
         panic("Network is not set up")
     }
 
-
-    pub fun validateAddonPrice(addon:String, flow:UFix64) {
+    pub fun calculateAddonCostInFlow(_ addon: String) : UFix64 {
         let network=FIND.account.borrow<&Network>(from: FIND.NetworkStoragePath)!
 
         if !network.publicEnabled {
@@ -117,35 +116,12 @@ pub contract FIND {
         if network.addonPrices[addon] == nil {
             panic("This addon is not available. addon : ".concat(addon))
         }
-
         var addonPrice = network.addonPrices[addon]!
-        let cost = FIND.convertUSDToFLOW(addonPrice)
-        let upper =  cost * 1.10
-        let lower =  cost * 0.90
-
-        if flow < lower {
-            panic("Cost of addon in flow is ".concat(cost.toString()).concat (" you sent in ").concat(flow.toString()).concat( " lower ").concat(lower.toString()).concat(" higher ").concat(upper.toString()))
-        }
-
-        if flow > upper {
-            panic("Cost of addon in flow is ".concat(cost.toString()).concat (" you sent in ").concat(flow.toString()).concat( " lower ").concat(lower.toString()).concat(" higher ").concat(upper.toString()))
-        }
+        let cost= FIND.convertUSDToFLOW(addonPrice)
+        return cost
 
 
-    }
-    pub fun validateCostInFlow(name:String, flow:UFix64) {
-        //TODO slippage is 10% either way here, not sure if that is too much
-        let cost = self.calculateCostInFlow(name)
-        let upper =  cost * 1.10
-        let lower =  cost * 0.90
 
-        if flow < lower {
-            panic("Cost of name in flow is ".concat(cost.toString()).concat (" you sent in ").concat(flow.toString()).concat( " lower ").concat(lower.toString()).concat(" higher ").concat(upper.toString()))
-        }
-
-        if flow > upper {
-            panic("Cost of name in flow is ".concat(cost.toString()).concat (" you sent in ").concat(flow.toString()).concat( " lower ").concat(lower.toString()).concat(" higher ").concat(upper.toString()))
-        }
     }
 
     pub fun calculateCost(_ name:String) : UFix64 {
@@ -621,8 +597,8 @@ pub contract FIND {
                 panic("Invalid name=".concat(name))
             }
 
+            let cost = FIND.calculateAddonCostInFlow(addon)
 
-            FIND.validateAddonPrice(addon: addon, flow:vault.balance)
             let lease = self.borrow(name)
 
             if !lease.validate() {
@@ -631,6 +607,10 @@ pub contract FIND {
 
             if lease.addons.containsKey(addon) {
                 panic("You already have this addon : ".concat(addon))
+            }
+
+            if vault.balance != cost {
+                panic("Expect ".concat(cost.toString()).concat(" FLOW for ").concat(addon).concat(" addon"))
             }
 
             lease.addAddon(addon)
@@ -1002,7 +982,12 @@ pub contract FIND {
         access(contract) fun renew(name: String, vault: @FlowToken.Vault) {
             if let lease= self.profiles[name] {
 
-                FIND.validateCostInFlow(name: name, flow: vault.balance)
+
+
+                let cost= FIND.calculateCostInFlow(name) 
+                if vault.balance != cost {
+                    panic("Vault did not contain ".concat(cost.toString()).concat(" amount of Flow"))
+                }
                 let walletRef = self.wallet.borrow() ?? panic("The receiver capability is invalid. Wallet address : ".concat(self.wallet.address.toString()))
                 walletRef.deposit(from: <- vault)
                 self.internal_renew(name: name)
@@ -1091,7 +1076,11 @@ pub contract FIND {
                 panic("Name is locked")
             }
 
-            FIND.validateCostInFlow(name: name, flow: vault.balance)
+            let cost= FIND.calculateCostInFlow(name) 
+            if vault.balance != cost {
+                panic("Vault did not contain ".concat(cost.toString()).concat(" amount of Flow"))
+            }
+
             self.wallet.borrow()!.deposit(from: <- vault)
 
             self.internal_register(name: name, profile: profile, leases: leases)

@@ -36,8 +36,8 @@ pub contract PublicPriceOracle {
     ///
     pub fun getLatestPrice(oracleAddr: Address): UFix64 {
 
-        //TODO: maybe fix this
-        return 0.42
+        //TODO: the cost is always double the USD. so for 1 usd you pay 2 flow
+        return 0.5
         /*
         let oraclePublicInterface_ReaderRef = getAccount(oracleAddr).getCapability<&{OracleInterface.OraclePublicInterface_Reader}>(OracleConfig.OraclePublicInterface_ReaderPath).borrow()
         ?? panic("Lost oracle public capability at ".concat(oracleAddr.toString()))

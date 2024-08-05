@@ -10,15 +10,13 @@ import (
 /*
 Tests must be in the same folder as flow.json with contracts and transactions/scripts in subdirectories in order for the path resolver to work correctly
 */
-func TestFINDDapper(t *testing.T) {
-
+func TestDapperFIND(t *testing.T) {
 	otu := NewOverflowTest(t).
 		setupFIND().
 		createDapperUser("user1").
 		registerDapperUser("user1")
 
 	t.Run("Should be able to register a name", func(t *testing.T) {
-
 		// Can fix this with pointerWant
 		otu.O.Script("getLeases").AssertWithPointerWant(t, "/0/name",
 			autogold.Want("allLeases", "user1"),
@@ -26,7 +24,6 @@ func TestFINDDapper(t *testing.T) {
 	})
 
 	t.Run("Should get expected output for register script", func(t *testing.T) {
-
 		otu.O.Script("getMetadataForRegisterDapper",
 			WithArg("merchAccount", "find"),
 			WithArg("name", "user2"),
@@ -40,7 +37,6 @@ func TestFINDDapper(t *testing.T) {
 	})
 
 	t.Run("Should get error if you try to register a name that is too short", func(t *testing.T) {
-
 		otu.O.Tx("devRegisterDapper",
 			WithSigner("user1"),
 			WithPayloadSigner("dapper"),
@@ -58,11 +54,9 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("name", "user1"),
 			WithArg("amount", 5.0),
 		).AssertFailure(t, "Name already registered")
-
 	})
 
 	t.Run("Should allow registering a lease after it is freed", func(t *testing.T) {
-
 		otu.expireLease().tickClock(2.0)
 
 		otu.O.Tx(`
@@ -90,12 +84,10 @@ func TestFINDDapper(t *testing.T) {
 	})
 
 	t.Run("Should be able to lookup address", func(t *testing.T) {
-
 		otu.assertLookupAddress("user1", otu.O.Address("user1"))
 	})
 
 	t.Run("Should not be able to lookup lease after expired", func(t *testing.T) {
-
 		otu.expireLease().
 			tickClock(2.0)
 
@@ -103,11 +95,9 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("name", "user1"),
 		).
 			AssertWant(t, autogold.Want("getNameStatus n", nil))
-
 	})
 
 	t.Run("Admin should be able to register without paying FUSD", func(t *testing.T) {
-
 		otu.O.Tx("adminRegisterName",
 			WithSigner("find-admin"),
 			WithArg("names", `["find-admin"]`),
@@ -117,11 +107,9 @@ func TestFINDDapper(t *testing.T) {
 			AssertEvent(t, otu.identifier("FIND", "Register"), map[string]interface{}{
 				"name": "find-admin",
 			})
-
 	})
 
 	t.Run("Should get expected output for renew name script", func(t *testing.T) {
-
 		otu.O.Script("getMetadataForRenewNameDapper",
 			WithArg("merchAccount", "find"),
 			WithArg("name", "user1"),
@@ -141,7 +129,6 @@ func TestFINDDapper(t *testing.T) {
 	otu.tickClock(1.0)
 
 	t.Run("Should be able to send lease to another name", func(t *testing.T) {
-
 		otu.O.Tx("moveNameToDapper",
 			WithSigner("user1"),
 			WithArg("name", "user1"),
@@ -151,22 +138,18 @@ func TestFINDDapper(t *testing.T) {
 			AssertEvent(t, otu.identifier("FIND", "Moved"), map[string]interface{}{
 				"name": "user1",
 			})
-
 	})
 
 	t.Run("Should automatically set Find name to empty if sender have none", func(t *testing.T) {
-
 		otu.O.Script("getName",
 			WithArg("address", "user1"),
 		).
 			AssertWant(t, autogold.Want("getName empty", nil))
 
 		otu.moveNameTo("user2", "user1", "user1")
-
 	})
 
 	t.Run("Should automatically set Find Name if sender have one", func(t *testing.T) {
-
 		otu.registerDapperUserWithName("user1", "name1").
 			moveNameTo("user1", "user2", "user1")
 
@@ -176,13 +159,11 @@ func TestFINDDapper(t *testing.T) {
 			AssertWant(t, autogold.Want("getName empty", "name1"))
 
 		otu.moveNameTo("user2", "user1", "user1")
-
 	})
 
 	otu.setProfile("user2")
 
 	t.Run("Should be able to register related account and remove it", func(t *testing.T) {
-
 		otu.O.Tx("setRelatedAccountDapper",
 			WithSigner("user1"),
 			WithArg("name", "dapper"),
@@ -228,11 +209,9 @@ func TestFINDDapper(t *testing.T) {
 		).
 			AssertWithPointerError(t, "/accounts",
 				"Object has no key 'accounts'")
-
 	})
 
 	t.Run("Should be able to set private mode", func(t *testing.T) {
-
 		otu.O.Tx("setPrivateModeDapper",
 			WithSigner("user1"),
 			WithArg("mode", true),
@@ -256,26 +235,24 @@ func TestFINDDapper(t *testing.T) {
 			AssertWithPointerWant(t, "/privateMode",
 				autogold.Want("privatemode false", false),
 			)
-
 	})
 
 	t.Run("Should be able to getFindStatus of new user", func(t *testing.T) {
-
 		nameAddress := otu.O.Address("user3")
 		otu.O.Script("getFindStatus",
 			WithArg("user", nameAddress),
 		).AssertWant(t,
 			autogold.Want("getFindStatus", map[string]interface{}{
 				"activatedAccount": true, "hasLostAndFoundItem": false,
-				"isDapper":          false,
-				"privateMode":       false,
-				"readyForWearables": false,
+				"isDapper":            false,
+				"isReadyForNameOffer": false,
+				"privateMode":         false,
+				"readyForWearables":   false,
 			}),
 		)
 	})
 
 	t.Run("Should be able to getFindPaths of a user", func(t *testing.T) {
-
 		nameAddress := otu.O.Address("user1")
 		otu.O.Script("getFindPaths",
 			WithArg("user", nameAddress),
@@ -290,7 +267,6 @@ func TestFINDDapper(t *testing.T) {
 	})
 
 	t.Run("If a user holds an invalid find name, get status should not return it", func(t *testing.T) {
-
 		nameAddress := otu.O.Address("user2")
 		otu.moveNameTo("user2", "user1", "user2")
 		otu.O.Script("getFindStatus",
@@ -302,7 +278,6 @@ func TestFINDDapper(t *testing.T) {
 	})
 
 	t.Run("Should be able to create and edit the social link", func(t *testing.T) {
-
 		otu.O.Tx("editProfileDapper",
 			WithSigner("user1"),
 			WithArg("name", "user1"),
@@ -348,11 +323,9 @@ func TestFINDDapper(t *testing.T) {
 			"/profile/links/FindTwitter",
 			"Object has no key 'FindTwitter'",
 		)
-
 	})
 
 	t.Run("Should get expected output for buyAddon script", func(t *testing.T) {
-
 		otu.O.Script("getMetadataForBuyAddonDapper",
 			WithArg("merchAccount", "find"),
 			WithArg("name", "name1"),
@@ -367,7 +340,6 @@ func TestFINDDapper(t *testing.T) {
 	})
 
 	t.Run("Should be able to buy addons that are on Network", func(t *testing.T) {
-
 		user := "user1"
 
 		otu.buyForgeDapper(user)
@@ -393,7 +365,5 @@ func TestFINDDapper(t *testing.T) {
 			WithArg("amount", 10.0),
 		).
 			AssertFailure(t, "This addon is not available.")
-
 	})
-
 }

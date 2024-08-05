@@ -28,15 +28,15 @@ func TestFIND(t *testing.T) {
 		otu.O.Tx("register",
 			WithSigner("user1"),
 			WithArg("name", "usr"),
-			WithArg("amount", 500.0/0.42),
-		).AssertFailure(t, "Amount withdrawn must be less than or equal than the balance of the Vault")
+			WithArg("maxAmount", 1001.0),
+		).Print().AssertFailure(t, "Balance of vault is not high enough")
 	})
 
 	t.Run("Should get error if you try to register a name that is too short", func(t *testing.T) {
 		otu.O.Tx("register",
 			WithSigner("user1"),
 			WithArg("name", "ur"),
-			WithArg("amount", 5.0/0.42),
+			WithArg("maxAmount", 5.0/0.42),
 		).AssertFailure(t, "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
 	})
 
@@ -44,7 +44,7 @@ func TestFIND(t *testing.T) {
 		otu.O.Tx("register",
 			WithSigner("user1"),
 			WithArg("name", "user1"),
-			WithArg("amount", 5.0/0.42),
+			WithArg("maxAmount", 5.0/0.42),
 		).AssertFailure(t, "Name already registered")
 	})
 
@@ -155,17 +155,20 @@ func TestFIND(t *testing.T) {
 				"action":     "add",
 			})
 
-		otu.O.Script("getFindStatus",
+		status := otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
-		).
-			AssertWithPointerWant(t, "/accounts/0",
-				autogold.Want("getFindStatus Dapper", map[string]interface{}{
-					"address": otu.O.Address("user2"),
-					"name":    "dapper",
-					"network": "Flow",
-					"node":    "FindRelatedAccounts",
-					"trusted": false,
-				}))
+		)
+
+		status.Print()
+
+		status.AssertWithPointerWant(t, "/accounts/0",
+			autogold.Want("getFindStatus Dapper", map[string]interface{}{
+				"address": otu.O.Address("user2"),
+				"name":    "dapper",
+				"network": "Flow",
+				"node":    "FindRelatedAccounts",
+				"trusted": false,
+			}))
 
 		otu.O.Tx("removeRelatedAccount",
 			WithSigner("user1"),
@@ -311,7 +314,7 @@ func TestFIND(t *testing.T) {
 			WithSigner("user1"),
 			WithArg("name", "name1"),
 			WithArg("addon", "forge"),
-			WithArg("amount", 10.0/0.42),
+			WithArg("maxAmount", 10.0/0.42),
 		).
 			AssertFailure(t, "Cost of addon in flow")
 	})

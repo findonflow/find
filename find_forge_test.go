@@ -168,7 +168,7 @@ func TestFindForge(t *testing.T) {
 			WithSigner("user1"),
 			WithArg("name", "user1"),
 			WithArg("addon", "premiumForge"),
-			WithArg("amount", price),
+			WithArg("maxAmount", price),
 		).AssertSuccess(t).
 			AssertEvent(t, otu.identifier("FIND", "AddonActivated"),
 				map[string]interface{}{
@@ -319,14 +319,14 @@ func TestFindForge(t *testing.T) {
 		otu.O.Tx("register",
 			WithSigner("user1"),
 			WithArg("name", testingName),
-			WithArg("amount", 500.0/0.42),
+			WithArg("maxAmount", 500.0/0.42),
 		).AssertSuccess(t)
 
 		otu.O.Tx("buyAddon",
 			WithSigner("user1"),
 			WithArg("name", testingName),
 			WithArg("addon", "forge"),
-			WithArg("amount", 50.0/0.42),
+			WithArg("maxAmount", 50.0/0.42),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "AddonActivated", map[string]interface{}{
