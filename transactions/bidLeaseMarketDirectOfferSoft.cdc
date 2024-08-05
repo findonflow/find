@@ -8,7 +8,7 @@ import "FindLeaseMarketDirectOfferSoft"
 
 transaction(leaseName: String, ftAliasOrIdentifier:String, amount: UFix64, validUntil: UFix64?) {
 
-    let bidsReference: &FindLeaseMarketDirectOfferSoft.MarketBidCollection?
+    let bidsReference: auth(FindLeaseMarketDirectOfferSoft.Buyer) &FindLeaseMarketDirectOfferSoft.MarketBidCollection?
     let ftVaultType: Type
 
     prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
@@ -29,17 +29,20 @@ transaction(leaseName: String, ftAliasOrIdentifier:String, amount: UFix64, valid
         let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
         let leaseTenant = leaseTenantCapability.borrow()!
 
-        let receiverCap=account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)!
+
+
+        let receiverCap=account.capabilities.get<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
         let leaseDOSBidType= Type<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>()
         let leaseDOSBidPublicPath=leaseTenant.getPublicPath(leaseDOSBidType)
         let leaseDOSBidStoragePath= leaseTenant.getStoragePath(leaseDOSBidType)
-        let leaseDOSBidCap= account.getCapability<&FindLeaseMarketDirectOfferSoft.MarketBidCollection>(leaseDOSBidPublicPath)
+        let leaseDOSBidCap= account.capabilities.get<&FindLeaseMarketDirectOfferSoft.MarketBidCollection>(leaseDOSBidPublicPath)
         if !leaseDOSBidCap.check() {
             account.storage.save<@FindLeaseMarketDirectOfferSoft.MarketBidCollection>(<- FindLeaseMarketDirectOfferSoft.createEmptyMarketBidCollection(receiver:receiverCap, tenantCapability:leaseTenantCapability), to: leaseDOSBidStoragePath)
-            account.link<&FindLeaseMarketDirectOfferSoft.MarketBidCollection>(leaseDOSBidPublicPath, target: leaseDOSBidStoragePath)
+            let cap = account.capabilities.storage.issue<&FindLeaseMarketDirectOfferSoft.MarketBidCollection>(leaseDOSBidStoragePath)
+            account.capabilities.publish(cap, at: leaseDOSBidPublicPath)
         }
 
-        self.bidsReference= account.storage.borrow<&FindLeaseMarketDirectOfferSoft.MarketBidCollection>(from: leaseDOSBidStoragePath)
+        self.bidsReference= account.storage.borrow<auth(FindLeaseMarketDirectOfferSoft.Buyer) &FindLeaseMarketDirectOfferSoft.MarketBidCollection>(from: leaseDOSBidStoragePath)
 
     }
 

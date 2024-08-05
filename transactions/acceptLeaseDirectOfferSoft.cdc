@@ -8,22 +8,33 @@ import "FIND"
 
 transaction(leaseName: String) {
 
-	let market : &FindLeaseMarketDirectOfferSoft.SaleItemCollection
-	let pointer : FindLeaseMarket.AuthLeasePointer
+    let market : auth(FindLeaseMarketDirectOfferSoft.Seller) &FindLeaseMarketDirectOfferSoft.SaleItemCollection
+    let pointer : FindLeaseMarket.AuthLeasePointer
 
-	prepare(account: auth(BorrowValue) &Account) {
-		let marketplace = FindMarket.getFindTenantAddress()
-		let tenant=FindMarket.getTenant(marketplace)
-		let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>())
-		self.market = account.storage.borrow<&FindLeaseMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
-		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>())
-		let item = FindLeaseMarket.assertOperationValid(tenant: marketplace, name: leaseName, marketOption: marketOption)
-		let ref = account.capabilities.storage.get<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(from: FIND.LeaseStoragePath) ?? panic("Cannot borrow reference to find lease collection. Account : ".concat(account.address.toString()))
-		self.pointer= FindLeaseMarket.AuthLeasePointer(ref: ref, name: leaseName)
-	}
+    prepare(account: auth(Storage, IssueStorageCapabilityController) &Account) {
+        let marketplace = FindMarket.getFindTenantAddress()
+        let tenant=FindMarket.getTenant(marketplace)
+        let storagePath=tenant.getStoragePath(Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>())
+        self.market = account.storage.borrow<auth(FindLeaseMarketDirectOfferSoft.Seller) &FindLeaseMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
 
-	execute {
-		self.market.acceptOffer(self.pointer)
-	}
+
+        let storagePathIdentifer = FIND.LeaseStoragePath.toString().split(separator:"/")[1]
+        let providerIdentifier = storagePathIdentifer.concat("ProviderFlow")
+        let providerStoragePath = StoragePath(identifier: providerIdentifier)!
+
+        var existingProvider= account.storage.copy<Capability<auth(FIND.LeaseOwner) &FIND.LeaseCollection>>(from: providerStoragePath) 
+        if existingProvider==nil {
+            existingProvider=account.capabilities.storage.issue<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(FIND.LeaseStoragePath) 
+            account.storage.save(existingProvider!, to: providerStoragePath)
+        }
+        var cap = existingProvider!
+        self.pointer= FindLeaseMarket.AuthLeasePointer(cap: cap, name: leaseName)
+
+
+    }
+
+    execute {
+        self.market.acceptOffer(self.pointer)
+    }
 }
 

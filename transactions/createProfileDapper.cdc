@@ -15,6 +15,7 @@ import "FindViews"
 
 transaction(name: String) {
     prepare(account: auth(Profile.Admin, StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
+
         let leaseCollection = account.capabilities.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)
         if !leaseCollection.check() {
             account.storage.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)

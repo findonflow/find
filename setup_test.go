@@ -424,6 +424,13 @@ func SetupFIND(o *OverflowState) error {
 		WithArg("cut", 0.0),
 	)
 
+	stx("tenantsetLeaseOptionMarket",
+		WithSigner("find"),
+		WithArg("nftName", "Lease"),
+		WithArg("nftType", findleaseQI),
+		WithArg("cut", 0.0),
+	)
+
 	return nil
 }
 

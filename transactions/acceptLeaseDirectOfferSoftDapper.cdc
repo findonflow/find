@@ -4,7 +4,6 @@ import "MetadataViews"
 import "FindViews"
 import "FindMarket"
 import "FindLeaseMarket"
-import "FungibleToken"
 import "FIND"
 
 transaction(leaseName: String) {
