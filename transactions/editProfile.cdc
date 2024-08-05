@@ -3,6 +3,8 @@ import "FUSD"
 import "FlowToken"
 import "FIND"
 import "Profile"
+import "FindMarket"
+import "FindLeaseMarketDirectOfferSoft"
 
 transaction(name:String, description: String, avatar: String, tags:[String], allowStoringFollowers: Bool, linkTitles : {String: String}, linkTypes: {String:String}, linkUrls : {String:String}, removeLinks : [String]) {
 
@@ -64,14 +66,18 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
             account.capabilities.publish(cap, at: FIND.LeasePublicPath)
         }
 
+        let leaseTenantCapability= FindMarket.getTenantCapability(FindMarket.getFindTenantAddress())!
+        let leaseTenant = leaseTenantCapability.borrow()!
 
-        let bidCollection = account.capabilities.get<&FIND.BidCollection>(FIND.BidPublicPath)
-        if !bidCollection.check() {
-            let fr = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-            let lc = account.capabilities.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)
-            account.storage.save(<- FIND.createEmptyBidCollection(receiver: fr, leases: lc), to: FIND.BidStoragePath)
-            let cap = account.capabilities.storage.issue<&FIND.BidCollection>(FIND.BidStoragePath)
-            account.capabilities.publish(cap, at: FIND.BidPublicPath)
+        let leaseDOSSaleItemType= Type<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>()
+        let leaseDOSPublicPath=leaseTenant.getPublicPath(leaseDOSSaleItemType)
+        let leaseDOSStoragePath= leaseTenant.getStoragePath(leaseDOSSaleItemType)
+        let leaseDOSSaleItemCap= account.capabilities.get<&FindLeaseMarketDirectOfferSoft.SaleItemCollection>(leaseDOSPublicPath)
+        if !leaseDOSSaleItemCap.check() {
+            //The link here has to be a capability not a tenant, because it can change.
+            account.storage.save<@FindLeaseMarketDirectOfferSoft.SaleItemCollection>(<- FindLeaseMarketDirectOfferSoft.createEmptySaleItemCollection(leaseTenantCapability), to: leaseDOSStoragePath)
+            let leaseDOSSaleItemCap = account.capabilities.storage.issue<&FindLeaseMarketDirectOfferSoft.SaleItemCollection>(leaseDOSStoragePath)
+            account.capabilities.publish(leaseDOSSaleItemCap, at: leaseDOSPublicPath)
         }
     }
 

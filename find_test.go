@@ -28,7 +28,7 @@ func TestFIND(t *testing.T) {
 		otu.O.Tx("register",
 			WithSigner("user1"),
 			WithArg("name", "usr"),
-			WithArg("amount", 500.0),
+			WithArg("maxAmount", 1000.0),
 		).AssertFailure(t, "Amount withdrawn must be less than or equal than the balance of the Vault")
 	})
 
@@ -36,7 +36,7 @@ func TestFIND(t *testing.T) {
 		otu.O.Tx("register",
 			WithSigner("user1"),
 			WithArg("name", "ur"),
-			WithArg("amount", 5.0),
+			WithArg("maxAmount", 10.0),
 		).AssertFailure(t, "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
 	})
 
@@ -44,7 +44,7 @@ func TestFIND(t *testing.T) {
 		otu.O.Tx("register",
 			WithSigner("user1"),
 			WithArg("name", "user1"),
-			WithArg("amount", 5.0),
+			WithArg("maxAmount", 10.0),
 		).AssertFailure(t, "Name already registered")
 	})
 

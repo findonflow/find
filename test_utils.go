@@ -73,22 +73,22 @@ func (otu *OverflowTestUtils) registerUserTransaction(name string) OverflowResul
 	return otu.O.Tx("register",
 		WithSigner(name),
 		WithArg("name", name),
-		WithArg("amount", 5.0),
+		WithArg("maxAmount", 10.0),
 	).AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
 			"validUntil":  expireTime,
 			"lockedUntil": lockedTime,
 			"owner":       nameAddress,
 			"name":        name,
-		}) //. TODO: This is failing, need to fix this
-	// AssertEvent(otu.T, "FungibleToken.Deposited", map[string]interface{}{
-	// 	"amount": 5.0,
-	// 	"to":     otu.O.Address("find-admin"),
-	// }).
-	// AssertEvent(otu.T, "FungibleToken.Withdrawn", map[string]interface{}{
-	// 	"amount": 5.0,
-	// 	"from":   nameAddress,
-	// })
+		}).
+		AssertEvent(otu.T, ".FungibleToken.Deposited", map[string]interface{}{
+			"amount": 10.0,
+			"to":     otu.O.Address("find-admin"),
+		}).
+		AssertEvent(otu.T, ".FungibleToken.Withdrawn", map[string]interface{}{
+			"amount": 10.0,
+			"from":   nameAddress,
+		})
 }
 
 func (otu *OverflowTestUtils) registerUserWithName(buyer, name string) *OverflowTestUtils {
@@ -103,7 +103,7 @@ func (otu *OverflowTestUtils) registerUserWithNameTransaction(buyer, name string
 	return otu.O.Tx("register",
 		WithSigner(buyer),
 		WithArg("name", name),
-		WithArg("amount", 5.0),
+		WithArg("maxAmount", 10.0),
 	).AssertSuccess(otu.T).
 		AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
 			"validUntil":  expireTime,
@@ -112,11 +112,11 @@ func (otu *OverflowTestUtils) registerUserWithNameTransaction(buyer, name string
 			"name":        name,
 		}).
 		AssertEvent(otu.T, "FungibleToken.Deposited", map[string]interface{}{
-			"amount": 5.0,
+			"amount": 10.0,
 			"to":     otu.O.Address("find-admin"),
 		}).
 		AssertEvent(otu.T, "FungibleToken.Withdrawn", map[string]interface{}{
-			"amount": 5.0,
+			"amount": 10.0,
 			"from":   nameAddress,
 		})
 }
