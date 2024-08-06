@@ -64,10 +64,12 @@ pub contract FIND {
         let lastResult = PublicPriceOracle.getLatestPrice(oracleAddr: self.getFlowUSDOracleAddress())
         let lastBlockNum = PublicPriceOracle.getLatestBlockHeight(oracleAddr: self.getFlowUSDOracleAddress())
 
+        /*
         // Make sure the price is not expired
         if getCurrentBlock().height - lastBlockNum > 2000 {
             panic("Price is expired")
         }
+        */
 
         return lastResult
     }
