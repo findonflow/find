@@ -278,6 +278,13 @@
                   }
                }
             },
+            "getFlowToUSD": {
+               "code": "import FIND from 0x179b6b1cb6755e31\n\naccess(all) fun main():UFix64 {\n\n    return FIND.getLatestPrice()\n}",
+               "spec": {
+                  "order": [],
+                  "parameters": {}
+               }
+            },
             "getInvalidatedLeases": {
                "code": "import FIND from 0x179b6b1cb6755e31\n\npub fun main(user: Address) : [String] {\n    let finLeases= getAuthAccount(user).borrow\u003c\u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)!\n    return finLeases.getInvalidatedLeases()\n}",
                "spec": {
@@ -3697,6 +3704,13 @@
                      "addresses": "[Address]",
                      "ids": "[UInt64]"
                   }
+               }
+            },
+            "getFlowToUSD": {
+               "code": "import FIND from 0x097bafa4e0b48eef\n\naccess(all) fun main():UFix64 {\n\n    return FIND.getLatestPrice()\n}",
+               "spec": {
+                  "order": [],
+                  "parameters": {}
                }
             },
             "getFlowToUsdc": {
@@ -7296,6 +7310,13 @@
                      "addresses": "[Address]",
                      "ids": "[UInt64]"
                   }
+               }
+            },
+            "getFlowToUSD": {
+               "code": "import FIND from 0x35717efbbce11c74\n\naccess(all) fun main():UFix64 {\n\n    return FIND.getLatestPrice()\n}",
+               "spec": {
+                  "order": [],
+                  "parameters": {}
                }
             },
             "getFlowToUsdc": {
