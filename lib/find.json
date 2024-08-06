@@ -279,7 +279,7 @@
                }
             },
             "getFlowToUSD": {
-               "code": "import FIND from 0x179b6b1cb6755e31\n\naccess(all) fun main():UFix64 {\n\n    return FIND.getLatestPrice()\n}",
+               "code": "import FIND from 0x179b6b1cb6755e31\n\npub fun main():UFix64 {\n\n    return FIND.getLatestPrice()\n}",
                "spec": {
                   "order": [],
                   "parameters": {}
@@ -651,7 +651,7 @@
                }
             },
             "getNamePriceInFlow": {
-               "code": "import FIND from 0x179b6b1cb6755e31\n\naccess(all) fun main(_ name:String):UFix64 {\n\n    return FIND.calculateCostInFlow(name)\n}",
+               "code": "import FIND from 0x179b6b1cb6755e31\n\npub fun main(_ name:String):UFix64 {\n\n    return FIND.calculateCostInFlow(name)\n}",
                "spec": {
                   "order": [
                      "name"
@@ -3718,7 +3718,7 @@
                }
             },
             "getFlowToUSD": {
-               "code": "import FIND from 0x097bafa4e0b48eef\n\naccess(all) fun main():UFix64 {\n\n    return FIND.getLatestPrice()\n}",
+               "code": "import FIND from 0x097bafa4e0b48eef\n\npub fun main():UFix64 {\n\n    return FIND.getLatestPrice()\n}",
                "spec": {
                   "order": [],
                   "parameters": {}
@@ -4199,7 +4199,7 @@
                }
             },
             "getNamePriceInFlow": {
-               "code": "import FIND from 0x097bafa4e0b48eef\n\naccess(all) fun main(_ name:String):UFix64 {\n\n    return FIND.calculateCostInFlow(name)\n}",
+               "code": "import FIND from 0x097bafa4e0b48eef\n\npub fun main(_ name:String):UFix64 {\n\n    return FIND.calculateCostInFlow(name)\n}",
                "spec": {
                   "order": [
                      "name"
@@ -7335,7 +7335,7 @@
                }
             },
             "getFlowToUSD": {
-               "code": "import FIND from 0x35717efbbce11c74\n\naccess(all) fun main():UFix64 {\n\n    return FIND.getLatestPrice()\n}",
+               "code": "import FIND from 0x35717efbbce11c74\n\npub fun main():UFix64 {\n\n    return FIND.getLatestPrice()\n}",
                "spec": {
                   "order": [],
                   "parameters": {}
@@ -7803,7 +7803,7 @@
                }
             },
             "getNamePriceInFlow": {
-               "code": "import FIND from 0x35717efbbce11c74\n\naccess(all) fun main(_ name:String):UFix64 {\n\n    return FIND.calculateCostInFlow(name)\n}",
+               "code": "import FIND from 0x35717efbbce11c74\n\npub fun main(_ name:String):UFix64 {\n\n    return FIND.calculateCostInFlow(name)\n}",
                "spec": {
                   "order": [
                      "name"
