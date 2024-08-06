@@ -650,6 +650,17 @@
                   }
                }
             },
+            "getNamePriceInFlow": {
+               "code": "import FIND from 0x179b6b1cb6755e31\n\naccess(all) fun main(_ name:String):UFix64 {\n\n    return FIND.calculateCostInFlow(name)\n}",
+               "spec": {
+                  "order": [
+                     "name"
+                  ],
+                  "parameters": {
+                     "name": "String"
+                  }
+               }
+            },
             "getNameSearchbar": {
                "code": "import FIND from 0x179b6b1cb6755e31\nimport Profile from 0x179b6b1cb6755e31\n\npub fun main(name: String) : NameReport? {\n\n    if FIND.validateFindName(name) {\n        let status = FIND.status(name)\n        let owner = status.owner\n        let cost=FIND.calculateCost(name)\n        var s=\"TAKEN\"\n        if status.status == FIND.LeaseStatus.FREE {\n            s=\"FREE\"\n        } else if status.status == FIND.LeaseStatus.LOCKED {\n            s=\"LOCKED\"\n        }\n        let findAddr = FIND.getFindNetworkAddress()\n        let network = getAuthAccount(findAddr).borrow\u003c\u0026FIND.Network\u003e(from: FIND.NetworkStoragePath)!\n        let lease =  network.getLease(name)\n\n        var avatar: String? = nil\n        if owner != nil {\n            if let ref = getAuthAccount(owner!).borrow\u003c\u0026Profile.User\u003e(from: Profile.storagePath) {\n                avatar = ref.getAvatar()\n            }\n        }\n        return NameReport(status: s, cost: cost, owner: lease?.profile?.address, avatar: avatar, validUntil: lease?.validUntil, lockedUntil: lease?.lockedUntil, registeredTime: lease?.registeredTime)\n    }\n    return nil\n\n}\n\npub struct NameReport {\n    pub let status: String\n    pub let cost: UFix64\n    pub let owner: Address?\n    pub let avatar: String?\n    pub let validUntil: UFix64?\n    pub let lockedUntil: UFix64?\n    pub let registeredTime: UFix64?\n\n    init(status: String, cost: UFix64, owner: Address?, avatar: String?, validUntil: UFix64?, lockedUntil: UFix64?, registeredTime: UFix64? ) {\n        self.status=status\n        self.cost=cost\n        self.owner=owner\n        self.avatar=avatar\n        self.validUntil=validUntil\n        self.lockedUntil=lockedUntil\n        self.registeredTime=registeredTime\n    }\n}",
                "spec": {
@@ -4184,6 +4195,17 @@
                   ],
                   "parameters": {
                      "user": "String"
+                  }
+               }
+            },
+            "getNamePriceInFlow": {
+               "code": "import FIND from 0x097bafa4e0b48eef\n\naccess(all) fun main(_ name:String):UFix64 {\n\n    return FIND.calculateCostInFlow(name)\n}",
+               "spec": {
+                  "order": [
+                     "name"
+                  ],
+                  "parameters": {
+                     "name": "String"
                   }
                }
             },
@@ -7777,6 +7799,17 @@
                   ],
                   "parameters": {
                      "user": "String"
+                  }
+               }
+            },
+            "getNamePriceInFlow": {
+               "code": "import FIND from 0x35717efbbce11c74\n\naccess(all) fun main(_ name:String):UFix64 {\n\n    return FIND.calculateCostInFlow(name)\n}",
+               "spec": {
+                  "order": [
+                     "name"
+                  ],
+                  "parameters": {
+                     "name": "String"
                   }
                }
             },
