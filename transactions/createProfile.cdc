@@ -12,7 +12,6 @@ import "FindMarketDirectOfferEscrow"
 import "FindLeaseMarketDirectOfferSoft"
 import "FindLeaseMarket"
 import "Dandy"
-//import "FindThoughts"
 
 transaction(name: String) {
     prepare(account: auth (Profile.Admin, StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
