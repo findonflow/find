@@ -5,20 +5,18 @@ import (
 	"os"
 	"sort"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 	"github.com/sanity-io/litter"
 )
 
 func main() {
-
 	o := Overflow(
 		WithNetwork(os.Args[1]),
 	)
 
-	q := o.ScriptFileNameFN("getEnabledNFTListings",
+	q := o.ScriptFileNameFN("devgetEnabledNFTListings",
 		WithArg("detail", false),
 	)
-
 
 	var r Res = Res{}
 
@@ -42,11 +40,10 @@ func main() {
 	}
 	r.Sort()
 	litter.Dump(r)
-
 }
 
 type Res struct {
-	Dapper []string
+	Dapper    []string
 	NonDapper []string
 }
 
@@ -60,4 +57,3 @@ func (r *Res) Sort() {
 	sort.Strings(r.Dapper)
 	sort.Strings(r.NonDapper)
 }
-

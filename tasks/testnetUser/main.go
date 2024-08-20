@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 )
 
 func main() {
@@ -125,8 +125,8 @@ func main() {
 	ftIdentifiers = ftIdentifiers + ` ]`
 	prices = prices + ` ]`
 
-	returnTime, _ := o.Script(`import Clock from "../contracts/Clock.cdc"
-	pub fun main() :  UFix64 {
+	returnTime, _ := o.Script(`import "Clock"
+	access(all) main() :  UFix64 {
 		return Clock.time()
 	}`).GetAsJson()
 

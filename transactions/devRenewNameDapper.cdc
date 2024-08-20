@@ -1,16 +1,17 @@
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "DapperUtilityCoin"
+import "FIND"
+import "FungibleToken"
 
 transaction(merchAccount: Address, name: String, amount: UFix64) {
 
 	let price : UFix64
-	let finLeases : &FIND.LeaseCollection
-	let mainDapperUtilityCoinVault: &DapperUtilityCoin.Vault
+	let finLeases : auth(FIND.LeaseOwner) &FIND.LeaseCollection
+	let mainDapperUtilityCoinVault: auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault
 	let balanceBeforeTransfer: UFix64
 
-	prepare(dapper: AuthAccount, acct: AuthAccount) {
+	prepare(dapper: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account, acct: auth(BorrowValue, FIND.LeaseOwner) &Account) {
 		self.price=FIND.calculateCost(name)
-		self.mainDapperUtilityCoinVault = dapper.borrow<&DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault) ?? panic("Cannot borrow DapperUtilityCoin vault from account storage".concat(dapper.address.toString()))
+		self.mainDapperUtilityCoinVault = dapper.storage.borrow<auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault) ?? panic("Cannot borrow DapperUtilityCoin vault from account storage".concat(dapper.address.toString()))
 		self.balanceBeforeTransfer = self.mainDapperUtilityCoinVault.balance
 		self.finLeases= acct.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath) ?? panic("Could not borrow reference to find lease collection")
 	}

@@ -1,9 +1,9 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FlowStorageFees from "../contracts/standard/FlowStorageFees.cdc"
+import "FungibleToken"
+import "FlowToken"
+import "FlowStorageFees"
 
 transaction() {
-    prepare(acct: AuthAccount) {
+    prepare(acct: auth(BorrowValue) &Account) {
 
         let sender <- acct.load<@FlowToken.Vault>(from: /storage/unusedFlow)
             ?? panic("Cannot load FlowToken vault from temp flow storage")

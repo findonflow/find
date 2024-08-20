@@ -13,7 +13,7 @@ In order to integrate with .find you have a couple of options.
  
 ### The web2 serverless api
 
-This api is published at  https://lookup.find.xyz/api/lookup
+This api is access(all)lished at  https://lookup.find.xyz/api/lookup
 
 It can be called either with a name or an address
 
@@ -33,7 +33,7 @@ We have tried to make it easy to use .find in cadence so most functions are onel
 ```cadence
 import FIND from 0x097bafa4e0b48eef
 
-pub fun main(name: String) : Address?  {
+access(all) main(name: String) : Address?  {
   return FIND.lookupAddress(name)
 }
 ```
@@ -42,7 +42,7 @@ If you want the read-only profile of a user for displaying in your solution you 
 ```cadence
 import FIND, Profile from 0x097bafa4e0b48eef
 
-pub fun main(name: String) :  Profile.UserProfile? {
+access(all) main(name: String) :  Profile.UserProfile? {
     return FIND.lookup(name)?.asProfile()
 }
 ```
@@ -52,7 +52,7 @@ pub fun main(name: String) :  Profile.UserProfile? {
 ```cadence
 import FIND, Profile from 0x097bafa4e0b48eef
 
-pub fun main(address: Address) :  String? {
+access(all) main(address: Address) :  String? {
     return FIND.reverseLookup(address)
 }
 ```
@@ -84,14 +84,14 @@ Implementing MetadataViews standards in the right way can help your NFTs display
 
 In essence what we need for each nft is the fields:
 ```
-	pub let id:UInt64
-	pub let name: String: The name of the nft
-	pub let image: String : the http url to the image, or ipfs://<cid>
-	pub let url: String: the url to go to when an nft is clicked
-	pub let listPrice: UFix64? : if this is item is listed in a marketplace show the price here
-	pub let listToken: String? : the string representation of the token used. Identifier of FT
-	pub let contentType:String : content type of image url, image or video works fine here
-	pub let rarity:String: rarity description for this NFT
+	access(all) let id:UInt64
+	access(all) let name: String: The name of the nft
+	access(all) let image: String : the http url to the image, or ipfs://<cid>
+	access(all) let url: String: the url to go to when an nft is clicked
+	access(all) let listPrice: UFix64? : if this is item is listed in a marketplace show the price here
+	access(all) let listToken: String? : the string representation of the token used. Identifier of FT
+	access(all) let contentType:String : content type of image url, image or video works fine here
+	access(all) let rarity:String: rarity description for this NFT
 ``` -->
 
 <!-- There are lots of examples for how this is done in the collections script already. 

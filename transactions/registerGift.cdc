@@ -1,6 +1,6 @@
-import FUSD from "../contracts/standard/FUSD.cdc"
-import Profile from "../contracts/Profile.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FUSD"
+import "Profile"
+import "FIND"
 
 transaction(name: String, amount: UFix64, recipient: String) {
 
@@ -8,9 +8,9 @@ transaction(name: String, amount: UFix64, recipient: String) {
 	let vaultRef : &FUSD.Vault? 
 	let receiverLease : Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>
 	let receiverProfile : Capability<&{Profile.Public}>
-	let leases : &FIND.LeaseCollection?
+	let leases : auth(FIND.LeaseOwner) &FIND.LeaseCollection?
 
-	prepare(acct: AuthAccount) {
+	prepare(acct: auth(BorrowValue) &Account) {
 
 		let resolveAddress = FIND.resolve(recipient)
 		if resolveAddress == nil {panic("The input pass in is not a valid name or address. Input : ".concat(recipient))}
@@ -21,7 +21,7 @@ transaction(name: String, amount: UFix64, recipient: String) {
 
 		self.vaultRef = acct.borrow<&FUSD.Vault>(from: /storage/fusdVault)
 
-		self.leases=acct.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)
+		self.leases=acct.borrow<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(from: FIND.LeaseStoragePath)
 
 		let receiver = getAccount(address)
 		self.receiverLease = receiver.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)

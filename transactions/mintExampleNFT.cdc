@@ -1,30 +1,28 @@
-import FIND from "../contracts/FIND.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "NonFungibleToken"
+import "FungibleToken"
+import "ExampleNFT"
+import "MetadataViews"
 
-transaction(user: String,
-		name: String,
-        description: String,
-        thumbnail: String,
-        soulBound: Bool ,
-        traits: [UInt64]
-		) {
-	let address : Address
-	let cap : Capability<&ExampleNFT.Collection{NonFungibleToken.CollectionPublic}>
+transaction(address: Address, name: String, description: String, thumbnail: String, soulBound: Bool) {
+    let cap : Capability<&ExampleNFT.Collection>
+    let royaltyCap : Capability<&{FungibleToken.Receiver}>
 
-	prepare(account: AuthAccount) {
-		self.address = FIND.resolve(user) ?? panic("Cannot find user with this name / address")
-		self.cap = getAccount(self.address).getCapability<&ExampleNFT.Collection{NonFungibleToken.CollectionPublic}>(ExampleNFT.CollectionPublicPath)
-	}
+    prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, UnpublishCapability) &Account) {
 
-	pre{
-		self.cap.check() : "Cannot borrow reference to receiver Collection. Receiver account : ".concat(self.address.toString())
-	}
+        self.cap = getAccount(address).capabilities.get<&ExampleNFT.Collection>(ExampleNFT.CollectionPublicPath)!
 
-	execute{
-		let r : MetadataViews.Royalties = MetadataViews.Royalties([])
-		let nft <- ExampleNFT.mintNFT(name: name, description: description, thumbnail: thumbnail, soulBound: soulBound, traits: traits, royalties: r)
-		self.cap.borrow()!.deposit(token: <- nft)
-	}
+        self.royaltyCap =getAccount(address).capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)!
+    }
+
+    pre{
+        self.cap.check() : "Cannot borrow reference to receiver Collection. Receiver account : ".concat(address.toString())
+    }
+
+    execute{
+
+        let r  = MetadataViews.Royalty(receiver:self.royaltyCap, cut: 0.01, description: "creator")
+        let royalties = MetadataViews.Royalties([r])
+        let nft <- ExampleNFT.mintNFT(name: name, description: description, thumbnail: thumbnail, soulBound:soulBound, traits:[], royalties: royalties)
+        self.cap.borrow()!.deposit(token: <- nft)
+    }
 }

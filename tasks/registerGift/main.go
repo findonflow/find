@@ -1,15 +1,14 @@
 package main
 
 import (
-	"github.com/bjartek/overflow"
+	"github.com/bjartek/overflow/v2"
 )
 
 func main() {
-
-	o := overflow.Overflow(overflow.WithNetwork("mainnet"))
+	o := overflow.Overflow(overflow.WithNetwork("migrationnet"))
 
 	addresses := map[string]string{
-		"0x97bf2205358ff29c": "gieft",
+		"0xb92dd41eee7b3bfd": "testing",
 	}
 
 	for account, name := range addresses {

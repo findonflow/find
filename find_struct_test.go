@@ -3,18 +3,17 @@ package test_main
 import (
 	"testing"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 	"github.com/findonflow/find/findGo"
 )
 
 func TestFindStruct(t *testing.T) {
+	otu := &OverflowTestUtils{T: t, O: ot.O}
 
-	otu := NewOverflowTest(t)
-
-	t.Run("Should be able to pass in Royalty Struct", func(t *testing.T) {
+	ot.Run(t, "Should be able to pass in Royalty Struct", func(t *testing.T) {
 		otu.O.Tx(
 			`
-				import FindPack from "../contracts/FindPack.cdc"
+				import "FindPack"
 
 				transaction(i: FindPack.Royalty) {}
 			`,
@@ -29,10 +28,10 @@ func TestFindStruct(t *testing.T) {
 			AssertSuccess(t)
 	})
 
-	t.Run("Should be able to pass in Verifier Struct", func(t *testing.T) {
+	ot.Run(t, "Should be able to pass in Verifier Struct", func(t *testing.T) {
 		otu.O.Tx(
 			`
-			import FindVerifier from "../contracts/FindVerifier.cdc"
+			import "FindVerifier"
 
 			transaction(i: {FindVerifier.Verifier}) {}
 			`,
@@ -45,10 +44,10 @@ func TestFindStruct(t *testing.T) {
 			AssertSuccess(t)
 	})
 
-	t.Run("Should be able to pass in PackRegisterSaleInfo Struct", func(t *testing.T) {
+	ot.Run(t, "Should be able to pass in PackRegisterSaleInfo Struct", func(t *testing.T) {
 		otu.O.Tx(
 			`
-			import FindPack from "../contracts/FindPack.cdc"
+			import "FindPack"
 
 			transaction(i: FindPack.PackRegisterSaleInfo) {}
 			`,
@@ -68,10 +67,10 @@ func TestFindStruct(t *testing.T) {
 			AssertSuccess(t)
 	})
 
-	t.Run("Should be able to pass in PackRegisterInfo Struct", func(t *testing.T) {
+	ot.Run(t, "Should be able to pass in PackRegisterInfo Struct", func(t *testing.T) {
 		otu.O.Tx(
 			`
-			import FindPack from "../contracts/FindPack.cdc"
+			import "FindPack"
 
 			transaction(i: FindPack.PackRegisterInfo) {}
 			`,
@@ -82,5 +81,4 @@ func TestFindStruct(t *testing.T) {
 		).
 			AssertSuccess(t)
 	})
-
 }

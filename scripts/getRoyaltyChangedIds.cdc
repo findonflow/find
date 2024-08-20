@@ -1,7 +1,7 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FindMarket"
+import "FIND"
 
-pub fun main(user: String) : {String : [UInt64]} {
+access(all) fun main(user: String) : {String : [UInt64]} {
     if let address = FIND.resolve(user){
 		let marketplace = FindMarket.getFindTenantAddress()
         return FindMarket.getRoyaltiesChangedIds(tenant:marketplace, address: address)

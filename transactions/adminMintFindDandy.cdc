@@ -1,23 +1,23 @@
-import FIND from "../contracts/FIND.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import Dandy from "../contracts/Dandy.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindForge from "../contracts/FindForge.cdc"
+import "FIND"
+import "NonFungibleToken"
+import "Dandy"
+import "MetadataViews"
+import "FindForge"
 
 transaction(name: String, maxEdition:UInt64, nftName:String, nftDescription:String, folderHash:String) {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 
-		let finLeases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
+		let finLeases= account.storage.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)!
 		let lease=finLeases.borrow(name)
 		let forgeType = Dandy.getForgeType()
 
-		let dandyCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(Dandy.CollectionPublicPath)
+		let dandyCap= account.getCapability<&{NonFungibleToken.Collection}>(Dandy.CollectionPublicPath)
 		let thumbNail=MetadataViews.IPFSFile(cid:folderHash, path: "thumbnail.webp")
 		let fullsize=MetadataViews.IPFSFile(cid:folderHash, path: "fullsize.webp")
 		let mediaFullsize=MetadataViews.Media(file: fullsize, mediaType: "image/webp")
 		let mediaThumbnail=MetadataViews.Media(file: thumbNail, mediaType: "image/webp")
 
-		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(Dandy.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to Dandy collection.")
+		let nftReceiver=account.getCapability<&{NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(Dandy.CollectionPublicPath).borrow() ?? panic("Cannot borrow reference to Dandy collection.")
 
 		let traits = MetadataViews.Traits([])
 		traits.addTrait(MetadataViews.Trait(name: "Creator", value: ".find", displayType:"Author", rarity:nil))

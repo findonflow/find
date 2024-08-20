@@ -1,7 +1,9 @@
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import NFTCatalogAdmin from "../contracts/standard/NFTCatalogAdmin.cdc"
+import "MetadataViews"
+import "NonFungibleToken"
+import "ViewResolver"
+import "FINDNFTCatalog"
+import "NFTCatalog"
+import "NFTCatalogAdmin"
 
 transaction(
     collectionIdentifier : String,
@@ -14,24 +16,22 @@ transaction(
 
     let adminResource: &NFTCatalogAdmin.Admin
 
-    prepare(acct: AuthAccount) {
-        self.adminResource = acct.borrow<&NFTCatalogAdmin.Admin>(from: NFTCatalogAdmin.AdminStoragePath) ?? panic("Cannot borrow Admin Reference.")
+    prepare(acct: auth (BorrowValue) &Account) {
+        self.adminResource = acct.storage.borrow<&NFTCatalogAdmin.Admin>(from: NFTCatalogAdmin.AdminStoragePath) ?? panic("Cannot borrow Admin Reference.")
     }
 
     execute {
 
         let nftAccount = getAccount(addressWithNFT)
         let pubPath = PublicPath(identifier: publicPathIdentifier)!
-        let collectionCap = nftAccount.getCapability<&AnyResource{MetadataViews.ResolverCollection}>(pubPath)
-        assert(collectionCap.check(), message: "MetadataViews Collection is not set up properly, ensure the Capability was created/linked correctly.")
-        let collectionRef = collectionCap.borrow()!
+        let collectionRef = nftAccount.capabilities.borrow<&{NonFungibleToken.Collection}>(pubPath) ?? panic("MetadataViews Collection is not set up properly, ensure the Capability was created/linked correctly.")
         assert(collectionRef.getIDs().length > 0, message: "No NFTs exist in this collection.")
-        let nftResolver = collectionRef.borrowViewResolver(id: nftID)
+        let nftResolver = collectionRef.borrowNFT(nftID) ?? panic("could not find item with id")
 
-		// return early if already in catalog
-		if FINDNFTCatalog.getCollectionDataForType(nftTypeIdentifier: nftResolver.getType().identifier) != nil {
-			return
-		}
+        // return early if already in catalog
+        if FINDNFTCatalog.getCollectionDataForType(nftTypeIdentifier: nftResolver.getType().identifier) != nil {
+            return
+        }
 
 
         let metadataCollectionData = MetadataViews.getNFTCollectionData(nftResolver)!
@@ -39,9 +39,7 @@ transaction(
         let collectionData = NFTCatalog.NFTCollectionData(
             storagePath: metadataCollectionData.storagePath,
             publicPath: metadataCollectionData.publicPath,
-            privatePath: metadataCollectionData.providerPath,
             publicLinkedType : metadataCollectionData.publicLinkedType,
-            privateLinkedType : metadataCollectionData.providerLinkedType
         )
 
         let collectionDisplay = MetadataViews.getNFTCollectionDisplay(nftResolver)!

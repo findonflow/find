@@ -1,83 +1,79 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FIND from "../contracts/FIND.cdc"
-import Profile from "../contracts/Profile.cdc"
+import "FungibleToken"
+import "FUSD"
+import "FlowToken"
+import "FIND"
+import "Profile"
 
 // map of {User in string (find name or address) : [tag]}
 transaction(follows:{String : [String]}) {
 
-	let profile : &Profile.User
+    let profile : auth(Profile.Admin) &Profile.User
 
-	prepare(account: AuthAccount) {
+    prepare(account: auth(BorrowValue, SaveValue, PublishCapability, IssueStorageCapabilityController) &Account) {
 
-		self.profile =account.borrow<&Profile.User>(from:Profile.storagePath) ?? panic("Cannot borrow reference to profile")
-
-		//Add exising FUSD or create a new one and add it
-		let fusdReceiver = account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-		if !fusdReceiver.check() {
-			let fusd <- FUSD.createEmptyVault()
-			account.save(<- fusd, to: /storage/fusdVault)
-			account.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
-			account.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
-		}
+        self.profile =account.storage.borrow<auth(Profile.Admin) &Profile.User>(from:Profile.storagePath) ?? panic("Cannot borrow reference to profile")
 
 
-		var hasFusdWallet=false
-		var hasFlowWallet=false
-		let wallets=self.profile.getWallets()
-		for wallet in wallets {
-			if wallet.name=="FUSD" {
-				hasFusdWallet=true
-			}
+        let fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
+        if !fusdReceiver.check(){
+            let fusd <- FUSD.createEmptyVault(vaultType: Type<@FUSD.Vault>())
+            account.storage.save(<- fusd, to: /storage/fusdVault)
+            var cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/fusdVault)
+            account.capabilities.publish(cap, at: /public/fusdReceiver)
+            let capb = account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/fusdVault)
+            account.capabilities.publish(capb, at: /public/fusdBalance)
+        }
 
-			if wallet.name =="Flow" {
-				hasFlowWallet=true
-			}
-		}
+        var hasFusdWallet=false
+        var hasFlowWallet=false
+        let wallets=self.profile.getWallets()
+        for wallet in wallets {
+            if wallet.name=="FUSD" {
+                hasFusdWallet=true
+            }
 
-		if !hasFlowWallet {
-			let flowWallet=Profile.Wallet(
-				name:"Flow",
-				receiver:account.getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver),
-				balance:account.getCapability<&{FungibleToken.Balance}>(/public/flowTokenBalance),
-				accept: Type<@FlowToken.Vault>(),
-				tags: ["flow"]
-			)
-			self.profile.addWallet(flowWallet)
-		}
+            if wallet.name =="Flow" {
+                hasFlowWallet=true
+            }
+        }
 
-		if !hasFusdWallet {
-			let fusdWallet=Profile.Wallet(
-				name:"FUSD",
-				receiver:account.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver),
-				balance:account.getCapability<&{FungibleToken.Balance}>(/public/fusdBalance),
-				accept: Type<@FUSD.Vault>(),
-				tags: ["fusd", "stablecoin"]
-			)
-			self.profile.addWallet(fusdWallet)
-		}
+        if !hasFlowWallet {
+            let flowWallet=Profile.Wallet(
+                name:"Flow",
+                receiver:account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver),
+                balance:account.capabilities.get<&{FungibleToken.Vault}>(/public/flowTokenBalance),
+                accept: Type<@FlowToken.Vault>(),
+                tags: ["flow"]
+            )
+            self.profile.addWallet(flowWallet)
+        }
 
-		let leaseCollection = account.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-		if !leaseCollection.check() {
-			account.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
-			account.link<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>( FIND.LeasePublicPath, target: FIND.LeaseStoragePath)
+        if !hasFusdWallet {
+            let fusdWallet=Profile.Wallet(
+                name:"FUSD",
+                receiver:account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver),
+                balance:account.capabilities.get<&{FungibleToken.Vault}>(/public/fusdBalance),
+                accept: Type<@FUSD.Vault>(),
+                tags: ["fusd", "stablecoin"]
+            )
+            self.profile.addWallet(fusdWallet)
+        }
 
-		}
+        let leaseCollection = account.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
+        if !leaseCollection.check() {
+            account.storage.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
+            let cap = account.capabilities.storage.issue<&FIND.LeaseCollection>(FIND.LeaseStoragePath)
+            account.capabilities.publish(cap, at: FIND.LeasePublicPath)
+        }
 
-		let bidCollection = account.getCapability<&FIND.BidCollection{FIND.BidCollectionPublic}>(FIND.BidPublicPath)
-		if !bidCollection.check() {
-			account.save(<- FIND.createEmptyBidCollection(receiver: fusdReceiver, leases: leaseCollection), to: FIND.BidStoragePath)
-			account.link<&FIND.BidCollection{FIND.BidCollectionPublic}>( FIND.BidPublicPath, target: FIND.BidStoragePath)
-		}
-	}
+    }
 
-	execute{
-		for key in follows.keys {
-			let user = FIND.resolve(key) ?? panic(key.concat(" cannot be resolved. It is either an invalid .find name or address"))
-			let tags = follows[key]!
-			self.profile.follow(user, tags: tags)
-		}
-	}
+    execute{
+        for key in follows.keys {
+            let user = FIND.resolve(key) ?? panic(key.concat(" cannot be resolved. It is either an invalid .find name or address"))
+            let tags = follows[key]!
+            self.profile.follow(user, tags: tags)
+        }
+    }
 }
 

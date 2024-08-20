@@ -1,33 +1,22 @@
+import "FungibleToken"
+import "FUSD"
 
-
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
 
 transaction(recipient: Address, amount: UFix64) {
-	let tokenAdmin: &FUSD.Administrator
-	let tokenReceiver: &{FungibleToken.Receiver}
+    let tokenAdmin: &FUSD.Minter
+    let tokenReceiver: &{FungibleToken.Receiver}
 
-	prepare(signer: AuthAccount) {
+    prepare(signer: auth (BorrowValue) &Account) {
 
-		self.tokenAdmin = signer
-		.borrow<&FUSD.Administrator>(from: /storage/fusdAdmin)
-		?? panic("Signer is not the token admin")
+        self.tokenAdmin = signer.storage.borrow<&FUSD.Minter>(from: FUSD.AdminStoragePath) ?? panic("Signer is not the token admin")
 
-		self.tokenReceiver = getAccount(recipient)
-		.getCapability(/public/fusdReceiver)
-		.borrow<&{FungibleToken.Receiver}>()
-		?? panic("Unable to borrow receiver reference")
-	}
+        self.tokenReceiver = getAccount(recipient).capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)!.borrow() ?? panic("Unable to borrow receiver reference")
+    }
 
-	execute {
+    execute {
 
+        let mintedVault <- self.tokenAdmin.mintTokens(amount: amount)
 
-
-		let minter <- self.tokenAdmin.createNewMinter()
-		let mintedVault <- minter.mintTokens(amount: amount)
-
-		self.tokenReceiver.deposit(from: <-mintedVault)
-
-		destroy minter
-	}
+        self.tokenReceiver.deposit(from: <-mintedVault)
+    }
 }

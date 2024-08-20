@@ -1,18 +1,18 @@
-import FIND from "../contracts/FIND.cdc"
+import "FIND"
 
 transaction(name: String, directSellPrice:UFix64) {
 
-	let finLeases : &FIND.LeaseCollection?
+    let finLeases : auth(FIND.LeaseOwner) &FIND.LeaseCollection?
 
-	prepare(acct: AuthAccount) {
-		self.finLeases= acct.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
-	}
+    prepare(acct: auth(BorrowValue) &Account) {
+        self.finLeases= acct.storage.borrow<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
+    }
 
-	pre{
-		self.finLeases != nil : "Cannot borrow reference to find lease collection"
-	}
+    pre{
+        self.finLeases != nil : "Cannot borrow reference to find lease collection"
+    }
 
-	execute{
-		self.finLeases!.listForSale(name: name,  directSellPrice:directSellPrice)
-	}
+    execute{
+        self.finLeases!.listForSale(name: name,  directSellPrice:directSellPrice)
+    }
 }

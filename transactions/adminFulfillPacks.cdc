@@ -1,9 +1,9 @@
-import Admin from "../contracts/Admin.cdc"
+import "Admin"
 
 transaction(rewards:{UInt64 : [UInt64]}, types: {UInt64 : [String]}, salts: {UInt64:String}) {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 
-		let adminClient=account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
+		let adminClient=account.storage.borrow<auth(Admin.Owner) &Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
 
 		if rewards.length != salts.length {
 			panic("Rewards and packs are not same length")

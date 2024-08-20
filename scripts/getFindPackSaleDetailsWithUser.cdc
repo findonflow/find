@@ -1,10 +1,10 @@
-import FindPack from "../contracts/FindPack.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import FlowStorageFees from "../contracts/standard/FlowStorageFees.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FindPack"
+import "FTRegistry"
+import "FlowStorageFees"
+import "MetadataViews"
+import "FIND"
 
-pub fun main(packTypeName: String, packTypeId: UInt64, user: Address) : Report? {
+access(all) fun main(packTypeName: String, packTypeId: UInt64, user: Address) : Report? {
 	if let metadata = FindPack.getMetadataById(packTypeName: packTypeName, typeId: packTypeId) {
 		let packsLeft = FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId: packTypeId).getPacksLeft()
 		return Report(metadata, user: user, packsLeft:packsLeft)
@@ -13,31 +13,31 @@ pub fun main(packTypeName: String, packTypeId: UInt64, user: Address) : Report? 
 	return nil
 }
 
-pub struct Report {
-		pub let name: String
-		pub let description: String
+access(all) struct Report {
+		access(all) let name: String
+		access(all) let description: String
 
-		pub let thumbnailHash: String?
-		pub let thumbnailUrl:String?
+		access(all) let thumbnailHash: String?
+		access(all) let thumbnailUrl:String?
 
-		pub let walletType: String
-		pub let walletAlias: String?
+		access(all) let walletType: String
+		access(all) let walletAlias: String?
 
-		pub let openTime: UFix64
+		access(all) let openTime: UFix64
 
-		pub let storageRequirement: UInt64
-		pub let collectionDisplay: MetadataViews.NFTCollectionDisplay
+		access(all) let storageRequirement: UInt64
+		access(all) let collectionDisplay: MetadataViews.NFTCollectionDisplay
 
-		pub let itemTypes: [Type]
+		access(all) let itemTypes: [Type]
 
-		pub let extraData : {String : AnyStruct}
-		pub let packFields: {String : String}
-		pub let requiresReservation: Bool
-		pub let storageFlowNeeded: UFix64? 
+		access(all) let extraData : {String : AnyStruct}
+		access(all) let packFields: {String : String}
+		access(all) let requiresReservation: Bool
+		access(all) let storageFlowNeeded: UFix64? 
 
-		pub let userQualifiedSale : UserSaleInfo?
-		pub let saleInfos: [SaleInfo]
-		pub let packsLeft : Int 
+		access(all) let userQualifiedSale : UserSaleInfo?
+		access(all) let saleInfos: [SaleInfo]
+		access(all) let packsLeft : Int 
 
 		init(_ md: FindPack.Metadata, user: Address, packsLeft: Int) {
 			self.packsLeft=packsLeft
@@ -60,14 +60,14 @@ pub struct Report {
 		}
 }
 
-pub struct UserSaleInfo {
-		pub let name : String
-		pub let startTime : UFix64 
-		pub let endTime : UFix64?
-		pub let price : UFix64
-		pub let purchaseLimit : UInt64?
-		pub let userPurchaseRecord : UInt64
-		pub let canBuyNow : Bool
+access(all) struct UserSaleInfo {
+		access(all) let name : String
+		access(all) let startTime : UFix64 
+		access(all) let endTime : UFix64?
+		access(all) let price : UFix64
+		access(all) let purchaseLimit : UInt64?
+		access(all) let userPurchaseRecord : UInt64
+		access(all) let canBuyNow : Bool
 
 		init(_ si: FindPack.SaleInfo, user: Address, timeStamp: UFix64) {
 			self.name=si.name
@@ -80,7 +80,7 @@ pub struct UserSaleInfo {
 		}
 }
 
-pub fun getSoonestQualifiedSale(_ infos: [FindPack.SaleInfo], user: Address) : UserSaleInfo? {
+access(all) getSoonestQualifiedSale(_ infos: [FindPack.SaleInfo], user: Address) : UserSaleInfo? {
 	let res : [UserSaleInfo] = []
 	let currentTime = getCurrentBlock().timestamp
 	var availableOption : FindPack.SaleInfo? = nil 
@@ -117,7 +117,7 @@ pub fun getSoonestQualifiedSale(_ infos: [FindPack.SaleInfo], user: Address) : U
 	return nil
 }
 
-pub fun getRequiredFlow(_ requiresReservation: UInt64, user: Address) : UFix64? {
+access(all) getRequiredFlow(_ requiresReservation: UInt64, user: Address) : UFix64? {
 
 	let account = getAccount(user)
 	if account.storageCapacity > account.storageUsed {
@@ -128,15 +128,15 @@ pub fun getRequiredFlow(_ requiresReservation: UInt64, user: Address) : UFix64? 
 	return FlowStorageFees.storageCapacityToFlow(FlowStorageFees.convertUInt64StorageBytesToUFix64Megabytes(account.storageUsed + requiresReservation))
 }
 
-pub struct SaleInfo {
-		pub let name : String
-		pub let startTime : UFix64 
-		pub let endTime : UFix64?
-		pub let price : UFix64
-		pub let purchaseLimit : UInt64?
-		pub let purchaseRecord : {Address : UInt64}
-		pub let verifiers : [String]
-		pub let verifyAll : Bool 
+access(all) struct SaleInfo {
+		access(all) let name : String
+		access(all) let startTime : UFix64 
+		access(all) let endTime : UFix64?
+		access(all) let price : UFix64
+		access(all) let purchaseLimit : UInt64?
+		access(all) let purchaseRecord : {Address : UInt64}
+		access(all) let verifiers : [String]
+		access(all) let verifyAll : Bool 
 
 		init(_ si: FindPack.SaleInfo) {
 			self.name=si.name
@@ -155,7 +155,7 @@ pub struct SaleInfo {
 		}
 }
 
-pub fun convertSaleInfo(_ info: [FindPack.SaleInfo]) : [SaleInfo] {
+access(all) convertSaleInfo(_ info: [FindPack.SaleInfo]) : [SaleInfo] {
 	let res : [SaleInfo] = []
 	for i in info {
 		res.append(SaleInfo(i))

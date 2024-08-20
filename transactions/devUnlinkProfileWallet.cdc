@@ -1,8 +1,6 @@
-import Profile from "../contracts/Profile.cdc"
-
-
+import "Profile"
 transaction() {
-	prepare(account: AuthAccount) {
-		account.unlink(Profile.publicReceiverPath)
-	}
+    prepare(account: auth(UnpublishCapability) &Account) {
+        account.capabilities.unpublish(Profile.publicReceiverPath)
+    }
 }

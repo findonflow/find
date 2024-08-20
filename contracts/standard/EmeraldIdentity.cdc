@@ -11,35 +11,35 @@
 // multiple addresses to your DiscordID, and you cannot configure
 // multiple DiscordIDs to your address. 1-1.
 
-pub contract EmeraldIdentity {
+access(all) contract EmeraldIdentity {
 
     //
     // Paths
     //
-    pub let AdministratorStoragePath: StoragePath
-    pub let AdministratorPrivatePath: PrivatePath
+    access(all) let AdministratorStoragePath: StoragePath
+    access(all) let AdministratorPrivatePath: PrivatePath
 
     //
     // Events
     //
-    pub event EmeraldIDCreated(account: Address, discordID: String)
-    pub event EmeraldIDRemoved(account: Address, discordID: String)
-    
+    access(all) event EmeraldIDCreated(account: Address, discordID: String)
+    access(all) event EmeraldIDRemoved(account: Address, discordID: String)
+
     //
     // Administrator
     //
-    pub resource Administrator {
+    access(all) resource Administrator {
         // 1-to-1
         access(account) var accountToDiscord: {Address: String}
         // 1-to-1
         access(account) var discordToAccount: {String: Address}
 
-        pub fun createEmeraldID(account: Address, discordID: String) {
+        access(all) fun createEmeraldID(account: Address, discordID: String) {
             pre {
                 EmeraldIdentity.getAccountFromDiscord(discordID: discordID) == nil:
-                    "The old discordID must remove their EmeraldID first."
+                "The old discordID must remove their EmeraldID first."
                 EmeraldIdentity.getDiscordFromAccount(account: account) == nil: 
-                    "The old account must remove their EmeraldID first."
+                "The old account must remove their EmeraldID first."
             }
 
             self.accountToDiscord[account] = discordID
@@ -48,12 +48,12 @@ pub contract EmeraldIdentity {
             emit EmeraldIDCreated(account: account, discordID: discordID)
         }
 
-        pub fun removeByAccount(account: Address) {
+        access(all) fun removeByAccount(account: Address) {
             let discordID = EmeraldIdentity.getDiscordFromAccount(account: account) ?? panic("This EmeraldID does not exist!")
             self.remove(account: account, discordID: discordID)
         }
 
-        pub fun removeByDiscord(discordID: String) {
+        access(all) fun removeByDiscord(discordID: String) {
             let account = EmeraldIdentity.getAccountFromDiscord(discordID: discordID) ?? panic("This EmeraldID does not exist!")
             self.remove(account: account, discordID: discordID)
         }
@@ -65,8 +65,8 @@ pub contract EmeraldIdentity {
             emit EmeraldIDRemoved(account: account, discordID: discordID)
         }
 
-        pub fun createAdministrator(): Capability<&Administrator> {
-            return EmeraldIdentity.account.getCapability<&Administrator>(EmeraldIdentity.AdministratorPrivatePath)
+        access(all) fun createAdministrator(): Capability<&Administrator> {
+            return EmeraldIdentity.account.capabilities.storage.issue<&Administrator>(EmeraldIdentity.AdministratorStoragePath)
         }
 
         init() {
@@ -77,13 +77,13 @@ pub contract EmeraldIdentity {
 
     /*** USE THE BELOW FUNCTIONS FOR SECURE VERIFICATION OF ID ***/ 
 
-    pub fun getDiscordFromAccount(account: Address): String?  {
-        let admin = EmeraldIdentity.account.borrow<&Administrator>(from: EmeraldIdentity.AdministratorStoragePath)!
+    access(all) view fun getDiscordFromAccount(account: Address): String?  {
+        let admin = EmeraldIdentity.account.storage.borrow<&Administrator>(from: EmeraldIdentity.AdministratorStoragePath)!
         return admin.accountToDiscord[account]
     }
 
-    pub fun getAccountFromDiscord(discordID: String): Address? {
-        let admin = EmeraldIdentity.account.borrow<&Administrator>(from: EmeraldIdentity.AdministratorStoragePath)!
+    access(all) view fun getAccountFromDiscord(discordID: String): Address? {
+        let admin = EmeraldIdentity.account.storage.borrow<&Administrator>(from: EmeraldIdentity.AdministratorStoragePath)!
         return admin.discordToAccount[discordID]
     }
 
@@ -91,7 +91,6 @@ pub contract EmeraldIdentity {
         self.AdministratorStoragePath = /storage/EmeraldIDAdministrator
         self.AdministratorPrivatePath = /private/EmeraldIDAdministrator
 
-        self.account.save(<- create Administrator(), to: EmeraldIdentity.AdministratorStoragePath)
-        self.account.link<&Administrator>(EmeraldIdentity.AdministratorPrivatePath, target: EmeraldIdentity.AdministratorStoragePath)
+        self.account.storage.save(<- create Administrator(), to: EmeraldIdentity.AdministratorStoragePath)
     }
 }

@@ -1,11 +1,11 @@
-import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
-import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
+import "TokenForwarding"
+import "FungibleToken"
+import "DapperUtilityCoin"
+import "FlowUtilityToken"
+import "FungibleTokenSwitchboard"
+import "FiatToken"
+import "FUSD"
+import "FlowToken"
 
 /**
  This is a transaction to set up an merchant account
@@ -20,14 +20,14 @@ import FlowToken from "../contracts/standard/FlowToken.cdc"
 
 transaction(dapperMerchantAccountAddress: Address) {
 
-	prepare(acct: AuthAccount) {
+	prepare(acct: auth(BorrowValue) &Account) {
 		// Get a Receiver reference for the Dapper account that will be the recipient of the forwarded DUC and FUT
 		let dapper = getAccount(dapperMerchantAccountAddress)
 
 		//FUSD
 		let fusdReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/fusdReceiver)
 		if !fusdReceiver.check() {
-			let fusd <- FUSD.createEmptyVault()
+			let fusd <- FUSD.createEmptyVault(vaultType: Type<@FUSD.Vault>())
 			acct.save(<- fusd, to: /storage/fusdVault)
 			acct.link<&FUSD.Vault{FungibleToken.Receiver}>( /public/fusdReceiver, target: /storage/fusdVault)
 			acct.link<&FUSD.Vault{FungibleToken.Balance}>( /public/fusdBalance, target: /storage/fusdVault)
@@ -59,8 +59,8 @@ transaction(dapperMerchantAccountAddress: Address) {
 		//FlowUtility token
 
 		let futReceiver = acct.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-		let dapperFUTReceiver = dapper.getCapability<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
-		if !futReceiver.check(){
+		let dapperFUTReceiver = dapper.capabilities.get<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
+		if !futReceiver!.check(){
 			let futForwarder <- TokenForwarding.createNewForwarder(recipient: dapperFUTReceiver)
 			acct.save(<-futForwarder, to: /storage/flowUtilityTokenReceiver)
 			acct.link<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver, target: /storage/flowUtilityTokenReceiver)

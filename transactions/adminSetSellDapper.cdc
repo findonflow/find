@@ -1,17 +1,17 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
-import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
+import "FungibleToken"
+import "MetadataViews"
+import "DapperUtilityCoin"
+import "FlowUtilityToken"
+import "FindMarket"
+import "FlowToken"
+import "FIND"
+import "FindMarketSale"
+import "FindMarketAuctionSoft"
+import "FindMarketDirectOfferSoft"
 
 transaction(market: String, merchAddress: Address, tenantCut: UFix64){
-    prepare(account: AuthAccount){
-        let clientRef = account.borrow<&FindMarket.TenantClient>(from: FindMarket.TenantClientStoragePath) ?? panic("Cannot borrow Tenant Client Reference.")
+    prepare(account: auth(BorrowValue) &Account){
+        let clientRef = account.storage.borrow<auth(FindMarket.TenantClientOwner) &FindMarket.TenantClient>(from: FindMarket.TenantClientStoragePath) ?? panic("Cannot borrow Tenant Client Reference.")
 
 		// emulator
 		var identifier = "A.f8d6e0586b0a20c7.Wearables.NFT"
@@ -33,14 +33,14 @@ transaction(market: String, merchAddress: Address, tenantCut: UFix64){
 		]
 
         switch market {
-            // case "AuctionEscrow" :
-            //     marketType = [Type<@FindLeaseMarketAuctionEscrow.SaleItem>()]
+            case "AuctionEscrow" :
+                marketType = [Type<@FindLeaseMarketAuctionEscrow.SaleItem>()]
 
             case "AuctionSoft" :
                 marketType = [Type<@FindMarketAuctionSoft.SaleItem>()]
 
-            // case "DirectOfferEscrow" :
-            //     marketType = [Type<@FindLeaseMarketDirectOfferEscrow.SaleItem>()]
+            case "DirectOfferEscrow" :
+                marketType = [Type<@FindLeaseMarketDirectOfferEscrow.SaleItem>()]
 
             case "DirectOfferSoft" :
                 marketType = [Type<@FindMarketDirectOfferSoft.SaleItem>()]

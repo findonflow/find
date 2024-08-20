@@ -1,15 +1,15 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FindAirdropper from "../contracts/FindAirdropper.cdc"
-import Wearables from "../contracts/community/Wearables.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FindViews"
+import "FIND"
+import "FindAirdropper"
+import "Wearables"
 
 transaction(allReceivers: [String] , ids:[UInt64], memos: [String]) {
 
 	let authPointers : [FindViews.AuthNFTPointer]
 
-	prepare(account : AuthAccount) {
+	prepare(account : auth(BorrowValue) &Account) {
 
 		self.authPointers = []
 		let privatePath = Wearables.CollectionPrivatePath
@@ -17,9 +17,9 @@ transaction(allReceivers: [String] , ids:[UInt64], memos: [String]) {
 
 		for id in ids {
 
-			var providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(privatePath)
+			var providerCap=account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.Collection}>(privatePath)
 			if !providerCap.check() {
-				let newCap = account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+				let newCap = account.link<&{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 					privatePath,
 					target: storagePath
 				)
@@ -27,11 +27,11 @@ transaction(allReceivers: [String] , ids:[UInt64], memos: [String]) {
 					// If linking is not successful, we link it using finds custom link
 					let pathIdentifier = privatePath.toString()
 					let findPath = PrivatePath(identifier: pathIdentifier.slice(from: "/private/".length , upTo: pathIdentifier.length).concat("_FIND"))!
-					account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+					account.link<&{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 						findPath,
 						target: storagePath
 					)
-					providerCap = account.getCapability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(findPath)
+					providerCap = account.getCapability<&{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(findPath)
 				}
 			}
 			let pointer = FindViews.AuthNFTPointer(cap: providerCap, id: id)

@@ -1,17 +1,17 @@
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "FindMarketAdmin"
+import "FindMarket"
+import "FlowToken"
+import "FUSD"
+import "FiatToken"
+import "DapperUtilityCoin"
+import "FlowUtilityToken"
+import "MetadataViews"
 
 //signed by admin to link tenantClient to a new tenant
 transaction(tenant: String, adminAddress: Address, tenantAddress: Address, findCut: UFix64) {
 	//versus account
-	prepare(account: AuthAccount) {
-		let adminClient=account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath)!
+	prepare(account: auth(BorrowValue) &Account) {
+		let adminClient=account.storage.borrow<auth(FindMarketAdmin.Owner) &FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath)!
 
 		// pass in the default cut rules here
 		let cut = [
@@ -35,7 +35,7 @@ transaction(tenant: String, adminAddress: Address, tenantAddress: Address, findC
 		let tenantCap= adminClient.createFindMarket(name: tenant, address: tenantAddress, findCutSaleItem: saleItem)
 
 		let tenantAccount=getAccount(adminAddress)
-		let tenantClient=tenantAccount.getCapability<&{FindMarket.TenantClientPublic}>(FindMarket.TenantClientPublicPath).borrow()!
+		let tenantClient=tenantAccount.capabilities.get<&{FindMarket.TenantClientPublic}>(FindMarket.TenantClientPublicPath)!.borrow()!
 		tenantClient.addCapability(tenantCap)
 	}
 }

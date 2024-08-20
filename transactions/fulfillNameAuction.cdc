@@ -1,19 +1,19 @@
-import FIND from "../contracts/FIND.cdc"
-import Profile from "../contracts/Profile.cdc"
+import "FIND"
+import "Profile"
 
 transaction(owner: Address, name: String) {
 
-	let leases : &FIND.LeaseCollection{FIND.LeaseCollectionPublic}?
+    let leases : &FIND.LeaseCollection?
 
-	prepare(account: AuthAccount) {
-		self.leases = getAccount(owner).getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath).borrow()
-	}
+    prepare(account: &Account) {
+        self.leases = getAccount(owner).capabilities.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)!.borrow()
+    }
 
-	pre{
-		self.leases != nil : "Cannot borrow reference to lease collection reference. Account address: ".concat(owner.toString())
-	}
+    pre{
+        self.leases != nil : "Cannot borrow reference to lease collection reference. Account address: ".concat(owner.toString())
+    }
 
-	execute{
-		self.leases!.fulfillAuction(name)
-	}
+    execute{
+        self.leases!.fulfillAuction(name)
+    }
 }

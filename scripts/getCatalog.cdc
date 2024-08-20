@@ -1,6 +1,6 @@
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+import "NFTCatalog"
+import "FINDNFTCatalog"
 
-pub fun main() : {String : NFTCatalog.NFTCatalogMetadata} {
+access(all) fun main() : {String : NFTCatalog.NFTCatalogMetadata} {
 	return FINDNFTCatalog.getCatalog() 
 }

@@ -1,0 +1,51 @@
+#/bin/bash
+flow-c1 migrate stage-contract -n testnet --skip-validation CharityNFT
+exit
+
+# this does not work
+#flow-c1 migrate stage-contract -n testnet --skip-validation FindUserStatus
+flow-c1 migrate stage-contract -n testnet --skip-validation NameVoucher
+flow-c1 migrate stage-contract -n testnet --skip-validation FindVerifier
+flow-c1 migrate stage-contract -n testnet --skip-validation FindMarketSale
+flow-c1 migrate stage-contract -n testnet --skip-validation FIND
+flow-c1 migrate stage-contract -n testnet --skip-validation Clock
+flow-c1 migrate stage-contract -n testnet --skip-validation Profile
+flow-c1 migrate stage-contract -n testnet --skip-validation Debug
+flow-c1 migrate stage-contract -n testnet --skip-validation Admin
+flow-c1 migrate stage-contract -n testnet --skip-validation FindMarketAdmin
+flow-c1 migrate stage-contract -n testnet --skip-validation FindViews
+flow-c1 migrate stage-contract -n testnet --skip-validation Dandy
+flow-c1 migrate stage-contract -n testnet --skip-validation FindMarket
+flow-c1 migrate stage-contract -n testnet --skip-validation FindMarketDirectOfferEscrow
+flow-c1 migrate stage-contract -n testnet --skip-validation FindMarketDirectOfferSoft
+flow-c1 migrate stage-contract -n testnet --skip-validation FindMarketAuctionEscrow
+flow-c1 migrate stage-contract -n testnet --skip-validation FindMarketAuctionSoft
+flow-c1 migrate stage-contract -n testnet --skip-validation Sender
+flow-c1 migrate stage-contract -n testnet --skip-validation FindRelatedAccounts
+flow-c1 migrate stage-contract -n testnet --skip-validation FTRegistry
+flow-c1 migrate stage-contract -n testnet --skip-validation FindForge
+flow-c1 migrate stage-contract -n testnet --skip-validation FindForgeOrder
+flow-c1 migrate stage-contract -n testnet --skip-validation FindForgeStruct
+flow-c1 migrate stage-contract -n testnet --skip-validation FindLeaseMarket
+flow-c1 migrate stage-contract -n testnet --skip-validation FindLeaseMarketSale
+flow-c1 migrate stage-contract -n testnet --skip-validation FindLeaseMarketAuctionSoft
+flow-c1 migrate stage-contract -n testnet --skip-validation FindLeaseMarketDirectOfferSoft
+flow-c1 migrate stage-contract -n testnet --skip-validation ProfileCache
+flow-c1 migrate stage-contract -n testnet --skip-validation FindRulesCache
+flow-c1 migrate stage-contract -n testnet --skip-validation FINDNFTCatalog
+flow-c1 migrate stage-contract -n testnet --skip-validation FINDNFTCatalogAdmin
+flow-c1 migrate stage-contract -n testnet --skip-validation FindPack
+flow-c1 migrate stage-contract -n testnet --skip-validation FindAirdropper
+flow-c1 migrate stage-contract -n testnet --skip-validation FindFurnace
+flow-c1 migrate stage-contract -n testnet --skip-validation FindThoughts
+flow-c1 migrate stage-contract -n testnet --skip-validation FindUtils
+flow-c1 migrate stage-contract -n testnet --skip-validation FindLostAndFoundWrapper
+flow-c1 migrate stage-contract -n testnet --skip-validation FindMarketCut
+flow-c1 migrate stage-contract -n testnet --skip-validation FindMarketCutStruct
+flow-c1 migrate stage-contract -n testnet --skip-validation FindMarketCutInterface
+flow-c1 migrate stage-contract -n testnet --skip-validation FindMarketInfrastructureCut
+flow-c1 migrate stage-contract -n testnet --skip-validation NFGv3
+flow-c1 migrate stage-contract -n testnet --skip-validation PartyFavorz
+flow-c1 migrate stage-contract -n testnet --skip-validation PartyFavorzExtraData
+flow-c1 migrate stage-contract -n testnet --skip-validation Flomies
+flow-c1 migrate stage-contract -n testnet --skip-validation GeneratedExperiences

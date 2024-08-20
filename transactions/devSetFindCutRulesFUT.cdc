@@ -1,10 +1,10 @@
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
+import "FindMarketAdmin"
+import "FindMarket"
+import "FlowUtilityToken"
 
 transaction(tenant: Address, cut: UFix64?){
-    prepare(account: AuthAccount){
-        let adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+    prepare(account: auth(BorrowValue) &Account){
+        let adminRef = account.storage.borrow<auth(FindMarketAdmin.Owner) &FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 		// pass in the default cut rules here
 		let rules = [
 			FindMarket.TenantRule( name:"standard ft", types:[Type<@FlowUtilityToken.Vault>()], ruleType:"ft", allow:true)

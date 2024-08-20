@@ -1,8 +1,8 @@
-import Debug from "../contracts/Debug.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "Debug"
+import "FIND"
 
 transaction(user: String) {
-    prepare(acct: AuthAccount) {
+    prepare(acct: auth(BorrowValue) &Account) {
         let name = FIND.resolve(user)
         Debug.log(name!.toString())
     }

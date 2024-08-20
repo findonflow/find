@@ -1,13 +1,12 @@
-import Profile from "../contracts/Profile.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "Profile"
+import "FIND"
 
 
 transaction(name: String) {
-	prepare(acct: AuthAccount) {
+    prepare(acct: auth(BorrowValue) &Account) {
 
-
-		let profile =acct.borrow<&Profile.User>(from:Profile.storagePath)!
-		profile.setFindName(name)
-	}
+        let profile =acct.borrow<&Profile.User>(from:Profile.storagePath)!
+        profile.setFindName(name)
+    }
 }
 

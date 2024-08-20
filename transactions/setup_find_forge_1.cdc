@@ -1,11 +1,9 @@
-import FindForge from "../contracts/FindForge.cdc"
+import "FindForge"
 
-
-//Transaction that is signed by find to create a find market tenant for find
 transaction() {
-	prepare(account: AuthAccount) {
-		//in finds case the 
-		account.save(<- FindForge.createForgeAdminProxyClient(), to:/storage/findForgeAdminProxy)
-		account.link<&{FindForge.ForgeAdminProxyClient}>(/public/findForgeAdminProxy, target: /storage/findForgeAdminProxy)
-	}
+    prepare(account: auth(BorrowValue, SaveValue, PublishCapability, IssueStorageCapabilityController) &Account) {
+        account.storage.save(<- FindForge.createForgeAdminProxyClient(), to:/storage/findForgeAdminProxy)
+        let cap = account.capabilities.storage.issue<&{FindForge.ForgeAdminProxyClient}>(/storage/findForgeAdminProxy)
+        account.capabilities.publish(cap, at: /public/findForgeAdminProxy)
+    }
 }

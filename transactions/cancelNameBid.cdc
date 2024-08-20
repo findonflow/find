@@ -1,11 +1,11 @@
-import FIND from "../contracts/FIND.cdc"
+import "FIND"
 
 transaction(names: [String]) {
 
 	let bids : &FIND.BidCollection?
 
-	prepare(account: AuthAccount) {
-		self.bids = account.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath)
+	prepare(account: auth(BorrowValue) &Account) {
+		self.bids = account.storage.borrow<&FIND.BidCollection>(from: FIND.BidStoragePath)
 	}
 
 	pre{

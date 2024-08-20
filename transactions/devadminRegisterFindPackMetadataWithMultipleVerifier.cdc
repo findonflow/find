@@ -1,27 +1,27 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FindPack from "../contracts/FindPack.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FindVerifier from "../contracts/FindVerifier.cdc"
-import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
-import FindForge from "../contracts/FindForge.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FINDNFTCatalog"
+import "FungibleToken"
+import "FindPack"
+import "FlowToken"
+import "FindVerifier"
+import "ExampleNFT"
+import "FindForge"
 
-import Admin from "../contracts/Admin.cdc"
+import "Admin"
 
 // this is a simple tx to update the metadata of a given type of NeoVoucher
 
 transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Address, openTime:UFix64, royaltyCut: UFix64, royaltyAddress: Address, requiresReservation: Bool, startTime:{String : UFix64}, endTime: {String : UFix64}, floatEventId: {String : UInt64}, price: {String : UFix64}, purchaseLimit:{String: UInt64}, checkAll: Bool) {
 
-	let admin: &Admin.AdminProxy
+	let admin: auth(Admin.Owner) &Admin.AdminProxy
 	let wallet: Capability<&{FungibleToken.Receiver}>
 	let royaltyWallet: Capability<&{FungibleToken.Receiver}>
-	let providerCaps : {Type : Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>}
+	let providerCaps : {Type : Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>}
 	let itemTypes : [Type]
 
-	prepare(account: AuthAccount) {
-		self.admin =account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
+	prepare(account: auth(BorrowValue) &Account) {
+		self.admin =account.storage.borrow<auth(Admin.Owner) &Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Could not borrow admin")
 		self.wallet = getAccount(wallet).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 		self.royaltyWallet = getAccount(royaltyAddress).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 
@@ -33,7 +33,7 @@ transaction(lease: String, typeId: UInt64, thumbnailHash: String, wallet: Addres
 				panic("Type : ".concat(type.identifier).concat(" is not supported in NFTCatalog at the moment"))
 			}
 			let collectionInfo = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collection!.keys[0])!.collectionData
-			let providerCap = account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(collectionInfo.privatePath)	
+			let providerCap = account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>(collectionInfo.privatePath)	
 
 			self.providerCaps[type] = providerCap
 		}

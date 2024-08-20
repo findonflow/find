@@ -1,11 +1,11 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
+import "FindMarket"
+import "FindMarketSale"
+import "NonFungibleToken"
+import "MetadataViews"
+import "NFTCatalog"
+import "FINDNFTCatalog"
+import "FTRegistry"
+import "FungibleToken"
 
 transaction(users: [Address], ids: [UInt64], amounts: [UFix64]) {
 
@@ -16,7 +16,7 @@ transaction(users: [Address], ids: [UInt64], amounts: [UFix64]) {
 	let saleItems: [&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}]
 	var totalPrice : UFix64
 	let prices : [UFix64]
-	prepare(dapper: AuthAccount, account: AuthAccount) {
+	prepare(dapper: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account, account: auth(BorrowValue) &Account) {
 
 		let marketplace = FindMarket.getFindTenantAddress()
 		if users.length != ids.length {
@@ -46,7 +46,7 @@ transaction(users: [Address], ids: [UInt64], amounts: [UFix64]) {
 		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath)
 		if !saleItemCap.check() {
 			//The link here has to be a capability not a tenant, because it can change.
-			account.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
+			account.storage.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
 			account.link<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
 		}
 		var vaultType : Type? = nil
@@ -94,7 +94,7 @@ transaction(users: [Address], ids: [UInt64], amounts: [UFix64]) {
 				fts[ftIdentifier] = ft
 			}
 
-			let dapperVault = dapper.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("Cannot borrow Dapper Coin Vault : ".concat(ft!.type.identifier))
+			let dapperVault = dapper.storage.borrow<&{FungibleToken.Vault}>(from: ft!.vaultPath) ?? panic("Cannot borrow Dapper Coin Vault : ".concat(ft!.type.identifier))
 
 			self.walletReference.append(
 				dapperVault
@@ -112,15 +112,15 @@ transaction(users: [Address], ids: [UInt64], amounts: [UFix64]) {
 				if account.type(at: cd.storagePath) != nil {
 					let pathIdentifier = nft!.publicPath.toString()
 					let findPath = PublicPath(identifier: pathIdentifier.slice(from: "/public/".length , upTo: pathIdentifier.length).concat("_FIND"))!
-					account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+					account.link<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 						findPath,
 						target: nft!.storagePath
 					)
-					targetCapability = account.getCapability<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(findPath)
+					targetCapability = account.getCapability<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(findPath)
 				} else {
-					account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
-					account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-					account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
+					account.storage.save(<- cd.createEmptyCollection(), to: cd.storagePath)
+					account.link<&{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
+					account.link<&{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
 				}
 
 			}

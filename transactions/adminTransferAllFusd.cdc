@@ -1,6 +1,6 @@
 // Mainnet
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
+import "FungibleToken"
+import "FUSD"
 
 // Testnet
 // import FungibleToken from 0x9a0766d93b6608b7
@@ -11,7 +11,7 @@ transaction(recipient: Address) {
   // The Vault resource that holds the tokens that are being transfered
   let sentVault: @FungibleToken.Vault
 
-  prepare(signer: AuthAccount) {
+  prepare(signer: auth(BorrowValue) &Account) {
     // Get a reference to the signer's stored vault
     let vaultRef = signer.borrow<&FUSD.Vault>(from: /storage/fusdVault)
       ?? panic("Could not borrow reference to the owner's Vault!")

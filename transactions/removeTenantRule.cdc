@@ -1,9 +1,9 @@
-import FindMarket from "../contracts/FindMarket.cdc"
+import "FindMarket"
 
 transaction(optionName: String, tenantRuleName: String){
-    prepare(account: AuthAccount){
+    prepare(account: auth(BorrowValue) &Account){
         let path = FindMarket.TenantClientStoragePath
-        let tenantRef = account.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
+        let tenantRef = account.storage.borrow<auth(FindMarket.TenantClientOwner) &FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
 
         tenantRef.removeTenantRule(optionName: optionName, tenantRuleName: tenantRuleName)
     }

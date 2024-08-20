@@ -1,19 +1,19 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import Dandy from "../contracts/Dandy.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import FindMarketAuctionEscrow from "../contracts/FindMarketAuctionEscrow.cdc"
-import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
-import FindMarketDirectOfferEscrow from "../contracts/FindMarketDirectOfferEscrow.cdc"
-import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "FindMarket"
+import "FindMarketAdmin"
+import "FlowToken"
+import "Dandy"
+import "FindMarketSale"
+import "FindMarketAuctionEscrow"
+import "FindMarketAuctionSoft"
+import "FindMarketDirectOfferEscrow"
+import "FindMarketDirectOfferSoft"
+import "FlowUtilityToken"
+import "FungibleToken"
+import "MetadataViews"
 
 transaction(tenant: Address, market: String){
-    prepare(account: AuthAccount){
-        let adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+    prepare(account: auth(BorrowValue) &Account){
+        let adminRef = account.storage.borrow<auth(FindMarketAdmin.Owner) &FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
 		let tenantRef = adminRef.getTenantRef(tenant)
 

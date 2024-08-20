@@ -1,28 +1,32 @@
-import FUSD from "../contracts/standard/FUSD.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FlowToken"
+import "FIND"
+import "FungibleToken"
 
-transaction(name: String, amount: UFix64) {
+transaction(name: String, maxAmount: UFix64) {
 
-	let vaultRef : &FUSD.Vault?
-	let leases : &FIND.LeaseCollection?
-	let price : UFix64
+    let vaultRef : auth(FungibleToken.Withdraw) &FlowToken.Vault?
+    let leases : auth(FIND.LeaseOwner) &FIND.LeaseCollection?
+    let cost : UFix64
 
-	prepare(account: AuthAccount) {
+    prepare(account: auth(BorrowValue) &Account) {
 
-		self.price=FIND.calculateCost(name)
-		log("The cost for registering this name is ".concat(self.price.toString()))
-		self.vaultRef = account.borrow<&FUSD.Vault>(from: /storage/fusdVault)
-		self.leases=account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)
-	}
+        self.vaultRef = account.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(from: /storage/flowTokenVault)
+        self.leases=account.storage.borrow<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(from: FIND.LeaseStoragePath)
 
-	pre{
-		self.vaultRef != nil : "Could not borrow reference to the fusdVault!"
-		self.leases != nil : "Could not borrow reference to find lease collection"
-		self.price == amount : "Calculated cost : ".concat(self.price.toString()).concat(" does not match expected cost : ").concat(amount.toString())
-	}
+        self.cost = FIND.calculateCostInFlow(name)
 
-	execute{
-		let payVault <- self.vaultRef!.withdraw(amount: self.price) as! @FUSD.Vault
-		self.leases!.register(name: name, vault: <- payVault)
-	}
+    }
+
+
+    pre{
+        self.cost <= maxAmount : "You have not sent in enough max flow, the cost is ".concat(self.cost.toString())
+        self.vaultRef != nil : "Could not borrow reference to the fusdVault!"
+        self.leases != nil : "Could not borrow reference to find lease collection"
+        self.vaultRef!.balance > self.cost : "Balance of vault is not high enough ".concat(self.cost.toString()).concat(" total balance is ").concat(self.vaultRef!.balance.toString())
+    }
+
+    execute{
+        let payVault <- self.vaultRef!.withdraw(amount: self.cost) as! @FlowToken.Vault
+        self.leases!.register(name: name, vault: <- payVault)
+    }
 }

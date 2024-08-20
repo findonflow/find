@@ -1,24 +1,47 @@
 
-import Admin from "../contracts/Admin.cdc"
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
+import "Admin"
+import "FindMarketAdmin"
+import "FUSD"
+import "FungibleToken"
 
 //set up the adminClient in the contract that will own the network
 transaction() {
 
-	prepare(account: AuthAccount) {
+    prepare(account: auth(SaveValue, IssueStorageCapabilityController,PublishCapability) &Account) {
 
-		if account.getCapability(Admin.AdminProxyPublicPath).check<&AnyResource>() {
-			account.unlink(Admin.AdminProxyPublicPath)
-			destroy <- account.load<@AnyResource>(from: Admin.AdminProxyStoragePath)
-		}
-		account.save(<- Admin.createAdminProxyClient(), to:Admin.AdminProxyStoragePath)
-		account.link<&{Admin.AdminProxyClient}>(Admin.AdminProxyPublicPath, target: Admin.AdminProxyStoragePath)
+        let fusd <- FUSD.createEmptyVault(vaultType: Type<@FUSD.Vault>())
+        account.storage.save(<- fusd, to: /storage/fusdVault)
+        let cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/fusdVault)
+        account.capabilities.publish(cap, at: /public/fusdReceiver)
 
-		if account.getCapability(FindMarketAdmin.AdminProxyPublicPath).check<&AnyResource>() {
-			account.unlink(FindMarketAdmin.AdminProxyPublicPath)
-			destroy <- account.load<@AnyResource>(from: FindMarketAdmin.AdminProxyStoragePath)
-		}
-		account.save(<- FindMarketAdmin.createAdminProxyClient(), to:FindMarketAdmin.AdminProxyStoragePath)
-		account.link<&{FindMarketAdmin.AdminProxyClient}>(FindMarketAdmin.AdminProxyPublicPath, target: FindMarketAdmin.AdminProxyStoragePath)
-	}
+        let capb = account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/fusdVault)
+        account.capabilities.publish(capb, at: /public/fusdBalance)
+
+
+        let caps = account.capabilities
+        let storage = account.storage
+
+        //Dont know why this does not work
+        /*
+        if caps.exists(Admin.AdminProxyPublicPath) {
+            caps.unpublish(Admin.AdminProxyPublicPath)
+            destroy <- storage.load<@AnyResource>(from: Admin.AdminProxyStoragePath)    
+        }
+        */
+        storage.save(<- Admin.createAdminProxyClient(), to:Admin.AdminProxyStoragePath)
+        let proxyCap =caps.storage.issue<&{Admin.AdminProxyClient}>(Admin.AdminProxyStoragePath)
+        caps.publish(proxyCap, at: Admin.AdminProxyPublicPath)
+
+        /*
+        if caps.exists(FindMarketAdmin.AdminProxyPublicPath) {
+            caps.unpublish(FindMarketAdmin.AdminProxyPublicPath)
+            destroy <- storage.load<@AnyResource>(from:FindMarketAdmin.AdminProxyStoragePath)
+        }
+        */
+        storage.save(<- FindMarketAdmin.createAdminProxyClient(), to:FindMarketAdmin.AdminProxyStoragePath)
+        let marketProxyCap =caps.storage.issue<&{FindMarketAdmin.AdminProxyClient}>(FindMarketAdmin.AdminProxyStoragePath)
+        caps.publish(marketProxyCap, at: FindMarketAdmin.AdminProxyPublicPath)
+
+
+    }
 }

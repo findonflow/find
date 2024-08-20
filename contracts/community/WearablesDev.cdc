@@ -1,14 +1,14 @@
 //This contract is for testing only and should not be deployed elsewhere
 
-import NonFungibleToken from "../standard/NonFungibleToken.cdc"
-import MetadataViews from "../standard/MetadataViews.cdc"
-import Wearables from "./Wearables.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "Wearables"
 
-pub contract WearablesDev {
+access(all) contract WearablesDev {
 
-	pub var initiated: Bool
+	access(all) var initiated: Bool
 
-	pub fun mintWearablesForTest(receiver: Address) {
+	access(all) mintWearablesForTest(receiver: Address) {
 		self.initialize()
 		let account = getAccount(receiver)
 		let wearable= account.getCapability<&Wearables.Collection{NonFungibleToken.Receiver}>(Wearables.CollectionPublicPath).borrow() ?? panic("cannot borrow werable cap")

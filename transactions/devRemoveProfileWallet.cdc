@@ -1,11 +1,11 @@
-import Profile from "../contracts/Profile.cdc"
+import "Profile"
 
 
 transaction() {
-	prepare(account: AuthAccount) {
-		let wallet = account.borrow<&Profile.User>(from: Profile.storagePath)! 
-		wallet.removeWallet("Flow")
-		wallet.removeWallet("FUSD")
-		wallet.removeWallet("USDC")
-	}
+    prepare(account: auth(BorrowValue, Profile.Admin) &Account) {
+        let wallet = account.storage.borrow<auth(Profile.Admin) &Profile.User>(from: Profile.storagePath)! 
+        wallet.removeWallet("Flow")
+        wallet.removeWallet("FUSD")
+        wallet.removeWallet("USDC")
+    }
 }

@@ -1,0 +1,19 @@
+[]test_main.ThoughtData{{
+	Body:               "body",
+	Created:            1,
+	Creator:            "0x192440c99cb17282",
+	CreatorAvatar:      "https://find.xyz/assets/img/avatars/avatar14.png",
+	CreatorName:        "user1",
+	CreatorProfileName: "user1",
+	Header:             "head",
+	Tags: []string{
+		"tag1",
+		"tag2",
+		"@find",
+	},
+	NFT: []test_main.NftDetail{{
+		Name:      "Neo Motorcycle 1 of 3",
+		Thumbnail: "https://neomotorcycles.co.uk/assets/img/neo_motorcycle_side.webp",
+		Type:      "A.f3fcd2c1a78f5eee.Dandy.NFT",
+	}},
+}}

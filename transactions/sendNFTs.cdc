@@ -1,200 +1,187 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FlowStorageFees from "../contracts/standard/FlowStorageFees.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FindAirdropper from "../contracts/FindAirdropper.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import Profile from "../contracts/Profile.cdc"
-import Sender from "../contracts/Sender.cdc"
+import "NonFungibleToken"
+import "FungibleToken"
+import "FlowStorageFees"
+import "FlowToken"
+import "MetadataViews"
+import "NFTCatalog"
+import "FINDNFTCatalog"
+import "FindViews"
+import "FIND"
+import "FindAirdropper"
+import "FTRegistry"
+import "Profile"
+import "Sender"
 
 transaction(nftIdentifiers: [String], allReceivers: [String] , ids:[UInt64], memos: [String], donationTypes: [String?], donationAmounts: [UFix64?], findDonationType: String?, findDonationAmount: UFix64?) {
 
-	let authPointers : [FindViews.AuthNFTPointer]
-	let paths : [PublicPath]
-    let flowVault : &FungibleToken.Vault
-    let flowTokenRepayment : Capability<&FlowToken.Vault{FungibleToken.Receiver}>
+    let authPointers : [FindViews.AuthNFTPointer]
+    let paths : [PublicPath]
+    let flowVault : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
+    let flowTokenRepayment : Capability<&FlowToken.Vault>
     let defaultTokenAvailableBalance : UFix64
 
-	let royalties: [MetadataViews.Royalties?]
-	let totalRoyalties: [UFix64]
-	let vaultRefs: {String : &FungibleToken.Vault}
-	var token : &Sender.Token
-
-	prepare(account : AuthAccount) {
-
-		self.authPointers = []
-		self.paths = []
-		self.royalties = []
-		self.totalRoyalties = []
-		self.vaultRefs = {}
+    let royalties: [MetadataViews.Royalties?]
+    let totalRoyalties: [UFix64]
+    let vaultRefs: {String : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}}
+    var token : &Sender.Token
 
 
-		let contractData : {Type : NFTCatalog.NFTCatalogMetadata} = {}
+    prepare(account: auth (Storage, StorageCapabilities, NonFungibleToken.Withdraw, IssueStorageCapabilityController, FungibleToken.Withdraw) &Account) {
+
+        self.authPointers = []
+        self.paths = []
+        self.royalties = []
+        self.totalRoyalties = []
+        self.vaultRefs = {}
 
 
-		for i , typeIdentifier in nftIdentifiers {
-			let type = CompositeType(typeIdentifier) ?? panic("Cannot refer to type with identifier : ".concat(typeIdentifier))
+        let contractData : {Type : NFTCatalog.NFTCatalogMetadata} = {}
 
-			var data : NFTCatalog.NFTCatalogMetadata? = contractData[type]
-			if data == nil {
-				data = FINDNFTCatalog.getMetadataFromType(type) ?? panic("NFT Type is not supported by NFT Catalog. Type : ".concat(type.identifier))
-				contractData[type] = data
-			}
 
-			let path = data!.collectionData
+        for i , typeIdentifier in nftIdentifiers {
+            let type = CompositeType(typeIdentifier) ?? panic("Cannot refer to type with identifier : ".concat(typeIdentifier))
 
-			var providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(path.privatePath)
-			if !providerCap.check() {
-				let newCap = account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
-					path.privatePath,
-					target: path.storagePath
-				)
-				if newCap == nil {
-					// If linking is not successful, we link it using finds custom link
-					let pathIdentifier = path.privatePath.toString()
-					let findPath = PrivatePath(identifier: pathIdentifier.slice(from: "/private/".length , upTo: pathIdentifier.length).concat("_FIND"))!
-					account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
-						findPath,
-						target: path.storagePath
-					)
-					providerCap = account.getCapability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(findPath)
-				}
-			}
-			let pointer = FindViews.AuthNFTPointer(cap: providerCap, id: ids[i])
+            var data : NFTCatalog.NFTCatalogMetadata? = contractData[type]
+            if data == nil {
+                data = FINDNFTCatalog.getMetadataFromType(type) ?? panic("NFT Type is not supported by NFT Catalog. Type : ".concat(type.identifier))
+                contractData[type] = data
+            }
 
-			if let dt = donationTypes[i] {
-				self.royalties.append(pointer.getRoyalty())
-				self.totalRoyalties.append(pointer.getTotalRoyaltiesCut())
+            let path = data!.collectionData
 
-				// get the vault for donation
-				if self.vaultRefs[dt] == nil {
-					let info = FTRegistry.getFTInfo(dt) ?? panic("This token type is not supported at the moment : ".concat(dt))
-					let ftPath = info.vaultPath
-					let ref = account.borrow<&FungibleToken.Vault>(from: ftPath) ?? panic("Cannot borrow vault reference for type : ".concat(dt))
-					self.vaultRefs[dt] = ref
-				}
+            let storage = account.capabilities.storage
 
-			} else {
-				self.royalties.append(nil)
-				self.totalRoyalties.append(0.0)
-			}
+            let storagePathIdentifer = path.storagePath.toString().split(separator:"/")[1]
+            let providerIdentifier = storagePathIdentifer.concat("Provider")
+            let providerStoragePath = StoragePath(identifier: providerIdentifier)!
 
-			self.authPointers.append(pointer)
-			self.paths.append(path.publicPath)
-		}
+            //if this stores anything but this it will panic, why does it not return nil?
+            var optProviderCap= account.storage.copy<Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>>(from: providerStoragePath) 
+            if optProviderCap==nil {
+                optProviderCap=account.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection}>(path.storagePath)
+                account.storage.save(optProviderCap!, to: providerStoragePath)
+            }
 
-        self.flowVault = account.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Cannot borrow reference to sender's flow vault")
-        self.flowTokenRepayment = account.getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+            let providerCap=optProviderCap!
+            let pointer = FindViews.AuthNFTPointer(cap: providerCap, id: ids[i])
+
+            if let dt = donationTypes[i] {
+                self.royalties.append(pointer.getRoyalty())
+                self.totalRoyalties.append(pointer.getTotalRoyaltiesCut())
+
+                // get the vault for donation
+                if self.vaultRefs[dt] == nil {
+                    let info = FTRegistry.getFTInfo(dt) ?? panic("This token type is not supported at the moment : ".concat(dt))
+                    let ftPath = info.vaultPath
+                    let ref = account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ftPath) ?? panic("Cannot borrow vault reference for type : ".concat(dt))
+                    self.vaultRefs[dt] = ref
+                }
+
+            } else {
+                self.royalties.append(nil)
+                self.totalRoyalties.append(0.0)
+            }
+
+            self.authPointers.append(pointer)
+            self.paths.append(path.publicPath)
+        }
+
+        self.flowVault = account.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Cannot borrow reference to sender's flow vault")
+        self.flowTokenRepayment = account.capabilities.get<&FlowToken.Vault>(/public/flowTokenReceiver)
         self.defaultTokenAvailableBalance = FlowStorageFees.defaultTokenAvailableBalance(account.address)
 
-		// get the vault for find donation
-		if let dt = findDonationType {
-			if self.vaultRefs[dt] == nil {
-				let info = FTRegistry.getFTInfo(dt) ?? panic("This token type is not supported at the moment : ".concat(dt))
-				let ftPath = info.vaultPath
-				let ref = account.borrow<&FungibleToken.Vault>(from: ftPath) ?? panic("Cannot borrow vault reference for type : ".concat(dt))
-				self.vaultRefs[dt] = ref
-			}
-		}
+        // get the vault for find donation
+        if let dt = findDonationType {
+            if self.vaultRefs[dt] == nil {
+                let info = FTRegistry.getFTInfo(dt) ?? panic("This token type is not supported at the moment : ".concat(dt))
+                let ftPath = info.vaultPath
+                let ref = account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ftPath) ?? panic("Cannot borrow vault reference for type : ".concat(dt))
+                self.vaultRefs[dt] = ref
+            }
+        }
 
-		if account.borrow<&Sender.Token>(from: Sender.storagePath) == nil {
-			account.save(<- Sender.create(), to: Sender.storagePath)
-		}
+        if account.storage.borrow<&Sender.Token>(from: Sender.storagePath) == nil {
+            account.storage.save(<- Sender.createToken(), to: Sender.storagePath)
+        }
 
-		self.token =account.borrow<&Sender.Token>(from: Sender.storagePath)!
+        self.token =account.storage.borrow<&Sender.Token>(from: Sender.storagePath)!
 
-	}
+    }
 
-	execute {
-		let addresses : {String : Address} = {}
+    execute {
+        let addresses : {String : Address} = {}
         let estimatedStorageFee = 0.0002 * UFix64(self.authPointers.length)
         // we pass in the least amount as possible for storage fee here
         let tempVault <- self.flowVault.withdraw(amount: 0.0)
-        var vaultRef = &tempVault as &FungibleToken.Vault
+        var vaultRef = &tempVault as auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
         if self.defaultTokenAvailableBalance <= estimatedStorageFee {
-            vaultRef = self.flowVault as &FungibleToken.Vault
+            vaultRef = self.flowVault 
         } else {
             tempVault.deposit(from: <- self.flowVault.withdraw(amount: estimatedStorageFee))
         }
 
-		let ctx : {String : String} = {
-			"tenant" : "find"
-		}
+        let ctx : {String : String} = {
+            "tenant" : "find"
+        }
 
-		for i,  pointer in self.authPointers {
-			let receiver = allReceivers[i]
-			let id = ids[i]
-			ctx["message"] = memos[i]
-			let path = self.paths[i]
+        for i,  pointer in self.authPointers {
+            let receiver = allReceivers[i]
+            let id = ids[i]
+            ctx["message"] = memos[i]
+            let path = self.paths[i]
 
-			var user = addresses[receiver]
-			if user == nil {
-				user = FIND.resolve(receiver) ?? panic("Cannot resolve user with name / address : ".concat(receiver))
-				addresses[receiver] = user
-			}
+            var user = addresses[receiver]
+            if user == nil {
+                user = FIND.resolve(receiver) ?? panic("Cannot resolve user with name / address : ".concat(receiver))
+                addresses[receiver] = user
+            }
 
-			// airdrop thru airdropper
-			FindAirdropper.forcedAirdrop(pointer: pointer, receiver: user!, path: path, context: ctx, storagePayment: vaultRef, flowTokenRepayment: self.flowTokenRepayment, deepValidation: true)
-		}
+            // airdrop thru airdropper
+            FindAirdropper.forcedAirdrop(pointer: pointer, receiver: user!, path: path, context: ctx, storagePayment: vaultRef, flowTokenRepayment: self.flowTokenRepayment, deepValidation: true)
+        }
         self.flowVault.deposit(from: <- tempVault)
 
-		// This is hard coded for spliting at the front end for now. So if there are no royalties, all goes to find
-		// AND This does not support different ft types for now.
-		var goesToFindFund = 0.0
-		for i , type in donationTypes {
-			if type == nil {
-				continue
-			}
-			let amount = donationAmounts[i]!
-			let royalties = self.royalties[i]!
-			let totalRoyalties = self.totalRoyalties[i]
-			let vaultRef = self.vaultRefs[type!]!
-			var noRoyalty = false
-			if totalRoyalties == 0.0 {
-				goesToFindFund = goesToFindFund + amount
-				continue
-			}
+        // This is hard coded for spliting at the front end for now. So if there are no royalties, all goes to find
+        // AND This does not support different ft types for now.
+        var goesToFindFund = 0.0
+        for i , type in donationTypes {
+            if type == nil {
+                continue
+            }
+            let amount = donationAmounts[i]!
+            let royalties = self.royalties[i]!
+            let totalRoyalties = self.totalRoyalties[i]
+            let vaultRef = self.vaultRefs[type!]!
+            var noRoyalty = false
+            if totalRoyalties == 0.0 {
+                goesToFindFund = goesToFindFund + amount
+                continue
+            }
 
-			let balance = vaultRef.balance
-			var totalPaid = 0.0
+            let balance = vaultRef.balance
+            var totalPaid = 0.0
 
-			for j, r in royalties.getRoyalties() {
-				var cap : Capability<&{FungibleToken.Receiver}> = r.receiver
-				if !r.receiver.check(){
-					// try to grab from profile
-					if let ref = getAccount(r.receiver.address).getCapability<&{Profile.Public}>(Profile.publicPath).borrow() {
-						if ref.hasWallet(vaultRef.getType().identifier) {
-							cap = getAccount(r.receiver.address).getCapability<&{FungibleToken.Receiver}>(Profile.publicReceiverPath)
-						} else if let ftInfo = FTRegistry.getFTInfo(vaultRef.getType().identifier) {
-							cap = getAccount(r.receiver.address).getCapability<&{FungibleToken.Receiver}>(ftInfo.receiverPath)
-						}
-					}
 
-				}
+            for j, r in royalties.getRoyalties() {
+                var cap : Capability<&{FungibleToken.Receiver}>? = r.receiver
+                if r.receiver.check() {
+                    let individualAmount = r.cut / totalRoyalties * amount
+                    let vault <- vaultRef.withdraw(amount: individualAmount)
+                    r.receiver.borrow()!.deposit(from: <- vault)
+                    totalPaid = totalPaid + individualAmount
+                }
+                //there is no way to send over funds if this does not happen anmore
+            }
 
-				if cap.check() {
-					let individualAmount = r.cut / totalRoyalties * amount
-					let vault <- vaultRef.withdraw(amount: individualAmount)
-					cap.borrow()!.deposit(from: <- vault)
+            assert(totalPaid <= amount, message: "Amount paid is greater than expected" )
 
-					totalPaid = totalPaid + individualAmount
-				}
-			}
+        }
 
-			assert(totalPaid <= amount, message: "Amount paid is greater than expected" )
-
-		}
-
-		// for donating to find
-		if findDonationType != nil {
-			vaultRef = self.vaultRefs[findDonationType!]!
-			let vault <- vaultRef.withdraw(amount: findDonationAmount! + goesToFindFund)
-			FIND.depositWithTagAndMessage(to: "find", message: "donation to .find", tag: "donation", vault: <- vault, from: self.token)
-		}
-	}
+        // for donating to find
+        if findDonationType != nil {
+            vaultRef = self.vaultRefs[findDonationType!]!
+            let vault <- vaultRef.withdraw(amount: findDonationAmount! + goesToFindFund)
+            FIND.depositWithTagAndMessage(to: "find", message: "donation to .find", tag: "donation", vault: <- vault, from: self.token)
+        }
+    }
 }

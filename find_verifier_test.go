@@ -4,23 +4,17 @@ import (
 	"fmt"
 	"testing"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 	"github.com/hexops/autogold"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFindVerifier(t *testing.T) {
-
+	otu := &OverflowTestUtils{T: t, O: ot.O}
 	user := "user1"
 
-	otu := NewOverflowTest(t).
-		setupFIND().
-		createUser(10000.0, "user1").
-		registerUser("user1")
-
 	// Has One FLOAT
-	t.Run("Should return false if user have no float", func(t *testing.T) {
-
+	ot.Run(t, "Should return false if user have no float", func(t *testing.T) {
 		floatID := otu.createFloatEvent("find")
 
 		otu.O.Script("devFindVerifierHasOneFLOAT",
@@ -33,8 +27,7 @@ func TestFindVerifier(t *testing.T) {
 			}))
 	})
 
-	t.Run("Should panic if no float is specified", func(t *testing.T) {
-
+	ot.Run(t, "Should panic if no float is specified", func(t *testing.T) {
 		_, err := otu.O.Script("devFindVerifierHasOneFLOAT",
 			WithArg("user", otu.O.Address(user)),
 			WithArg("floatIDs", []uint64{}),
@@ -42,11 +35,9 @@ func TestFindVerifier(t *testing.T) {
 			GetAsInterface()
 
 		assert.Error(t, err)
-
 	})
 
-	t.Run("Should return true if user has one of the float", func(t *testing.T) {
-
+	ot.Run(t, "Should return true if user has one of the float", func(t *testing.T) {
 		floatID := otu.createFloatEvent("find")
 
 		otu.claimFloat("find", user, floatID)
@@ -61,8 +52,7 @@ func TestFindVerifier(t *testing.T) {
 			}))
 	})
 
-	t.Run("Should return false if user doesn't have float contained", func(t *testing.T) {
-
+	ot.Run(t, "Should return false if user doesn't have float contained", func(t *testing.T) {
 		claimedFloatID := otu.createFloatEvent("find")
 		notClaimedFloatID := otu.createFloatEvent("find")
 
@@ -79,8 +69,7 @@ func TestFindVerifier(t *testing.T) {
 	})
 
 	// Has All FLOAT
-	t.Run("Should return true if user has all of the float", func(t *testing.T) {
-
+	ot.Run(t, "Should return true if user has all of the float", func(t *testing.T) {
 		floatID := otu.createFloatEvent("find")
 		floatID2 := otu.createFloatEvent("find")
 
@@ -97,8 +86,7 @@ func TestFindVerifier(t *testing.T) {
 			}))
 	})
 
-	t.Run("Should return false if user doesn't have all float contained", func(t *testing.T) {
-
+	ot.Run(t, "Should return false if user doesn't have all float contained", func(t *testing.T) {
 		floatID := otu.createFloatEvent("find")
 		floatID2 := otu.createFloatEvent("find")
 
@@ -115,8 +103,7 @@ func TestFindVerifier(t *testing.T) {
 			}))
 	})
 
-	t.Run("Should panic if no float is specified", func(t *testing.T) {
-
+	ot.Run(t, "Should panic if no float is specified", func(t *testing.T) {
 		_, err := otu.O.Script("devFindVerifierHasAllFLOAT",
 			WithArg("user", otu.O.Address(user)),
 			WithArg("floatIDs", []uint64{}),
@@ -127,8 +114,7 @@ func TestFindVerifier(t *testing.T) {
 	})
 
 	// WhiteLabel
-	t.Run("Should return true if user is in whiteLabel", func(t *testing.T) {
-
+	ot.Run(t, "Should return true if user is in whiteLabel", func(t *testing.T) {
 		otu.O.Script("devFindVerifierIsInWhiteList",
 			WithArg("user", otu.O.Address(user)),
 			WithAddresses("addresses", user, "user2", "user3"),
@@ -139,8 +125,7 @@ func TestFindVerifier(t *testing.T) {
 			}))
 	})
 
-	t.Run("Should return true if user is not in whiteLabel", func(t *testing.T) {
-
+	ot.Run(t, "Should return true if user is not in whiteLabel", func(t *testing.T) {
 		otu.O.Script("devFindVerifierIsInWhiteList",
 			WithArg("user", otu.O.Address(user)),
 			WithAddresses("addresses", "user2", "user3"),
@@ -151,8 +136,7 @@ func TestFindVerifier(t *testing.T) {
 			}))
 	})
 
-	t.Run("Should panic if no one is not in whiteLabel", func(t *testing.T) {
-
+	ot.Run(t, "Should panic if no one is not in whiteLabel", func(t *testing.T) {
 		_, err := otu.O.Script("devFindVerifierIsInWhiteList",
 			WithArg("user", otu.O.Address(user)),
 			WithArg("addresses", "[]"),
@@ -163,8 +147,7 @@ func TestFindVerifier(t *testing.T) {
 	})
 
 	// Has Find Name
-	t.Run("Should return true if user has the find name", func(t *testing.T) {
-
+	ot.Run(t, "Should return true if user has the find name", func(t *testing.T) {
 		otu.O.Script("devFindVerifierHasFindName",
 			WithArg("user", otu.O.Address(user)),
 			WithArg("findNames", []string{"user1", "user2"}),
@@ -175,8 +158,7 @@ func TestFindVerifier(t *testing.T) {
 			}))
 	})
 
-	t.Run("Should return false if user does not have the find name", func(t *testing.T) {
-
+	ot.Run(t, "Should return false if user does not have the find name", func(t *testing.T) {
 		otu.O.Script("devFindVerifierHasFindName",
 			WithArg("user", otu.O.Address(user)),
 			WithArg("findNames", []string{"user2", "user3"}),
@@ -187,8 +169,7 @@ func TestFindVerifier(t *testing.T) {
 			}))
 	})
 
-	t.Run("Should panic if no find name is specified", func(t *testing.T) {
-
+	ot.Run(t, "Should panic if no find name is specified", func(t *testing.T) {
 		_, err := otu.O.Script("devFindVerifierHasFindName",
 			WithArg("user", otu.O.Address(user)),
 			WithArg("findNames", "[]"),
@@ -198,37 +179,34 @@ func TestFindVerifier(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("Should return false if user has no lease collection", func(t *testing.T) {
-
+	ot.Run(t, "Should return false if user has no lease collection", func(t *testing.T) {
 		otu.O.Script("devFindVerifierHasFindName",
-			WithArg("user", otu.O.Address("user2")),
-			WithArg("findNames", []string{"user2", "user3"}),
+			WithArg("user", otu.O.Address("user3")),
+			WithArg("findNames", []string{"user3"}),
 		).
 			AssertWant(t, autogold.Want("HasFindName user no lease collection, false", map[string]interface{}{
-				"description": "Users with one of these find names are verified : user2, user3",
+				"description": "Users with one of these find names are verified : user3",
 				"result":      false,
 			}))
 	})
 
 	// Has No. of NFTs in Path
 
-	t.Run("Should return true if user has no of NFTs equal to threshold", func(t *testing.T) {
-
+	ot.Run(t, "Should return true if user has no of NFTs equal to threshold", func(t *testing.T) {
 		otu.O.Script("devFindVerifierHasNFTsInPath",
-			WithArg("user", otu.O.Address("find")),
-			WithArg("path", "exampleNFTCollection"),
+			WithArg("user", otu.O.Address("user1")),
+			WithArg("path", "findDandy"),
 			WithArg("threshold", 2),
 		).
 			AssertWant(t, autogold.Want("Has no. of NFT equal to threshold, true", map[string]interface{}{
-				"description": "Users with at least 2 nos. of NFT in path /public/exampleNFTCollection are verified",
+				"description": "Users with at least 2 nos. of NFT in path /public/findDandy are verified",
 				"result":      true,
 			}))
 	})
 
-	t.Run("Should return true if user has no of NFTs more than threshold", func(t *testing.T) {
-
+	ot.Run(t, "Should return true if user has no of NFTs more than threshold", func(t *testing.T) {
 		otu.O.Script("devFindVerifierHasNFTsInPath",
-			WithArg("user", otu.O.Address("find")),
+			WithArg("user", otu.O.Address("user1")),
 			WithArg("path", "exampleNFTCollection"),
 			WithArg("threshold", 1),
 		).
@@ -238,10 +216,9 @@ func TestFindVerifier(t *testing.T) {
 			}))
 	})
 
-	t.Run("Should return false if user has no of NFTs less than threshold", func(t *testing.T) {
-
+	ot.Run(t, "Should return false if user has no of NFTs less than threshold", func(t *testing.T) {
 		otu.O.Script("devFindVerifierHasNFTsInPath",
-			WithArg("user", otu.O.Address("find")),
+			WithArg("user", otu.O.Address("user1")),
 			WithArg("path", "exampleNFTCollection"),
 			WithArg("threshold", 100),
 		).
@@ -251,10 +228,9 @@ func TestFindVerifier(t *testing.T) {
 			}))
 	})
 
-	t.Run("Should panic if 0 threshold is specified", func(t *testing.T) {
-
+	ot.Run(t, "Should panic if 0 threshold is specified", func(t *testing.T) {
 		_, err := otu.O.Script("devFindVerifierHasNFTsInPath",
-			WithArg("user", otu.O.Address("find")),
+			WithArg("user", otu.O.Address("user1")),
 			WithArg("path", "exampleNFTCollection"),
 			WithArg("threshold", 0),
 		).
@@ -263,8 +239,7 @@ func TestFindVerifier(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("Should return false if user has no collection", func(t *testing.T) {
-
+	ot.Run(t, "Should return false if user has no collection", func(t *testing.T) {
 		otu.O.Script("devFindVerifierHasNFTsInPath",
 			WithArg("user", otu.O.Address("user3")),
 			WithArg("path", "exampleNFTCollection"),
@@ -276,11 +251,9 @@ func TestFindVerifier(t *testing.T) {
 			}))
 	})
 
-	// HasNFTWithRarities
-	t.Run("Should return true if user has nft with specified rarity", func(t *testing.T) {
-
+	ot.Run(t, "Should return true if user has nft with specified rarity", func(t *testing.T) {
 		otu.O.Script("devFindVerifierHasNFTsWithRarity",
-			WithArg("user", otu.O.Address("find")),
+			WithArg("user", otu.O.Address("user1")),
 			WithArg("path", "exampleNFTCollection"),
 			WithArg("rarityA", true),
 			WithArg("rarityB", true),
@@ -291,10 +264,9 @@ func TestFindVerifier(t *testing.T) {
 			}))
 	})
 
-	t.Run("Should return false if user does not have nft with specified rarity", func(t *testing.T) {
-
+	ot.Run(t, "Should return false if user does not have nft with specified rarity", func(t *testing.T) {
 		otu.O.Script("devFindVerifierHasNFTsWithRarity",
-			WithArg("user", otu.O.Address("find")),
+			WithArg("user", otu.O.Address("user1")),
 			WithArg("path", "exampleNFTCollection"),
 			WithArg("rarityA", false),
 			WithArg("rarityB", true),
@@ -305,10 +277,9 @@ func TestFindVerifier(t *testing.T) {
 			}))
 	})
 
-	t.Run("Should panic if no rarity is specified", func(t *testing.T) {
-
+	ot.Run(t, "Should panic if no rarity is specified", func(t *testing.T) {
 		_, err := otu.O.Script("devFindVerifierHasNFTsWithRarity",
-			WithArg("user", otu.O.Address("find")),
+			WithArg("user", otu.O.Address("user1")),
 			WithArg("path", "exampleNFTCollection"),
 			WithArg("rarityA", false),
 			WithArg("rarityB", false),
@@ -318,8 +289,7 @@ func TestFindVerifier(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("Should return false if user has no collection specified for rarity", func(t *testing.T) {
-
+	ot.Run(t, "Should return false if user has no collection specified for rarity", func(t *testing.T) {
 		otu.O.Script("devFindVerifierHasNFTsWithRarity",
 			WithArg("user", otu.O.Address("user3")),
 			WithArg("path", "exampleNFTCollection"),

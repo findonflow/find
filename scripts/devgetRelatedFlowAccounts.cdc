@@ -1,9 +1,8 @@
-import FindRelatedAccounts from "../contracts/FindRelatedAccounts.cdc"
+import "FindRelatedAccounts"
 
-pub fun main(user: Address) : {String : [Address]} {
-	let account = getAccount(user)
-	let cap= account.getCapability<&FindRelatedAccounts.Accounts{FindRelatedAccounts.Public}>(FindRelatedAccounts.publicPath)
-	let ref = cap.borrow()! 
-	return ref.getFlowAccounts()
+access(all)fun  main(user: Address) : {String : [Address]} {
+    let account = getAccount(user)
+    let ref= account.capabilities.borrow<&FindRelatedAccounts.Accounts>(FindRelatedAccounts.publicPath)!
+    return ref.getFlowAccounts()
 
 }

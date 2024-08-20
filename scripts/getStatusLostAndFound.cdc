@@ -1,10 +1,10 @@
-import FIND from "../contracts/FIND.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import "FIND"
+import "FINDNFTCatalog"
+import "FindLostAndFoundWrapper"
+import "NFTCatalog"
+import "NonFungibleToken"
 
-pub fun main(user: String) :  {String : NFTCatalog.NFTCollectionData} {
+access(all) fun main(user: String) :  {String : NFTCatalog.NFTCollectionData} {
 	let lostAndFoundTypes: {String : NFTCatalog.NFTCollectionData}={}
 
 	if let address=FIND.resolve(user) {

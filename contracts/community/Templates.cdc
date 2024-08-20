@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
-import MetadataViews from "../standard/MetadataViews.cdc"
-import FungibleToken from "../standard/FungibleToken.cdc"
+import "MetadataViews"
+import "FungibleToken"
 
 // This contracts stores all the defined interfaces and structs.
 // Interfaces can span on both Characters and Wearables therefore it is better to have them in a central contract
-pub contract Templates {
+access(all) contract Templates {
 
 	access(contract) let counters : {String : UInt64}
 	access(contract) let features : {String : Bool}
 
-	pub event CountersReset()
+	access(all) event CountersReset()
 
 	access(account) fun createEditionInfoManually(name: String, counter:String, edition:UInt64?) : EditionInfo {
 		let oldMax=Templates.counters[counter] ?? 0
@@ -27,15 +27,15 @@ pub contract Templates {
 		return EditionInfo(counter: counter, name:name, number:max)
 	}
 
-	pub struct interface Editionable {
+	access(all) struct interface Editionable {
 
-		pub fun getCounterSuffix() : String
+		access(all) getCounterSuffix() : String
 		// e.g. set , position
-		pub fun getClassifier() : String
+		access(all) getClassifier() : String
 		// e.g. character, wearable
-		pub fun getContract() : String
+		access(all) getContract() : String
 
-		pub fun getCounter() : String {
+		access(all) getCounter() : String {
 			return self.getContract().concat("_").concat(self.getClassifier()).concat("_").concat(self.getCounterSuffix())
 		}
 
@@ -43,19 +43,19 @@ pub contract Templates {
 			return Templates.createEditionInfoManually(name:self.getClassifier(), counter:self.getCounter(), edition:edition)
 		}
 
-		pub fun getCurrentCount() : UInt64 {
+		access(all) getCurrentCount() : UInt64 {
 			return Templates.counters[self.getCounter()] ?? 0
 		}
 
 	}
 
-	pub struct interface Retirable{
+	access(all) struct interface Retirable{
 
-		pub var active:Bool
+		access(all) var active:Bool
 
-		pub fun getCounterSuffix() : String
-		pub fun getClassifier() : String
-		pub fun getContract() : String
+		access(all) getCounterSuffix() : String
+		access(all) getClassifier() : String
+		access(all) getContract() : String
 
 		access(account) fun enable(_ bool : Bool) {
 			pre{
@@ -65,10 +65,10 @@ pub contract Templates {
 		}
 	}
 
-	pub struct interface RoyaltyHolder {
-		pub let royalties: [Templates.Royalty]
+	access(all) struct interface RoyaltyHolder {
+		access(all) let royalties: [Templates.Royalty]
 
-		pub fun getRoyalties() : [MetadataViews.Royalty] {
+		access(all) getRoyalties() : [MetadataViews.Royalty] {
 			let royalty : [MetadataViews.Royalty] = []
 			for r in self.royalties {
 				royalty.append(r.getRoyalty())
@@ -77,10 +77,10 @@ pub contract Templates {
 		}
 	}
 
-	pub struct EditionInfo {
-		pub let counter :String
-		pub let name : String
-		pub let number:UInt64
+	access(all) struct EditionInfo {
+		access(all) let counter :String
+		access(all) let name : String
+		access(all) let number:UInt64
 
 		init(counter: String, name:String, number:UInt64) {
 			self.counter=counter
@@ -88,11 +88,11 @@ pub contract Templates {
 			self.number=number
 		}
 
-		pub fun getSupply() : UInt64 {
+		access(all) getSupply() : UInt64 {
 			return Templates.counters[self.counter] ?? 0
 		}
 
-		pub fun getAsMetadataEdition(_ active:Bool) : MetadataViews.Edition {
+		access(all) getAsMetadataEdition(_ active:Bool) : MetadataViews.Edition {
 			var max : UInt64?=nil
 			if !active  {
 				max=Templates.counters[self.counter]
@@ -100,18 +100,18 @@ pub contract Templates {
 			return MetadataViews.Edition(name:self.name, number:self.number, max:max)
 		}
 
-		pub fun getMaxEdition() : UInt64 {
+		access(all) getMaxEdition() : UInt64 {
 			return Templates.counters[self.counter]!
 		}
 
 	}
 
-	pub struct Royalty {
-		pub let name : String
-		pub let address: Address
-		pub let cut: UFix64
-		pub let description: String
-		pub let publicPath: String
+	access(all) struct Royalty {
+		access(all) let name : String
+		access(all) let address: Address
+		access(all) let cut: UFix64
+		access(all) let description: String
+		access(all) let publicPath: String
 
 		init(name : String , address: Address , cut: UFix64 , description: String , publicPath: String) {
 			self.name = name
@@ -121,22 +121,22 @@ pub contract Templates {
 			self.publicPath = publicPath
 		}
 
-		pub fun getPublicPath() : PublicPath {
+		access(all) getPublicPath() : PublicPath {
 			return PublicPath(identifier: self.publicPath)!
 		}
 
-		pub fun getRoyalty() : MetadataViews.Royalty {
+		access(all) getRoyalty() : MetadataViews.Royalty {
 			let cap = getAccount(self.address).getCapability<&{FungibleToken.Receiver}>(self.getPublicPath())
 			return MetadataViews.Royalty(receiver: cap, cut: self.cut, description: self.name)
 		}
 
 	}
 
-	pub fun featureEnabled(_ action: String) : Bool {
+	access(all) featureEnabled(_ action: String) : Bool {
 		return self.features[action] ?? false
 	}
 
-	pub fun assertFeatureEnabled(_ action: String) {
+	access(all) assertFeatureEnabled(_ action: String) {
 		if !Templates.featureEnabled(action) {
 			panic("Action cannot be taken, feature is not enabled : ".concat(action))
 		}

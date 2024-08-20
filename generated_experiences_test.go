@@ -1,37 +1,20 @@
 package test_main
 
 import (
-	"fmt"
 	"testing"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 	"github.com/findonflow/find/findGo"
 	"github.com/hexops/autogold"
 )
 
-var forge = "user1"
-
 func TestGeneratedExperiences(t *testing.T) {
+	otu := &OverflowTestUtils{T: t, O: ot.O}
 
-	otu := NewOverflowTest(t).
-		setupFIND().
-		createUser(10000.0, "user1").
-		registerUserWithName("user1", forge).
-		buyForgeForName("user1", forge)
-
-	generatedExpForge := otu.identifier("GeneratedExperiences", "Forge")
-
-	otu.O.Tx("adminAddForge",
-		WithSigner("find-admin"),
-		WithArg("type", generatedExpForge),
-		WithArg("name", forge),
-	).AssertSuccess(t)
-
-	t.Run("Should be able to add season", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to add season", func(t *testing.T) {
 		season := []findGo.GeneratedExperiences_CollectionInfo{
 			{
-				Season: 1,
+				Season: 2,
 				RoyaltiesInput: []findGo.FindPack_Royalty{
 					{
 						Recipient:   otu.O.Address("user1"),
@@ -66,15 +49,13 @@ func TestGeneratedExperiences(t *testing.T) {
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "SeasonAdded", map[string]interface{}{
-				"season":      1,
+				"season":      2,
 				"squareImage": "ipfs://square",
 				"bannerImage": "ipfs://banner",
 			})
-
 	})
 
-	t.Run("Should be able to add mint token", func(t *testing.T) {
-
+	ot.Run(t, "Should be able to add mint token", func(t *testing.T) {
 		info := []findGo.GeneratedExperiences_Info{
 			{
 				Season:      1,
@@ -108,7 +89,7 @@ func TestGeneratedExperiences(t *testing.T) {
 			},
 		}
 
-		otu.O.Tx("devAdminMintGeneratedExperiences",
+		result := otu.O.Tx("devAdminMintGeneratedExperiences",
 			WithSigner("find-admin"),
 			WithArg("name", "user1"),
 			WithArg("info", info),
@@ -135,27 +116,23 @@ func TestGeneratedExperiences(t *testing.T) {
 				"maxEdition": 2,
 			})
 
-	})
+		ids := result.GetIdsFromEvent("Minted", "id")
+		geIdentifier, _ := otu.O.QualifiedIdentifier("GeneratedExperiences", "NFT")
 
-	t.Run("Ensure views are returned correctly", func(t *testing.T) {
+		otu.O.Tx("devaddNFTCatalog",
+			WithSigner("account"),
+			WithArg("collectionIdentifier", geIdentifier),
+			WithArg("contractName", geIdentifier),
+			WithArg("contractAddress", "find-forge"),
+			WithArg("addressWithNFT", "find-admin"),
+			WithArg("nftID", ids[0]),
+			WithArg("publicPathIdentifier", "GeneratedExperiences"),
+		).AssertSuccess(t)
 
-		viewscript := `
-		import GeneratedExperiences from "../contracts/GeneratedExperiences.cdc"
-		import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-
-		pub fun main(user: Address): AnyStruct {
-			let acct = getAccount(user)
-			let collectionRef = acct.getCapability(GeneratedExperiences.CollectionPublicPath)
-				.borrow<&{MetadataViews.ResolverCollection}>()
-				?? panic("Could not borrow capability from public collection")
-
-			let resolver = collectionRef.borrowViewResolver(id: collectionRef.getIDs()[0])
-			return resolver.getViews()
-		}
-	`
-
-		otu.O.Script(viewscript,
-			WithArg("user", "find-admin"),
+		otu.O.Script("getNFTViewsForAddress",
+			WithArg("address", "find-admin"),
+			WithArg("aliasOrIdentifier", geIdentifier),
+			WithArg("id", ids[0]),
 		).
 			AssertWant(t, autogold.Want("views", `[]interface {}{
   "A.f8d6e0586b0a20c7.MetadataViews.Display",
@@ -167,61 +144,47 @@ func TestGeneratedExperiences(t *testing.T) {
   "A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionDisplay",
   "A.f8d6e0586b0a20c7.MetadataViews.Medias",
   "A.f8d6e0586b0a20c7.MetadataViews.Rarity",
-  "A.179b6b1cb6755e31.FindPack.PackRevealData",
+  "A.f3fcd2c1a78f5eee.FindPack.PackRevealData",
 }`))
-	})
 
-	tcs := map[string]autogold.Value{
-		"A.f8d6e0586b0a20c7.MetadataViews.Display":     autogold.Want("Display", map[string]interface{}{"description": "Description", "name": "Name", "thumbnail": map[string]interface{}{"cid": "thumbnail"}}),
-		"A.f8d6e0586b0a20c7.MetadataViews.Royalties":   autogold.Want("Royalties", map[string]interface{}{"cutInfos": []interface{}{map[string]interface{}{"cut": 0.1, "description": "Royalty", "receiver": "Capability<&AnyResource{A.ee82856bf20e2aa6.FungibleToken.Receiver}>(address: 0xf669cb8d41ce0c74, path: /public/findProfileReceiver)"}}}),
-		"A.f8d6e0586b0a20c7.MetadataViews.Editions":    autogold.Want("Editions", map[string]interface{}{"infoList": []interface{}{map[string]interface{}{"max": 2, "name": "generatedexperiences", "number": 1}}}),
-		"A.f8d6e0586b0a20c7.MetadataViews.Traits":      autogold.Want("Traits", map[string]interface{}{"traits": []interface{}{map[string]interface{}{"displayType": "String", "name": "Artist", "value": "Artist"}}}),
-		"A.f8d6e0586b0a20c7.MetadataViews.ExternalURL": autogold.Want("ExternalURL", map[string]interface{}{"url": "https://find.xyz/0xf3fcd2c1a78f5eee/collection/main/GeneratedExperiences/332"}),
-		"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionDisplay": autogold.Want("NFTCollectionDisplay", map[string]interface{}{
-			"bannerImage": map[string]interface{}{"file": map[string]interface{}{"cid": "banner"}, "mediaType": "png"}, "description": "Description",
-			"externalURL": map[string]interface{}{"url": "https://find.xyz/mp/GeneratedExperiences"},
-			"name":        "GeneratedExperiences",
-			"socials": map[string]interface{}{
-				"discord": map[string]interface{}{"url": "discord"},
-				"twitter": map[string]interface{}{"url": "twitter"},
-			},
-			"squareImage": map[string]interface{}{
-				"file":      map[string]interface{}{"cid": "square"},
-				"mediaType": "png",
-			},
-		}),
-		"A.f8d6e0586b0a20c7.MetadataViews.Medias": autogold.Want("Medias", map[string]interface{}{"items": []interface{}{map[string]interface{}{"file": map[string]interface{}{"cid": "thumbnail"}, "mediaType": "image"}, map[string]interface{}{
-			"file":      map[string]interface{}{"cid": "fullsize"},
-			"mediaType": "image",
-		}}}),
-		"A.f8d6e0586b0a20c7.MetadataViews.Rarity":    autogold.Want("Rarity", map[string]interface{}{"description": "Common"}),
-		"A.179b6b1cb6755e31.FindPack.PackRevealData": autogold.Want("PackRevealData", map[string]interface{}{"data": map[string]interface{}{"nftImage": "ipfs://thumbnail", "nftName": "Name", "packType": "GeneratedExperiences"}}),
-	}
+		tcs := map[string]autogold.Value{
+			"A.f8d6e0586b0a20c7.MetadataViews.Display": autogold.Want("Display", map[string]interface{}{"description": "Description", "name": "Name", "thumbnail": map[string]interface{}{"cid": "thumbnail"}}),
+			"A.f8d6e0586b0a20c7.MetadataViews.Royalties": autogold.Want("Royalties", map[string]interface{}{"cutInfos": []interface{}{map[string]interface{}{"cut": 0.1, "description": "Royalty", "receiver": map[string]interface{}{
+				"address":    "0x192440c99cb17282",
+				"borrowType": "&{A.ee82856bf20e2aa6.FungibleToken.Receiver}",
+				"id":         9,
+			}}}}),
+			"A.f8d6e0586b0a20c7.MetadataViews.Editions": autogold.Want("Editions", map[string]interface{}{"infoList": []interface{}{map[string]interface{}{"max": 2, "name": "generatedexperiences", "number": 1}}}),
+			"A.f8d6e0586b0a20c7.MetadataViews.Traits":   autogold.Want("Traits", map[string]interface{}{"traits": []interface{}{map[string]interface{}{"displayType": "String", "name": "Artist", "value": "Artist"}}}),
+			"A.f8d6e0586b0a20c7.MetadataViews.NFTCollectionDisplay": autogold.Want("NFTCollectionDisplay", map[string]interface{}{
+				"bannerImage": map[string]interface{}{"file": map[string]interface{}{"cid": "banner"}, "mediaType": "png"}, "description": "Description",
+				"externalURL": map[string]interface{}{"url": "https://find.xyz/mp/GeneratedExperiences"},
+				"name":        "GeneratedExperiences",
+				"socials": map[string]interface{}{
+					"discord": map[string]interface{}{"url": "discord"},
+					"twitter": map[string]interface{}{"url": "twitter"},
+				},
+				"squareImage": map[string]interface{}{
+					"file":      map[string]interface{}{"cid": "square"},
+					"mediaType": "png",
+				},
+			}),
+			"A.f8d6e0586b0a20c7.MetadataViews.Medias": autogold.Want("Medias", map[string]interface{}{"items": []interface{}{map[string]interface{}{"file": map[string]interface{}{"cid": "thumbnail"}, "mediaType": "image"}, map[string]interface{}{
+				"file":      map[string]interface{}{"cid": "fullsize"},
+				"mediaType": "image",
+			}}}),
+			"A.f8d6e0586b0a20c7.MetadataViews.Rarity":    autogold.Want("Rarity", map[string]interface{}{"description": "Common"}),
+			"A.179b6b1cb6755e31.FindPack.PackRevealData": autogold.Want("PackRevealData", nil),
+		}
 
-	script := `
-	import GeneratedExperiences from "../contracts/GeneratedExperiences.cdc"
-	import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-
-	pub fun main(user: Address, view: String): AnyStruct {
-		let acct = getAccount(user)
-		let collectionRef = acct.getCapability(GeneratedExperiences.CollectionPublicPath)
-			.borrow<&{MetadataViews.ResolverCollection}>()
-			?? panic("Could not borrow capability from public collection")
-
-		let resolver = collectionRef.borrowViewResolver(id: collectionRef.getIDs()[1])
-		return resolver.resolveView(CompositeType(view)!)
-	}
-`
-
-	for view, val := range tcs {
-		t.Run(fmt.Sprintf("Ensure view : %s returned correctly", view), func(t *testing.T) {
-
-			otu.O.Script(script,
-				WithArg("user", "find-admin"),
+		for view, val := range tcs {
+			otu.O.Script("getNFTViewForAddress",
+				WithArg("aliasOrIdentifier", geIdentifier),
+				WithArg("id", ids[0]),
+				WithArg("address", "find-admin"),
 				WithArg("view", view),
 			).
 				AssertWant(t, val)
-		})
-	}
-
+		}
+	})
 }

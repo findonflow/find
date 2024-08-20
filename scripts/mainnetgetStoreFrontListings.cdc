@@ -1,20 +1,20 @@
-import FIND from "../contracts/FIND.cdc"
+import "FIND"
 
 import NFTStorefront from 0x4eb8a10cb9f87357
 import Marketplace from 0xd796ff17107bbff6
 import Art from 0xd796ff17107bbff6
-import FlowToken from "../contracts/standard/FlowToken.cdc"
+import "FlowToken"
 import Flovatar from 0x921ea449dffec68a
 import FlovatarMarketplace from  0x921ea449dffec68a
 
 // This script returns the details for a listing within a storefront
 
-pub struct Listing {
-	pub let marketplace : String
-	pub let ftVault: Type
-	pub let price:UFix64
-	pub let nftType: Type
-	pub let nftId: UInt64
+access(all) struct Listing {
+	access(all) let marketplace : String
+	access(all) let ftVault: Type
+	access(all) let price:UFix64
+	access(all) let nftType: Type
+	access(all) let nftId: UInt64
 
 	init(marketplace:String, ftVault:Type, price:UFix64, nftType:Type, nftId:UInt64) {
 		self.marketplace=marketplace
@@ -25,7 +25,7 @@ pub struct Listing {
 	}
 }
 
-pub fun main(user: String): {UInt64 :[Listing]} {
+access(all) fun main(user: String): {UInt64 :[Listing]} {
 
 	let resolveAddress = FIND.resolve(user) 
 	if resolveAddress == nil {return {}}

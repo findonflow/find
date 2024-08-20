@@ -1,8 +1,8 @@
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+import "MetadataViews"
+import "NFTCatalog"
+import "FINDNFTCatalog"
 
-pub fun main(collectionIdentifier : String, type: String?) : NFTCatalogMetadata? {
+access(all) fun main(collectionIdentifier : String, type: String?) : NFTCatalogMetadata? {
 	if let catalog = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier) {
 		return NFTCatalogMetadata(
 			contractName : catalog.contractName, 
@@ -38,11 +38,11 @@ pub fun main(collectionIdentifier : String, type: String?) : NFTCatalogMetadata?
 	return nil
 }
 
-pub struct NFTCatalogMetadata {
-	pub let contractName : String
-	pub let contractAddress : Address
-	pub let nftType: String
-	pub let collectionDisplay: MetadataViews.NFTCollectionDisplay
+access(all) struct NFTCatalogMetadata {
+	access(all) let contractName : String
+	access(all) let contractAddress : Address
+	access(all) let nftType: String
+	access(all) let collectionDisplay: MetadataViews.NFTCollectionDisplay
 
 	init (contractName : String, contractAddress : Address, nftType: Type, collectionDisplay : MetadataViews.NFTCollectionDisplay) {
 		self.contractName = contractName

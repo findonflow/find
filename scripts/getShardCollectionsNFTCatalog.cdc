@@ -1,8 +1,8 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+import "NonFungibleToken"
+import "FIND"
+import "FINDNFTCatalog"
 
-pub fun main(user: String) : {String : CollectionLength} {
+access(all) fun main(user: String) : {String : CollectionLength} {
 
 	if let address = FIND.resolve(user) {
 
@@ -13,9 +13,9 @@ pub fun main(user: String) : {String : CollectionLength} {
 
 }
 
-pub struct CollectionLength {
-	pub let shard : String 
-	pub let length : Int 
+access(all) struct CollectionLength {
+	access(all) let shard : String 
+	access(all) let length : Int 
 	init(shard : String, length : Int ) {
 		self.shard=shard 
 		self.length=length
@@ -24,11 +24,11 @@ pub struct CollectionLength {
 
 // Helper function 
 
-pub fun resolveAddress(user: String) : Address? {
+access(all) resolveAddress(user: String) : Address? {
 	return FIND.resolve(user)
 }
 
-pub fun getNFTIDs_Catalog(ownerAddress: Address, cacheCollections: {String:CollectionLength}) : {String:CollectionLength} {
+access(all) getNFTIDs_Catalog(ownerAddress: Address, cacheCollections: {String:CollectionLength}) : {String:CollectionLength} {
 
 	let account = getAuthAccount(ownerAddress)
 

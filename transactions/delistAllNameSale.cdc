@@ -1,10 +1,10 @@
-import FIND from "../contracts/FIND.cdc"
+import "FIND"
 
 transaction() {
 
-	let finLeases : &FIND.LeaseCollection?
+	let finLeases : auth(FIND.LeaseOwner) &FIND.LeaseCollection?
 
-	prepare(acct: AuthAccount) {
+	prepare(acct: auth(BorrowValue) &Account) {
 		self.finLeases= acct.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
 
 	}

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 	"github.com/hexops/autogold"
 	"github.com/onflow/cadence"
 	"github.com/sanity-io/litter"
@@ -13,17 +13,16 @@ import (
 )
 
 func TestFindUtils(t *testing.T) {
-
-	otu := NewOverflowTest(t)
+	otu := &OverflowTestUtils{T: t, O: ot.O}
 	o := otu.O
 
-	devCheckContainsChar := `import FindUtils from "../contracts/FindUtils.cdc"
+	devCheckContainsChar := `import "FindUtils"
 
-	pub fun main(string: String, char:Character) : Bool {
+	access(all) fun main(string: String, char:Character) : Bool {
 		return FindUtils.containsChar(string, char: char)
 	}`
 	// containsChar
-	t.Run("containsChar should return false if string does not contain", func(t *testing.T) {
+	ot.Run(t, "containsChar should return false if string does not contain", func(t *testing.T) {
 		o.Script(devCheckContainsChar,
 			WithArg("string", "bam.find"),
 			WithArg("char", cadence.Character(",")),
@@ -31,7 +30,7 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("false", false))
 	})
 
-	t.Run("containsChar should return true if string contains", func(t *testing.T) {
+	ot.Run(t, "containsChar should return true if string contains", func(t *testing.T) {
 		o.Script(devCheckContainsChar,
 			WithArg("string", "bam.find"),
 			WithArg("char", cadence.Character(".")),
@@ -39,14 +38,14 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("true", true))
 	})
 
-	devCheckContains := `import FindUtils from "../contracts/FindUtils.cdc"
+	devCheckContains := `import "FindUtils"
 
-	pub fun main(string: String, element:String) : Bool {
+	access(all) fun main(string: String, element:String) : Bool {
 		return FindUtils.contains(string, element: element)
 	}`
 
 	// contains
-	t.Run("contains should be able to check contains", func(t *testing.T) {
+	ot.Run(t, "contains should be able to check contains", func(t *testing.T) {
 		o.Script(devCheckContains,
 			WithArg("string", "string"),
 			WithArg("element", "string"),
@@ -54,7 +53,7 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("true", true))
 	})
 
-	t.Run("contains should return false if string does not contain", func(t *testing.T) {
+	ot.Run(t, "contains should return false if string does not contain", func(t *testing.T) {
 		o.Script(devCheckContains,
 			WithArg("string", "string"),
 			WithArg("element", "stt"),
@@ -62,7 +61,7 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("false", false))
 	})
 
-	t.Run("contains should return true if string partially contains", func(t *testing.T) {
+	ot.Run(t, "contains should return true if string partially contains", func(t *testing.T) {
 		o.Script(devCheckContains,
 			WithArg("string", "string"),
 			WithArg("element", "ing"),
@@ -94,9 +93,9 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("false", false))
 	})
 
-	devCheckHasSuffix := `import FindUtils from "../contracts/FindUtils.cdc"
+	devCheckHasSuffix := `import "FindUtils"
 
-	pub fun main(string: String, suffix:String) : Bool {
+	access(all) fun main(string: String, suffix:String) : Bool {
 		return FindUtils.hasSuffix(string, suffix: suffix)
 	}`
 
@@ -141,9 +140,9 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("false", false))
 	})
 
-	devCheckHasPrefix := `import FindUtils from "../contracts/FindUtils.cdc"
+	devCheckHasPrefix := `import "FindUtils"
 
-	pub fun main(string: String, prefix:String) : Bool {
+	access(all) fun main(string: String, prefix:String) : Bool {
 		return FindUtils.hasPrefix(string, prefix: prefix)
 	}`
 
@@ -196,9 +195,9 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("false", false))
 	})
 
-	devCheckToUpper := `import FindUtils from "../contracts/FindUtils.cdc"
+	devCheckToUpper := `import "FindUtils"
 
-	pub fun main(string: String) : String {
+	access(all) fun main(string: String) : String {
 		return FindUtils.toUpper(string)
 	}
 	`
@@ -220,9 +219,9 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("if they are already upper cases", strings.ToUpper(s)))
 	})
 
-	devCheckFirstUpperLetter := `import FindUtils from "../contracts/FindUtils.cdc"
+	devCheckFirstUpperLetter := `import "FindUtils"
 
-	pub fun main(string: String) : String {
+	access(all) fun main(string: String) : String {
 		return FindUtils.firstUpperLetter(string)
 	}
 	`
@@ -252,9 +251,9 @@ func TestFindUtils(t *testing.T) {
 			AssertWant(t, autogold.Want("should returns same if first letter is already upper case", s))
 	})
 
-	dev_check_to_snake_case := `import FindUtils from "../contracts/FindUtils.cdc"
+	dev_check_to_snake_case := `import "FindUtils"
 
-pub fun main(string: String) : String {
+access(all) fun main(string: String) : String {
 	return FindUtils.to_snake_case(string)
 }
 `
@@ -284,9 +283,9 @@ pub fun main(string: String) : String {
 			AssertWant(t, autogold.Want("Camel case", "camel_case"))
 	})
 
-	devCheckToCamelCase := `import FindUtils from "../contracts/FindUtils.cdc"
+	devCheckToCamelCase := `import "FindUtils"
 
-pub fun main(string: String) : String {
+access(all) fun main(string: String) : String {
 	return FindUtils.toCamelCase(string)
 }
 `
@@ -324,9 +323,9 @@ pub fun main(string: String) : String {
 			AssertWant(t, autogold.Want("Camel case", "camelCase"))
 	})
 
-	devTrimSuffix := `import FindUtils from "../contracts/FindUtils.cdc"
+	devTrimSuffix := `import "FindUtils"
 
-pub fun main(string: String, suffix:String) : String {
+access(all) fun main(string: String, suffix:String) : String {
 	return FindUtils.trimSuffix(string, suffix:suffix)
 }
 `
@@ -357,9 +356,9 @@ pub fun main(string: String, suffix:String) : String {
 
 	// Extra tests on trimFindSuffix on FIND
 
-	devTrimFindSuffix := `import FIND from "../contracts/FIND.cdc"
+	devTrimFindSuffix := `import "FIND"
 
-pub fun main(name: String) : String {
+access(all) fun main(name: String) : String {
 	return FIND.trimFindSuffix(name)
 }
 `
@@ -378,9 +377,9 @@ pub fun main(name: String) : String {
 	})
 
 	// splitString
-	devSplitString := `import FindUtils from "../contracts/FindUtils.cdc"
+	devSplitString := `import "FindUtils"
 
-	pub fun main(string: String, sep: Character) : [String] {
+	access(all) fun main(string: String, sep: Character) : [String] {
 		return FindUtils.splitString(string, sep:sep)
 	}
 	`
@@ -417,9 +416,9 @@ pub fun main(name: String) : String {
 	})
 
 	// joinMapToString
-	devJoinMapToString := `import FindUtils from "../contracts/FindUtils.cdc"
+	devJoinMapToString := `import "FindUtils"
 
-pub fun main(map: {String : String}) : String {
+access(all) fun main(map: {String : String}) : String {
 	return FindUtils.joinMapToString(map)
 }
 `
@@ -435,9 +434,9 @@ pub fun main(map: {String : String}) : String {
 	})
 
 	// joinString
-	devJoinString := `import FindUtils from "../contracts/FindUtils.cdc"
+	devJoinString := `import "FindUtils"
 
-pub fun main(s: [String], sep: String) : String {
+access(all) fun main(s: [String], sep: String) : String {
 	return FindUtils.joinString(s, sep:sep)
 }
 `
@@ -454,12 +453,12 @@ pub fun main(s: [String], sep: String) : String {
 	})
 
 	// deDupTypeArray
-	devDeDupTypeArray := `import FindUtils from "../contracts/FindUtils.cdc"
+	devDeDupTypeArray := `import "FindUtils"
 
-pub fun main(s: [String]) : [Type] {
+access(all) fun main(s: [String]) : [Type] {
 	var typ : [Type] = []
 	for t in s {
-		typ.append(CompositeType(t)!)
+		typ.append(CompositeType(t) ?? panic("value ".concat(t).concat(" is not a composite type")))
 	}
 	return FindUtils.deDupTypeArray(typ)
 }
@@ -467,11 +466,11 @@ pub fun main(s: [String]) : [Type] {
 	t.Run("deDupTypeArray should dedup duplicated as expected", func(t *testing.T) {
 		flow, err := o.QualifiedIdentifier("FlowToken", "Vault")
 		assert.NoError(t, err)
-		ft, err := o.QualifiedIdentifier("FungibleToken", "Vault")
+		ft, err := o.QualifiedIdentifier("FUSD", "Vault")
 		assert.NoError(t, err)
-		nft, err := o.QualifiedIdentifier("NonFungibleToken", "NFT")
+		nft, err := o.QualifiedIdentifier("ExampleNFT", "NFT")
 		assert.NoError(t, err)
-		collection, err := o.QualifiedIdentifier("NonFungibleToken", "Collection")
+		collection, err := o.QualifiedIdentifier("Dandy", "Collection")
 		assert.NoError(t, err)
 		o.Script(devDeDupTypeArray,
 			WithArg("s", []string{
@@ -497,5 +496,4 @@ pub fun main(s: [String]) : [Type] {
   "%s",
 }`, flow, ft, nft, collection)))
 	})
-
 }

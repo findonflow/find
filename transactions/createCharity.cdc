@@ -1,20 +1,20 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import CharityNFT from "../contracts/CharityNFT.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "CharityNFT"
 
 //This transaction will prepare the art collection
 transaction() {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 
-		let stdCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(CharityNFT.CollectionPublicPath)
+		let stdCap= account.getCapability<&{NonFungibleToken.Collection}>(CharityNFT.CollectionPublicPath)
 		if !stdCap.check() {
-			account.save<@NonFungibleToken.Collection>(<- CharityNFT.createEmptyCollection(), to: CharityNFT.CollectionStoragePath)
-			account.link<&{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(CharityNFT.CollectionPublicPath, target: CharityNFT.CollectionStoragePath)
+			account.storage.save<@NonFungibleToken.Collection>(<- CharityNFT.createEmptyCollection(), to: CharityNFT.CollectionStoragePath)
+			account.link<&{NonFungibleToken.Collection, ViewResolver.ResolverCollection}>(CharityNFT.CollectionPublicPath, target: CharityNFT.CollectionStoragePath)
 		}
 
 		let charityCap = account.getCapability<&{CharityNFT.CollectionPublic}>(/public/findCharityNFTCollection)
 		if !charityCap.check() {
-			account.link<&{CharityNFT.CollectionPublic, MetadataViews.ResolverCollection}>(/public/findCharityNFTCollection, target: CharityNFT.CollectionStoragePath)
+			account.link<&{CharityNFT.CollectionPublic, ViewResolver.ResolverCollection}>(/public/findCharityNFTCollection, target: CharityNFT.CollectionStoragePath)
 		}
 	}
 }

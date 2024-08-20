@@ -1,41 +1,24 @@
-`[
-    {
-        "body": "This is new body",
-        "created": 1,
-        "creator": "0xf669cb8d41ce0c74",
-        "creatorAvatar": "https://find.xyz/assets/img/avatars/avatar14.png",
-        "creatorName": "user1",
-        "creatorProfileName": "user1",
-        "header": "This is new header",
-        "hidden": false,
-        "id": 10002,
-        "lastUpdated": 1,
-        "medias": {
-            "ipfs://mediaHash": "mediaType"
-        },
-        "reacted": {
-            "sad": [
-                {
-                    "address": "0x192440c99cb17282",
-                    "avatar": "https://find.xyz/assets/img/avatars/avatar14.png",
-                    "findName": "user2",
-                    "name": "user2",
-                    "reaction": "sad"
-                }
-            ]
-        },
-        "reactedUsers": {
-            "sad": [
-                "user2"
-            ]
-        },
-        "reactions": {
-            "sad": 1
-        },
-        "tags": [
-            "tag4",
-            "tag5",
-            "@fest"
-        ]
-    }
-]`
+[]test_main.ThoughtData{{
+	Body:               "This is body",
+	Created:            1,
+	Creator:            "0x192440c99cb17282",
+	CreatorAvatar:      "https://find.xyz/assets/img/avatars/avatar14.png",
+	CreatorName:        "user1",
+	CreatorProfileName: "user1",
+	Header:             "This is header",
+	Medias:             map[string]string{"ipfs://mediaHash": "mediaType"},
+	Reacted: map[string]interface{}{"fire": []interface{}{map[string]interface{}{
+		"address":  "0xfd43f9148d4b725d",
+		"avatar":   "https://find.xyz/assets/img/avatars/avatar14.png",
+		"findName": "user2",
+		"name":     "user2",
+		"reaction": "fire",
+	}}},
+	ReactedUsers: map[string]interface{}{"fire": []interface{}{"user2"}},
+	Reactions:    map[string]string{"fire": "1"},
+	Tags: []string{
+		"tag1",
+		"tag2",
+		"@find",
+	},
+}}

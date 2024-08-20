@@ -1,27 +1,23 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
+import "FungibleToken"
+import "FiatToken"
 
 transaction(recipient: Address, amount: UFix64) {
-	let tokenAdmin: &FiatToken.Administrator
-	let tokenReceiver: &{FungibleToken.Receiver}
+    let tokenAdmin: &FiatToken.Administrator
+    let tokenReceiver: &{FungibleToken.Receiver}
 
-	prepare(signer: AuthAccount) {
+    prepare(signer: auth(BorrowValue) &Account) {
 
-		self.tokenAdmin = signer.borrow<&FiatToken.Administrator>(from: FiatToken.AdminStoragePath)
-		?? panic("Signer is not the token admin")
+        self.tokenAdmin = signer.storage.borrow<&FiatToken.Administrator>(from: FiatToken.AdminStoragePath) ?? panic("Signer is not the token admin")
 
-		self.tokenReceiver = getAccount(recipient)
-		.getCapability(FiatToken.VaultReceiverPubPath)
-		.borrow<&{FungibleToken.Receiver}>()
-		?? panic("Unable to borrow receiver reference")
-	}
+        self.tokenReceiver = getAccount(recipient).capabilities.borrow<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath) ?? panic("Unable to borrow receiver reference")
+    }
 
-	execute {
-		let minter <- self.tokenAdmin.createNewMinter()
-		let mintedVault <- minter.mintTokens(amount: amount)
+    execute {
+        let minter <- self.tokenAdmin.createNewMinter()
+        let mintedVault <- minter.mintTokens(amount: amount)
 
-		self.tokenReceiver.deposit(from: <-mintedVault)
+        self.tokenReceiver.deposit(from: <-mintedVault)
 
-		destroy minter
-	}
+        destroy minter
+    }
 }

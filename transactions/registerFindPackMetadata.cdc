@@ -1,12 +1,12 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FindPack from "../contracts/FindPack.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import FindVerifier from "../contracts/FindVerifier.cdc"
-import FindForge from "../contracts/FindForge.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FINDNFTCatalog"
+import "FungibleToken"
+import "FindPack"
+import "FlowToken"
+import "FindVerifier"
+import "FindForge"
+import "FIND"
 
 // this is a simple tx to update the metadata of a given type of NeoVoucher
 
@@ -14,11 +14,11 @@ transaction(forge: String, name: String, description:String, typeId: UInt64, ext
 
 	let lease: &FIND.Lease
 	let wallet: Capability<&{FungibleToken.Receiver}>
-	let providerCaps : {Type : Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>}
+	let providerCaps : {Type : Capability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>}
 	let types : [Type]
 
-	prepare(account: AuthAccount) {
-		let leaseCol =account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath) ?? panic("Could not borrow leases collection")
+	prepare(account: auth(BorrowValue) &Account) {
+		let leaseCol =account.storage.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath) ?? panic("Could not borrow leases collection")
 		self.lease = leaseCol.borrow(forge)
 		self.wallet = getAccount(wallet).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 
@@ -31,7 +31,7 @@ transaction(forge: String, name: String, description:String, typeId: UInt64, ext
 				panic("Type : ".concat(typeName).concat(" is not supported in NFTCatalog at the moment"))
 			}
 			let collectionInfo = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collection!.keys[0])!.collectionData
-			let providerCap= account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>(collectionInfo.privatePath)
+			let providerCap= account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>(collectionInfo.privatePath)
 			let type = CompositeType(typeName)!
 			self.types.append(type)
 			self.providerCaps[type] = providerCap

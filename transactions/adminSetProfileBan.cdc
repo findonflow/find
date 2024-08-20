@@ -1,11 +1,11 @@
-import Profile from "../contracts/Profile.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "Profile"
+import "FIND"
 
 transaction(user: String) {
-	prepare(acct: AuthAccount) {
-		let profile =acct.borrow<&Profile.User>(from:Profile.storagePath)!
-		let address =FIND.resolve(user) ?? panic("Not a registered name or valid address.")
-		profile.addBan(address)
-	}
+    prepare(account: auth(BorrowValue, Profile.Admin) &Account) {
+        let profile =account.storage.borrow<auth(Profile.Admin) &Profile.User>(from:Profile.storagePath)!
+        let address =FIND.resolve(user) ?? panic("Not a registered name or valid address.")
+        profile.addBan(address)
+    }
 }
 

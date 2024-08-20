@@ -1,11 +1,11 @@
-import Admin from "../contracts/Admin.cdc"
+import "Admin"
 
 transaction(typeIdentifier: String) {
 
-    let adminRef : &Admin.AdminProxy
+    let adminRef : auth(Admin.Owner) &Admin.AdminProxy
 
-    prepare(account: AuthAccount){
-        self.adminRef = account.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+    prepare(account: auth(BorrowValue) &Account){
+        self.adminRef = account.storage.borrow<auth(Admin.Owner) &Admin.AdminProxy>(from: Admin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
         
     }
 

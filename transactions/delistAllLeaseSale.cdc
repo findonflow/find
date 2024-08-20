@@ -1,9 +1,9 @@
-import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
+import "FindLeaseMarketSale"
+import "FindMarket"
+import "FindLeaseMarket"
 
 transaction() {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 		// Get all the saleItems Id
 
 		let tenant = FindMarket.getTenant(FindMarket.getFindTenantAddress())
@@ -12,7 +12,7 @@ transaction() {
 		let ref = cap.borrow() ?? panic("Cannot borrow reference to the capability.")
 
 		let listingType=Type<@FindLeaseMarketSale.SaleItemCollection>()
-		let saleItems= account.borrow<&FindLeaseMarketSale.SaleItemCollection>(from: tenant.getStoragePath(listingType))!
+		let saleItems= account.storage.borrow<&FindLeaseMarketSale.SaleItemCollection>(from: tenant.getStoragePath(listingType))!
 		let leases = ref.getNameSales()
 		for lease in leases {
 			saleItems.delist(lease)

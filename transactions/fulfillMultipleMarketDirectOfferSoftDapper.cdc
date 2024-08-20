@@ -1,7 +1,7 @@
-import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
+import "FindMarketDirectOfferSoft"
+import "FungibleToken"
+import "FTRegistry"
+import "FindMarket"
 
 transaction(ids: [UInt64], amounts:[UFix64]) {
 
@@ -10,11 +10,11 @@ transaction(ids: [UInt64], amounts:[UFix64]) {
 	let requiredAmount: [UFix64]
 	let balanceBeforeTransfer: {Type : UFix64}
 
-	prepare(dapper: AuthAccount, account: AuthAccount) {
+	prepare(dapper: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account, account: auth(BorrowValue) &Account) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
-		self.bidsReference= account.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Cannot borrow direct offer soft bid collection")
+		self.bidsReference= account.storage.borrow<&FindMarketDirectOfferSoft.MarketBidCollection>(from: storagePath) ?? panic("Cannot borrow direct offer soft bid collection")
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketDirectOfferSoft.MarketBidCollection>())
 
 		var counter = 0
@@ -41,7 +41,7 @@ transaction(ids: [UInt64], amounts:[UFix64]) {
 				let vaultRef = vaultRefs[ft!.vaultPath]!
 				self.walletReference.append(vaultRef)
 			} else {
-				let walletReference = dapper.borrow<&FungibleToken.Vault>(from: ft!.vaultPath) ?? panic("Cannot borrow Dapper Coin Vault. Type : ".concat(ft!.type.identifier))
+				let walletReference = dapper.storage.borrow<&{FungibleToken.Vault}>(from: ft!.vaultPath) ?? panic("Cannot borrow Dapper Coin Vault. Type : ".concat(ft!.type.identifier))
 				vaultRefs[ft!.vaultPath] = walletReference
 				self.walletReference.append(walletReference)
 				self.balanceBeforeTransfer[walletReference.getType()] = walletReference.balance

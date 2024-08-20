@@ -1,28 +1,31 @@
-import FindRelatedAccounts from "../contracts/FindRelatedAccounts.cdc"
+import "FindRelatedAccounts"
 
 transaction(name: String, network: String, address: String) {
 
-	var relatedAccounts : &FindRelatedAccounts.Accounts?
+    var relatedAccounts : auth(FindRelatedAccounts.Owner) &FindRelatedAccounts.Accounts?
 
-	prepare(account: AuthAccount) {
+    prepare(account: auth(BorrowValue, SaveValue, IssueStorageCapabilityController, UnpublishCapability, PublishCapability) &Account) {
 
-		self.relatedAccounts= account.borrow<&FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
-		if self.relatedAccounts == nil {
-			let relatedAccounts <- FindRelatedAccounts.createEmptyAccounts()
-			account.save(<- relatedAccounts, to: FindRelatedAccounts.storagePath)
-			account.link<&FindRelatedAccounts.Accounts{FindRelatedAccounts.Public}>(FindRelatedAccounts.publicPath, target: FindRelatedAccounts.storagePath)
-			self.relatedAccounts = account.borrow<&FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
-		}
+        self.relatedAccounts= account.storage.borrow<auth(FindRelatedAccounts.Owner) &FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
+        if self.relatedAccounts == nil {
+            let relatedAccounts <- FindRelatedAccounts.createEmptyAccounts()
+            account.storage.save(<- relatedAccounts, to: FindRelatedAccounts.storagePath)
 
-		let cap = account.getCapability<&FindRelatedAccounts.Accounts{FindRelatedAccounts.Public}>(FindRelatedAccounts.publicPath)
-		if !cap.check() {
-			account.unlink(FindRelatedAccounts.publicPath)
-			account.link<&FindRelatedAccounts.Accounts{FindRelatedAccounts.Public}>(FindRelatedAccounts.publicPath, target: FindRelatedAccounts.storagePath)
-		}
-	}
+            let cap = account.capabilities.storage.issue<&{FindRelatedAccounts.Public}>(FindRelatedAccounts.storagePath)
+            account.capabilities.publish(cap, at: FindRelatedAccounts.publicPath)
+            self.relatedAccounts = account.storage.borrow<auth(FindRelatedAccounts.Owner) &FindRelatedAccounts.Accounts>(from:FindRelatedAccounts.storagePath)
+        }
 
-	execute {
-		self.relatedAccounts!.removeRelatedAccount(name:name, network:network, address: address)
-	}
+        let cap = account.capabilities.get<&{FindRelatedAccounts.Public}>(FindRelatedAccounts.publicPath)
+        if !cap.check() {
+            account.capabilities.unpublish(FindRelatedAccounts.publicPath)
+            let cap = account.capabilities.storage.issue<&{FindRelatedAccounts.Public}>(FindRelatedAccounts.storagePath)
+            account.capabilities.publish(cap, at: FindRelatedAccounts.publicPath)
+        }
+    }
+
+    execute {
+        self.relatedAccounts!.removeRelatedAccount(name:name, network:network, address: address)
+    }
 
 }

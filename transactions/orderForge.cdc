@@ -1,15 +1,15 @@
-import FindForge from "../contracts/FindForge.cdc"
-import FIND from "../contracts/FIND.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "FindForge"
+import "FIND"
+import "MetadataViews"
 
 
 transaction(name: String, mintType:String, minterCut: UFix64, collectionDisplay: MetadataViews.NFTCollectionDisplay) {
 
 	let leases : &FIND.LeaseCollection?
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 
-		self.leases= account.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
+		self.leases= account.storage.borrow<&FIND.LeaseCollection>(from:FIND.LeaseStoragePath)
 
 	}
 

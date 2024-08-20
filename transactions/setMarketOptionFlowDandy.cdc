@@ -1,11 +1,11 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import Dandy from "../contracts/Dandy.cdc"
+import "FindMarket"
+import "FlowToken"
+import "Dandy"
 
 transaction(){
-    prepare(account: AuthAccount){
+    prepare(account: auth(BorrowValue) &Account){
         let path = FindMarket.TenantClientStoragePath
-        let tenantRef = account.borrow<&FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
+        let tenantRef = account.storage.borrow<auth(FindMarket.TenantClientOwner) &FindMarket.TenantClient>(from: path) ?? panic("Cannot borrow Reference.")
 
         tenantRef.setMarketOption(name:"FlowDandy", cut: nil, rules:[
             FindMarket.TenantRule(name:"Flow", types:[Type<@FlowToken.Vault>()], ruleType: "ft", allow: true),

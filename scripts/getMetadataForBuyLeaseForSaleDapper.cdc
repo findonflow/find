@@ -1,11 +1,11 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FIND from "../contracts/FIND.cdc"
-import Profile from "../contracts/Profile.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
-import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
+import "FindMarket"
+import "FIND"
+import "Profile"
+import "DapperUtilityCoin"
+import "FindLeaseMarketSale"
+import "FindLeaseMarket"
 
-pub fun main(sellerAccount: Address, leaseName: String, amount: UFix64) :PurchaseData{
+access(all) fun main(sellerAccount: Address, leaseName: String, amount: UFix64) :PurchaseData{
 
 	let address = FIND.resolve(leaseName) ?? panic("The address input is not a valid name nor address. Input : ".concat(leaseName))
 	let leaseMarketplace = FindMarket.getFindTenantAddress()
@@ -26,12 +26,12 @@ pub fun main(sellerAccount: Address, leaseName: String, amount: UFix64) :Purchas
 			)
 }
 
-pub struct PurchaseData {
-	pub let id: UInt64
-	pub let name: String
-	pub let amount: UFix64
-	pub let description: String
-	pub let imageURL: String
+access(all) struct PurchaseData {
+	access(all) let id: UInt64
+	access(all) let name: String
+	access(all) let amount: UFix64
+	access(all) let description: String
+	access(all) let imageURL: String
 
 	init(id: UInt64, name: String, amount: UFix64, description: String, imageURL: String) {
 		self.id = id

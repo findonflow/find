@@ -1,17 +1,17 @@
-import FIND from "../contracts/FIND.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
+import "FIND"
+import "NonFungibleToken"
+import "ExampleNFT"
 
 transaction(user: String, id: UInt64) {
 	let address : Address
-	let cap : Capability<&ExampleNFT.Collection{NonFungibleToken.CollectionPublic}>
+	let cap : Capability<&ExampleNFT.Collection{NonFungibleToken.Collection}>
 	let senderRef : &ExampleNFT.Collection
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 		self.address = FIND.resolve(user) ?? panic("Cannot find user with this name / address")
-		self.cap = getAccount(self.address).getCapability<&ExampleNFT.Collection{NonFungibleToken.CollectionPublic}>(ExampleNFT.CollectionPublicPath)
+		self.cap = getAccount(self.address).getCapability<&ExampleNFT.Collection{NonFungibleToken.Collection}>(ExampleNFT.CollectionPublicPath)
 
-		self.senderRef = account.borrow<&ExampleNFT.Collection>(from: ExampleNFT.CollectionStoragePath) ?? panic("Cannot borrow reference to sender Collection.")
+		self.senderRef = account.storage.borrow<&ExampleNFT.Collection>(from: ExampleNFT.CollectionStoragePath) ?? panic("Cannot borrow reference to sender Collection.")
 	}
 
 	pre{

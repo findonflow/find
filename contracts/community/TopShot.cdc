@@ -1,32 +1,32 @@
 
 
-import NonFungibleToken from "../standard/NonFungibleToken.cdc"
-import MetadataViews from "../standard/MetadataViews.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
 
-pub contract TopShot: NonFungibleToken {
+access(all) contract TopShot: NonFungibleToken {
 
     // Emitted when the TopShot contract is created
-    pub event ContractInitialized()
+    access(all) event ContractInitialized()
     //
     // Emitted when a moment is withdrawn from a Collection
-    pub event Withdraw(id: UInt64, from: Address?)
+    access(all) event Withdraw(id: UInt64, from: Address?)
     // Emitted when a moment is deposited into a Collection
-    pub event Deposit(id: UInt64, to: Address?)
-    pub var totalSupply: UInt64
+    access(all) event Deposit(id: UInt64, to: Address?)
+    access(all) var totalSupply: UInt64
 
     // The resource that represents the Moment NFTs
     //
-    pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+    access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 
         // Global unique moment ID
-        pub let id: UInt64
+        access(all) let id: UInt64
 
         init() {
             self.id = self.uuid
         }
 
         // All supported metadata views for the Moment including the Core NFT Views
-        pub fun getViews(): [Type] {
+        access(all) getViews(): [Type] {
             return [
                 Type<MetadataViews.Display>(),
                 Type<MetadataViews.Royalties>(),
@@ -38,7 +38,7 @@ pub contract TopShot: NonFungibleToken {
 
 
 
-        pub fun resolveView(_ view: Type): AnyStruct? {
+        access(all) resolveView(_ view: Type): AnyStruct? {
             switch view {
                 case Type<MetadataViews.Display>():
                     return MetadataViews.Display(
@@ -60,8 +60,8 @@ pub contract TopShot: NonFungibleToken {
                         publicPath: /public/MomentCollection,
                         providerPath: /private/MomentCollection,
                         publicCollection: Type<&TopShot.Collection{TopShot.MomentCollectionPublic}>(),
-                        publicLinkedType: Type<&TopShot.Collection{TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}>(),
-                        providerLinkedType: Type<&TopShot.Collection{NonFungibleToken.Provider,TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}>(),
+                        publicLinkedType: Type<&TopShot.Collection{TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.Collection,ViewResolver.ResolverCollection}>(),
+                        providerLinkedType: Type<&TopShot.Collection{NonFungibleToken.Provider,TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.Collection,ViewResolver.ResolverCollection}>(),
                         createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
                             return <-TopShot.createEmptyCollection()
                         })
@@ -97,11 +97,11 @@ pub contract TopShot: NonFungibleToken {
         }
 	}
 
-    pub resource interface MomentCollectionPublic {
-        pub fun deposit(token: @NonFungibleToken.NFT)
-        pub fun getIDs(): [UInt64]
-        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
-        pub fun borrowMoment(id: UInt64): &TopShot.NFT? {
+    access(all) resource interface MomentCollectionPublic {
+        access(all) deposit(token: @NonFungibleToken.NFT)
+        access(all) view fun getIDs(): [UInt64]
+        access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT
+        access(all) borrowMoment(id: UInt64): &TopShot.NFT? {
             // If the result isn't nil, the id of the returned reference
             // should be the same as the argument to the function
             post {
@@ -114,10 +114,10 @@ pub contract TopShot: NonFungibleToken {
     // Collection is a resource that every user who owns NFTs
     // will store in their account to manage their NFTS
     //
-    pub resource Collection: MomentCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
+    access(all) resource Collection: MomentCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection {
         // Dictionary of Moment conforming tokens
         // NFT is a resource type with a UInt64 ID field
-        pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+        access(all) var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
         init() {
             self.ownedNFTs <- {}
@@ -129,7 +129,7 @@ pub contract TopShot: NonFungibleToken {
         // that is to be removed from the Collection
         //
         // returns: @NonFungibleToken.NFT the token that was withdrawn
-        pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+        access(all) withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
 
             // Borrow nft and check if locked
             let nft = self.borrowNFT(id: withdrawID)
@@ -148,7 +148,7 @@ pub contract TopShot: NonFungibleToken {
         //
         // Paramters: token: the NFT to be deposited in the collection
         //
-        pub fun deposit(token: @NonFungibleToken.NFT) {
+        access(all) deposit(token: @NonFungibleToken.NFT) {
 
             // Cast the deposited token as a TopShot NFT to make sure
             // it is the correct type
@@ -171,7 +171,7 @@ pub contract TopShot: NonFungibleToken {
         }
 
         // getIDs returns an array of the IDs that are in the Collection
-        pub fun getIDs(): [UInt64] {
+        access(all) view fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
         }
 
@@ -186,7 +186,7 @@ pub contract TopShot: NonFungibleToken {
         // not any topshot specific data. Please use borrowMoment to
         // read Moment data.
         //
-        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
+        access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT {
             return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
         }
 
@@ -200,19 +200,19 @@ pub contract TopShot: NonFungibleToken {
         // Parameters: id: The ID of the NFT to get the reference for
         //
         // Returns: A reference to the NFT
-        pub fun borrowMoment(id: UInt64): &TopShot.NFT? {
+        access(all) borrowMoment(id: UInt64): &TopShot.NFT? {
             if self.ownedNFTs[id] != nil {
-                let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+                let ref = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
                 return ref as! &TopShot.NFT
             } else {
                 return nil
             }
         }
 
-        pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
-            let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+        access(all) borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
+            let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
             let topShotNFT = nft as! &TopShot.NFT
-            return topShotNFT as &AnyResource{MetadataViews.Resolver}
+            return topShotNFT as &AnyResource{ViewResolver.Resolver}
         }
 
         // If a transaction destroys the Collection object,
@@ -225,7 +225,7 @@ pub contract TopShot: NonFungibleToken {
         }
     }
 
-	pub fun createEmptyCollection() : @NonFungibleToken.Collection {
+	access(all) createEmptyCollection() : @NonFungibleToken.Collection {
 		return <- create Collection()
 	}
 
@@ -234,7 +234,7 @@ pub contract TopShot: NonFungibleToken {
         self.totalSupply = 0
 
         // Put a new Collection in storage
-        self.account.save<@Collection>(<- create Collection(), to: /storage/MomentCollection)
+        self.account.storage.save<@Collection>(<- create Collection(), to: /storage/MomentCollection)
 
         // Create a public capability for the Collection
         self.account.link<&{MomentCollectionPublic}>(/public/MomentCollection, target: /storage/MomentCollection)

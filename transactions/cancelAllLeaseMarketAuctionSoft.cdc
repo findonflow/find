@@ -1,14 +1,14 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindLeaseMarketAuctionSoft from "../contracts/FindLeaseMarketAuctionSoft.cdc"
+import "FindMarket"
+import "FindLeaseMarketAuctionSoft"
 
 transaction() {
 
 	let saleItems : &FindLeaseMarketAuctionSoft.SaleItemCollection?
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 		let leaseMarketplace = FindMarket.getFindTenantAddress()
 		let tenant = FindMarket.getTenant(leaseMarketplace)
-		self.saleItems= account.borrow<&FindLeaseMarketAuctionSoft.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindLeaseMarketAuctionSoft.SaleItemCollection>()))
+		self.saleItems= account.storage.borrow<&FindLeaseMarketAuctionSoft.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindLeaseMarketAuctionSoft.SaleItemCollection>()))
 
 	}
 

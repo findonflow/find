@@ -1,21 +1,21 @@
-import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FindViews from "../contracts/FindViews.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
+import "FindMarketDirectOfferSoft"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FindViews"
+import "NFTCatalog"
+import "FINDNFTCatalog"
+import "FindMarket"
 
 transaction(ids: [UInt64]) {
 
 	let market : &FindMarketDirectOfferSoft.SaleItemCollection
 	let pointer : [FindViews.AuthNFTPointer]
 
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 		let marketplace = FindMarket.getFindTenantAddress()
 		let tenant=FindMarket.getTenant(marketplace)
 		let storagePath=tenant.getStoragePath(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())
-		self.market = account.borrow<&FindMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
+		self.market = account.storage.borrow<&FindMarketDirectOfferSoft.SaleItemCollection>(from: storagePath)!
 		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketDirectOfferSoft.SaleItemCollection>())
 
 		var counter = 0
@@ -37,7 +37,7 @@ transaction(ids: [UInt64]) {
 				nfts[nftIdentifier] = nft
 			}
 
-			let providerCap=account.getCapability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(nft!.privatePath)
+			let providerCap=account.getCapability<&{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.Collection}>(nft!.privatePath)
 			let pointer= FindViews.AuthNFTPointer(cap: providerCap, id: item.getItemID())
 			self.pointer.append(pointer)
 			counter = counter + 1

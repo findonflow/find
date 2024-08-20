@@ -1,56 +1,60 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FindLeaseMarketSale from "../contracts/FindLeaseMarketSale.cdc"
-import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
+import "FindMarket"
+import "FTRegistry"
+import "FungibleToken"
+import "FIND"
+import "Profile"
+import "FindLeaseMarketSale"
+import "FindLeaseMarket"
 
 transaction(leaseName: String, amount: UFix64) {
 
-	let walletReference : &FungibleToken.Vault
+    let buyer : Address
+    let walletReference : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
 
-	let saleItemsCap: Capability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>
-	let buyer: Address
+    let saleItemCollection: &{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}
 
-	prepare(account: AuthAccount) {
+    prepare(account: auth(BorrowValue, SaveValue, IssueStorageCapabilityController) &Account) {
 
-		let resolveAddress = FIND.resolve(leaseName)
-		if resolveAddress == nil {
-			panic("The address input is not a valid name nor address. Input : ".concat(leaseName))
-		}
-		let address = resolveAddress!
-		let leaseMarketplace = FindMarket.getFindTenantAddress()
-		let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
-		let leaseTenant = leaseTenantCapability.borrow()!
+        let profile=account.storage.borrow<&Profile.User>(from: Profile.storagePath) ?? panic("You do not have a profile set up, initialize the user first")
 
-		let leaseSaleItemType= Type<@FindLeaseMarketSale.SaleItemCollection>()
-		let leasePublicPath=leaseTenant.getPublicPath(leaseSaleItemType)
-		let leaseStoragePath= leaseTenant.getStoragePath(leaseSaleItemType)
-		let leaseSaleItemCap= account.getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath)
-		if !leaseSaleItemCap.check() {
-			//The link here has to be a capability not a tenant, because it can change.
-			account.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
-			account.link<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath, target: leaseStoragePath)
-		}
+        let address = FIND.resolve(leaseName) ?? panic("The address input is not a valid name nor address. Input : ".concat(leaseName))
 
-		self.saleItemsCap= getAccount(address).getCapability<&FindLeaseMarketSale.SaleItemCollection{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath)
-		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindLeaseMarketSale.SaleItemCollection>())
+        if address == nil {
+            panic("The address input is not a valid name nor address. Input : ".concat(leaseName))
+        }
 
-		let item= FindLeaseMarket.assertOperationValid(tenant: leaseMarketplace, name: leaseName, marketOption: marketOption)
+        let leaseMarketplace = FindMarket.getTenantAddress("find") ?? panic("Cannot find find tenant")
+        let saleItemsCap= FindLeaseMarketSale.getSaleItemCapability(marketplace: leaseMarketplace, user:address) ?? panic("cannot find sale item cap for find")
 
-		let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
+        let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
+        let leaseTenant = leaseTenantCapability.borrow()!
 
-		self.walletReference = account.borrow<&FungibleToken.Vault>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
-		self.buyer = account.address
-	}
+        let leaseSaleItemType= Type<@FindLeaseMarketSale.SaleItemCollection>()
+        let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: "find")
+        let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:"find")
+        var leaseSaleItemCap= account.capabilities.get<&{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leasePublicPath)
+        if !leaseSaleItemCap.check(){
+            //The link here has to be a capability not a tenant, because it can change.
+            account.storage.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
+            leaseSaleItemCap= account.capabilities.storage.issue<&{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}>(leaseStoragePath)
+        }
 
-	pre {
-		self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
-	}
+        self.saleItemCollection = saleItemsCap.borrow()!
+        let item = self.saleItemCollection.borrowSaleItem(leaseName)
 
-	execute {
-		let vault <- self.walletReference.withdraw(amount: amount)
-		self.saleItemsCap.borrow()!.buy(name:leaseName, vault: <- vault, to: self.buyer)
-	}
+        let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(item.getFtType().identifier))
+
+
+        self.walletReference = account.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ft.vaultPath) ?? panic("No suitable wallet linked for this account")
+        self.buyer = account.address
+    }
+
+    pre {
+        self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
+    }
+
+    execute {
+        let vault <- self.walletReference.withdraw(amount: amount)
+        self.saleItemCollection.buy(name:leaseName, vault: <- vault, to: self.buyer)
+    }
 }
-

@@ -6,50 +6,50 @@ Welcome to the Wearables contract for Doodles2
 A wearable is an equipment that can be equipped  to a Doodle2
 */
 
-import NonFungibleToken from "../standard/NonFungibleToken.cdc"
-import FungibleToken from "../standard/FungibleToken.cdc"
-import MetadataViews from "../standard/MetadataViews.cdc"
-import Templates from "./Templates.cdc"
-import FindUtils from "../FindUtils.cdc"
+import "NonFungibleToken"
+import "FungibleToken"
+import "MetadataViews"
+import "Templates"
+import "FindUtils"
 
-pub contract Wearables: NonFungibleToken {
+access(all) contract Wearables: NonFungibleToken {
 
 	//Holds the total supply of wearables ever minted
-	pub var totalSupply: UInt64
+	access(all) var totalSupply: UInt64
 
-	pub event ContractInitialized()
+	access(all) event ContractInitialized()
 
 	//emitted when a NFT is withdrawn as defined in the NFT standard
-	pub event Withdraw(id: UInt64, from: Address?)
+	access(all) event Withdraw(id: UInt64, from: Address?)
 
 	//emitted when a NFT is deposited as defined in the NFT standard
-	pub event Deposit(id: UInt64, to: Address?)
+	access(all) event Deposit(id: UInt64, to: Address?)
 
 	//emitted when an Wearable is minted either as part of dooplication or later as part of batch minting, note that context and its fields will vary according to when/how it was minted
-	pub event Minted(id:UInt64, address:Address, name: String, thumbnail:String, set: String, position: String, template: String, tags:[String], templateId:UInt64, context: {String : String})
+	access(all) event Minted(id:UInt64, address:Address, name: String, thumbnail:String, set: String, position: String, template: String, tags:[String], templateId:UInt64, context: {String : String})
 
 	//standard paths in the nft metadata standard
-	pub let CollectionStoragePath: StoragePath
-	pub let CollectionPublicPath: PublicPath
-	pub let CollectionPrivatePath: PrivatePath
+	access(all) let CollectionStoragePath: StoragePath
+	access(all) let CollectionPublicPath: PublicPath
+	access(all) let CollectionPrivatePath: PrivatePath
 
 
 	// SETS
 
 	// sets is a registry that is stored in the contract for ease of reuse and also to be able to count the mints of a set an retire it
-	pub event SetRegistered(id:UInt64, name:String)
-	pub event SetRetired(id:UInt64)
+	access(all) event SetRegistered(id:UInt64, name:String)
+	access(all) event SetRetired(id:UInt64)
 
 	//a registry of sets to group Wearables
-	pub let sets: {UInt64 : Set}
+	access(all) let sets: {UInt64 : Set}
 
 	//the definition of a set, a data structure that is Retriable and Editionable
-	pub struct Set : Templates.Retirable, Templates.Editionable, Templates.RoyaltyHolder {
-		pub let id:UInt64
-		pub let name: String
-		pub var active:Bool
-		pub let royalties: [Templates.Royalty]
-		pub let creator : String
+	access(all) struct Set : Templates.Retirable, Templates.Editionable, Templates.RoyaltyHolder {
+		access(all) let id:UInt64
+		access(all) let name: String
+		access(all) var active:Bool
+		access(all) let royalties: [Templates.Royalty]
+		access(all) let creator : String
 		access(self) let extra: {String : AnyStruct}
 
 		init(id:UInt64, name:String, creator: String, royalties: [Templates.Royalty]) {
@@ -61,20 +61,20 @@ pub contract Wearables: NonFungibleToken {
 			self.extra={}
 		}
 
-		pub fun getCreator() : String {
+		access(all) getCreator() : String {
 			return self.creator
 		}
 
 
-		pub fun getClassifier() : String{
+		access(all) getClassifier() : String{
 			return "set"
 		}
 
-		pub fun getCounterSuffix() : String {
+		access(all) getCounterSuffix() : String {
 			return self.name
 		}
 
-		pub fun getContract() : String {
+		access(all) getContract() : String {
 			return "wearable"
 		}
 	}
@@ -98,17 +98,17 @@ pub contract Wearables: NonFungibleToken {
 	// POSITION
 	// a concept that tells where on a Doodle2 a wearable can be equipped.
 
-	pub event PositionRegistered(id:UInt64, name:String, classifiers:[String])
-	pub event PositionRetired(id:UInt64)
+	access(all) event PositionRegistered(id:UInt64, name:String, classifiers:[String])
+	access(all) event PositionRetired(id:UInt64)
 
-	pub let positions: {UInt64 : Position}
+	access(all) let positions: {UInt64 : Position}
 
 	//the definition of a position, a data structure that is Retriable and Editionable
-	pub struct Position : Templates.Retirable, Templates.Editionable{
-		pub let id:UInt64
-		pub let name: String
-		pub let classifiers: [String]
-		pub var active:Bool
+	access(all) struct Position : Templates.Retirable, Templates.Editionable{
+		access(all) let id:UInt64
+		access(all) let name: String
+		access(all) let classifiers: [String]
+		access(all) var active:Bool
 		access(self) let extra: {String : AnyStruct}
 
 		init(id:UInt64, name:String) {
@@ -119,7 +119,7 @@ pub contract Wearables: NonFungibleToken {
 			self.extra={}
 		}
 
-		pub fun getName(_ index: Int) :String {
+		access(all) getName(_ index: Int) :String {
 			if self.classifiers.length==0 {
 				return self.name
 			}
@@ -128,7 +128,7 @@ pub contract Wearables: NonFungibleToken {
 			return self.name.concat("_").concat(classifier)
 		}
 
-		pub fun getPositionCount() :Int{
+		access(all) getPositionCount() :Int{
 			let length=self.classifiers.length
 			if length==0 {
 				return 1
@@ -136,15 +136,15 @@ pub contract Wearables: NonFungibleToken {
 			return length
 		}
 
-		pub fun getClassifier() :String {
+		access(all) getClassifier() :String {
 			return "position"
 		}
 
-		pub fun getCounterSuffix() : String {
+		access(all) getCounterSuffix() : String {
 			return self.name
 		}
 
-		pub fun getContract() : String {
+		access(all) getContract() : String {
 			return "wearable"
 		}
 	}
@@ -169,24 +169,24 @@ pub contract Wearables: NonFungibleToken {
 	// a template is a preregistered set of values that a Wearable can get when it is minted, it is then copied into the NFT for provenance
 
 	//these events are there to track changes internally for registers that are needed to make this contract work
-	pub event TemplateRegistered(id:UInt64, set: UInt64, position: UInt64, name: String, tags:[String])
-	pub event TemplateRetired(id:UInt64)
+	access(all) event TemplateRegistered(id:UInt64, set: UInt64, position: UInt64, name: String, tags:[String])
+	access(all) event TemplateRetired(id:UInt64)
 
 	//a registry of templates that defines how a Wearable can be minted
-	pub let templates: {UInt64 : Template}
+	access(all) let templates: {UInt64 : Template}
 
 	//the definition of a template, a data structure that is Retriable and Editionable
-	pub struct Template : Templates.Retirable, Templates.Editionable {
-		pub let id:UInt64
-		pub let name: String
-		pub let set: UInt64
-		pub let position: UInt64
-		pub let tags: [Tag]
-		pub let thumbnail: MetadataViews.Media
-		pub let image: MetadataViews.Media
-		pub var active: Bool
-		pub let hidden: Bool
-		pub let plural: Bool
+	access(all) struct Template : Templates.Retirable, Templates.Editionable {
+		access(all) let id:UInt64
+		access(all) let name: String
+		access(all) let set: UInt64
+		access(all) let position: UInt64
+		access(all) let tags: [Tag]
+		access(all) let thumbnail: MetadataViews.Media
+		access(all) let image: MetadataViews.Media
+		access(all) var active: Bool
+		access(all) let hidden: Bool
+		access(all) let plural: Bool
 		access(self) let extra: {String : AnyStruct}
 
 		init(id:UInt64, set: UInt64, position: UInt64, name: String, tags:[Tag], thumbnail: MetadataViews.Media, image: MetadataViews.Media, hidden: Bool, plural: Bool) {
@@ -205,7 +205,7 @@ pub contract Wearables: NonFungibleToken {
 			self.extra={}
 		}
 
-		pub fun getTags() : [String] {
+		access(all) getTags() : [String] {
 			let t : [String] = []
 			for tag in self.tags {
 				t.append(tag.getCounterSuffix())
@@ -213,48 +213,48 @@ pub contract Wearables: NonFungibleToken {
 			return t
 		}
 
-		pub fun getPlural() : Bool {
+		access(all) getPlural() : Bool {
 			return self.plural
 		}
 
-		pub fun getHidden() : Bool {
+		access(all) getHidden() : Bool {
 				return self.hidden
 		}
 
-		pub fun getIdentifier() : String {
+		access(all) getIdentifier() : String {
 			return self.name
 		}
 
-		pub fun getClassifier() :String {
+		access(all) getClassifier() :String {
 			return "template"
 		}
 
 		// Trim is not a unique identifier here
-		pub fun getCounterSuffix() : String {
+		access(all) getCounterSuffix() : String {
 			return self.name
 		}
 
-		pub fun getContract() : String {
+		access(all) getContract() : String {
 			return "wearable"
 		}
 
-		pub fun getPositionName(_ index:Int) : String {
+		access(all) getPositionName(_ index:Int) : String {
 			return Wearables.positions[self.position]!.getName(index)
 		}
 
-		pub fun getPosition() : Wearables.Position {
+		access(all) getPosition() : Wearables.Position {
 			return Wearables.positions[self.position]!
 		}
 
-		pub fun getSetName() : String {
+		access(all) getSetName() : String {
 			return Wearables.sets[self.set]!.name
 		}
 
-		pub fun getSet() : Wearables.Set {
+		access(all) getSet() : Wearables.Set {
 			return Wearables.sets[self.set]!
 		}
 
-		pub fun getRoyalties() : [MetadataViews.Royalty] {
+		access(all) getRoyalties() : [MetadataViews.Royalty] {
 			return Wearables.sets[self.set]!.getRoyalties()
 		}
 
@@ -272,8 +272,8 @@ pub contract Wearables: NonFungibleToken {
 	}
 
 	//A tag is a label for a Wearable, they can have many tags associated with them
-	pub struct Tag : Templates.Editionable {
-		pub let value : String
+	access(all) struct Tag : Templates.Editionable {
+		access(all) let value : String
 		access(self) let extra: {String : AnyStruct}
 
 		init(value: String) {
@@ -281,20 +281,20 @@ pub contract Wearables: NonFungibleToken {
 			self.extra={}
 		}
 
-		pub fun getValue() : String {
+		access(all) getValue() : String {
 			return self.value
 		}
 
-		pub fun getCounterSuffix() : String {
+		access(all) getCounterSuffix() : String {
 			return self.value
 		}
 
 		// e.g. set , position
-		pub fun getClassifier() : String {
+		access(all) getClassifier() : String {
 			return "tag_".concat(self.value)
 		}
 		// e.g. character, wearable
-		pub fun getContract() : String {
+		access(all) getContract() : String {
 			return "wearable"
 		}
 	}
@@ -322,29 +322,29 @@ pub contract Wearables: NonFungibleToken {
 
 	// A resource on flow https://developers.flow.com/cadence/language/resources is kind of like a struct just with way stronger semantics and rules around security
 
-	pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+	access(all) resource NFT: NonFungibleToken.INFT, ViewResolver.Resolver {
 
 		//the unique id of a NFT, Wearables uses UUID so this id is unique across _all_ resources on flow
-		pub let id:UInt64
+		access(all) let id:UInt64
 
 		//The template that this Werable was made as
-		pub let template: Template
+		access(all) let template: Template
 
 		//a list of edition info used to present counters for the various types of data
-		pub let editions: [Templates.EditionInfo]
+		access(all) let editions: [Templates.EditionInfo]
 
 		//stores who has interacted with this wearable, that
-		pub let interactions: [Pointer]
+		access(all) let interactions: [Pointer]
 
 		//internal counter to count how many times a wearable has been deposited.
 		access(account) var nounce:UInt64
 
 		//the royalties defined in this werable
-		pub let royalties: MetadataViews.Royalties
+		access(all) let royalties: MetadataViews.Royalties
 
-		pub let context: { String: String}
+		access(all) let context: { String: String}
 		//stores extra data in case we need it for later iterations since we cannot add data
-		pub let extra: {String : AnyStruct}
+		access(all) let extra: {String : AnyStruct}
 
 		init(
 			template: Template,
@@ -361,11 +361,11 @@ pub contract Wearables: NonFungibleToken {
 			self.editions=editions
 		}
 
-		pub fun getContext() : {String:String} {
+		access(all) getContext() : {String:String} {
 			return self.context
 		}
 
-		pub fun getViews(): [Type] {
+		access(all) getViews(): [Type] {
 			return  [
 			Type<MetadataViews.Display>(),
 			Type<MetadataViews.Royalties>(),
@@ -378,22 +378,22 @@ pub contract Wearables: NonFungibleToken {
 			]
 		}
 
-		pub fun getTemplateActive() : Bool {
+		access(all) getTemplateActive() : Bool {
 			let t = Wearables.templates[self.template.id]!
 			return t.active
 		}
 
-		pub fun getPositionActive() : Bool {
+		access(all) getPositionActive() : Bool {
 			let p = self.template.getPosition()
 			return p.active
 		}
 
-		pub fun getSetActive() : Bool {
+		access(all) getSetActive() : Bool {
 			let s = self.template.getSet()
 			return s.active
 		}
 
-		pub fun getActive(_ classifier: String) : Bool {
+		access(all) getActive(_ classifier: String) : Bool {
 			switch classifier {
 
 				case "wearable" :
@@ -411,7 +411,7 @@ pub contract Wearables: NonFungibleToken {
 			return true
 		}
 
-		pub fun getLastInteraction() : Pointer? {
+		access(all) getLastInteraction() : Pointer? {
 			if self.interactions.length == 0 {
 				return nil
 			}
@@ -429,18 +429,18 @@ pub contract Wearables: NonFungibleToken {
 		}
 
 		//the thumbnail is a png but the image is a SVG, it was decided after deployment that the svg is what we will use for thumbnail and ignore the image
-		pub fun getThumbnail() : {MetadataViews.File} {
+		access(all) getThumbnail() : {MetadataViews.File} {
 				let ipfsFile =self.template.image.file as! MetadataViews.IPFSFile
 				let httpFile= MetadataViews.HTTPFile(url:"https://wcnft.mypinata.cloud/ipfs/".concat(ipfsFile.cid))
 				return httpFile
 		}
 
-		pub fun getThumbnailUrl() : String{
+		access(all) getThumbnailUrl() : String{
 			return self.getThumbnail().uri()
 		}
 
 
-		pub fun getName() : String {
+		access(all) getName() : String {
 			if self.template.tags.length == 0 {
 				return self.template.name
 			}
@@ -450,7 +450,7 @@ pub contract Wearables: NonFungibleToken {
 		}
 
 
-		pub fun getDescription() : String {
+		access(all) getDescription() : String {
 			var plural=self.template.getPlural()
 
 			var first="This"
@@ -464,7 +464,7 @@ pub contract Wearables: NonFungibleToken {
 
 		}
 
-		pub fun resolveView(_ view: Type): AnyStruct? {
+		access(all) resolveView(_ view: Type): AnyStruct? {
 			let description= self.getDescription()
 
 			switch view {
@@ -496,9 +496,9 @@ pub contract Wearables: NonFungibleToken {
 				return MetadataViews.NFTCollectionData(storagePath: Wearables.CollectionStoragePath,
 				publicPath: Wearables.CollectionPublicPath,
 				providerPath: Wearables.CollectionPrivatePath,
-				publicCollection: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
-				publicLinkedType: Type<&Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
-				providerLinkedType: Type<&Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
+				publicCollection: Type<&Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
+				publicLinkedType: Type<&Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
+				providerLinkedType: Type<&Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(),
 				createEmptyCollectionFunction: fun(): @NonFungibleToken.Collection {return <- Wearables.createEmptyCollection()})
 
 			case Type<MetadataViews.Editions>() :
@@ -523,7 +523,7 @@ pub contract Wearables: NonFungibleToken {
 			self.nounce=self.nounce+1
 		}
 
-		pub fun getAllTraitsMetadata() : [MetadataViews.Trait] {
+		access(all) getAllTraitsMetadata() : [MetadataViews.Trait] {
 			var rarity : MetadataViews.Rarity? = nil
 
 			let traits : [MetadataViews.Trait]= []
@@ -596,10 +596,10 @@ pub contract Wearables: NonFungibleToken {
 	}
 
 	//A metadata for technical information that is not useful as traits
-	pub struct Metadata {
-		pub let templateId:UInt64
-		pub let setId:UInt64
-		pub let positionId:UInt64
+	access(all) struct Metadata {
+		access(all) let templateId:UInt64
+		access(all) let setId:UInt64
+		access(all) let positionId:UInt64
 
 		init(templateId:UInt64, setId:UInt64, positionId:UInt64) {
 			self.templateId=templateId
@@ -611,10 +611,10 @@ pub contract Wearables: NonFungibleToken {
 	// POINTER
 
 	// a struct to store who has interacted with a wearable
-	pub struct Pointer {
-		pub let id: UInt64
-		pub let characterId: UInt64
-		pub let address: Address
+	access(all) struct Pointer {
+		access(all) let id: UInt64
+		access(all) let characterId: UInt64
+		access(all) let address: Address
 		access(self) let extra: {String : AnyStruct}
 		init(id: UInt64 , characterId: UInt64 , address: Address )  {
 			self.id = id
@@ -623,7 +623,7 @@ pub contract Wearables: NonFungibleToken {
 			self.extra = {}
 		}
 
-		pub fun isNewInteraction(owner: Address, characterId: UInt64) : Bool {
+		access(all) isNewInteraction(owner: Address, characterId: UInt64) : Bool {
 			return self.address == owner && self.characterId == characterId
 		}
 	}
@@ -631,17 +631,17 @@ pub contract Wearables: NonFungibleToken {
 
 
 
-	pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection  {
+	access(all) resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.Collection, ViewResolver.ResolverCollection  {
 		// dictionary of NFT conforming tokens
 		// NFT is a resource type with an `UInt64` ID field
-		pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+		access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
 
 		init () {
 			self.ownedNFTs <- {}
 		}
 
 		// withdraw removes an NFT from the collection and moves it to the caller
-		pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+		access(all) withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
 			let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
 
 			emit Withdraw(id: token.id, from: self.owner?.address)
@@ -650,7 +650,7 @@ pub contract Wearables: NonFungibleToken {
 		}
 
 		// deposit moves an NFT into this collection
-		pub fun deposit(token: @NonFungibleToken.NFT) {
+		access(all) deposit(token: @NonFungibleToken.NFT) {
 			let token <- token as! @NFT
 
 			let id: UInt64 = token.id
@@ -665,26 +665,26 @@ pub contract Wearables: NonFungibleToken {
 		}
 
 		// getIDs returns an array of the IDs that are in the collection
-		pub fun getIDs(): [UInt64] {
+		access(all) view fun getIDs(): [UInt64] {
 			return self.ownedNFTs.keys
 		}
 
 		// borrowNFT gets a reference to an NFT in the collection
 		// so that the caller can read its metadata and call its methods
-		pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
+		access(all) borrowNFT(id: UInt64): &NonFungibleToken.NFT {
 			return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
 		}
 
 		//a borrow method for the generic view resolver pattern
-		pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
-			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+		access(all) borrowViewResolver(id: UInt64): &AnyResource{ViewResolver.Resolver} {
+			let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
 			let wearable = nft as! &NFT
 			return wearable
 		}
 
 		//This function is here so that other accounts in the doodles ecosystem can borrow it to perform cross-contract interactions. like bumping the equipped counter
 		access(account) fun borrowWearableNFT(id: UInt64) : &Wearables.NFT {
-			let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+			let nft = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)
 			let wearable = nft as! &NFT
 			return wearable
 		}
@@ -695,7 +695,7 @@ pub contract Wearables: NonFungibleToken {
 	}
 
 	// public function that anyone can call to create a new empty collection
-	pub fun createEmptyCollection(): @NonFungibleToken.Collection {
+	access(all) createEmptyCollection(): @NonFungibleToken.Collection {
 		return <- create Collection()
 	}
 
@@ -825,14 +825,14 @@ pub contract Wearables: NonFungibleToken {
 	//Below here are internal resources that is not really relevant to the public
 
 	//internal struct to use for batch minting that points to a specific wearable
-	pub struct WearableMintData {
-		pub let template: UInt64
-		pub let setEdition: UInt64
-		pub let positionEdition: UInt64
-		pub let templateEdition: UInt64
-		pub let taggedTemplateEdition: UInt64
-		pub let tagEditions: [UInt64]
-		pub let extra: {String : AnyStruct}
+	access(all) struct WearableMintData {
+		access(all) let template: UInt64
+		access(all) let setEdition: UInt64
+		access(all) let positionEdition: UInt64
+		access(all) let templateEdition: UInt64
+		access(all) let taggedTemplateEdition: UInt64
+		access(all) let tagEditions: [UInt64]
+		access(all) let extra: {String : AnyStruct}
 
 		init(
 			template: UInt64,
@@ -854,12 +854,12 @@ pub contract Wearables: NonFungibleToken {
 
 	// This is not in use anymore. Use WearableMintData
 	//cadence does not allow us to remove this
-	pub struct MintData {
-		pub let template: UInt64
-		pub let setEdition: UInt64
-		pub let positionEdition: UInt64
-		pub let templateEdition: UInt64
-		pub let tagEditions: [UInt64]
+	access(all) struct MintData {
+		access(all) let template: UInt64
+		access(all) let setEdition: UInt64
+		access(all) let positionEdition: UInt64
+		access(all) let templateEdition: UInt64
+		access(all) let tagEditions: [UInt64]
 
 		init(
 		) {
@@ -883,12 +883,12 @@ pub contract Wearables: NonFungibleToken {
 		self.CollectionPublicPath = /public/wearables
 		self.CollectionPrivatePath = /private/wearables
 
-		self.account.save<@NonFungibleToken.Collection>(<- Wearables.createEmptyCollection(), to: Wearables.CollectionStoragePath)
-		self.account.link<&Wearables.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+		self.account.storage.save<@NonFungibleToken.Collection>(<- Wearables.createEmptyCollection(), to: Wearables.CollectionStoragePath)
+		self.account.link<&Wearables.Collection{NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 			Wearables.CollectionPublicPath,
 			target: Wearables.CollectionStoragePath
 		)
-		self.account.link<&Wearables.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
+		self.account.link<&Wearables.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, NonFungibleToken.Receiver, ViewResolver.ResolverCollection}>(
 			Wearables.CollectionPrivatePath,
 			target: Wearables.CollectionStoragePath
 		)

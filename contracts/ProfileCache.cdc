@@ -1,6 +1,6 @@
-import Clock from "../contracts/Clock.cdc"
+import "Clock"
 
-pub contract ProfileCache {
+access(all) contract ProfileCache {
 
 	// If there is no findName, the string is set to "". 
 	access(contract) let addressLeaseName : {Address : LeaseCache}
@@ -9,10 +9,10 @@ pub contract ProfileCache {
 	access(contract) let profileWalletIndex : {Address : {Type : Int}}
 
 	// Find Leases
-	pub struct LeaseCache {
-		pub let address : Address?
-		pub let leaseName : String 
-		pub let validUntil : UFix64 
+	access(all) struct LeaseCache {
+		access(all) let address : Address?
+		access(all) let leaseName : String 
+		access(all) let validUntil : UFix64 
 
 		init(leaseName: String, validUntil: UFix64, address: Address?) {
 			self.leaseName=leaseName 
@@ -34,7 +34,7 @@ pub contract ProfileCache {
 		// We cannot panic here, because imagine someone has expired lease. 
  	}
 
-	pub fun getAddressLeaseName(_ address: Address) : String? {
+	access(all) fun getAddressLeaseName(_ address: Address) : String? {
 		if self.addressLeaseName[address] == nil {
 			return nil
 		}
@@ -52,7 +52,7 @@ pub contract ProfileCache {
 		panic("There is already a cache for this name. Name : ".concat(leaseName))
  	}
 
-	pub fun getNameAddress(_ name: String) : LeaseCache? {
+	access(all) fun getNameAddress(_ name: String) : LeaseCache? {
 		if self.nameAddress[name]!.validUntil >= Clock.time() {
 			return self.nameAddress[name]
 		}
@@ -63,8 +63,6 @@ pub contract ProfileCache {
 		self.addressLeaseName.remove(key: address)
 		self.nameAddress.remove(key: leaseName)
 	}
-
-
 
 	access(account) fun setWalletIndexCache(address: Address, walletType: Type, index: Int) {
 		if self.profileWalletIndex[address] == nil {
@@ -78,7 +76,7 @@ pub contract ProfileCache {
 		panic("There is already a cache for this wallet. User : ".concat(address.toString()).concat(". Wallet : ").concat(walletType.identifier))
  	}
 
-	pub fun getWalletIndex(address: Address, walletType: Type) : Int? {
+	access(all) fun getWalletIndex(address: Address, walletType: Type) : Int? {
 		if self.profileWalletIndex[address] == nil {
 			return nil
 		}
@@ -92,8 +90,6 @@ pub contract ProfileCache {
 	init() {
 		self.addressLeaseName = {}
 		self.nameAddress = {}
-
 		self.profileWalletIndex = {}
 	}
-
 }

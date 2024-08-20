@@ -1,8 +1,8 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
+import "FungibleToken"
+import "FlowToken"
 
 transaction(receiver: Address, amount:UFix64) {
-    prepare(acct: AuthAccount) {
+    prepare(acct: auth(BorrowValue) &Account) {
         let receiver = getAccount(receiver).getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver).borrow() ?? panic("Cannot borrow FlowToken receiver")
 
         let sender = acct.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault)

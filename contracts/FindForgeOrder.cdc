@@ -1,233 +1,260 @@
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import FungibleToken from "./standard/FungibleToken.cdc"
-import MetadataViews from "./standard/MetadataViews.cdc"
-import FIND from "./FIND.cdc"
-import FindUtils from "./FindUtils.cdc"
+import "NonFungibleToken"
+import "FungibleToken"
+import "MetadataViews"
+import "ViewResolver"
+import "FIND"
+import "FindUtils"
 
-pub contract FindForgeOrder {
+access(all) contract FindForgeOrder {
 
-	pub event ContractInitialized()
-	pub event Withdraw(id: UInt64, from: Address?)
-	pub event Deposit(id: UInt64, to: Address?)
-	pub event ForgeOrdered(lease: String, mintType: String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String , collectionBannerImage: String, collectionSocials: {String : String})
-	pub event ForgeOrderCompleted(lease: String, mintType: String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String , collectionBannerImage: String, collectionSocials: {String : String}, contractName: String)
-	pub event ForgeOrderCancelled(lease: String, mintType: String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String , collectionBannerImage: String, collectionSocials: {String : String}, contractName: String)
+    access(all) event ContractInitialized()
+    access(all) event Withdraw(id: UInt64, from: Address?)
+    access(all) event Deposit(id: UInt64, to: Address?)
+    access(all) event ForgeOrdered(lease: String, mintType: String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String , collectionBannerImage: String, collectionSocials: {String : String})
+    access(all) event ForgeOrderCompleted(lease: String, mintType: String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String , collectionBannerImage: String, collectionSocials: {String : String}, contractName: String)
+    access(all) event ForgeOrderCancelled(lease: String, mintType: String, collectionDescription: String, collectionExternalURL: String, collectionSquareImage: String , collectionBannerImage: String, collectionSocials: {String : String}, contractName: String)
 
-	pub let QueuedCollectionStoragePath: StoragePath
-	pub let QueuedCollectionPublicPath: PublicPath
-	pub let CompletedCollectionStoragePath: StoragePath
-	pub let CompletedCollectionPublicPath: PublicPath
+    access(all) let QueuedCollectionStoragePath: StoragePath
+    access(all) let QueuedCollectionPublicPath: PublicPath
+    access(all) let CompletedCollectionStoragePath: StoragePath
+    access(all) let CompletedCollectionPublicPath: PublicPath
 
-	pub let mintTypes : [String]
-	// contractName : Resource UUID
-	pub let contractNames : {String : UInt64}
-	
-	pub resource Order: MetadataViews.Resolver {
-		pub let id: UInt64
-		pub let leaseName: String 
-		pub let mintType: String 
-		pub let contractName: String
-		pub let minterCut: UFix64?
-		pub let collectionDisplay : MetadataViews.NFTCollectionDisplay 
+    access(all) let mintTypes : [String]
+    // contractName : Resource UUID
+    access(all) let contractNames : {String : UInt64}
 
-		init(
-			lease: String,
-			mintType: String, 
-			minterCut: UFix64?,
-			collectionDisplay : MetadataViews.NFTCollectionDisplay 
-		) {
-			pre{
-				collectionDisplay.name.toLower() == lease : "Collection Display Name must equal to lease Name"
-				FindForgeOrder.mintTypes.contains(mintType) : "MintType is not supported at the moment"
-			}
-			self.id = self.uuid
-			self.leaseName=lease
-			self.mintType=mintType
-			self.contractName="Find".concat(FindUtils.firstUpperLetter(self.leaseName)).concat(mintType)
-			self.minterCut=minterCut
-			self.collectionDisplay = collectionDisplay
-		}
+    access(all) resource interface OrderPublic {
+        access(all) fun getID(): UInt64
+        access(all) fun getLeaseName(): String
+        access(all) fun getMintType(): String
+        access(all) fun getContractName(): String
+        access(all) fun getMinterCut(): UFix64?
+        access(all) fun getCollectionDisplay(): MetadataViews.NFTCollectionDisplay
+    }
 
-		pub fun getViews(): [Type] {
-			return [
-				Type<MetadataViews.Display>()
-			]
-		}
+    access(all) resource Order: OrderPublic, ViewResolver.Resolver {
+        access(all) let id: UInt64
+        access(all) let leaseName: String 
+        access(all) let mintType: String 
+        access(all) let contractName: String
+        access(all) let minterCut: UFix64?
+        access(all) let collectionDisplay : MetadataViews.NFTCollectionDisplay 
 
-		pub fun resolveView(_ view: Type): AnyStruct? {
-			switch view {
-			case Type<MetadataViews.Display>():
-				return MetadataViews.Display(
-					name: self.collectionDisplay.name,
-					description: self.collectionDisplay.description,
-					thumbnail: self.collectionDisplay.squareImage.file
-				)
-			
-			// This can be implemented when borrow contract is implemented 
-			//case Type<MetadataViews.NFTCollectionData>():
-			//	return MetadataViews.NFTCollectionData(
-			//		storagePath: NFGv3.CollectionStoragePath,
-			//		publicPath: NFGv3.CollectionPublicPath,
-			//		providerPath: NFGv3.CollectionPrivatePath,
-			//		publicCollection: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
-			//		publicLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
-			//		providerLinkedType: Type<&NFGv3.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
-			//		createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
-			//			return <-NFGv3.createEmptyCollection()
-			//		})
-			//	)
-			case Type<MetadataViews.NFTCollectionDisplay>():
-				return self.collectionDisplay
-			}
-			return nil
-		}
-	}
+        init(
+            lease: String,
+            mintType: String, 
+            minterCut: UFix64?,
+            collectionDisplay : MetadataViews.NFTCollectionDisplay 
+        ) {
+            pre{
+                collectionDisplay.name.toLower() == lease : "Collection Display Name must equal to lease Name"
+                FindForgeOrder.mintTypes.contains(mintType) : "MintType is not supported at the moment"
+            }
+            self.id = self.uuid
+            self.leaseName=lease
+            self.mintType=mintType
+            self.contractName="Find".concat(FindUtils.firstUpperLetter(self.leaseName)).concat(mintType)
+            self.minterCut=minterCut
+            self.collectionDisplay = collectionDisplay
+        }
 
-	pub resource Collection : MetadataViews.ResolverCollection {
-		pub let orders: @{UInt64: FindForgeOrder.Order}
+        access(all) view fun getViews(): [Type] {
+            return [
+            Type<MetadataViews.Display>()
+            ]
+        }
 
-		init () {
-			self.orders <- {}
-		}
+        access(all) fun resolveView(_ view: Type): AnyStruct? {
+            switch view {
+            case Type<MetadataViews.Display>():
+                return MetadataViews.Display(
+                    name: self.collectionDisplay.name,
+                    description: self.collectionDisplay.description,
+                    thumbnail: self.collectionDisplay.squareImage.file
+                )
 
-		destroy () {
-			destroy self.orders
-		}
+                // This can be implemented when borrow contract is implemented 
+                //case Type<MetadataViews.NFTCollectionData>():
+                //	return MetadataViews.NFTCollectionData(
+                //		storagePath: NFGv3.CollectionStoragePath,
+                //		publicPath: NFGv3.CollectionPublicPath,
+                //		providerPath: NFGv3.CollectionPrivatePath,
+                //		publicCollection: Type<&NFGv3.Collection>(),
+                //		publicLinkedType: Type<&NFGv3.Collection>(),
+                //		providerLinkedType: Type<&NFGv3.Collection{NonFungibleToken.Collection,NonFungibleToken.Provider,ViewResolver.ResolverCollection}>(),
+                //		createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
+                //			return <-NFGv3.createEmptyCollection()
+                //		})
+                //	)
+            case Type<MetadataViews.NFTCollectionDisplay>():
+                return self.collectionDisplay
+            }
+            return nil
+        }
 
-		// withdraw removes an NFT from the collection and moves it to the caller
-		pub fun withdraw(withdrawID: UInt64): @FindForgeOrder.Order {
-			let token <- self.orders.remove(key: withdrawID) ?? panic("missing Order : ".concat(withdrawID.toString()))
+        access(all) fun getID(): UInt64 {
+            return self.id
+        }
+        access(all) fun getLeaseName(): String {
+            return self.leaseName
+        }
+        access(all) fun getMintType(): String {
+            return self.mintType
+        }
+        access(all) fun getContractName(): String {
+            return self.contractName
+        }
+        access(all) fun getMinterCut(): UFix64? {
+            return self.minterCut
+        }
+        access(all) fun getCollectionDisplay(): MetadataViews.NFTCollectionDisplay {
+            return self.collectionDisplay
+        }
+    }
 
-			emit Withdraw(id: token.id, from: self.owner?.address)
+    access(all) resource interface OrderCollection {
+        access(all) fun borrow(_ id: UInt64): &FindForgeOrder.Order?
+        access(all) fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}
+        access(all) view fun getIDs(): [UInt64]
+        access(all) fun deposit(token: @FindForgeOrder.Order)
+    }
 
-			return <-token
-		}
+    access(all) entitlement Owner
 
-		// deposit takes a NFT and adds it to the collections dictionary
-		// and adds the ID to the id array
-		pub fun deposit(token: @FindForgeOrder.Order) {
+    access(all) resource Collection : OrderCollection, ViewResolver.ResolverCollection {
+        access(all) let orders: @{UInt64: FindForgeOrder.Order}
 
-			emit Deposit(id: token.id, to: self.owner?.address)
+        init () {
+            self.orders <- {}
+        }
 
-			self.orders[token.id] <-! token
-		}
+        // withdraw removes an NFT from the collection and moves it to the caller
+        access(Owner) fun withdraw(withdrawID: UInt64): @FindForgeOrder.Order {
+            let token <- self.orders.remove(key: withdrawID) ?? panic("missing Order : ".concat(withdrawID.toString()))
 
-		// getIDs returns an array of the IDs that are in the collection
-		pub fun getIDs(): [UInt64] {
-			return self.orders.keys
-		}
+            emit Withdraw(id: token.getID(), from: self.owner?.address)
 
-		// borrowNFT gets a reference to an NFT in the collection
-		// so that the caller can read its metadata and call its methods
-		pub fun borrow(_ id: UInt64): &FindForgeOrder.Order {
-			return (&self.orders[id] as &FindForgeOrder.Order?)!
-		}
+            return <-token
+        }
 
-		pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
-			let nft = (&self.orders[id] as auth &FindForgeOrder.Order?)!
-			return nft as &AnyResource{MetadataViews.Resolver}
-		}
+        // deposit takes a NFT and adds it to the collections dictionary
+        // and adds the ID to the id array
+        access(all) fun deposit(token: @FindForgeOrder.Order) {
 
-	}
+            emit Deposit(id: token.getID(), to: self.owner?.address)
 
-	access(account) fun orderForge(leaseName: String, mintType: String, minterCut: UFix64?, collectionDisplay: MetadataViews.NFTCollectionDisplay) {
+            self.orders[token.getID()] <-! token
+        }
 
-		let order <- create FindForgeOrder.Order(lease: leaseName, mintType: mintType, minterCut: minterCut, collectionDisplay: collectionDisplay)
-		let c = collectionDisplay
-		let s : {String : String} = {}
-		for social in c.socials.keys {
-			s[social] = c.socials[social]!.url
-		} 
-		emit ForgeOrdered(lease: leaseName, mintType: mintType, collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s)
-		FindForgeOrder.contractNames[order.contractName] = order.id
-		let col = FindForgeOrder.account.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
-		col.deposit(token: <- order)
-	}
+        // getIDs returns an array of the IDs that are in the collection
+        access(all) view fun getIDs(): [UInt64] {
+            return self.orders.keys
+        }
 
-	access(account) fun cancelForgeOrder(leaseName: String, mintType: String) {
-		let contractName = "Find".concat(FindUtils.firstUpperLetter(leaseName)).concat(mintType)
-		let id = FindForgeOrder.contractNames[contractName] ?? panic("Forge is not ordered. identifier : ".concat(contractName))
-		let queuedCol = FindForgeOrder.account.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
-		let order <- queuedCol.withdraw(withdrawID: id) 
-		let c = order.collectionDisplay
-		let s : {String : String} = {}
-		for social in c.socials.keys {
-			s[social] = c.socials[social]!.url
-		} 
-		emit ForgeOrderCancelled(lease: order.leaseName, mintType: order.mintType, collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s, contractName : contractName)
-		destroy order
-	}
+        // borrowNFT gets a reference to an NFT in the collection
+        // so that the caller can read its metadata and call its methods
+        access(all) fun borrow(_ id: UInt64): &FindForgeOrder.Order? {
+            return &self.orders[id]
+        }
 
-	access(account) fun fulfillForgeOrder(_ contractName: String, forgeType: Type) : &FindForgeOrder.Order {
-		let id = FindForgeOrder.contractNames[contractName] ?? panic("Forge is not ordered. identifier : ".concat(contractName))
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver} {
+            let nft = &self.orders[id] as &{ViewResolver.Resolver}?
+            return nft!
+        }
 
-		let queuedCol = FindForgeOrder.account.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
-		let order <- queuedCol.withdraw(withdrawID: id) 
-		let c = order.collectionDisplay
-		let s : {String : String} = {}
-		for social in c.socials.keys {
-			s[social] = c.socials[social]!.url
-		} 
-		emit ForgeOrderCompleted(lease: order.leaseName, mintType: order.mintType, collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s, contractName : contractName)
+    }
 
-		let completedCol = FindForgeOrder.account.borrow<&FindForgeOrder.Collection>(from: FindForgeOrder.CompletedCollectionStoragePath)!
-		completedCol.deposit(token: <- order)
-		let ref = completedCol.borrow(id)
-		return ref
-	}
+    access(account) fun orderForge(leaseName: String, mintType: String, minterCut: UFix64?, collectionDisplay: MetadataViews.NFTCollectionDisplay) {
+        let order <- create FindForgeOrder.Order(lease: leaseName, mintType: mintType, minterCut: minterCut, collectionDisplay: collectionDisplay)
+        let c = collectionDisplay
+        let s : {String : String} = {}
+        for social in c.socials.keys {
+            s[social] = c.socials[social]!.url
+        } 
+        emit ForgeOrdered(lease: leaseName, mintType: mintType, collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s)
+        FindForgeOrder.contractNames[order.contractName] = order.id
+        let col = FindForgeOrder.account.storage.borrow<auth(Owner) &FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
+        col.deposit(token: <- order)
+    }
 
-	access(account) fun addMintType(_ mintType: String) {
-		pre{
-			!self.mintTypes.contains(mintType) : "Mint type is already there : ".concat(mintType)
-		}
-		self.mintTypes.append(mintType)
-	}
+    access(account) fun cancelForgeOrder(leaseName: String, mintType: String) {
+        let contractName = "Find".concat(FindUtils.firstUpperLetter(leaseName)).concat(mintType)
+        let id = FindForgeOrder.contractNames[contractName] ?? panic("Forge is not ordered. identifier : ".concat(contractName))
+        let queuedCol = FindForgeOrder.account.storage.borrow<auth(Owner) &FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
+        let order <- queuedCol.withdraw(withdrawID: id) 
+        let c = order.getCollectionDisplay()
+        let s : {String : String} = {}
+        for social in c.socials.keys {
+            s[social] = c.socials[social]!.url
+        } 
+        emit ForgeOrderCancelled(lease: order.getLeaseName(), mintType: order.getMintType(), collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s, contractName : contractName)
+        destroy order
+    }
 
-	access(account) fun removeMintType(_ mintType: String) {
-		pre{
-			self.mintTypes.contains(mintType) : "Mint type not there : ".concat(mintType)
-		}
-		self.mintTypes.remove(at: self.mintTypes.firstIndex(of: mintType)!)
-	}
+    access(account) fun fulfillForgeOrder(_ contractName: String, forgeType: Type) : &FindForgeOrder.Order {
+        let id = FindForgeOrder.contractNames[contractName] ?? panic("Forge is not ordered. identifier : ".concat(contractName))
+        let queuedCol = FindForgeOrder.account.storage.borrow<auth(Owner) &FindForgeOrder.Collection>(from: FindForgeOrder.QueuedCollectionStoragePath)!
+        let order <- queuedCol.withdraw(withdrawID: id) 
+        let c = order.getCollectionDisplay()
+        let s : {String : String} = {}
+        for social in c.socials.keys {
+            s[social] = c.socials[social]!.url
+        } 
+        emit ForgeOrderCompleted(lease: order.getLeaseName(), mintType: order.getMintType(), collectionDescription: c.description, collectionExternalURL: c.externalURL.url, collectionSquareImage: c.squareImage.file.uri() , collectionBannerImage: c.bannerImage.file.uri(), collectionSocials: s, contractName : contractName)
+
+        let completedCol = FindForgeOrder.account.storage.borrow<auth(Owner) &FindForgeOrder.Collection>(from: FindForgeOrder.CompletedCollectionStoragePath)!
+        completedCol.deposit(token: <- order)
+        let ref = completedCol.borrow(id)
+        return ref!
+    }
+
+    access(account) fun addMintType(_ mintType: String) {
+        pre{
+            !self.mintTypes.contains(mintType) : "Mint type is already there : ".concat(mintType)
+        }
+        self.mintTypes.append(mintType)
+    }
+
+    access(account) fun removeMintType(_ mintType: String) {
+        pre{
+            self.mintTypes.contains(mintType) : "Mint type not there : ".concat(mintType)
+        }
+        self.mintTypes.remove(at: self.mintTypes.firstIndex(of: mintType)!)
+    }
 
 
-	// public function that anyone can call to create a new empty collection
-	pub fun createEmptyCollection(): @FindForgeOrder.Collection {
-		return <- create Collection()
-	}
+    // public function that anyone can call to create a new empty collection
+    access(all) fun createEmptyCollection(): @{FindForgeOrder.OrderCollection} {
+        return <- create Collection()
+    }
 
-	init() {
-		// Initialize the total supply
-		self.mintTypes = []
-		self.contractNames = {}
+    init() {
+        // Initialize the total supply
+        self.mintTypes = []
+        self.contractNames = {}
 
-		// Set the named paths
-		self.QueuedCollectionStoragePath = /storage/queuedFindForgeOrder
-		self.QueuedCollectionPublicPath = /public/queuedFindForgeOrder
-		self.CompletedCollectionStoragePath = /storage/completedFindForgeOrder
-		self.CompletedCollectionPublicPath = /public/completedFindForgeOrder
+        // Set the named paths
+        self.QueuedCollectionStoragePath = /storage/queuedFindForgeOrder
+        self.QueuedCollectionPublicPath = /public/queuedFindForgeOrder
+        self.CompletedCollectionStoragePath = /storage/completedFindForgeOrder
+        self.CompletedCollectionPublicPath = /public/completedFindForgeOrder
 
-		// Create a Collection resource and save it to storage
-		let queuedCollection <- create Collection()
-		self.account.save(<-queuedCollection, to: self.QueuedCollectionStoragePath)
+        // Create a Collection resource and save it to storage
+        let queuedCollection <- create Collection()
+        self.account.storage.save(<-queuedCollection, to: self.QueuedCollectionStoragePath)
 
-		// create a public capability for the collection
-		self.account.link<&FindForgeOrder.Collection{MetadataViews.ResolverCollection}>(
-			self.QueuedCollectionPublicPath,
-			target: self.QueuedCollectionStoragePath
-		)
+        // create a public capability for the collection
+        let cap = self.account.capabilities.storage.issue<&{FindForgeOrder.OrderCollection}>(self.QueuedCollectionStoragePath)
+        self.account.capabilities.publish(cap, at: self.QueuedCollectionPublicPath)
 
-		// Create a Collection resource and save it to storage
-		let completedCollection <- create Collection()
-		self.account.save(<-completedCollection, to: self.CompletedCollectionStoragePath)
+        // Create a Collection resource and save it to storage
+        let completedCollection <- create Collection()
+        self.account.storage.save(<-completedCollection, to: self.CompletedCollectionStoragePath)
 
-		// create a public capability for the collection
-		self.account.link<&FindForgeOrder.Collection{MetadataViews.ResolverCollection}>(
-			self.CompletedCollectionPublicPath,
-			target: self.CompletedCollectionStoragePath
-		)
-
-	}
+        // create a public capability for the collection
+        let cap2 = self.account.capabilities.storage.issue<&{FindForgeOrder.OrderCollection}>(self.CompletedCollectionStoragePath)
+        self.account.capabilities.publish(cap2, at: self.CompletedCollectionPublicPath)
+    }
 }
 
- 
+

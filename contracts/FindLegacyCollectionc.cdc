@@ -2,7 +2,7 @@
 This is a legacy contract that we will use as a last resort to fetch data that is not present in either the Metadata form or from the Alchemy onChain Registry
 */
 
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import "NonFungibleToken"
 
 //mainnet
 import Beam from 0x86b4a0010a71cfc3 
@@ -37,8 +37,8 @@ import Art from 0xd796ff17107bbff6
 import Marketplace from 0xd796ff17107bbff6
 import Flovatar from 0x921ea449dffec68a
 import FlovatarMarketplace from  0x921ea449dffec68a
-import CharityNFT from "../contracts/CharityNFT.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "CharityNFT"
+import "FIND"
 
 import MatrixWorldAssetsNFT from 0xf20df769e658c257
 
@@ -61,13 +61,13 @@ import Momentables from 0x9d21537544d9123d
 import ZeedzINO from 0x62b3063fbe672fc8
 import PartyMansionDrinksContract from 0x34f2bf4a80bb0f69
 
-pub contract FindLegacyCollectionc {
+access(all) contract FindLegacyCollectionc {
 
-	pub struct MetadataCollections {
+	access(all) struct MetadataCollections {
 
-		pub let items: {String : MetadataCollectionItem}
-		pub let collections: {String : [String]}
-		pub let curatedCollections: {String : [String]}
+		access(all) let items: {String : MetadataCollectionItem}
+		access(all) let collections: {String : [String]}
+		access(all) let curatedCollections: {String : [String]}
 
 		init(items: {String : MetadataCollectionItem}, collections: {String : [String]}, curatedCollections: {String: [String]}) {
 			self.items=items
@@ -77,9 +77,9 @@ pub contract FindLegacyCollectionc {
 	}
 
 
-	pub struct MetadataCollection{
-		pub let type: String
-		pub let items: [MetadataCollectionItem]
+	access(all) struct MetadataCollection{
+		access(all) let type: String
+		access(all) let items: [MetadataCollectionItem]
 
 		init(type:String, items: [MetadataCollectionItem]) {
 			self.type=type
@@ -88,15 +88,15 @@ pub contract FindLegacyCollectionc {
 	}
 
 
-	pub struct MetadataCollectionItem {
-		pub let id:UInt64
-		pub let name: String
-		pub let image: String
-		pub let url: String
-		pub let listPrice: UFix64?
-		pub let listToken: String?
-		pub let contentType:String
-		pub let rarity:String
+	access(all) struct MetadataCollectionItem {
+		access(all) let id:UInt64
+		access(all) let name: String
+		access(all) let image: String
+		access(all) let url: String
+		access(all) let listPrice: UFix64?
+		access(all) let listToken: String?
+		access(all) let contentType:String
+		access(all) let rarity:String
 
 
 		init(id:UInt64, name:String, image:String, url:String, listPrice: UFix64?, listToken:String?, contentType: String, rarity: String) {
@@ -111,13 +111,13 @@ pub contract FindLegacyCollectionc {
 		}
 	}
 
-	pub fun getNFTs(ownerAddress: Address, ids: {String:[UInt64]}): [MetadataCollectionItem] {
+	access(all) getNFTs(ownerAddress: Address, ids: {String:[UInt64]}): [MetadataCollectionItem] {
 
 		return []
 
 	}
 
-	pub fun getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
+	access(all) getNFTIDs(ownerAddress: Address): {String: [UInt64]} {
 		let account = getAccount(ownerAddress)
 		let ids: {String: [UInt64]} = {}
 
@@ -142,7 +142,7 @@ pub contract FindLegacyCollectionc {
 			ids["Versus"]=versusArtCap.borrow()!.getIDs()
 		}
 
-		let goobersCap = account.getCapability<&GooberXContract.Collection{NonFungibleToken.CollectionPublic, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
+		let goobersCap = account.getCapability<&GooberXContract.Collection{NonFungibleToken.Collection, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
 		if goobersCap.check() {
 			ids["Gooberz"] = goobersCap.borrow()!.getIDs()
 		}
@@ -204,7 +204,7 @@ pub contract FindLegacyCollectionc {
 			ids["JambbVoucher"] = voucherCap.borrow()!.getIDs()
 		}
 
-		let mwaCap = account.getCapability<&{MatrixWorldAssetsNFT.Metadata, NonFungibleToken.CollectionPublic}>(MatrixWorldAssetsNFT.collectionPublicPath)
+		let mwaCap = account.getCapability<&{MatrixWorldAssetsNFT.Metadata, NonFungibleToken.Collection}>(MatrixWorldAssetsNFT.collectionPublicPath)
 		if mwaCap.check() {
 			ids["MatrixWorldAssets"] = mwaCap.borrow()!.getIDs()
 		}
@@ -229,7 +229,7 @@ pub contract FindLegacyCollectionc {
 			ids["Evolution"] = evolutionCap.borrow()!.getIDs()
 		}
 
-		let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.CollectionPublic, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
+		let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.Collection, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
 		if geniaceCap.check() {
 			ids["Geniace"] = geniaceCap.borrow()!.getIDs()
 		}
@@ -259,17 +259,17 @@ pub contract FindLegacyCollectionc {
 			ids["GoatedGoatsTraitVoucher"] = goatsTraitVoucherCap.borrow()!.getIDs()
 		}
 
-		let goatsCap = account.getCapability<&{MetadataViews.ResolverCollection}>(GoatedGoats.CollectionPublicPath)
+		let goatsCap = account.getCapability<&{ViewResolver.ResolverCollection}>(GoatedGoats.CollectionPublicPath)
 		if goatsCap.check() {
 			ids["GoatedGoats"] = goatsCap.borrow()!.getIDs()
 		}
 
-		let goatsTraitCap = account.getCapability<&{MetadataViews.ResolverCollection}>(GoatedGoatsTrait.CollectionPublicPath)
+		let goatsTraitCap = account.getCapability<&{ViewResolver.ResolverCollection}>(GoatedGoatsTrait.CollectionPublicPath)
 		if goatsTraitCap.check() {
 			ids["GoatedGoatsTrait"] = goatsTraitCap.borrow()!.getIDs()
 		}
 
-		let goatsTraitPackCap = account.getCapability<&{MetadataViews.ResolverCollection}>(GoatedGoatsTraitPack.CollectionPublicPath)
+		let goatsTraitPackCap = account.getCapability<&{ViewResolver.ResolverCollection}>(GoatedGoatsTraitPack.CollectionPublicPath)
 		if goatsTraitPackCap.check() {
 			ids["GoatedGoatsTraitPack"] = goatsTraitPackCap.borrow()!.getIDs()
 		}
@@ -290,17 +290,17 @@ pub contract FindLegacyCollectionc {
 			ids["mynft"] = mynftCap.borrow()!.getIDs()
 		}
 
-		let neoAvatarCap = account.getCapability<&{MetadataViews.ResolverCollection}>(NeoAvatar.CollectionPublicPath)
+		let neoAvatarCap = account.getCapability<&{ViewResolver.ResolverCollection}>(NeoAvatar.CollectionPublicPath)
 		if neoAvatarCap.check() {
 			ids["NeoAvatar"] = neoAvatarCap.borrow()!.getIDs()
 		}
 
-		let neoVoucherCap = account.getCapability<&{MetadataViews.ResolverCollection}>(NeoVoucher.CollectionPublicPath)
+		let neoVoucherCap = account.getCapability<&{ViewResolver.ResolverCollection}>(NeoVoucher.CollectionPublicPath)
 		if neoVoucherCap.check() {
 			ids["NeoVoucher"] = neoVoucherCap.borrow()!.getIDs()
 		}
 
-		let neoMemberCap = account.getCapability<&{MetadataViews.ResolverCollection}>(NeoVoucher.CollectionPublicPath)
+		let neoMemberCap = account.getCapability<&{ViewResolver.ResolverCollection}>(NeoVoucher.CollectionPublicPath)
 		if neoMemberCap.check() {
 			ids["NeoMember"] = neoVoucherCap.borrow()!.getIDs()
 		}
@@ -310,7 +310,7 @@ pub contract FindLegacyCollectionc {
 			ids["BarterYardClubPack"] = barterYardPackCap.borrow()!.getIDs()
 		}
 
-		let byCap = account.getCapability<&{MetadataViews.ResolverCollection}>(BarterYardClubWerewolf.CollectionPublicPath)
+		let byCap = account.getCapability<&{ViewResolver.ResolverCollection}>(BarterYardClubWerewolf.CollectionPublicPath)
 		if byCap.check() {
 			ids["BarterYardClubWerewolf"] = byCap.borrow()!.getIDs()
 		}
@@ -332,7 +332,7 @@ pub contract FindLegacyCollectionc {
 
 
 
-pub fun main(user: String) : MetadataCollections? {
+access(all) main(user: String) : MetadataCollections? {
 
 	let resolvingAddress = FIND.resolve(user)
 	if resolvingAddress == nil {
@@ -462,7 +462,7 @@ pub fun main(user: String) : MetadataCollections? {
 
 
 	let partyMansion: [String] = []
-	let goobersCap = account.getCapability<&GooberXContract.Collection{NonFungibleToken.CollectionPublic, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
+	let goobersCap = account.getCapability<&GooberXContract.Collection{NonFungibleToken.Collection, GooberXContract.GooberCollectionPublic}>(GooberXContract.CollectionPublicPath)
 	if goobersCap.check() {
 		let goobers = goobersCap.borrow()!.listUsersGoobers()
 		for id in goobers.keys {
@@ -936,7 +936,7 @@ pub fun main(user: String) : MetadataCollections? {
 
 	}
 
-	let matrixworldAsset = account.getCapability<&{MatrixWorldAssetsNFT.Metadata, NonFungibleToken.CollectionPublic}>(MatrixWorldAssetsNFT.collectionPublicPath)
+	let matrixworldAsset = account.getCapability<&{MatrixWorldAssetsNFT.Metadata, NonFungibleToken.Collection}>(MatrixWorldAssetsNFT.collectionPublicPath)
 	if matrixworldAsset.check() {
 		let collection = matrixworldAsset.borrow()!
 		for id in collection.getIDs() {
@@ -1059,7 +1059,7 @@ pub fun main(user: String) : MetadataCollections? {
 	}
 
 
-	let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.CollectionPublic, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
+	let geniaceCap = account.getCapability<&GeniaceNFT.Collection{NonFungibleToken.Collection, GeniaceNFT.GeniaceNFTCollectionPublic}>(GeniaceNFT.CollectionPublicPath)
 	if geniaceCap.check() {
 		let geniace=geniaceCap.borrow()!
 		let nfts = geniace.getIDs()
@@ -1561,9 +1561,9 @@ return MetadataCollections(items: resultMap, collections:results, curatedCollect
 }
 
 //This uses a view from Neo until we agree on another for ExternalDomainViewUrl
-pub fun getItemForMetadataStandard(path: PublicPath, account:PublicAccount, externalFixedUrl: String) : [MetadataCollectionItem] {
+access(all) getItemForMetadataStandard(path: PublicPath, account:PublicAccount, externalFixedUrl: String) : [MetadataCollectionItem] {
 	let items: [MetadataCollectionItem] = []
-	let resolverCollectionCap= account.getCapability<&{MetadataViews.ResolverCollection}>(path)
+	let resolverCollectionCap= account.getCapability<&{ViewResolver.ResolverCollection}>(path)
 	if resolverCollectionCap.check() {
 		let collection = resolverCollectionCap.borrow()!
 		for id in collection.getIDs() {

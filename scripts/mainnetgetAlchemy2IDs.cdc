@@ -1,103 +1,93 @@
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FindUtils from "../contracts/FindUtils.cdc"
-// /* Alchemy Mainnet Wrapper */
-// import AlchemyMetadataWrapperMainnetShard1 from 0xeb8cb4c3157d5dac
+import "MetadataViews"
+import "FIND"
+import "FINDNFTCatalog"
+import "FindUtils"
 import AlchemyMetadataWrapperMainnetShard2 from 0xeb8cb4c3157d5dac
-// import AlchemyMetadataWrapperMainnetShard3 from 0xeb8cb4c3157d5dac
-// import AlchemyMetadataWrapperMainnetShard4 from 0xeb8cb4c3157d5dac
-
-// /* Alchemy Testnet Wrapper */
-
-// import AlchemyMetadataWrapperTestnetShard1 from 0x5ff2c7b4c40de11
-// import AlchemyMetadataWrapperTestnetShard2 from 0x5ff2c7b4c40de11
-// import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11
 
 
 
 
-    pub fun main(user: String, collections: [String]) : {String : ItemReport} {
-        return fetchAlchemyShard2(user: user, targetCollections:collections)
+access(all) fun main(user: String, collections: [String]) : {String : ItemReport} {
+    return fetchAlchemyShard2(user: user, targetCollections:collections)
+}
+
+access(all) let NFTCatalogContracts : [String] = getNFTCatalogContracts()
+
+access(all) struct ItemReport {
+    access(all) let length : Int // mapping of collection to no. of ids
+    access(all) let extraIDs : [UInt64]
+    access(all) let shard : String
+    access(all) let extraIDsIdentifier : String
+    access(all) let collectionName: String
+
+    init(length : Int, extraIDs :[UInt64] , shard: String, extraIDsIdentifier: String, collectionName: String) {
+        self.length=length
+        self.extraIDs=extraIDs
+        self.shard=shard
+        self.extraIDsIdentifier=extraIDsIdentifier
+        self.collectionName=collectionName
     }
+}
 
-    pub let NFTCatalogContracts : [String] = getNFTCatalogContracts()
+// Helper function
 
-    pub struct ItemReport {
-        pub let length : Int // mapping of collection to no. of ids
-        pub let extraIDs : [UInt64]
-        pub let shard : String
-        pub let extraIDsIdentifier : String
-	    pub let collectionName: String
+access(all) fun resolveAddress(user: String) : Address? {
+    return FIND.resolve(user)
+}
 
-        init(length : Int, extraIDs :[UInt64] , shard: String, extraIDsIdentifier: String, collectionName: String) {
-            self.length=length
-            self.extraIDs=extraIDs
-            self.shard=shard
-            self.extraIDsIdentifier=extraIDsIdentifier
-            self.collectionName=collectionName
+access(all) fun getNFTCatalogContracts() : [String] {
+    let catalogs = FINDNFTCatalog.getCatalog()
+    let names : [String] = []
+    for catalog in catalogs.values {
+        names.append(catalog.contractName)
+    }
+    return names
+}
+
+access(all) fun fetchAlchemyShard2(user: String, targetCollections: [String]) : {String : ItemReport} {
+    let source = "Shard2"
+    let account = resolveAddress(user: user)
+    if account == nil { return {} }
+
+
+    let extraIDs = AlchemyMetadataWrapperMainnetShard2.getNFTIDs(ownerAddress: account!)
+    let inventory : {String : ItemReport} = {}
+    var fetchedCount : Int = 0
+
+    for project in extraIDs.keys {
+        if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
+            extraIDs.remove(key: project)
+            continue
         }
-    }
 
-    // Helper function
+        let collectionLength = extraIDs[project]!.length
 
-    pub fun resolveAddress(user: String) : Address? {
-	    return FIND.resolve(user)
-    }
-
-    pub fun getNFTCatalogContracts() : [String] {
-        let catalogs = FINDNFTCatalog.getCatalog()
-        let names : [String] = []
-        for catalog in catalogs.values {
-            names.append(catalog.contractName)
+        // by pass if this is not the target collection
+        if targetCollections.length > 0 && !targetCollections.contains(project) {
+            // inventory[project] = ItemReport(items: [],  length : collectionLength, extraIDs :extraIDs[project]! , shard: source)
+            continue
         }
-        return names
-    }
 
-    pub fun fetchAlchemyShard2(user: String, targetCollections: [String]) : {String : ItemReport} {
-        let source = "Shard2"
-        let account = resolveAddress(user: user)
-        if account == nil { return {} }
-
-
-        let extraIDs = AlchemyMetadataWrapperMainnetShard2.getNFTIDs(ownerAddress: account!)
-        let inventory : {String : ItemReport} = {}
-        var fetchedCount : Int = 0
-
-        for project in extraIDs.keys {
-            if extraIDs[project]! == nil || extraIDs[project]!.length < 1{
-                extraIDs.remove(key: project)
+        let contractItem = AlchemyMetadataWrapperMainnetShard2.getNFTs(ownerAddress: account!, ids: {rename(project) : [extraIDs[project]![0]]})
+        if contractItem.length > 0 && contractItem[0] != nil {
+            if NFTCatalogContracts.contains(contractItem[0]!.contract.name) {
                 continue
             }
-
-            let collectionLength = extraIDs[project]!.length
-
-            // by pass if this is not the target collection
-            if targetCollections.length > 0 && !targetCollections.contains(project) {
-                // inventory[project] = ItemReport(items: [],  length : collectionLength, extraIDs :extraIDs[project]! , shard: source)
-                continue
-            }
-
-            let contractItem = AlchemyMetadataWrapperMainnetShard2.getNFTs(ownerAddress: account!, ids: {rename(project) : [extraIDs[project]![0]]})
-            if contractItem.length > 0 && contractItem[0] != nil {
-                if NFTCatalogContracts.contains(contractItem[0]!.contract.name) {
-                    continue
-                }
-            }
-
-            inventory[project] = ItemReport(length : collectionLength, extraIDs :extraIDs[project] ?? [] , shard: source, extraIDsIdentifier: rename(project), collectionName: contractItem[0]?.contract?.name ?? project)
-
         }
 
-        return inventory
+        inventory[project] = ItemReport(length : collectionLength, extraIDs :extraIDs[project] ?? [] , shard: source, extraIDsIdentifier: rename(project), collectionName: contractItem[0]?.contract?.name ?? project)
 
     }
 
-    pub fun rename(_ name: String) : String {
+    return inventory
 
-		if FindUtils.contains(name, element: "MintStoreItem") {
-			return "MintStoreItem"
-		}
-		return name
+}
 
+access(all) fun rename(_ name: String) : String {
+
+    if FindUtils.contains(name, element: "MintStoreItem") {
+        return "MintStoreItem"
     }
+    return name
+
+}

@@ -1,10 +1,10 @@
-import Profile from "../contracts/Profile.cdc"
+import "Profile"
 
 transaction(mode: Bool) {
 
 	let profile : &Profile.User?
 
-	prepare(acct: AuthAccount) {
+	prepare(acct: auth(BorrowValue) &Account) {
 		self.profile =acct.borrow<&Profile.User>(from:Profile.storagePath)
 	}
 

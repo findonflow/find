@@ -1,96 +1,105 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import Profile from "../contracts/Profile.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import DapperStorageRent from "../contracts/standard/DapperStorageRent.cdc"
-import TopShot from "../contracts/community/TopShot.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
+import "FindMarket"
+import "Profile"
+import "FindMarketSale"
+import "NFTCatalog"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FungibleToken"
+import "DapperStorageRent"
+
+//import "TopShot"
+import "DapperUtilityCoin"
+import "FlowUtilityToken"
 
 //first argument is the address to the merchant that gets the funds
 transaction(address: Address, id: UInt64, amount: UFix64) {
 
-	let targetCapability : Capability<&{NonFungibleToken.Receiver}>
-	let walletReference : &FungibleToken.Vault
-	let receiver : Address
+    let targetCapability : Capability<&{NonFungibleToken.Receiver}>
+    let walletReference : auth(FungibleToken.Withdraw) &{FungibleToken.Vault}
+    let receiver : Address
 
-	let saleItemsCap: Capability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic}>
-	let balanceBeforeTransfer: UFix64
-	prepare(dapper: AuthAccount, account: AuthAccount) {
-		let marketplace = FindMarket.getFindTenantAddress()
-		self.receiver=account.address
-		let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
-		let tenantCapability= FindMarket.getTenantCapability(marketplace)!
-		let tenant = tenantCapability.borrow()!
-		let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
-		let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
 
-		let saleItemCap= account.getCapability<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath)
-		if !saleItemCap.check() {
-			//The link here has to be a capability not a tenant, because it can change.
-			account.save<@FindMarketSale.SaleItemCollection>(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
-			account.link<&FindMarketSale.SaleItemCollection{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath, target: storagePath)
-		}
+    //TODO: should we use concrete implementation here or not?
+    let saleItemsCap: Capability<&{FindMarketSale.SaleItemCollectionPublic}>
 
-		self.saleItemsCap= FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
-		let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())
+    let balanceBeforeTransfer: UFix64
+    prepare(dapper: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account, account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue, UnpublishCapability) &Account) {
+        let marketplace = FindMarket.getFindTenantAddress()
+        self.receiver=account.address
+        let saleItemType= Type<@FindMarketSale.SaleItemCollection>()
+        let tenantCapability= FindMarket.getTenantCapability(marketplace)!
+        let tenant = tenantCapability.borrow()!
+        let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)
+        let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)
 
-		//we do some security check to verify that this tenant can do this operation. This will ensure that the onefootball tenant can only sell using DUC and not some other token. But we can change this with transactions later and not have to modify code/transactions
-		let item= FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: id)
-   		let collectionIdentifier = NFTCatalog.getCollectionsForType(nftTypeIdentifier: item.getItemType().identifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(item.getItemType().identifier))
-		let collection = NFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
-		let nft = collection.collectionData
+        let saleItemCap= account.capabilities.get<&{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(publicPath)
+        if !saleItemCap.check() {
+            account.storage.save(<- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)
+            let cap = account.capabilities.storage.issue<&{FindMarketSale.SaleItemCollectionPublic, FindMarket.SaleItemCollectionPublic}>(storagePath)
+            account.capabilities.publish(cap, at: publicPath)
+        }
+        self.saleItemsCap= FindMarketSale.getSaleItemCapability(marketplace: marketplace, user:address) ?? panic("cannot find sale item cap")
+        let marketOption = FindMarket.getMarketOptionFromType(Type<@FindMarketSale.SaleItemCollection>())
 
-		var ftVaultPath : StoragePath? = nil
-		switch item.getFtType() {
-			case Type<@DapperUtilityCoin.Vault>() :
-				ftVaultPath = /storage/dapperUtilityCoinVault
+        //we do some security check to verify that this tenant can do this operation. This will ensure that the onefootball tenant can only sell using DUC and not some other token. But we can change this with transactions later and not have to modify code/transactions
+        let item= FindMarket.assertOperationValid(tenant: marketplace, address: address, marketOption: marketOption, id: id)
+        let collectionIdentifier = NFTCatalog.getCollectionsForType(nftTypeIdentifier: item.getItemType().identifier)?.keys ?? panic("This NFT is not supported by the NFT Catalog yet. Type : ".concat(item.getItemType().identifier))
+        let collection = NFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
+        let nft = collection.collectionData
 
-			case Type<@FlowUtilityToken.Vault>() :
-				ftVaultPath = /storage/flowUtilityTokenVault
+        var ftVaultPath : StoragePath? = nil
+        switch item.getFtType() {
+        case Type<@DapperUtilityCoin.Vault>() :
+            ftVaultPath = /storage/dapperUtilityCoinVault
 
-			default :
-			panic("This FT is not supported by the Find Market in Dapper Wallet. Type : ".concat(item.getFtType().identifier))
-		}
+        case Type<@FlowUtilityToken.Vault>() :
+            ftVaultPath = /storage/flowUtilityTokenVault
 
-		self.targetCapability= account.getCapability<&{NonFungibleToken.Receiver}>(nft.publicPath)
+            default :
+            panic("This FT is not supported by the Find Market in Dapper Wallet. Type : ".concat(item.getFtType().identifier))
+        }
 
-		if !self.targetCapability.check() {
-			let cd = item.getNFTCollectionData()
-			if let storage = account.borrow<&AnyResource>(from: cd.storagePath) {
-				if let st = account.borrow<&TopShot.Collection>(from: cd.storagePath) {
-					// here means the topShot is not linked in the way it should be. We can relink that for our use
-					account.unlink(cd.publicPath)
-					account.link<&TopShot.Collection{TopShot.MomentCollectionPublic,NonFungibleToken.Receiver,NonFungibleToken.CollectionPublic,MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-				} else {
-					panic("This collection public link is not set up properly.")
-				}
-			} else {
-				account.save(<- cd.createEmptyCollection(), to: cd.storagePath)
-				account.link<&{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.publicPath, target: cd.storagePath)
-				account.link<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(cd.providerPath, target: cd.storagePath)
-			}
-		}
 
-		self.walletReference = dapper.borrow<&FungibleToken.Vault>(from: ftVaultPath!) ?? panic("No suitable wallet linked for this account")
-		self.balanceBeforeTransfer = self.walletReference.balance
-	}
+        let col= account.storage.borrow<&AnyResource>(from: nft.storagePath) as? &{NonFungibleToken.Collection}?
+        if col == nil {
+            let cd = item.getNFTCollectionData()
+            account.storage.save(<- cd.createEmptyCollection(), to: cd.storagePath)
+            account.capabilities.unpublish(cd.publicPath)
+            let cap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(cd.storagePath)
+            account.capabilities.publish(cap, at: cd.publicPath)
+            self.targetCapability=cap
+        } else {
+            //TODO: I do not think this works as intended
+            var targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
+            if  !targetCapability.check() {
+                let cd = item.getNFTCollectionData()
+                let cap = account.capabilities.storage.issue<&{NonFungibleToken.Collection}>(cd.storagePath)
+                account.capabilities.unpublish(cd.publicPath)
+                account.capabilities.publish(cap, at: cd.publicPath)
+                targetCapability= account.capabilities.get<&{NonFungibleToken.Collection}>(nft.publicPath)
+            }
+            self.targetCapability=targetCapability
 
-	pre {
-		self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
-	}
+        }
 
-	execute {
-		let vault <- self.walletReference.withdraw(amount: amount)
-		self.saleItemsCap.borrow()!.buy(id:id, vault: <- vault, nftCap: self.targetCapability)
-		DapperStorageRent.tryRefill(self.receiver)
-	}
+        //TODO: handle topshot
 
-	// Check that all dapper Coin was routed back to Dapper
-	post {
-		self.walletReference.balance == self.balanceBeforeTransfer: "Dapper Coin leakage"
-	}
+        self.walletReference = dapper.storage.borrow<auth(FungibleToken.Withdraw) &{FungibleToken.Vault}>(from: ftVaultPath!) ?? panic("No suitable wallet linked for this account")
+        self.balanceBeforeTransfer = self.walletReference.balance
+    }
+
+    pre {
+        self.walletReference.balance > amount : "Your wallet does not have enough funds to pay for this item"
+    }
+
+    execute {
+        let vault <- self.walletReference.withdraw(amount: amount)
+        self.saleItemsCap.borrow()!.buy(id:id, vault: <- vault, nftCap: self.targetCapability)
+        DapperStorageRent.tryRefill(self.receiver)
+    }
+
+    // Check that all dapper Coin was routed back to Dapper
+    post {
+        self.walletReference.balance == self.balanceBeforeTransfer: "Dapper Coin leakage"
+    }
 }

@@ -1,19 +1,18 @@
-import FindForge from "../contracts/FindForge.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FindForge"
+import "FIND"
 
 //link together the administrator to the client, signed by the owner of the contract
 transaction(ownerAddress: Address) {
 
     //versus account
-    prepare(account: AuthAccount) {
+    prepare(account: auth(BorrowValue, IssueStorageCapabilityController) &Account) {
 
         let owner= getAccount(ownerAddress)
-        let client= owner.getCapability<&{FindForge.ForgeAdminProxyClient}>(/public/findForgeAdminProxy)
-                .borrow() ?? panic("Could not borrow admin client")
+        let client= owner.capabilities.borrow<&{FindForge.ForgeAdminProxyClient}>(/public/findForgeAdminProxy) ?? panic("Could not borrow admin client")
 
-        let network=account.getCapability<&FIND.Network>(FIND.NetworkPrivatePath)
+        let network = account.capabilities.storage.issue<&FIND.Network>(FIND.NetworkStoragePath)
         client.addCapability(network)
 
     }
 }
- 
+

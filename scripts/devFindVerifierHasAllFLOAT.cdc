@@ -1,14 +1,14 @@
-import FindVerifier from "../contracts/FindVerifier.cdc"
+import "FindVerifier"
 
-pub fun main(user: Address, floatIDs: [UInt64]) : Result {
+access(all) fun main(user: Address, floatIDs: [UInt64]) : Result {
     let verifier = FindVerifier.HasAllFLOAT(floatIDs)
     let input : {String : AnyStruct} = {"address" : user}
     return Result(verifier, input: input)
 }
 
-pub struct Result{
-    pub let result : Bool 
-    pub let description : String 
+access(all) struct Result{
+    access(all) let result : Bool 
+    access(all) let description : String 
 
     init(_ v : {FindVerifier.Verifier}, input: {String : AnyStruct}) {
         self.result=v.verify(input)

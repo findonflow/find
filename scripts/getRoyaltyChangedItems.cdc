@@ -1,7 +1,7 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FindMarket"
+import "FIND"
 
-pub fun main(user: String) : {String : FindMarket.SaleItemCollectionReport} {
+access(all) fun main(user: String) : {String : FindMarket.SaleItemCollectionReport} {
     if let address = FIND.resolve(user){
 		let marketplace = FindMarket.getFindTenantAddress()
         return FindMarket.getRoyaltiesChangedItems(tenant:marketplace, address: address)

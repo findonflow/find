@@ -1,7 +1,7 @@
-import FIND from "../contracts/FIND.cdc"
+import "FIND"
 import AlchemyMetadataWrapperTestnetShard3 from 0x5ff2c7b4c40de11
 
-pub fun main(user: String , project: String, id: UInt64, views: [String]): AlchemyMetadataWrapperTestnetShard3.NFTData? {
+access(all) fun main(user: String , project: String, id: UInt64, views: [String]): AlchemyMetadataWrapperTestnetShard3.NFTData? {
 
 	return nil
 

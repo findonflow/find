@@ -1,7 +1,7 @@
-import FindVerifier from "../contracts/FindVerifier.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "FindVerifier"
+import "MetadataViews"
 
-pub fun main(user: Address, path: String, rarityA: Bool, rarityB: Bool) : Result {
+access(all) fun main(user: Address, path: String, rarityA: Bool, rarityB: Bool) : Result {
 
     let rarities : [MetadataViews.Rarity] = []
 
@@ -18,9 +18,9 @@ pub fun main(user: Address, path: String, rarityA: Bool, rarityB: Bool) : Result
     return Result(verifier, input: input)
 }
 
-pub struct Result{
-    pub let result : Bool 
-    pub let description : String 
+access(all) struct Result{
+    access(all) let result : Bool 
+    access(all) let description : String 
 
     init(_ v : {FindVerifier.Verifier}, input: {String : AnyStruct}) {
         self.result=v.verify(input)

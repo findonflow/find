@@ -16,7 +16,7 @@ emulator:
 	flow emulator -v
 
 test:
-	gotessum -f testname
+	gotestsum -f testname
 
 dev:
 	gotestsum -f testname --watch

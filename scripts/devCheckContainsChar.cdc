@@ -1,5 +1,5 @@
-import FindUtils from "../contracts/FindUtils.cdc"
+import "FindUtils"
 
-pub fun main(string: String, char:Character) : Bool {
+access(all) fun main(string: String, char:Character) : Bool {
 	return FindUtils.containsChar(string, char: char)
 }

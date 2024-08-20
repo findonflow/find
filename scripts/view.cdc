@@ -1,14 +1,14 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FIND"
 
 //Fetch a single view from a nft on a given path
-pub fun main(user: Address, path:PublicPath, id: UInt64, identifier: String) : AnyStruct? {
+access(all) fun main(user: Address, path:PublicPath, id: UInt64, identifier: String) : AnyStruct? {
 
 	let address = user
 	let account=getAccount(address)
 
-	let collection= getAccount(address).getCapability(path).borrow<&{MetadataViews.ResolverCollection}>()!
+	let collection= getAccount(address).getCapability(path).borrow<&{ViewResolver.ResolverCollection}>()!
 
 	let nft=collection.borrowViewResolver(id: id)
 

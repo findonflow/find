@@ -1,9 +1,9 @@
-import FungibleToken from "../standard/FungibleToken.cdc"
-import NonFungibleToken from "../standard/NonFungibleToken.cdc"
-import FUSD from "../standard/FUSD.cdc"
+import "FungibleToken"
+import "NonFungibleToken"
+import "FUSD"
 
-import FlowtyUtils from "./FlowtyUtils.cdc"
-import CoatCheck from "./CoatCheck.cdc"
+import "FlowtyUtils"
+import "CoatCheck"
 
 // Flowty
 //
@@ -25,12 +25,12 @@ import CoatCheck from "./CoatCheck.cdc"
 // Lenders can watch for Listing events and check the NFT type and
 // ID to see if they wish to fund the listed loan.
 //
-pub contract Flowty {
+access(all) contract Flowty {
     // FlowtyInitialized
     // This contract has been deployed.
     // Event consumers can now expect events from this contract.
     //
-    pub event FlowtyInitialized()
+    access(all) event FlowtyInitialized()
 
     // FlowtyStorefrontInitialized
     // A FlowtyStorefront resource has been created.
@@ -44,7 +44,7 @@ pub contract Flowty {
     // If the seller moves the FlowtyStorefront while the listing is valid, 
     // that is on them.
     //
-    pub event FlowtyStorefrontInitialized(flowtyStorefrontResourceID: UInt64)
+    access(all) event FlowtyStorefrontInitialized(flowtyStorefrontResourceID: UInt64)
 
     // FlowtyMarketplaceInitialized
     // A FlowtyMarketplace resource has been created.
@@ -58,21 +58,21 @@ pub contract Flowty {
     // If the seller moves the FlowtyStorefront while the listing is valid, 
     // that is on them.
     //
-    pub event FlowtyMarketplaceInitialized(flowtyMarketplaceResourceID: UInt64)
+    access(all) event FlowtyMarketplaceInitialized(flowtyMarketplaceResourceID: UInt64)
 
     // FlowtyStorefrontDestroyed
     // A FlowtyStorefront has been destroyed.
     // Event consumers can now stop processing events from this FlowtyStorefront.
     // Note that we do not specify an address.
     //
-    pub event FlowtyStorefrontDestroyed(flowtyStorefrontResourceID: UInt64)
+    access(all) event FlowtyStorefrontDestroyed(flowtyStorefrontResourceID: UInt64)
 
     // FlowtyMarketplaceDestroyed
     // A FlowtyMarketplace has been destroyed.
     // Event consumers can now stop processing events from this FlowtyMarketplace.
     // Note that we do not specify an address.
     //
-    pub event FlowtyMarketplaceDestroyed(flowtyStorefrontResourceID: UInt64)
+    access(all) event FlowtyMarketplaceDestroyed(flowtyStorefrontResourceID: UInt64)
 
     // ListingAvailable
     // A listing has been created and added to a FlowtyStorefront resource.
@@ -80,7 +80,7 @@ pub contract Flowty {
     // the state of the accounts they refer to may be changed outside of the
     // FlowtyMarketplace workflow, so be careful to check when using them.
     //
-    pub event ListingAvailable(
+    access(all) event ListingAvailable(
         flowtyStorefrontAddress: Address,
         flowtyStorefrontID: UInt64, 
         listingResourceID: UInt64,
@@ -98,7 +98,7 @@ pub contract Flowty {
     // ListingCompleted
     // The listing has been resolved. It has either been funded, or removed and destroyed.
     //
-    pub event ListingCompleted(
+    access(all) event ListingCompleted(
         listingResourceID: UInt64, 
         flowtyStorefrontID: UInt64, 
         funded: Bool,
@@ -113,7 +113,7 @@ pub contract Flowty {
     // the state of the accounts they refer to may be changed outside of the
     // FlowtyMarketplace workflow, so be careful to check when using them.
     //
-    pub event FundingAvailable(
+    access(all) event FundingAvailable(
         fundingResourceID: UInt64,
         listingResourceID: UInt64,
         borrower: Address,
@@ -127,7 +127,7 @@ pub contract Flowty {
     // FundingRepaid
     // A funding has been repaid.
     //
-    pub event FundingRepaid(
+    access(all) event FundingRepaid(
         fundingResourceID: UInt64,
         listingResourceID: UInt64,
         borrower: Address,
@@ -140,7 +140,7 @@ pub contract Flowty {
     // FundingSettled
     // A funding has been settled.
     //
-    pub event FundingSettled(
+    access(all) event FundingSettled(
         fundingResourceID: UInt64,
         listingResourceID: UInt64,
         borrower: Address,
@@ -150,17 +150,17 @@ pub contract Flowty {
         repaymentAmount: UFix64
     )
 
-    pub event CollectionSupportChanged(
+    access(all) event CollectionSupportChanged(
         collectionIdentifier: String,
         state: Bool
     )
 
-    pub event RoyaltyAdded(
+    access(all) event RoyaltyAdded(
         collectionIdentifier: String,
         rate: UFix64
     )
 
-    pub event RoyaltyEscrow(
+    access(all) event RoyaltyEscrow(
         fundingResourceID: UInt64,
         listingResourceID: UInt64,
         lender: Address,
@@ -169,48 +169,48 @@ pub contract Flowty {
 
     // FlowtyStorefrontStoragePath
     // The location in storage that a FlowtyStorefront resource should be located.
-    pub let FlowtyStorefrontStoragePath: StoragePath
+    access(all) let FlowtyStorefrontStoragePath: StoragePath
 
     // FlowtyMarketplaceStoragePath
     // The location in storage that a FlowtyMarketplace resource should be located.
-    pub let FlowtyMarketplaceStoragePath: StoragePath
+    access(all) let FlowtyMarketplaceStoragePath: StoragePath
 
     // FlowtyStorefrontPublicPath
     // The public location for a FlowtyStorefront link.
-    pub let FlowtyStorefrontPublicPath: PublicPath
+    access(all) let FlowtyStorefrontPublicPath: PublicPath
 
     // FlowtyMarketplacePublicPath
     // The public location for a FlowtyMarketplace link.
-    pub let FlowtyMarketplacePublicPath: PublicPath
+    access(all) let FlowtyMarketplacePublicPath: PublicPath
 
     // FlowtyAdminStoragePath
     // The location in storage that an FlowtyAdmin resource should be located.
-    pub let FlowtyAdminStoragePath: StoragePath
+    access(all) let FlowtyAdminStoragePath: StoragePath
 
     // FusdVaultStoragePath
     // The location in storage that an FUSD Vault resource should be located.
-    pub let FusdVaultStoragePath: StoragePath
+    access(all) let FusdVaultStoragePath: StoragePath
 
     // FusdReceiverPublicPath
     // The public location for a FUSD Receiver link.
-    pub let FusdReceiverPublicPath: PublicPath
+    access(all) let FusdReceiverPublicPath: PublicPath
 
     // FusdBalancePublicPath
     // The public location for a FUSD Balance link.
-    pub let FusdBalancePublicPath: PublicPath
+    access(all) let FusdBalancePublicPath: PublicPath
 
     // ListingFee
     // The fixed fee in FUSD for a listing.
-    pub var ListingFee: UFix64
+    access(all) var ListingFee: UFix64
 
     // FundingFee
     // The percentage fee on funding, a number between 0 and 1.
-    pub var FundingFee: UFix64
+    access(all) var FundingFee: UFix64
 
     // SuspendedFundingPeriod
     // The suspended funding period in seconds(started on listing). 
     // So that the borrower has some time to delist it.
-    pub var SuspendedFundingPeriod: UFix64
+    access(all) var SuspendedFundingPeriod: UFix64
 
     // A dictionary for the Collection to royalty configuration.
     access(account) var Royalties: {String:Royalty}
@@ -223,17 +223,17 @@ pub contract Flowty {
     // A struct representing a recipient that must be sent a certain amount
     // of the payment when a tx is executed.
     //
-    pub struct PaymentCut {
+    access(all) struct PaymentCut {
         // The receiver for the payment.
         // Note that we do not store an address to find the Vault that this represents,
         // as the link or resource that we fetch in this way may be manipulated,
         // so to find the address that a cut goes to you must get this struct and then
         // call receiver.borrow().owner.address on it.
         // This can be done efficiently in a script.
-        pub let receiver: Capability<&{FungibleToken.Receiver}>
+        access(all) let receiver: Capability<&{FungibleToken.Receiver}>
 
         // The amount of the payment FungibleToken that will be paid to the receiver.
-        pub let amount: UFix64
+        access(all) let amount: UFix64
 
         // initializer
         //
@@ -243,12 +243,12 @@ pub contract Flowty {
         }
     }
 
-    pub struct Royalty {
+    access(all) struct Royalty {
         // The percentage points that should go to the collection owner
         // In the event of a loan default
-        pub let Rate: UFix64
-        pub let Address: Address 
-        pub let ReceiverPaths: {String: PublicPath}
+        access(all) let Rate: UFix64
+        access(all) let Address: Address 
+        access(all) let ReceiverPaths: {String: PublicPath}
 
         init(rate: UFix64, address: Address) {
             self.Rate = rate
@@ -264,40 +264,40 @@ pub contract Flowty {
     // ListingDetails
     // A struct containing a Listing's data.
     //
-    pub struct ListingDetails {
+    access(all) struct ListingDetails {
         // The FlowtyStorefront that the Listing is stored in.
         // Note that this resource cannot be moved to a different FlowtyStorefront
-        pub var flowtyStorefrontID: UInt64
+        access(all) var flowtyStorefrontID: UInt64
         // Whether this listing has been funded or not.
-        pub var funded: Bool
+        access(all) var funded: Bool
         // The Type of the NonFungibleToken.NFT that is being listed.
-        pub let nftType: Type
+        access(all) let nftType: Type
         // The ID of the NFT within that type.
-        pub let nftID: UInt64
+        access(all) let nftID: UInt64
         // The amount of the requested loan.
-        pub let amount: UFix64
+        access(all) let amount: UFix64
         // The interest rate in %, a number between 0 and 1.
-        pub let interestRate: UFix64
+        access(all) let interestRate: UFix64
         //The term in seconds for this listing.
-        pub var term: UFix64
+        access(all) var term: UFix64
         // The Type of the FungibleToken that fundings must be made in.
-        pub let paymentVaultType: Type
+        access(all) let paymentVaultType: Type
         // This specifies the division of payment between recipients.
         access(self) let paymentCuts: [PaymentCut]
         //The time the funding start at
-        pub var listedTime: UFix64
+        access(all) var listedTime: UFix64
         // The royalty rate needed as a deposit for this loan to be funded
-        pub var royaltyRate: UFix64
+        access(all) var royaltyRate: UFix64
         // The number of seconds this listing is valid for
-        pub var expiresAfter: UFix64
+        access(all) var expiresAfter: UFix64
 
         // getPaymentCuts
         // Returns payment cuts
-        pub fun getPaymentCuts(): [PaymentCut] {
+        access(all) getPaymentCuts(): [PaymentCut] {
             return self.paymentCuts
         }
 
-        pub fun getTotalPayment(): UFix64 {
+        access(all) getTotalPayment(): UFix64 {
             return self.amount * (1.0 + (self.interestRate * Flowty.FundingFee) + self.royaltyRate)
         }
 
@@ -353,36 +353,36 @@ pub contract Flowty {
     // ListingPublic
     // An interface providing a useful public interface to a Listing.
     //
-    pub resource interface ListingPublic {
+    access(all) resource interface ListingPublic {
         // borrowNFT
         // This will assert in the same way as the NFT standard borrowNFT()
         // if the NFT is absent, for example if it has been sold via another listing.
         //
-        pub fun borrowNFT(): &NonFungibleToken.NFT
+        access(all) borrowNFT(): &NonFungibleToken.NFT
 
         // fund
         // Fund the listing.
         // This pays the beneficiaries and returns the token to the buyer.
         //
-        pub fun fund(payment: @FungibleToken.Vault, 
+        access(all) fund(payment: @FungibleToken.Vault, 
             lenderFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>, 
-            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>)
+            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>)
 
         // getDetails
         //
-        pub fun getDetails(): ListingDetails
+        access(all) getDetails(): ListingDetails
 
         // suspensionTimeRemaining
         // 
-        pub fun suspensionTimeRemaining() : Fix64
+        access(all) suspensionTimeRemaining() : Fix64
 
         // remainingTimeToFund
         //
-        pub fun remainingTimeToFund(): Fix64
+        access(all) remainingTimeToFund(): Fix64
 
         // isFundingEnabled
         //
-        pub fun isFundingEnabled(): Bool 
+        access(all) isFundingEnabled(): Bool 
     }
 
 
@@ -390,7 +390,7 @@ pub contract Flowty {
     // A resource that allows an NFT to be fund for an amount of a given FungibleToken,
     // and for the proceeds of that payment to be split between several recipients.
     // 
-    pub resource Listing: ListingPublic {
+    access(all) resource Listing: ListingPublic {
         // The simple (non-Capability, non-complex) details of the listing
         access(self) let details: ListingDetails
 
@@ -398,10 +398,10 @@ pub contract Flowty {
         // This capability allows the resource to withdraw *any* NFT, so you should be careful when giving
         // such a capability to a resource and always check its code to make sure it will use it in the
         // way that it claims.
-        access(contract) let nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
+        access(contract) let nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.Collection}>
 
         // A capability allowing this resource to access the owner's NFT public collection 
-        access(contract) let nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>
+        access(contract) let nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>
 
 
         // A capability allowing this resource to withdraw `FungibleToken`s from borrower account.
@@ -413,7 +413,7 @@ pub contract Flowty {
         // This will assert in the same way as the NFT standard borrowNFT()
         // if the NFT is absent, for example if it has been sold via another listing.
         //
-        pub fun borrowNFT(): &NonFungibleToken.NFT {
+        access(all) borrowNFT(): &NonFungibleToken.NFT {
             let ref = self.nftProviderCapability.borrow()!.borrowNFT(id: self.getDetails().nftID)
             assert(ref.getType() == self.getDetails().nftType, message: "token has wrong type")
             assert(ref.id == self.getDetails().nftID, message: "token has wrong ID")
@@ -425,7 +425,7 @@ pub contract Flowty {
         // This avoids having more public variables and getter methods for them, and plays
         // nicely with scripts (which cannot return resources).
         //
-        pub fun getDetails(): ListingDetails {
+        access(all) getDetails(): ListingDetails {
             return self.details
         }
 
@@ -433,9 +433,9 @@ pub contract Flowty {
         // Fund the listing.
         // This pays the beneficiaries and move the NFT to the funding resource stored in the marketplace account.
         //
-        pub fun fund(payment: @FungibleToken.Vault, 
+        access(all) fund(payment: @FungibleToken.Vault, 
             lenderFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>,
-            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>) {
+            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>) {
             pre {
                 self.isFundingEnabled(): "Funding is not enabled or this listing has expired"
                 self.details.funded == false: "listing has already been funded"
@@ -528,7 +528,7 @@ pub contract Flowty {
 
         // suspensionTimeRemaining
         // The remaining time. This can be negative if is expired
-        pub fun suspensionTimeRemaining() : Fix64 {
+        access(all) suspensionTimeRemaining() : Fix64 {
             let listedTime = self.details.listedTime
             let currentTime = getCurrentBlock().timestamp
 
@@ -539,7 +539,7 @@ pub contract Flowty {
 
         // remainingTimeToFund
         // The time in seconds left until this listing is no longer valid
-        pub fun remainingTimeToFund(): Fix64 {
+        access(all) remainingTimeToFund(): Fix64 {
             let listedTime = self.details.listedTime
             let currentTime = getCurrentBlock().timestamp
             let remaining = Fix64(listedTime + self.details.expiresAfter) - Fix64(currentTime)
@@ -547,7 +547,7 @@ pub contract Flowty {
         }
 
         // isFundingEnabled
-        pub fun isFundingEnabled(): Bool {
+        access(all) isFundingEnabled(): Bool {
             let timeRemaining = self.suspensionTimeRemaining()
             let listingTimeRemaining = self.remainingTimeToFund()
             return timeRemaining < Fix64(0.0) && listingTimeRemaining > Fix64(0.0)
@@ -556,8 +556,8 @@ pub contract Flowty {
         // initializer
         //
         init (
-            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>,
-            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.Collection}>,
+            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>,
             fusdProviderCapability: Capability<&{FungibleToken.Provider}>?,
             nftType: Type,
             nftID: UInt64,
@@ -618,29 +618,29 @@ pub contract Flowty {
     // FundingDetails
     // A struct containing a Fundings's data.
     //
-    pub struct FundingDetails {
+    access(all) struct FundingDetails {
         // The FlowtyStorefront that the Funding is stored in.
         // Note that this resource cannot be moved to a different FlowtyStorefront
-        pub var flowtyStorefrontID: UInt64
-        pub var listingResourceID: UInt64
+        access(all) var flowtyStorefrontID: UInt64
+        access(all) var listingResourceID: UInt64
 
         // Whether this funding has been repaid or not.
-        pub var repaid: Bool
+        access(all) var repaid: Bool
 
         // Whether this funding has been settled or not.
-        pub var settled: Bool
+        access(all) var settled: Bool
 
         // The Type of the FungibleToken that fundings must be repaid.
-        pub let paymentVaultType: Type
+        access(all) let paymentVaultType: Type
 
         // The amount that must be repaid in the specified FungibleToken.
-        pub let repaymentAmount: UFix64
+        access(all) let repaymentAmount: UFix64
 
         // the time the funding start at
-        pub var startTime: UFix64
+        access(all) var startTime: UFix64
 
         // The length in seconds for this funding
-        pub var term: UFix64
+        access(all) var term: UFix64
 
         // setToRepaid
         // Irreversibly set this funding as repaid.
@@ -679,45 +679,45 @@ pub contract Flowty {
     // FundingPublic
     // An interface providing a useful public interface to a Funding.
     //
-    pub resource interface FundingPublic {
+    access(all) resource interface FundingPublic {
 
         // repay
         //
-        pub fun repay(payment: @FungibleToken.Vault)
+        access(all) repay(payment: @FungibleToken.Vault)
 
         // getDetails
         //
-        pub fun getDetails(): FundingDetails
+        access(all) getDetails(): FundingDetails
 
         // get the listing details for this loan
         //
-        pub fun getListingDetails(): Flowty.ListingDetails
+        access(all) getListingDetails(): Flowty.ListingDetails
 
         // timeRemaining
         // 
-        pub fun timeRemaining() : Fix64
+        access(all) timeRemaining() : Fix64
 
         // isFundingExpired
         //
-        pub fun isFundingExpired(): Bool 
+        access(all) isFundingExpired(): Bool 
 
         // get the amount stored in a vault for royalty payouts
         //
-        pub fun getRoyaltyAmount(): UFix64?
+        access(all) getRoyaltyAmount(): UFix64?
     }
 
     // Funding
     // 
-    pub resource Funding: FundingPublic {
+    access(all) resource Funding: FundingPublic {
         // The simple (non-Capability, non-complex) details of the listing
         access(self) let details: FundingDetails
         access(self) let listingDetails: ListingDetails
 
         // A capability allowing this resource to access the owner's NFT public collection 
-        access(contract) let ownerNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>
+        access(contract) let ownerNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>
 
         // A capability allowing this resource to access the lender's NFT public collection 
-        access(contract) let lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>
+        access(contract) let lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>
 
         // The receiver for the repayment.
         access(contract) let lenderFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>
@@ -736,15 +736,15 @@ pub contract Flowty {
         // This avoids having more public variables and getter methods for them, and plays
         // nicely with scripts (which cannot return resources).
         //
-        pub fun getDetails(): FundingDetails {
+        access(all) getDetails(): FundingDetails {
             return self.details
         }
 
-        pub fun getListingDetails(): ListingDetails {
+        access(all) getListingDetails(): ListingDetails {
             return self.listingDetails
         }
 
-        pub fun getRoyaltyAmount(): UFix64? {
+        access(all) getRoyaltyAmount(): UFix64? {
             return self.royaltyVault?.balance
         }
 
@@ -752,7 +752,7 @@ pub contract Flowty {
         // Repay the funding.
         // This pays the lender and returns the NFT to the owner.
         //
-        pub fun repay(payment: @FungibleToken.Vault) {
+        access(all) repay(payment: @FungibleToken.Vault) {
             pre {
                 !self.isFundingExpired(): "the loan has expired"
                 self.details.repaid == false: "funding has already been repaid"
@@ -794,7 +794,7 @@ pub contract Flowty {
         // Repay the funding with borrower permit.
         // This pays the lender and returns the NFT to the owner using FUSD allowance from borrower account.
         //
-        pub fun repayWithPermit() {
+        access(all) repayWithPermit() {
             pre {
                 self.details.repaid == false: "funding has already been repaid"
                 self.details.settled == false: "funding has already been settled"
@@ -838,7 +838,7 @@ pub contract Flowty {
         // Settle the different statuses responsible for the repayment and claiming processes.
         // NFT is moved to the lender, because the borrower hasn't repaid the loan.
         //
-        pub fun settleFunding() {
+        access(all) settleFunding() {
             pre {
                 self.isFundingExpired(): "the loan hasn't expired"
                 self.details.repaid == false: "funding has already been repaid"
@@ -878,7 +878,7 @@ pub contract Flowty {
 
         // timeRemaining
         // The remaining time. This can be negative if is expired
-        pub fun timeRemaining() : Fix64 {
+        access(all) timeRemaining() : Fix64 {
             let fundingTerm = self.details.term
 
             let startTime = self.details.startTime
@@ -890,7 +890,7 @@ pub contract Flowty {
         }
 
         // isFundingExpired
-        pub fun isFundingExpired(): Bool {
+        access(all) isFundingExpired(): Bool {
             let timeRemaining= self.timeRemaining()
             return timeRemaining < Fix64(0.0)
         }
@@ -900,8 +900,8 @@ pub contract Flowty {
         init (
             flowtyStorefrontID: UInt64,
             listingResourceID: UInt64,
-            ownerNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
-            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            ownerNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
+            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
             NFT: @NonFungibleToken.NFT,
             paymentVaultType: Type,
             repaymentAmount: UFix64,
@@ -949,15 +949,15 @@ pub contract Flowty {
     // An interface for adding and removing Fundings within a FlowtyMarketplace,
     // intended for use by the FlowtyStorefront's own
     //
-    pub resource interface FlowtyMarketplaceManager {
+    access(all) resource interface FlowtyMarketplaceManager {
         // createFunding
         // Allows the FlowtyMarketplace owner to create and insert Fundings.
         //
         access(contract) fun createFunding(
             flowtyStorefrontID: UInt64, 
             listingResourceID: UInt64,
-            ownerNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
-            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            ownerNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
+            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
             NFT: @NonFungibleToken.NFT,
             paymentVaultType: Type,
             lenderFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>,
@@ -970,37 +970,37 @@ pub contract Flowty {
         // removeFunding
         // Allows the FlowtyMarketplace owner to remove any funding.
         //
-        pub fun removeFunding(fundingResourceID: UInt64)
+        access(all) removeFunding(fundingResourceID: UInt64)
 
-        pub fun borrowPrivateFunding(fundingResourceID: UInt64): &Funding?
+        access(all) borrowPrivateFunding(fundingResourceID: UInt64): &Funding?
     }
 
     // FlowtyMarketplacePublic
     // An interface to allow listing and borrowing Listings, and funding loans via Listings
     // in a FlowtyStorefront.
     //
-    pub resource interface FlowtyMarketplacePublic {
-        pub fun getFundingIDs(): [UInt64]
-        pub fun borrowFunding(fundingResourceID: UInt64): &Funding{FundingPublic}?
-        pub fun getAllowedCollections(): [String]
+    access(all) resource interface FlowtyMarketplacePublic {
+        access(all) getFundingIDs(): [UInt64]
+        access(all) borrowFunding(fundingResourceID: UInt64): &Funding{FundingPublic}?
+        access(all) getAllowedCollections(): [String]
     }
 
     // FlowtyStorefront
     // A resource that allows its owner to manage a list of Listings, and anyone to interact with them
     // in order to query their details and fund the loans that they represent.
     //
-    pub resource FlowtyMarketplace : FlowtyMarketplaceManager, FlowtyMarketplacePublic {
+    access(all) resource FlowtyMarketplace : FlowtyMarketplaceManager, FlowtyMarketplacePublic {
         // The dictionary of Fundings uuids to Funding resources.
         access(self) var fundings: @{UInt64: Funding}
 
         // insert
-        // Create and publish a funding for an NFT.
+        // Create and access(all)lish a funding for an NFT.
         //
         access(contract) fun createFunding(
             flowtyStorefrontID: UInt64, 
             listingResourceID: UInt64,
-            ownerNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
-            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            ownerNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
+            lenderNFTCollection: Capability<&AnyResource{NonFungibleToken.Collection}>,
             NFT: @NonFungibleToken.NFT,
             paymentVaultType: Type,
             lenderFungibleTokenReceiver: Capability<&{FungibleToken.Receiver}>,
@@ -1062,7 +1062,7 @@ pub contract Flowty {
         // removeFunding
         // Remove a Funding.
         //
-        pub fun removeFunding(fundingResourceID: UInt64) {
+        access(all) removeFunding(fundingResourceID: UInt64) {
             let funding <- self.fundings.remove(key: fundingResourceID)
                 ?? panic("missing Funding")
     
@@ -1075,14 +1075,14 @@ pub contract Flowty {
         // getFundingIDs
         // Returns an array of the Funding resource IDs that are in the collection
         //
-        pub fun getFundingIDs(): [UInt64] {
+        access(all) getFundingIDs(): [UInt64] {
             return self.fundings.keys
         }
 
         // borrowFunding
         // Returns a read-only view of the Funding for the given fundingID if it is contained by this collection.
         //
-        pub fun borrowFunding(fundingResourceID: UInt64): &Funding{FundingPublic}? {
+        access(all) borrowFunding(fundingResourceID: UInt64): &Funding{FundingPublic}? {
             if self.fundings[fundingResourceID] != nil {
                 return &self.fundings[fundingResourceID] as! &Funding{FundingPublic}?
             } else {
@@ -1093,7 +1093,7 @@ pub contract Flowty {
         // borrowPrivateFunding
         // Returns a private view of the Funding for the given fundingID if it is contained by this collection.
         //
-        pub fun borrowPrivateFunding(fundingResourceID: UInt64): &Funding? {
+        access(all) borrowPrivateFunding(fundingResourceID: UInt64): &Funding? {
             if self.fundings[fundingResourceID] != nil {
                 return &self.fundings[fundingResourceID] as! &Funding?
             } else {
@@ -1101,7 +1101,7 @@ pub contract Flowty {
             }
         }
 
-        pub fun getAllowedCollections(): [String] {
+        access(all) getAllowedCollections(): [String] {
             return Flowty.SupportedCollections.keys
         }
 
@@ -1127,14 +1127,14 @@ pub contract Flowty {
     // FlowtyStorefrontManager
     // An interface for adding and removing Listings within a FlowtyStorefront,
     // intended for use by the FlowtyStorefront's own
-    pub resource interface FlowtyStorefrontManager {
+    access(all) resource interface FlowtyStorefrontManager {
         // createListing
         // Allows the FlowtyStorefront owner to create and insert Listings.
         //
-        pub fun createListing(
+        access(all) createListing(
             payment: @FungibleToken.Vault,
-            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>,
-            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.Collection}>,
+            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>,
             fusdProviderCapability: Capability<&{FungibleToken.Provider}>?,
             nftType: Type,
             nftID: UInt64,
@@ -1148,35 +1148,35 @@ pub contract Flowty {
         // removeListing
         // Allows the FlowtyStorefront owner to remove any sale listing, accepted or not.
         //
-        pub fun removeListing(listingResourceID: UInt64)
+        access(all) removeListing(listingResourceID: UInt64)
     }
 
     // FlowtyStorefrontPublic
     // An interface to allow listing and borrowing Listings, and funding loans via Listings
     // in a FlowtyStorefront.
     //
-    pub resource interface FlowtyStorefrontPublic {
-        pub fun getListingIDs(): [UInt64]
-        pub fun borrowListing(listingResourceID: UInt64): &Listing{ListingPublic}?
-        pub fun cleanup(listingResourceID: UInt64)
-        pub fun getRoyalties(): {String:Flowty.Royalty}
+    access(all) resource interface FlowtyStorefrontPublic {
+        access(all) getListingIDs(): [UInt64]
+        access(all) borrowListing(listingResourceID: UInt64): &Listing{ListingPublic}?
+        access(all) cleanup(listingResourceID: UInt64)
+        access(all) getRoyalties(): {String:Flowty.Royalty}
    }
 
     // FlowtyStorefront
     // A resource that allows its owner to manage a list of Listings, and anyone to interact with them
     // in order to query their details and fund the loans that they represent.
     //
-    pub resource FlowtyStorefront : FlowtyStorefrontManager, FlowtyStorefrontPublic {
+    access(all) resource FlowtyStorefront : FlowtyStorefrontManager, FlowtyStorefrontPublic {
         // The dictionary of Listing uuids to Listing resources.
         access(self) var listings: @{UInt64: Listing}
 
         // insert
-        // Create and publish a Listing for an NFT.
+        // Create and access(all)lish a Listing for an NFT.
         //
-         pub fun createListing(
+         access(all) createListing(
             payment: @FungibleToken.Vault,
-            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>,
-            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.CollectionPublic}>,
+            nftProviderCapability: Capability<&{NonFungibleToken.Provider, NonFungibleToken.Collection}>,
+            nftPublicCollectionCapability: Capability<&AnyResource{NonFungibleToken.Collection}>,
             fusdProviderCapability: Capability<&{FungibleToken.Provider}>?,
             nftType: Type,
             nftID: UInt64,
@@ -1228,7 +1228,7 @@ pub contract Flowty {
 
             // Listing fee
             // let listingFee <- payment.withdraw(amount: Flowty.ListingFee)
-            // let flowtyFusdReceiver = Flowty.account.borrow<&FUSD.Vault{FungibleToken.Receiver}>(from: Flowty.FusdVaultStoragePath)
+            // let flowtyFusdReceiver = Flowty.account.storage.borrow<&FUSD.Vault{FungibleToken.Receiver}>(from: Flowty.FusdVaultStoragePath)
             //     ?? panic("Missing or mis-typed FUSD Reveiver")
             // flowtyFusdReceiver.deposit(from: <-listingFee)
             destroy payment
@@ -1256,7 +1256,7 @@ pub contract Flowty {
         // removeListing
         // Remove a Listing that has not yet been funded from the collection and destroy it.
         //
-        pub fun removeListing(listingResourceID: UInt64) {
+        access(all) removeListing(listingResourceID: UInt64) {
             let listing <- self.listings.remove(key: listingResourceID)
                 ?? panic("missing Listing")
     
@@ -1267,14 +1267,14 @@ pub contract Flowty {
         // getListingIDs
         // Returns an array of the Listing resource IDs that are in the collection
         //
-        pub fun getListingIDs(): [UInt64] {
+        access(all) getListingIDs(): [UInt64] {
             return self.listings.keys
         }
 
         // borrowListing
         // Returns a read-only view of the Listing for the given listingID if it is contained by this collection.
         //
-        pub fun borrowListing(listingResourceID: UInt64): &Listing{ListingPublic}? {
+        access(all) borrowListing(listingResourceID: UInt64): &Listing{ListingPublic}? {
             if self.listings[listingResourceID] != nil {
                 return &self.listings[listingResourceID] as! &Listing{ListingPublic}?
             } else {
@@ -1287,7 +1287,7 @@ pub contract Flowty {
         // Anyone can call, but at present it only benefits the account owner to do so.
         // Kind purchasers can however call it if they like.
         //
-        pub fun cleanup(listingResourceID: UInt64) {
+        access(all) cleanup(listingResourceID: UInt64) {
             pre {
                 self.listings[listingResourceID] != nil: "could not find listing with given id"
             }
@@ -1297,7 +1297,7 @@ pub contract Flowty {
             destroy listing
         }
 
-        pub fun getRoyalties(): {String:Flowty.Royalty} {
+        access(all) getRoyalties(): {String:Flowty.Royalty} {
             return Flowty.Royalties
         }
 
@@ -1323,27 +1323,27 @@ pub contract Flowty {
     // createStorefront
     // Make creating a FlowtyStorefront publicly accessible.
     //
-    pub fun createStorefront(): @FlowtyStorefront {
+    access(all) createStorefront(): @FlowtyStorefront {
         return <-create FlowtyStorefront()
     }
 
     access(account) fun borrowMarketplace(): &Flowty.FlowtyMarketplace {
-        return self.account.borrow<&Flowty.FlowtyMarketplace>(from: Flowty.FlowtyMarketplaceStoragePath)!
+        return self.account.storage.borrow<&Flowty.FlowtyMarketplace>(from: Flowty.FlowtyMarketplaceStoragePath)!
     }
 
-    pub fun getRoyalty(nftTypeIdentifier: String): Royalty {
+    access(all) getRoyalty(nftTypeIdentifier: String): Royalty {
         return Flowty.Royalties[nftTypeIdentifier]!
     }
 
-    pub fun getTokenPaths(): {String:PublicPath} {
+    access(all) getTokenPaths(): {String:PublicPath} {
         return self.TokenPaths
     }
 
     // FlowtyAdmin
     // Allows the adminitrator to set the amount of fees, set the suspended funding period
     //
-    pub resource FlowtyAdmin {
-        pub fun setFees(listingFixedFee: UFix64, fundingPercentageFee: UFix64) {
+    access(all) resource FlowtyAdmin {
+        access(all) setFees(listingFixedFee: UFix64, fundingPercentageFee: UFix64) {
             pre {
                 // The UFix64 type covers a negative numbers
                 fundingPercentageFee <= 1.0: "Funding fee should be a percentage"
@@ -1353,16 +1353,16 @@ pub contract Flowty {
             Flowty.FundingFee = fundingPercentageFee
         }
 
-        pub fun setSuspendedFundingPeriod(period: UFix64) {
+        access(all) setSuspendedFundingPeriod(period: UFix64) {
             Flowty.SuspendedFundingPeriod = period
         }
 
-        pub fun setSupportedCollection(collection: String, state: Bool) {
+        access(all) setSupportedCollection(collection: String, state: Bool) {
             Flowty.SupportedCollections[collection] = state
             emit CollectionSupportChanged(collectionIdentifier: collection, state: state)
         }
 
-        pub fun setCollectionRoyalty(collection: String, royalty: Royalty) {
+        access(all) setCollectionRoyalty(collection: String, royalty: Royalty) {
             pre {
                 royalty.Rate <= 1.0: "Royalty rate must be a percentage"
             }
@@ -1371,7 +1371,7 @@ pub contract Flowty {
             emit RoyaltyAdded(collectionIdentifier: collection, rate: royalty.Rate)
         }
 
-        pub fun registerFungibleTokenPath(vaultType: Type, path: PublicPath) {
+        access(all) registerFungibleTokenPath(vaultType: Type, path: PublicPath) {
             Flowty.TokenPaths[vaultType.identifier] = path
         }
     }
@@ -1395,13 +1395,13 @@ pub contract Flowty {
 
         let marketplace <- create FlowtyMarketplace()
 
-        self.account.save(<-marketplace, to: self.FlowtyMarketplaceStoragePath) 
+        self.account.storage.save(<-marketplace, to: self.FlowtyMarketplaceStoragePath) 
         // create a public capability for the .Marketplace
         self.account.link<&Flowty.FlowtyMarketplace{Flowty.FlowtyMarketplacePublic}>(Flowty.FlowtyMarketplacePublicPath, target: Flowty.FlowtyMarketplaceStoragePath)
 
         // FlowtyAdmin
         let flowtyAdmin <- create FlowtyAdmin()
-        self.account.save(<-flowtyAdmin, to: self.FlowtyAdminStoragePath)
+        self.account.storage.save(<-flowtyAdmin, to: self.FlowtyAdminStoragePath)
 
         emit FlowtyInitialized()
     }

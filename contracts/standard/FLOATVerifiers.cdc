@@ -20,24 +20,24 @@
 // of the secret code through. For Limited, we need to know the totalSupply of the event,
 // so we pass it through as well.
 
-import FLOAT from "./FLOAT.cdc"
+import "FLOAT"
 
-pub contract FLOATVerifiers {
+access(all) contract FLOATVerifiers {
 
     // The "verifiers" to be used
-    
+
     //
     // Timelock
     //
     // Specifies a time range in which the 
     // FLOAT from an event can be claimed
-    pub struct Timelock: FLOAT.IVerifier {
+    access(all) struct Timelock: FLOAT.IVerifier {
         // An automatic switch handled by the contract
         // to stop people from claiming after a certain time.
-        pub let dateStart: UFix64
-        pub let dateEnding: UFix64
+        access(all) let dateStart: UFix64
+        access(all) let dateEnding: UFix64
 
-        pub fun verify(_ params: {String: AnyStruct}) {
+        access(all) fun verify(_ params: {String: AnyStruct}) {
             assert(
                 getCurrentBlock().timestamp >= self.dateStart,
                 message: "This FLOAT Event has not started yet."
@@ -59,11 +59,11 @@ pub contract FLOATVerifiers {
     //
     // Specifies a secret code in order
     // to claim a FLOAT (not very secure, but cool feature)
-    pub struct Secret: FLOAT.IVerifier {
+    access(all) struct Secret: FLOAT.IVerifier {
         // The secret code, set by the owner of this event.
         access(self) let secretPhrase: String
 
-        pub fun verify(_ params: {String: AnyStruct}) {
+        access(all) fun verify(_ params: {String: AnyStruct}) {
             let secretPhrase = params["secretPhrase"]! as! String
             assert(
                 self.secretPhrase == secretPhrase, 
@@ -83,12 +83,12 @@ pub contract FLOATVerifiers {
     // who can CLAIM. Not to be confused with how many currently
     // hold a FLOAT from this event, since users can
     // delete their FLOATs.
-    pub struct Limited: FLOAT.IVerifier {
-        pub var capacity: UInt64
+    access(all) struct Limited: FLOAT.IVerifier {
+        access(all) var capacity: UInt64
 
-        pub fun verify(_ params: {String: AnyStruct}) {
-            let event = params["event"]! as! &FLOAT.FLOATEvent{FLOAT.FLOATEventPublic}
-            let currentCapacity = event.totalSupply
+        access(all) fun verify(_ params: {String: AnyStruct}) {
+            let e = params["event"]! as! &FLOAT.FLOATEvent
+            let currentCapacity = e.totalSupply
             assert(
                 currentCapacity < self.capacity,
                 message: "This FLOAT Event is at capacity."
@@ -106,10 +106,10 @@ pub contract FLOATVerifiers {
     // Allows for Multiple Secret codes
     // Everytime a secret gets used, it gets removed
     // from the list.
-    pub struct MultipleSecret: FLOAT.IVerifier {
+    access(all) struct MultipleSecret: FLOAT.IVerifier {
         access(self) let secrets: {String: Bool}
 
-        pub fun verify(_ params: {String: AnyStruct}) {
+        access(all) fun verify(_ params: {String: AnyStruct}) {
             let secretPhrase = params["secretPhrase"]! as! String
             assert(
                 self.secrets[secretPhrase] != nil, 

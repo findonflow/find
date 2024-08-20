@@ -1,11 +1,11 @@
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
+import "FindMarketAdmin"
 
 transaction(address: Address) {
 
-    let adminRef : &FindMarketAdmin.AdminProxy
+    let adminRef : auth(FindMarketAdmin.Owner) &FindMarketAdmin.AdminProxy
 
-    prepare(account: AuthAccount){
-        self.adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+    prepare(account: auth(BorrowValue) &Account){
+        self.adminRef = account.storage.borrow<auth(FindMarketAdmin.Owner) &FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
     }
 

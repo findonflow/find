@@ -1,7 +1,7 @@
-import FIND from "../contracts/FIND.cdc"
+import "FIND"
 
-pub fun main(name:String) : Address?{
+access(all) fun main(name:String) : Address?{
 
-	return FIND.resolve(name)
+    return FIND.resolve(name)
 
 }

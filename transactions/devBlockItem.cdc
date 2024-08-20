@@ -1,10 +1,10 @@
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
-import FindMarket from "../contracts/FindMarket.cdc"
-import Dandy from "../contracts/Dandy.cdc"
+import "FindMarketAdmin"
+import "FindMarket"
+import "Dandy"
 
 transaction(tenant: Address){
-    prepare(account: AuthAccount){
-        let adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+    prepare(account: auth(BorrowValue) &Account){
+        let adminRef = account.storage.borrow<auth(FindMarketAdmin.Owner) &FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
         let rules = [
             FindMarket.TenantRule(name:"nft", types:[Type<@Dandy.NFT>()], ruleType:"nft", allow:false)
         ]

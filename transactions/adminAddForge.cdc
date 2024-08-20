@@ -1,14 +1,15 @@
 
-import Admin from "../contracts/Admin.cdc"
+import "Admin"
 
 transaction(name: String, type: String) {
 
-	prepare(admin:AuthAccount) {
 
-		let client= admin.borrow<&Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
+    prepare(account: auth(BorrowValue) &Account){
 
-		client.addPrivateForgeType(name: name, forgeType: CompositeType(type)!)
+        let client= account.storage.borrow<auth(Admin.Owner) &Admin.AdminProxy>(from: Admin.AdminProxyStoragePath)!
 
-	}
+        client.addPrivateForgeType(name: name, forgeType: CompositeType(type)!)
+
+    }
 
 }

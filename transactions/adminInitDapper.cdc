@@ -1,11 +1,11 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
+import "FungibleToken"
+import "DapperUtilityCoin"
+import "TokenForwarding"
 
 
 transaction(dapperAddress:Address) {
 
-	prepare(acct: AuthAccount) {
+	prepare(acct: auth(BorrowValue) &Account) {
 		// Get a Receiver reference for the Dapper account that will be the recipient of the forwarded DUC
 		let dapper = getAccount(dapperAddress)
 		let dapperDUCReceiver = dapper.getCapability(/public/dapperUtilityCoinReceiver)

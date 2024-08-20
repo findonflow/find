@@ -1,25 +1,25 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
+import "FindMarket"
+import "FindMarketAuctionSoft"
 
 transaction() {
 
-	let saleItems : &FindMarketAuctionSoft.SaleItemCollection?
+    let saleItems : auth(FindMarketAuctionSoft.Seller) &FindMarketAuctionSoft.SaleItemCollection?
 
-	prepare(account: AuthAccount) {
-		let marketplace = FindMarket.getFindTenantAddress()
-		let tenant = FindMarket.getTenant(marketplace)
-		self.saleItems= account.borrow<&FindMarketAuctionSoft.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionSoft.SaleItemCollection>()))
+    prepare(account: auth(BorrowValue) &Account) {
+        let marketplace = FindMarket.getFindTenantAddress()
+        let tenant = FindMarket.getTenant(marketplace)
+        self.saleItems= account.storage.borrow<auth(FindMarketAuctionSoft.Seller) &FindMarketAuctionSoft.SaleItemCollection>(from: tenant.getStoragePath(Type<@FindMarketAuctionSoft.SaleItemCollection>()))
 
-	}
+    }
 
-	pre{
-		self.saleItems != nil : "Cannot borrow reference to the saleItem."
-	}
+    pre{
+        self.saleItems != nil : "Cannot borrow reference to the saleItem."
+    }
 
-	execute {
-		let ids = self.saleItems!.getIds()
-		for id in ids {
-			self.saleItems!.cancel(id)
-		}
-	}
+    execute {
+        let ids = self.saleItems!.getIds()
+        for id in ids {
+            self.saleItems!.cancel(id)
+        }
+    }
 }

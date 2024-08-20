@@ -1,10 +1,10 @@
-import FungibleToken from "../standard/FungibleToken.cdc"
-import NonFungibleToken from "../standard/NonFungibleToken.cdc"
-import FlowToken from "../standard/FlowToken.cdc"
-import FlovatarComponentTemplate from "./FlovatarComponentTemplate.cdc"
-import FlovatarComponent from "./FlovatarComponent.cdc"
+import "FungibleToken"
+import "NonFungibleToken"
+import "FlowToken"
+import "FlovatarComponentTemplate"
+import "FlovatarComponent"
 import Crypto
-import FlowUtilityToken from "../standard/FlowUtilityToken.cdc"
+import "FlowUtilityToken"
 
 /*
 
@@ -21,39 +21,39 @@ import FlowUtilityToken from "../standard/FlowUtilityToken.cdc"
 
  */
 
-pub contract FlovatarPack {
+access(all) contract FlovatarPack {
 
-    pub let CollectionStoragePath: StoragePath
-    pub let CollectionPublicPath: PublicPath
+    access(all) let CollectionStoragePath: StoragePath
+    access(all) let CollectionPublicPath: PublicPath
 
     // Counter for all the Packs ever minted
-    pub var totalSupply: UInt64
+    access(all) var totalSupply: UInt64
 
     // Standard events that will be emitted
-    pub event ContractInitialized()
-    pub event Withdraw(id: UInt64, from: Address?)
-    pub event Deposit(id: UInt64, to: Address?)
-    pub event Created(id: UInt64, prefix: String)
-    pub event Opened(id: UInt64)
-    pub event Purchased(id: UInt64)
+    access(all) event ContractInitialized()
+    access(all) event Withdraw(id: UInt64, from: Address?)
+    access(all) event Deposit(id: UInt64, to: Address?)
+    access(all) event Created(id: UInt64, prefix: String)
+    access(all) event Opened(id: UInt64)
+    access(all) event Purchased(id: UInt64)
 
     // The public interface contains only the ID and the price of the Pack
-    pub resource interface Public {
-        pub let id: UInt64
-        pub let price: UFix64
-        pub let sparkCount: UInt32
-        pub let series: UInt32
-        pub let name: String
+    access(all) resource interface Public {
+        access(all) let id: UInt64
+        access(all) let price: UFix64
+        access(all) let sparkCount: UInt32
+        access(all) let series: UInt32
+        access(all) let name: String
     }
 
     // The Pack resource that implements the Public interface and that contains
     // different Components in a Dictionary
-    pub resource Pack: Public {
-        pub let id: UInt64
-        pub let price: UFix64
-        pub let sparkCount: UInt32
-        pub let series: UInt32
-        pub let name: String
+    access(all) resource Pack: Public {
+        access(all) let id: UInt64
+        access(all) let price: UFix64
+        access(all) let sparkCount: UInt32
+        access(all) let series: UInt32
+        access(all) let name: String
         access(account) let components: @[FlovatarComponent.NFT]
         access(account) var randomString: String
 
@@ -125,23 +125,23 @@ pub contract FlovatarPack {
             self.randomString = randomString
         }
 
-        pub fun removeComponent(at: Int): @FlovatarComponent.NFT {
+        access(all) removeComponent(at: Int): @FlovatarComponent.NFT {
             return <- self.components.remove(at: at)
         }
 
     }
 
     //Pack CollectionPublic interface that allows users to purchase a Pack
-    pub resource interface CollectionPublic {
-        pub fun getIDs(): [UInt64]
-        pub fun deposit(token: @FlovatarPack.Pack)
-        pub fun purchase(tokenId: UInt64, recipientCap: Capability<&{FlovatarPack.CollectionPublic}>, buyTokens: @FungibleToken.Vault, signature: String)
-        pub fun purchaseDapper(tokenId: UInt64, recipientCap: Capability<&{FlovatarPack.CollectionPublic}>, buyTokens: @FungibleToken.Vault, signature: String, expectedPrice: UFix64)
+    access(all) resource interface CollectionPublic {
+        access(all) view fun getIDs(): [UInt64]
+        access(all) deposit(token: @FlovatarPack.Pack)
+        access(all) purchase(tokenId: UInt64, recipientCap: Capability<&{FlovatarPack.CollectionPublic}>, buyTokens: @FungibleToken.Vault, signature: String)
+        access(all) purchaseDapper(tokenId: UInt64, recipientCap: Capability<&{FlovatarPack.CollectionPublic}>, buyTokens: @FungibleToken.Vault, signature: String, expectedPrice: UFix64)
     }
 
     // Main Collection that implements the Public interface and that
     // will handle the purchase transactions
-    pub resource Collection: CollectionPublic {
+    access(all) resource Collection: CollectionPublic {
         // Dictionary of all the Packs owned
         access(account) let ownedPacks: @{UInt64: FlovatarPack.Pack}
         // Capability to send the FLOW tokens to the owner's account
@@ -154,13 +154,13 @@ pub contract FlovatarPack {
         }
 
         // getIDs returns an array of the IDs that are in the collection
-        pub fun getIDs(): [UInt64] {
+        access(all) view fun getIDs(): [UInt64] {
             return self.ownedPacks.keys
         }
 
         // deposit takes a Pack and adds it to the collections dictionary
         // and adds the ID to the id array
-        pub fun deposit(token: @FlovatarPack.Pack) {
+        access(all) deposit(token: @FlovatarPack.Pack) {
             let id: UInt64 = token.id
 
             // add the new token to the dictionary which removes the old one
@@ -172,7 +172,7 @@ pub contract FlovatarPack {
         }
 
         // withdraw removes a Pack from the collection and moves it to the caller
-        pub fun withdraw(withdrawID: UInt64): @FlovatarPack.Pack {
+        access(all) withdraw(withdrawID: UInt64): @FlovatarPack.Pack {
             let token <- self.ownedPacks.remove(key: withdrawID) ?? panic("Missing Pack")
 
             emit Withdraw(id: token.id, from: self.owner?.address)
@@ -183,7 +183,7 @@ pub contract FlovatarPack {
         // This function allows any Pack owner to open the pack and receive its content
         // into the owner's Component Collection.
         // The pack is destroyed after the Components are delivered.
-        pub fun openPack(id: UInt64) {
+        access(all) openPack(id: UInt64) {
 
             // Gets the Component Collection Public capability to be able to
             // send there the Components contained in the Pack
@@ -233,7 +233,7 @@ pub contract FlovatarPack {
         // This will guarantee that the contract owner will be able to decide which user can buy a pack, by
         // providing them the correct signature.
         //
-        pub fun purchase(tokenId: UInt64, recipientCap: Capability<&{FlovatarPack.CollectionPublic}>, buyTokens: @FungibleToken.Vault, signature: String) {
+        access(all) purchase(tokenId: UInt64, recipientCap: Capability<&{FlovatarPack.CollectionPublic}>, buyTokens: @FungibleToken.Vault, signature: String) {
 
             // Checks that the pack is still available and that the FLOW tokens are sufficient
             pre {
@@ -267,7 +267,7 @@ pub contract FlovatarPack {
 
             // Verifies that the signature is valid and that it was generated from the
             // owner of the collection
-            if(!keyList.verify(signatureSet: signatureSet, signedData: self.getRandomString(id: tokenId).utf8)){
+            if(!keyList.verify(signatureSet: signatureSet, signedData: self.getRandomString(id: tokenId).utf8,  domainSeparationTag: "FLOW-V0.0-user")){
                 panic("Unable to validate the signature for the pack!")
             }
 
@@ -296,7 +296,7 @@ pub contract FlovatarPack {
 
         }
         //
-        pub fun purchaseDapper(tokenId: UInt64, recipientCap: Capability<&{FlovatarPack.CollectionPublic}>, buyTokens: @FungibleToken.Vault, signature: String, expectedPrice: UFix64) {
+        access(all) purchaseDapper(tokenId: UInt64, recipientCap: Capability<&{FlovatarPack.CollectionPublic}>, buyTokens: @FungibleToken.Vault, signature: String, expectedPrice: UFix64) {
 
             // Checks that the pack is still available and that the FLOW tokens are sufficient
             pre {
@@ -331,7 +331,7 @@ pub contract FlovatarPack {
 
             // Verifies that the signature is valid and that it was generated from the
             // owner of the collection
-            if(!keyList.verify(signatureSet: signatureSet, signedData: self.getRandomString(id: tokenId).utf8)){
+            if(!keyList.verify(signatureSet: signatureSet, signedData: self.getRandomString(id: tokenId).utf8,  domainSeparationTag: "FLOW-V0.0-user")){
                 panic("Unable to validate the signature for the pack!")
             }
 
@@ -368,12 +368,12 @@ pub contract FlovatarPack {
 
 
     // public function that anyone can call to create a new empty collection
-    pub fun createEmptyCollection(ownerVault: Capability<&{FungibleToken.Receiver}>): @FlovatarPack.Collection {
+    access(all) createEmptyCollection(ownerVault: Capability<&{FungibleToken.Receiver}>): @FlovatarPack.Collection {
         return <- create Collection(ownerVault: ownerVault)
     }
 
     // Get all the packs from a specific account
-    pub fun getPacks(address: Address) : [UInt64]? {
+    access(all) getPacks(address: Address) : [UInt64]? {
 
         let account = getAccount(address)
 
@@ -423,7 +423,7 @@ pub contract FlovatarPack {
         // Initialize the total supply
         self.totalSupply = 0
 
-        self.account.save<@FlovatarPack.Collection>(<- FlovatarPack.createEmptyCollection(ownerVault: wallet), to: FlovatarPack.CollectionStoragePath)
+        self.account.storage.save<@FlovatarPack.Collection>(<- FlovatarPack.createEmptyCollection(ownerVault: wallet), to: FlovatarPack.CollectionStoragePath)
         self.account.link<&{FlovatarPack.CollectionPublic}>(FlovatarPack.CollectionPublicPath, target: FlovatarPack.CollectionStoragePath)
 
         emit ContractInitialized()

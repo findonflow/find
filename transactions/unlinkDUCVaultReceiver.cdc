@@ -1,8 +1,8 @@
-import TokenForwarding from "../contracts/standard/TokenForwarding.cdc"
+import "TokenForwarding"
 
 
 transaction() {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 		account.unlink(/public/dapperUtilityCoinReceiver)
 	}
 }

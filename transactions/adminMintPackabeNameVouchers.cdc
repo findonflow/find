@@ -1,6 +1,6 @@
-import Admin from "../contracts/Admin.cdc"
-import NameVoucher from "../contracts/NameVoucher.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
+import "Admin"
+import "NameVoucher"
+import "NonFungibleToken"
 
 transaction(amount: Int, minCharLength: UInt64) {
 

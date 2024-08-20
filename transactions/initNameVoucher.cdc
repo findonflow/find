@@ -1,43 +1,12 @@
-import NameVoucher from "../contracts/NameVoucher.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "NameVoucher"
 
 transaction() {
-	prepare(account: AuthAccount) {
-
-		let nameVoucherRef= account.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
-		if nameVoucherRef == nil {
-			account.save<@NonFungibleToken.Collection>(<- NameVoucher.createEmptyCollection(), to: NameVoucher.CollectionStoragePath)
-			account.unlink(NameVoucher.CollectionPublicPath)
-			account.link<&NameVoucher.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
-				NameVoucher.CollectionPublicPath,
-				target: NameVoucher.CollectionStoragePath
-			)
-			account.unlink(NameVoucher.CollectionPrivatePath)
-			account.link<&NameVoucher.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
-				NameVoucher.CollectionPrivatePath,
-				target: NameVoucher.CollectionStoragePath
-			)
-			return
-		}
-
-		let nameVoucherCap= account.getCapability<&NameVoucher.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(NameVoucher.CollectionPublicPath)
-		if !nameVoucherCap.check() {
-			account.unlink(NameVoucher.CollectionPublicPath)
-			account.link<&NameVoucher.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
-				NameVoucher.CollectionPublicPath,
-				target: NameVoucher.CollectionStoragePath
-			)
-		}
-
-		let nameVoucherProviderCap= account.getCapability<&NameVoucher.Collection{NonFungibleToken.Provider,NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(NameVoucher.CollectionPrivatePath)
-		if !nameVoucherProviderCap.check() {
-			account.unlink(NameVoucher.CollectionPrivatePath)
-			account.link<&NameVoucher.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(
-				NameVoucher.CollectionPrivatePath,
-				target: NameVoucher.CollectionStoragePath
-			)
-		}
-
-	}
+    prepare(account: auth (StorageCapabilities, SaveValue, PublishCapability, BorrowValue) &Account) {
+        let col= account.storage.borrow<&NameVoucher.Collection>(from: NameVoucher.CollectionStoragePath)
+        if col == nil {
+            account.storage.save( <- NameVoucher.createEmptyCollection(nftType:Type<@NameVoucher.NFT>()), to: NameVoucher.CollectionStoragePath)
+            let cap = account.capabilities.storage.issue<&NameVoucher.Collection>(NameVoucher.CollectionStoragePath)
+            account.capabilities.publish(cap, at: NameVoucher.CollectionPublicPath)
+        }
+    }
 }

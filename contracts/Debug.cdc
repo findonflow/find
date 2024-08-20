@@ -1,10 +1,9 @@
-pub contract Debug {
+access(all) contract Debug {
 
-	pub event Log(msg: String)
-	
+	access(all) event Log(msg: String)
 	access(account) var enabled :Bool
 
-	pub fun log(_ msg: String) {
+	access(all) fun log(_ msg: String) {
 		if self.enabled {
 			emit Log(msg: msg)
 		}
@@ -17,6 +16,4 @@ pub contract Debug {
 	init() {
 		self.enabled=false
 	}
-
-
 }

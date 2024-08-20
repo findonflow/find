@@ -1,9 +1,9 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FiatToken from "../contracts/standard/FiatToken.cdc"
+import "FungibleToken"
+import "FiatToken"
 
 transaction() {
 
-    prepare(signer: AuthAccount) {
+    prepare(signer: auth(BorrowValue) &Account) {
 
         // Return early if the account already stores a FiatToken Vault
         if signer.borrow<&FiatToken.Vault>(from: FiatToken.VaultStoragePath) != nil {

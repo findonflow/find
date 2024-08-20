@@ -1,12 +1,12 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FindMarketAdmin from "../contracts/FindMarketAdmin.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
-import FUSD from "../contracts/standard/FUSD.cdc"
-import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
+import "FindMarket"
+import "FindMarketAdmin"
+import "FlowUtilityToken"
+import "FUSD"
+import "ExampleNFT"
 
 transaction(tenant: Address) {
-    prepare(account: AuthAccount){
-        let adminRef = account.borrow<&FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
+    prepare(account: auth(BorrowValue) &Account){
+        let adminRef = account.storage.borrow<auth(FindMarketAdmin.Owner) &FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
         let flowExample = FindMarket.TenantSaleItem(name:"FlowExampleNFT", cut: nil, rules:[
             FindMarket.TenantRule(name:"Fut", types:[Type<@FlowUtilityToken.Vault>()], ruleType: "ft", allow: true),

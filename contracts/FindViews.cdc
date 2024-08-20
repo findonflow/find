@@ -1,67 +1,64 @@
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "NonFungibleToken"
+import "FungibleToken"
+import "MetadataViews"
+import "ViewResolver"
 
-pub contract FindViews {
+access(all) contract FindViews {
 
-	pub struct OnChainFile : MetadataViews.File{
-		pub let content: String
-		pub let mediaType: String
-		pub let protocol: String
+    access(all) struct OnChainFile : MetadataViews.File{
+        access(all) let content: String
+        access(all) let mediaType: String
+        access(all) let protocol: String
 
-		init(content:String, mediaType: String) {
-			self.content=content
-			self.protocol="onChain"
-			self.mediaType=mediaType
-		}
+        init(content:String, mediaType: String) {
+            self.content=content
+            self.protocol="onChain"
+            self.mediaType=mediaType
+        }
 
-		pub fun uri(): String {
-			return "data:".concat(self.mediaType).concat(",").concat(self.content)
-		}
-	}
-
-	pub struct SharedMedia : MetadataViews.File {
-		pub let mediaType: String
-		pub let pointer: ViewReadPointer
-		pub let protocol: String
-
-		init(pointer: ViewReadPointer, mediaType: String) {
-			self.pointer=pointer
-			self.mediaType=mediaType
-			self.protocol="shared"
-
-			if pointer.resolveView(Type<OnChainFile>()) == nil {
-				panic("Cannot create shared media if the pointer does not contain StringMedia")
-			}
-		}
-
-		pub fun uri(): String {
-			let media = self.pointer.resolveView(Type<OnChainFile>())
-			if media == nil {
-				return ""
-			}
-			return (media as! OnChainFile).uri()
-		}
-	}
-
-	pub resource interface VaultViews {
-        pub var balance: UFix64
-
-        pub fun getViews() : [Type]
-        pub fun resolveView(_ view: Type): AnyStruct?
+        access(all) view fun uri(): String {
+            return "data:".concat(self.mediaType).concat(",").concat(self.content)
+        }
     }
 
-    pub struct FTVaultData {
-        pub let tokenAlias: String
-        pub let storagePath: StoragePath
-        pub let receiverPath: PublicPath
-        pub let balancePath: PublicPath
-        pub let providerPath: PrivatePath
-        pub let vaultType: Type
-        pub let receiverType: Type
-        pub let balanceType: Type
-        pub let providerType: Type
-        pub let createEmptyVault: ((): @FungibleToken.Vault)
+    access(all) struct SharedMedia : MetadataViews.File {
+        access(all) let mediaType: String
+        access(all) let pointer: ViewReadPointer
+        access(all) let protocol: String
+
+        init(pointer: ViewReadPointer, mediaType: String) {
+            self.pointer=pointer
+            self.mediaType=mediaType
+            self.protocol="shared"
+
+            if pointer.resolveView(Type<OnChainFile>()) == nil {
+                panic("Cannot create shared media if the pointer does not contain StringMedia")
+            }
+        }
+
+        // todo: this is not working so we have a workaround in the contract
+        access(all) view fun uri(): String {
+            return "data:".concat(self.mediaType).concat(",").concat(self.protocol)
+        }
+    }
+
+    access(all) resource interface VaultViews {
+        access(all) var balance: UFix64
+        access(all) view fun getViews() : [Type]
+        access(all) fun resolveView(_ view: Type): AnyStruct?
+    }
+
+    access(all) struct FTVaultData {
+        access(all) let tokenAlias: String
+        access(all) let storagePath: StoragePath
+        access(all) let receiverPath: PublicPath
+        access(all) let balancePath: PublicPath
+        access(all) let providerPath: PrivatePath
+        access(all) let vaultType: Type
+        access(all) let receiverType: Type
+        access(all) let balanceType: Type
+        access(all) let providerType: Type
+        access(all) let createEmptyVault: (fun(): @{FungibleToken.Vault})
 
         init(
             tokenAlias: String,
@@ -73,11 +70,11 @@ pub contract FindViews {
             receiverType: Type,
             balanceType: Type,
             providerType: Type,
-            createEmptyVault: ((): @FungibleToken.Vault)
+            createEmptyVault: (fun(): @{FungibleToken.Vault})
         ) {
             pre {
                 receiverType.isSubtype(of: Type<&{FungibleToken.Receiver}>()): "Receiver type must include FungibleToken.Receiver interfaces."
-                balanceType.isSubtype(of: Type<&{FungibleToken.Balance}>()): "Balance type must include FungibleToken.Balance interfaces."
+                balanceType.isSubtype(of: Type<&{FungibleToken.Vault}>()): "Balance type must include FungibleToken.Vault interfaces."
                 providerType.isSubtype(of: Type<&{FungibleToken.Provider}>()): "Provider type must include FungibleToken.Provider interface."
             }
             self.tokenAlias=tokenAlias
@@ -93,300 +90,307 @@ pub contract FindViews {
         }
     }
 
-	// This is an example taken from Versus
-	pub struct CreativeWork {
-		pub let artist: String
-		pub let name: String
-		pub let description: String
-		pub let type: String
+    // This is an example taken from Versus
+    access(all) struct CreativeWork {
+        access(all) let artist: String
+        access(all) let name: String
+        access(all) let description: String
+        access(all) let type: String
 
-		init(artist: String, name: String, description: String, type: String) {
-			self.artist=artist
-			self.name=name
-			self.description=description
-			self.type=type
-		}
-	}
+        init(artist: String, name: String, description: String, type: String) {
+            self.artist=artist
+            self.name=name
+            self.description=description
+            self.type=type
+        }
+    }
 
+    /// A basic pointer that can resolve data and get owner/id/uuid and gype
+    access(all) struct interface Pointer {
+        access(all) let id: UInt64
+        access(all) fun resolveView(_ type: Type) : AnyStruct?
+        access(all) fun getUUID() :UInt64
+        access(all) fun getViews() : [Type]
+        access(all) fun owner() : Address
+        access(all) fun valid() : Bool
+        access(all) fun getItemType() : Type
+        access(all) fun getViewResolver() : &{ViewResolver.Resolver}
 
-	/// A basic pointer that can resolve data and get owner/id/uuid and gype
-	pub struct interface Pointer {
-		pub let id: UInt64
-		pub fun resolveView(_ type: Type) : AnyStruct?
-		pub fun getUUID() :UInt64
-		pub fun getViews() : [Type]
-		pub fun owner() : Address
-		pub fun valid() : Bool
-		pub fun getItemType() : Type
-		pub fun getViewResolver() : &AnyResource{MetadataViews.Resolver}
+        //There are just convenience functions for shared views in the standard
+        access(all) fun getRoyalty() : MetadataViews.Royalties
+        access(all) fun getTotalRoyaltiesCut() : UFix64
 
-		//There are just convenience functions for shared views in the standard
-		pub fun getRoyalty() : MetadataViews.Royalties
-		pub fun getTotalRoyaltiesCut() : UFix64
+        //Requred views
+        access(all) fun getDisplay() : MetadataViews.Display
+        access(all) fun getNFTCollectionData() : MetadataViews.NFTCollectionData
 
-		//Requred views
-		pub fun getDisplay() : MetadataViews.Display
-		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData
+        access(all) fun checkSoulBound() : Bool
 
-		pub fun checkSoulBound() : Bool
+    }
 
-	}
+    //An interface to say that this pointer can withdraw
+    access(all) struct interface AuthPointer {
+        access(all) fun withdraw() : @AnyResource
+    }
 
-	//An interface to say that this pointer can withdraw
-	pub struct interface AuthPointer {
-		pub fun withdraw() : @AnyResource
-	}
+    access(all) struct ViewReadPointer : Pointer {
+        access(self) let cap: Capability<&{ViewResolver.ResolverCollection}>
+        access(all) let id: UInt64
+        access(all) let uuid: UInt64
+        access(all) let itemType: Type
 
-	pub struct ViewReadPointer : Pointer {
-		access(self) let cap: Capability<&{MetadataViews.ResolverCollection}>
-		pub let id: UInt64
-		pub let uuid: UInt64
-		pub let itemType: Type
+        init(cap: Capability<&{ViewResolver.ResolverCollection}>, id: UInt64) {
+            self.cap=cap
+            self.id=id
 
-		init(cap: Capability<&{MetadataViews.ResolverCollection}>, id: UInt64) {
-			self.cap=cap
-			self.id=id
+            if !self.cap.check() {
+                panic("The capability is not valid.")
+            }
+            let viewResolver=self.cap.borrow()!.borrowViewResolver(id: self.id)!
+            let display = MetadataViews.getDisplay(viewResolver) ?? panic("MetadataViews Display View is not implemented on this NFT.")
+            let nftCollectionData = MetadataViews.getNFTCollectionData(viewResolver) ?? panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
+            self.uuid=viewResolver.uuid
+            self.itemType=viewResolver.getType()
+        }
 
-			if !self.cap.check() {
-				panic("The capability is not valid.")
-			}
-			let viewResolver=self.cap.borrow()!.borrowViewResolver(id: self.id)
-			let display = MetadataViews.getDisplay(viewResolver) ?? panic("MetadataViews Display View is not implemented on this NFT.")
-			let nftCollectionData = MetadataViews.getNFTCollectionData(viewResolver) ?? panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
-			self.uuid=viewResolver.uuid
-			self.itemType=viewResolver.getType()
-		}
+        access(all) fun resolveView(_ type: Type) : AnyStruct? {
+            return self.getViewResolver().resolveView(type)
+        }
 
-		pub fun resolveView(_ type: Type) : AnyStruct? {
-			return self.getViewResolver().resolveView(type)
-		}
+        access(all) fun getUUID() :UInt64{
+            return self.uuid
+        }
 
-		pub fun getUUID() :UInt64{
-			return self.uuid
-		}
+        access(all) fun getViews() : [Type]{
+            return self.getViewResolver().getViews()
+        }
 
-		pub fun getViews() : [Type]{
-			return self.getViewResolver().getViews()
-		}
+        access(all) fun owner() : Address {
+            return self.cap.address
+        }
 
-		pub fun owner() : Address {
-			return self.cap.address
-		}
+        access(all) fun getTotalRoyaltiesCut() :UFix64 {
+            var total=0.0
+            for royalty in self.getRoyalty().getRoyalties() {
+                total = total + royalty.cut
+            }
+            return total
+        }
 
-		pub fun getTotalRoyaltiesCut() :UFix64 {
-			var total=0.0
-			for royalty in self.getRoyalty().getRoyalties() {
-				total = total + royalty.cut
-			}
-			return total
-		}
+        access(all) fun getRoyalty() : MetadataViews.Royalties {
+            if let v = MetadataViews.getRoyalties(self.getViewResolver()) {
+                return v
+            }
+            return MetadataViews.Royalties([])
+        }
 
-		pub fun getRoyalty() : MetadataViews.Royalties {
-			if let v = MetadataViews.getRoyalties(self.getViewResolver()) {
-				return v
-			}
-			return MetadataViews.Royalties([])
-		}
+        access(all) fun valid() : Bool {
+            if !self.cap.check() || self.cap.borrow()!.borrowViewResolver(id: self.id) == nil {
+                return false
+            }
+            return true
+        }
 
-		pub fun valid() : Bool {
-			if !self.cap.check() || !self.cap.borrow()!.getIDs().contains(self.id) {
-				return false
-			}
-			return true
-		}
+        access(all) fun getItemType() : Type {
+            return self.itemType
+        }
 
-		pub fun getItemType() : Type {
-			return self.itemType
-		}
+        access(all) fun getViewResolver() : &{ViewResolver.Resolver} {
+            let nft=self.cap.borrow()!.borrowViewResolver(id: self.id) ?? panic("The capability of view pointer is not linked.")
+            return nft
 
-		pub fun getViewResolver() : &AnyResource{MetadataViews.Resolver} {
-			return self.cap.borrow()?.borrowViewResolver(id: self.id) ?? panic("The capability of view pointer is not linked.")
-		}
+        }
 
-		pub fun getDisplay() : MetadataViews.Display {
-			if let v = MetadataViews.getDisplay(self.getViewResolver()) {
-				return v
-			}
-			panic("MetadataViews Display View is not implemented on this NFT.")
-		}
+        access(all) fun getDisplay() : MetadataViews.Display {
+            if let v = MetadataViews.getDisplay(self.getViewResolver()) {
+                return v
+            }
+            panic("MetadataViews Display View is not implemented on this NFT.")
+        }
 
-		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData {
-			if let v = MetadataViews.getNFTCollectionData(self.getViewResolver()) {
-				return v
-			}
-			panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
-		}
+        access(all) fun getNFTCollectionData() : MetadataViews.NFTCollectionData {
+            if let v = MetadataViews.getNFTCollectionData(self.getViewResolver()) {
+                return v
+            }
+            panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
+        }
 
-		pub fun checkSoulBound() : Bool {
-			return FindViews.checkSoulBound(self.getViewResolver())
-		}
-	}
-
-
-	pub fun getNounce(_ viewResolver: &{MetadataViews.Resolver}) : UInt64 {
-		if let nounce = viewResolver.resolveView(Type<FindViews.Nounce>()) {
-			if let v = nounce as? FindViews.Nounce {
-				return v.nounce
-			}
-		}
-		return 0
-	}
+        access(all) fun checkSoulBound() : Bool {
+            return FindViews.checkSoulBound(self.getViewResolver())
+        }
+    }
 
 
-	pub struct AuthNFTPointer : Pointer, AuthPointer{
-		access(self) let cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
-		pub let id: UInt64
-		pub let nounce: UInt64
-		pub let uuid: UInt64
-		pub let itemType: Type
+    access(all) fun getNounce(_ viewResolver: &{ViewResolver.Resolver}) : UInt64 {
+        if let nounce = viewResolver.resolveView(Type<FindViews.Nounce>()) {
+            if let v = nounce as? FindViews.Nounce {
+                return v.nounce
+            }
+        }
+        return 0
+    }
 
-		init(cap: Capability<&{MetadataViews.ResolverCollection, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>, id: UInt64) {
-			self.cap=cap
-			self.id=id
+    access(all) struct AuthNFTPointer : Pointer, AuthPointer{
+        access(self) let cap: Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.CollectionPublic, NonFungibleToken.Provider, ViewResolver.ResolverCollection}>
+        access(all) let id: UInt64
+        access(all) let nounce: UInt64
+        access(all) let uuid: UInt64
+        access(all) let itemType: Type
 
-			if !self.cap.check() {
-				panic("The capability is not valid.")
-			}
+        init(cap: Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Collection, NonFungibleToken.Provider, ViewResolver.ResolverCollection}>, id: UInt64) {
+            self.cap=cap
+            self.id=id
 
-			let viewResolver=self.cap.borrow()!.borrowViewResolver(id: self.id)
-			let display = MetadataViews.getDisplay(viewResolver) ?? panic("MetadataViews Display View is not implemented on this NFT.")
-			let nftCollectionData = MetadataViews.getNFTCollectionData(viewResolver) ?? panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
-			self.nounce=FindViews.getNounce(viewResolver)
-			self.uuid=viewResolver.uuid
-			self.itemType=viewResolver.getType()
-		}
+            if !self.cap.check() {
+                panic("The capability is not valid.")
+            }
 
-		pub fun getViewResolver() : &AnyResource{MetadataViews.Resolver} {
-			return self.cap.borrow()?.borrowViewResolver(id: self.id) ?? panic("The capability of view pointer is not linked.")
-		}
+            let collection = self.cap.borrow() ?? panic("could not find collection")
+            let viewResolver=collection.borrowNFT(self.id) ?? panic("could not borrow nft")
+            let display = MetadataViews.getDisplay(viewResolver) ?? panic("MetadataViews Display View is not implemented on this NFT.")
+            let nftCollectionData = MetadataViews.getNFTCollectionData(viewResolver) ?? panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
+            self.nounce=FindViews.getNounce(viewResolver)
+            self.uuid=viewResolver.uuid
+            self.itemType=viewResolver.getType()
+        }
 
-		pub fun resolveView(_ type: Type) : AnyStruct? {
-			return self.getViewResolver().resolveView(type)
-		}
+        access(all) fun getViewResolver() : &{ViewResolver.Resolver} {
+            let cap = self.cap.borrow()!
+            let viewResolver = cap.borrowNFT(self.id) ?? panic("The capability of view pointer is not linked.")
+            return viewResolver 
+        }
 
-		pub fun getUUID() :UInt64{
-			return self.uuid
-		}
+        access(all) fun resolveView(_ type: Type) : AnyStruct? {
+            return self.getViewResolver().resolveView(type)
+        }
 
-		pub fun getViews() : [Type]{
-			return self.getViewResolver().getViews()
-		}
+        access(all) fun getUUID() :UInt64{
+            return self.uuid
+        }
 
-		pub fun valid() : Bool {
-			if !self.cap.check() || !self.cap.borrow()!.getIDs().contains(self.id) {
-				return false
-			}
+        access(all) fun getViews() : [Type]{
+            return self.getViewResolver().getViews()
+        }
 
-			let viewResolver=self.getViewResolver()
+        access(all) fun valid() : Bool {
+            if !self.cap.check() {
+                return false
+            }
 
-			if let nounce = viewResolver.resolveView(Type<FindViews.Nounce>()) {
-				if let v = nounce as? FindViews.Nounce {
-					return v.nounce==self.nounce
-				}
-			}
-			return true
-		}
+            let nft= self.cap.borrow()!.borrowNFT(self.id)
 
-		pub fun getTotalRoyaltiesCut() :UFix64 {
-			var total=0.0
-			for royalty in self.getRoyalty().getRoyalties() {
-				total = total + royalty.cut
-			}
-			return total
-		}
+            if nft ==nil {
+                return false
+            }
 
-		pub fun getRoyalty() : MetadataViews.Royalties {
-			if let v = MetadataViews.getRoyalties(self.getViewResolver()) {
-				return v
-			}
-			return MetadataViews.Royalties([])
-		}
+            if let nounce = nft!.resolveView(Type<FindViews.Nounce>()) {
+                if let v = nounce as? FindViews.Nounce {
+                    return v.nounce==self.nounce
+                }
+            }
+            return true
+        }
 
-		pub fun getDisplay() : MetadataViews.Display {
-			if let v = MetadataViews.getDisplay(self.getViewResolver()) {
-				return v
-			}
-			panic("MetadataViews Display View is not implemented on this NFT.")
-		}
+        access(all) fun getTotalRoyaltiesCut() :UFix64 {
+            var total=0.0
+            for royalty in self.getRoyalty().getRoyalties() {
+                total = total + royalty.cut
+            }
+            return total
+        }
 
-		pub fun getNFTCollectionData() : MetadataViews.NFTCollectionData {
-			if let v = MetadataViews.getNFTCollectionData(self.getViewResolver()) {
-				return v
-			}
-			panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
-		}
+        access(all) fun getRoyalty() : MetadataViews.Royalties {
+            if let v = MetadataViews.getRoyalties(self.getViewResolver()) {
+                return v
+            }
+            return MetadataViews.Royalties([])
+        }
 
-		pub fun withdraw() :@NonFungibleToken.NFT {
-			if !self.cap.check() {
-				panic("The pointer capability is invalid.")
-			}
-			return <- self.cap.borrow()!.withdraw(withdrawID: self.id)
-		}
+        access(all) fun getDisplay() : MetadataViews.Display {
+            if let v = MetadataViews.getDisplay(self.getViewResolver()) {
+                return v
+            }
+            panic("MetadataViews Display View is not implemented on this NFT.")
+        }
 
-		pub fun deposit(_ nft: @NonFungibleToken.NFT){
+        access(all) fun getNFTCollectionData() : MetadataViews.NFTCollectionData {
+            if let v = MetadataViews.getNFTCollectionData(self.getViewResolver()) {
+                return v
+            }
+            panic("MetadataViews NFTCollectionData View is not implemented on this NFT.")
+        }
+
+        access(all) fun withdraw() :@{NonFungibleToken.NFT} {
+            if !self.cap.check() {
+                panic("The pointer capability is invalid.")
+            }
+            return <- self.cap.borrow()!.withdraw(withdrawID: self.id)
+        }
+
+        access(all) fun deposit(_ nft: @{NonFungibleToken.NFT}){
             if !self.cap.check(){
                 panic("The pointer capablity is invalid.")
             }
-			self.cap.borrow()!.deposit(token: <- nft)
-		}
+            self.cap.borrow()!.deposit(token: <- nft)
+        }
 
-		pub fun owner() : Address {
-			return self.cap.address
-		}
+        access(all) fun owner() : Address {
+            return self.cap.address
+        }
 
-		pub fun getItemType() : Type {
-			return self.itemType
-		}
+        access(all) fun getItemType() : Type {
+            return self.itemType
+        }
 
-		pub fun checkSoulBound() : Bool {
-			return FindViews.checkSoulBound(self.getViewResolver())
-		}
-	}
+        access(all) fun checkSoulBound() : Bool {
+            return FindViews.checkSoulBound(self.getViewResolver())
+        }
+    }
 
-	pub fun createViewReadPointer(address:Address, path:PublicPath, id:UInt64) : ViewReadPointer {
-		let cap=	getAccount(address).getCapability<&{MetadataViews.ResolverCollection}>(path)
-		let pointer= FindViews.ViewReadPointer(cap: cap, id: id)
-		return pointer
-	}
+    access(all) fun createViewReadPointer(address:Address, path:PublicPath, id:UInt64) : ViewReadPointer {
+        let cap=	getAccount(address).capabilities.get<&{ViewResolver.ResolverCollection}>(path)
+        let pointer= FindViews.ViewReadPointer(cap: cap, id: id)
+        return pointer
+    }
 
-	pub struct Nounce {
-		pub let nounce: UInt64
+    access(all) struct Nounce {
+        access(all) let nounce: UInt64
 
-		init(_ nounce: UInt64) {
-			self.nounce=nounce
-		}
-	}
+        init(_ nounce: UInt64) {
+            self.nounce=nounce
+        }
+    }
 
-	pub struct SoulBound {
+    access(all) struct SoulBound {
 
-		pub let message: String
+        access(all) let message: String
 
-		init(_ message:String) {
-			self.message=message
+        init(_ message:String) {
+            self.message=message
 
-		}
-	}
+        }
+    }
 
-	pub fun checkSoulBound(_ viewResolver: &{MetadataViews.Resolver}) : Bool {
-		if let soulBound = viewResolver.resolveView(Type<FindViews.SoulBound>()) {
-			if let v = soulBound as? FindViews.SoulBound {
-				return true
-			}
-		}
-		return false
-	}
+    access(all) fun checkSoulBound(_ viewResolver: &{ViewResolver.Resolver}) : Bool {
+        if let soulBound = viewResolver.resolveView(Type<FindViews.SoulBound>()) {
+            if let v = soulBound as? FindViews.SoulBound {
+                return true
+            }
+        }
+        return false
+    }
 
-	pub fun getDapperAddress(): Address {
-		switch FindViews.account.address.toString() {
-			case "0x097bafa4e0b48eef":
-			//mainnet
-				return 0xead892083b3e2c6c
-			case  "0x35717efbbce11c74":
-				//testnet
-				return 0x82ec283f88a62e65
-			default:
-				//emulator
-				return 0x01cf0e2f2f715450
-		}
-	}
+    access(all) fun getDapperAddress(): Address {
+        switch FindViews.account.address.toString() {
+        case "0x097bafa4e0b48eef":
+            //mainnet
+            return 0xead892083b3e2c6c
+        case  "0x35717efbbce11c74":
+            //testnet
+            return 0x82ec283f88a62e65
+        default:
+            //emulator
+            return 0x01cf0e2f2f715450
+        }
+    }
 }

@@ -1,17 +1,17 @@
-import FIND from "../contracts/FIND.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import ExampleNFT from "../contracts/standard/ExampleNFT.cdc"
+import "FIND"
+import "NonFungibleToken"
+import "ExampleNFT"
 
 transaction() {
-	prepare(account: AuthAccount) {
-		let dandyCap= account.getCapability<&{NonFungibleToken.CollectionPublic}>(ExampleNFT.CollectionPublicPath)
+	prepare(account: auth(BorrowValue) &Account) {
+		let dandyCap= account.getCapability<&{NonFungibleToken.Collection}>(ExampleNFT.CollectionPublicPath)
 		if !dandyCap.check() {
-			account.save<@NonFungibleToken.Collection>(<- ExampleNFT.createEmptyCollection(), to: ExampleNFT.CollectionStoragePath)
-			account.link<&ExampleNFT.Collection{NonFungibleToken.CollectionPublic, ExampleNFT.ExampleNFTCollectionPublic}>(
+			account.storage.save<@NonFungibleToken.Collection>(<- ExampleNFT.createEmptyCollection(), to: ExampleNFT.CollectionStoragePath)
+			account.link<&ExampleNFT.Collection{NonFungibleToken.Collection, ExampleNFT.ExampleNFTCollectionPublic}>(
 				ExampleNFT.CollectionPublicPath,
 				target: ExampleNFT.CollectionStoragePath
 			)
-			account.link<&ExampleNFT.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, ExampleNFT.ExampleNFTCollectionPublic}>(
+			account.link<&ExampleNFT.Collection{NonFungibleToken.Provider, NonFungibleToken.Collection, ExampleNFT.ExampleNFTCollectionPublic}>(
 				ExampleNFT.CollectionPrivatePath,
 				target: ExampleNFT.CollectionStoragePath
 			)

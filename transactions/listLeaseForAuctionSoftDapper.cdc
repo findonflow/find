@@ -1,51 +1,62 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import FTRegistry from "../contracts/FTRegistry.cdc"
-import FIND from "../contracts/FIND.cdc"
-import FindLeaseMarketAuctionSoft from "../contracts/FindLeaseMarketAuctionSoft.cdc"
-import FindLeaseMarket from "../contracts/FindLeaseMarket.cdc"
+import "FindMarket"
+import "FTRegistry"
+import "FIND"
+import "FindLeaseMarketAuctionSoft"
+import "FindLeaseMarket"
 
 transaction(leaseName: String, ftAliasOrIdentifier: String, price:UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64, minimumBidIncrement: UFix64, auctionValidUntil: UFix64?) {
 
-	let saleItems : &FindLeaseMarketAuctionSoft.SaleItemCollection?
-	let pointer : FindLeaseMarket.AuthLeasePointer
-	let vaultType : Type
+    let saleItems : auth(FindLeaseMarketAuctionSoft.Seller) &FindLeaseMarketAuctionSoft.SaleItemCollection?
+    let pointer : FindLeaseMarket.AuthLeasePointer
+    let vaultType : Type
 
-	prepare(account: AuthAccount) {
+    prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, Storage, IssueStorageCapabilityController) &Account) {
 
-		// Get supported NFT and FT Information from Registries from input alias
-		let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
+        // Get supported NFT and FT Information from Registries from input alias
+        let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
 
-		let leaseMarketplace = FindMarket.getFindTenantAddress()
-		let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
-		let leaseTenant = leaseTenantCapability.borrow()!
+        let leaseMarketplace = FindMarket.getFindTenantAddress()
+        let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!
+        let leaseTenant = leaseTenantCapability.borrow()!
 
-		let leaseASSaleItemType= Type<@FindLeaseMarketAuctionSoft.SaleItemCollection>()
-		let leaseASPublicPath=leaseTenant.getPublicPath(leaseASSaleItemType)
-		let leaseASStoragePath= leaseTenant.getStoragePath(leaseASSaleItemType)
-		let leaseASSaleItemCap= account.getCapability<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseASPublicPath)
-		if !leaseASSaleItemCap.check() {
-			//The link here has to be a capability not a tenant, because it can change.
-			account.save<@FindLeaseMarketAuctionSoft.SaleItemCollection>(<- FindLeaseMarketAuctionSoft.createEmptySaleItemCollection(leaseTenantCapability), to: leaseASStoragePath)
-			account.link<&FindLeaseMarketAuctionSoft.SaleItemCollection{FindLeaseMarketAuctionSoft.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}>(leaseASPublicPath, target: leaseASStoragePath)
-		}
+        let leaseASSaleItemType= Type<@FindLeaseMarketAuctionSoft.SaleItemCollection>()
+        let leaseASPublicPath=leaseTenant.getPublicPath(leaseASSaleItemType)
+        let leaseASStoragePath= leaseTenant.getStoragePath(leaseASSaleItemType)
+        let leaseASSaleItemCap= account.capabilities.get<&FindLeaseMarketAuctionSoft.SaleItemCollection>(leaseASPublicPath)
+        if !leaseASSaleItemCap.check() {
+            //The link here has to be a capability not a tenant, because it can change.
+            account.storage.save<@FindLeaseMarketAuctionSoft.SaleItemCollection>(<- FindLeaseMarketAuctionSoft.createEmptySaleItemCollection(leaseTenantCapability), to: leaseASStoragePath)
+            let saleColCap = account.capabilities.storage.issue<&FindLeaseMarketAuctionSoft.SaleItemCollection>(leaseASStoragePath)
+            account.capabilities.publish(saleColCap, at: leaseASPublicPath)
+        }
 
-		self.saleItems= account.borrow<&FindLeaseMarketAuctionSoft.SaleItemCollection>(from: leaseASStoragePath)
-		let ref= account.borrow<&FIND.LeaseCollection>(from: FIND.LeaseStoragePath)!
-		self.pointer= FindLeaseMarket.AuthLeasePointer(ref: ref, name: leaseName)
-		self.vaultType= ft.type
-	}
+        self.saleItems= account.storage.borrow<auth(FindLeaseMarketAuctionSoft.Seller) &FindLeaseMarketAuctionSoft.SaleItemCollection>(from: leaseASStoragePath)
 
-	pre{
-		// Ben : panic on some unreasonable inputs in trxn
-		minimumBidIncrement > 0.0 :"Minimum bid increment should be larger than 0."
-		(auctionReservePrice - auctionReservePrice) % minimumBidIncrement == 0.0 : "Acution ReservePrice should be in step of minimum bid increment."
-		auctionDuration > 0.0 : "Auction Duration should be greater than 0."
-		auctionExtensionOnLateBid > 0.0 : "Auction Duration should be greater than 0."
-		self.saleItems != nil : "Cannot borrow reference to saleItem"
-	}
+        let storagePathIdentifer = FIND.LeaseStoragePath.toString().split(separator:"/")[1]
+        let providerIdentifier = storagePathIdentifer.concat("Provider")
+        let providerStoragePath = StoragePath(identifier: providerIdentifier)!
 
-	execute{
-		self.saleItems!.listForAuction(pointer: self.pointer, vaultType: self.vaultType, auctionStartPrice: price, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration, auctionExtensionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement: minimumBidIncrement, auctionValidUntil: auctionValidUntil, saleItemExtraField: {})
+        var existingProvider= account.storage.copy<Capability<auth(FIND.LeaseOwner) &FIND.LeaseCollection>>(from: providerStoragePath) 
+        if existingProvider==nil {
+            existingProvider=account.capabilities.storage.issue<auth(FIND.LeaseOwner) &FIND.LeaseCollection>(FIND.LeaseStoragePath) 
+            account.storage.save(existingProvider!, to: providerStoragePath)
+        }
+        var cap = existingProvider!
+        self.pointer= FindLeaseMarket.AuthLeasePointer(cap: cap, name: leaseName)
+        self.vaultType= ft.type
+    }
 
-	}
+    pre{
+        // Ben : panic on some unreasonable inputs in trxn
+        minimumBidIncrement > 0.0 :"Minimum bid increment should be larger than 0."
+        (auctionReservePrice - auctionReservePrice) % minimumBidIncrement == 0.0 : "Acution ReservePrice should be in step of minimum bid increment."
+        auctionDuration > 0.0 : "Auction Duration should be greater than 0."
+        auctionExtensionOnLateBid > 0.0 : "Auction Duration should be greater than 0."
+        self.saleItems != nil : "Cannot borrow reference to saleItem"
+    }
+
+    execute{
+        self.saleItems!.listForAuction(pointer: self.pointer, vaultType: self.vaultType, auctionStartPrice: price, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration, auctionExtensionOnLateBid: auctionExtensionOnLateBid, minimumBidIncrement: minimumBidIncrement, auctionValidUntil: auctionValidUntil, saleItemExtraField: {})
+
+    }
 }

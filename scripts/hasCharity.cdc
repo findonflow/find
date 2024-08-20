@@ -1,6 +1,6 @@
-import CharityNFT from "../contracts/CharityNFT.cdc"
+import "CharityNFT"
 
-pub fun main(user: Address) : Bool {
+access(all) fun main(user: Address) : Bool {
 	let account=getAccount(user)
 	if account.balance == 0.0 {
 		return false

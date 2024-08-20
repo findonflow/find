@@ -1,16 +1,16 @@
-import FindViews from "../contracts/FindViews.cdc"
-import FIND from "../contracts/FIND.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import FindUserStatus from "../contracts/FindUserStatus.cdc"
+import "FindViews"
+import "FIND"
+import "MetadataViews"
+import "FINDNFTCatalog"
+import "FindUserStatus"
 
-pub struct NFTDetailReport {
-	pub let storefront: FindUserStatus.StorefrontListing?
-	pub let storefrontV2: FindUserStatus.StorefrontListing?
-	pub let flowty: FindUserStatus.FlowtyListing?
-	pub let flowtyRental: FindUserStatus.FlowtyRental?
-	pub let flovatar: FindUserStatus.FlovatarListing?
-	pub let flovatarComponent: FindUserStatus.FlovatarComponentListing?
+access(all) struct NFTDetailReport {
+	access(all) let storefront: FindUserStatus.StorefrontListing?
+	access(all) let storefrontV2: FindUserStatus.StorefrontListing?
+	access(all) let flowty: FindUserStatus.FlowtyListing?
+	access(all) let flowtyRental: FindUserStatus.FlowtyRental?
+	access(all) let flovatar: FindUserStatus.FlovatarListing?
+	access(all) let flovatarComponent: FindUserStatus.FlovatarComponentListing?
 
 	init(
 		 storefront: FindUserStatus.StorefrontListing?,
@@ -29,7 +29,7 @@ pub struct NFTDetailReport {
 	}
 }
 
-pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDetailReport?{
+access(all) fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDetailReport?{
 	let resolveAddress = FIND.resolve(user)
 	if resolveAddress == nil {
 		return nil
@@ -42,8 +42,8 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 
 		let storagePath = getStoragePath(project)
 		let publicPath = PublicPath(identifier: "find_temp_path")!
-		account.link<&{MetadataViews.ResolverCollection}>(publicPath, target: storagePath)
-		let cap = account.getCapability<&{MetadataViews.ResolverCollection}>(publicPath)
+		account.link<&{ViewResolver.ResolverCollection}>(publicPath, target: storagePath)
+		let cap = account.getCapability<&{ViewResolver.ResolverCollection}>(publicPath)
 		if !cap.check() {
 			panic("The user does not set up collection correctly.")
 		}
@@ -70,7 +70,7 @@ pub fun main(user: String, project:String, id: UInt64, views: [String]) : NFTDet
 
 }
 
-pub fun getStoragePath(_ nftIdentifier: String) : StoragePath {
+access(all) getStoragePath(_ nftIdentifier: String) : StoragePath {
 	if let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftIdentifier)?.keys {
 		let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!
 		return collection.collectionData.storagePath

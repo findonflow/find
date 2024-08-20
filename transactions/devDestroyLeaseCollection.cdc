@@ -1,8 +1,8 @@
-import FIND from "../contracts/FIND.cdc"
+import "FIND"
 
 
 transaction() {
-	prepare(account: AuthAccount) {
+	prepare(account: auth(BorrowValue) &Account) {
 		destroy account.load<@FIND.LeaseCollection>(from: FIND.LeaseStoragePath)
 	}
 }

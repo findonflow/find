@@ -1,15 +1,15 @@
-import FindMarket from "../contracts/FindMarket.cdc"
-import DapperUtilityCoin from "../contracts/standard/DapperUtilityCoin.cdc"
-import FlowUtilityToken from "../contracts/standard/FlowUtilityToken.cdc"
-import FindMarketSale from "../contracts/FindMarketSale.cdc"
-import FindMarketAuctionSoft from "../contracts/FindMarketAuctionSoft.cdc"
-import FindMarketDirectOfferSoft from "../contracts/FindMarketDirectOfferSoft.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import FungibleTokenSwitchboard from "../contracts/standard/FungibleTokenSwitchboard.cdc"
+import "FindMarket"
+import "DapperUtilityCoin"
+import "FlowUtilityToken"
+import "FindMarketSale"
+import "FindMarketAuctionSoft"
+import "FindMarketDirectOfferSoft"
+import "MetadataViews"
+import "FungibleToken"
+import "FungibleTokenSwitchboard"
 
 transaction(nftName: String, nftTypes: [String], cut: UFix64){
-    prepare(account: AuthAccount){
+    prepare(account: auth(BorrowValue) &Account){
 
 		let defaultRules : [FindMarket.TenantRule] = [
 			FindMarket.TenantRule(
@@ -50,7 +50,7 @@ transaction(nftName: String, nftTypes: [String], cut: UFix64){
 		var royalty : MetadataViews.Royalty? = nil
 		if cut != 0.0 {
 			royalty = MetadataViews.Royalty(
-				receiver: account.getCapability<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath),
+				receiver: account.capabilities.get<&{FungibleToken.Receiver}>(FungibleTokenSwitchboard.ReceiverPublicPath)!,
 				cut: cut,
 				description: "tenant"
 			)
@@ -63,7 +63,7 @@ transaction(nftName: String, nftTypes: [String], cut: UFix64){
 			status: "active"
 		)
 
-        let clientRef = account.borrow<&FindMarket.TenantClient>(from: FindMarket.TenantClientStoragePath) ?? panic("Cannot borrow Tenant Client Reference.")
+        let clientRef = account.storage.borrow<auth(FindMarket.TenantClientOwner) &FindMarket.TenantClient>(from: FindMarket.TenantClientStoragePath) ?? panic("Cannot borrow Tenant Client Reference.")
         clientRef.setMarketOption(saleItem: saleItem)
     }
 }

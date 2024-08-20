@@ -1,11 +1,10 @@
-import Dandy from "../contracts/Dandy.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-
+import "Dandy"
+import "NonFungibleToken"
+import "MetadataViews"
+import "ViewResolver"
 
 transaction() {
-	prepare(account: AuthAccount) {
-		account.unlink(Dandy.CollectionPrivatePath)
-		account.link<&{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(Dandy.CollectionPrivatePath, target: Dandy.CollectionStoragePath)
+	prepare(account: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue, UnpublishCapability) &Account) {
+		account.capabilities.unpublish(Dandy.CollectionPublicPath)
 	}
 }

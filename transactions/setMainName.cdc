@@ -1,20 +1,22 @@
-import Profile from "../contracts/Profile.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "Profile"
+import "FIND"
 
 
 transaction(name: String) {
 
-	let leaseCollectionOwner : Capability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>
+	let leaseCollectionOwner : Capability<&FIND.LeaseCollection>
 	let profile : &Profile.User
 
-	prepare(acct: AuthAccount) {
-		self.leaseCollectionOwner = acct.getCapability<&FIND.LeaseCollection{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)
-		self.profile =acct.borrow<&Profile.User>(from:Profile.storagePath)!
+	prepare(acct: auth(BorrowValue) &Account) {
+		self.leaseCollectionOwner = acct.capabilities.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)!
+		if (self.leaseCollectionOwner.borrow()!.getLease(name) == nil) {
+			panic("You do not own this lease so you cannot set it as main name")
+		}
+		self.profile =acct.storage.borrow<&Profile.User>(from:Profile.storagePath)!
 	}
 
 	pre{
 		self.leaseCollectionOwner.check() : "Not a find user"
-		self.leaseCollectionOwner.borrow()!.getLease(name) != nil : "You do not own this lease so you cannot set it as main name"
 	}
 
 	execute{

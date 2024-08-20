@@ -11,14 +11,14 @@ import SwapConfig from 0xddb929038d45d4b3
 import SwapError from 0xddb929038d45d4b3
 import SwapInterfaces from 0xddb929038d45d4b3
 
-pub contract SwapRouter {
+access(all) contract SwapRouter {
     /// Perform a chained swap calculation starting with exact amountIn
     ///
     /// @Param  - amountIn:     e.g. 50.0
     /// @Param  - tokenKeyPath: e.g. [A.f8d6e0586b0a20c7.FUSD, A.f8d6e0586b0a20c7.FlowToken, A.f8d6e0586b0a20c7.USDC]
     /// @Return - [UFix64]:     e.g. [50.0, 10.0, 48.0]
     ///
-    pub fun getAmountsOut(amountIn: UFix64, tokenKeyPath: [String]): [UFix64] {
+    access(all) fun getAmountsOut(amountIn: UFix64, tokenKeyPath: [String]): [UFix64] {
         pre {
             tokenKeyPath.length >= 2: SwapError.ErrorEncode(msg: "SwapRouter: Invalid path", err: SwapError.ErrorCode.INVALID_PARAMETERS)
         }
@@ -54,7 +54,7 @@ pub contract SwapRouter {
 
     /// Perform a chained swap calculation end with exact amountOut
     ///
-    pub fun getAmountsIn(amountOut: UFix64, tokenKeyPath: [String]): [UFix64] {
+    access(all) fun getAmountsIn(amountOut: UFix64, tokenKeyPath: [String]): [UFix64] {
         pre {
             tokenKeyPath.length >= 2: SwapError.ErrorEncode(msg: "SwapRouter: Invalid path", err: SwapError.ErrorCode.INVALID_PARAMETERS)
         }
@@ -99,7 +99,7 @@ pub contract SwapRouter {
     /// @Param  - deadline:     The timeout block timestamp for the transaction
     /// @Return - Vault:        outVault
     ///
-    pub fun swapExactTokensForTokens(
+    access(all) fun swapExactTokensForTokens(
         exactVaultIn: @FungibleToken.Vault,
         amountOutMin: UFix64,
         tokenKeyPath: [String],
@@ -131,7 +131,7 @@ return <- self.swapWithPath(vaultIn: <-exactVaultIn, tokenKeyPath: tokenKeyPath,
     /// @Param  - deadline:       The timeout block timestamp for the transaction
     /// @Return - [OutVault, RemainingInVault]
     ///
-    pub fun swapTokensForExactTokens(
+    access(all) fun swapTokensForExactTokens(
         vaultInMax: @FungibleToken.Vault,
         exactAmountOut: UFix64,
         tokenKeyPath: [String],
@@ -158,7 +158,7 @@ return <-[<-self.swapWithPath(vaultIn: <-vaultInExact, tokenKeyPath: tokenKeyPat
 
     /// SwapWithPath
     ///
-    pub fun swapWithPath(vaultIn: @FungibleToken.Vault, tokenKeyPath: [String], exactAmounts: [UFix64]?): @FungibleToken.Vault {
+    access(all) fun swapWithPath(vaultIn: @FungibleToken.Vault, tokenKeyPath: [String], exactAmounts: [UFix64]?): @FungibleToken.Vault {
         pre {
             tokenKeyPath.length >= 2: SwapError.ErrorEncode(msg: "Invalid path.", err: SwapError.ErrorCode.INVALID_PARAMETERS)
         }
@@ -194,11 +194,11 @@ return <-[<-self.swapWithPath(vaultIn: <-vaultInExact, tokenKeyPath: tokenKeyPat
         var index = 4
         var curVaultOut <- vaultOut4
         while(index < tokenKeyPath.length-1) {
-            var in <- curVaultOut.withdraw(amount: curVaultOut.balance)
+            var in2 <- curVaultOut.withdraw(amount: curVaultOut.balance)
 
             var exactAmountOut: UFix64? = nil
             if exactAmounts != nil { exactAmountOut = exactAmounts![index+1] }
-            var out <- self.swapWithPair(vaultIn: <- in, exactAmountOut: exactAmountOut, token0Key: tokenKeyPath[index], token1Key:tokenKeyPath[index+1])
+            var out <- self.swapWithPair(vaultIn: <- in2, exactAmountOut: exactAmountOut, token0Key: tokenKeyPath[index], token1Key:tokenKeyPath[index+1])
             curVaultOut <-> out
 
             destroy out
@@ -210,7 +210,7 @@ return <-[<-self.swapWithPath(vaultIn: <-vaultInExact, tokenKeyPath: tokenKeyPat
 
     /// SwapWithPair
     ///
-    pub fun swapWithPair(
+    access(all) fun swapWithPair(
         vaultIn: @FungibleToken.Vault,
         exactAmountOut: UFix64?,
         token0Key: String,
@@ -221,3 +221,4 @@ return <-[<-self.swapWithPath(vaultIn: <-vaultInExact, tokenKeyPath: tokenKeyPat
         return <- pairPublicRef.swap(vaultIn: <- vaultIn, exactAmountOut: exactAmountOut)
     }
 }
+

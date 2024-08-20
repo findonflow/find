@@ -1,0 +1,27 @@
+[]test_main.ThoughtData{{
+	Body:               "body",
+	Created:            1,
+	Creator:            "0x192440c99cb17282",
+	CreatorAvatar:      "https://find.xyz/assets/img/avatars/avatar14.png",
+	CreatorName:        "user1",
+	CreatorProfileName: "user1",
+	Header:             "header",
+	Tags:               []string{"tag1"},
+	QuotedThought: &test_main.ThoughtData{
+		Body:               "This is body",
+		Created:            1,
+		Creator:            "0x192440c99cb17282",
+		CreatorAvatar:      "https://find.xyz/assets/img/avatars/avatar14.png",
+		CreatorName:        "user1",
+		CreatorProfileName: "user1",
+		Header:             "This is header",
+		Medias: map[string]string{
+			"ipfs://mediaHash": "mediaType",
+		},
+		Tags: []string{
+			"tag1",
+			"tag2",
+			"@find",
+		},
+	},
+}}

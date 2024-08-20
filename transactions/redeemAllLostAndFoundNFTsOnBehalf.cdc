@@ -1,10 +1,10 @@
-import FindLostAndFoundWrapper from "../contracts/FindLostAndFoundWrapper.cdc"
-import LostAndFound from "../contracts/standard/LostAndFound.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
-import NFTCatalog from "../contracts/standard/NFTCatalog.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
-import FIND from "../contracts/FIND.cdc"
+import "FindLostAndFoundWrapper"
+import "LostAndFound"
+import "FINDNFTCatalog"
+import "NFTCatalog"
+import "NonFungibleToken"
+import "MetadataViews"
+import "FIND"
 
 //IMPORT
 
@@ -14,7 +14,7 @@ transaction(receiverAddress: Address) {
 	let nftInfos : {String : NFTCatalog.NFTCollectionData}
 	let receiverAddress : Address
 
-	prepare(account: AuthAccount){
+	prepare(account: auth(BorrowValue) &Account){
 		self.receiverAddress = receiverAddress
 
 		self.nftInfos = {}

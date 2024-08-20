@@ -1,55 +1,54 @@
-import NonFungibleToken from "./standard/NonFungibleToken.cdc"
-import FungibleToken from "./standard/FungibleToken.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "NonFungibleToken"
+import "FungibleToken"
+import "MetadataViews"
 import Crypto
-import Clock from "../contracts/Clock.cdc"
-import Debug from "./Debug.cdc"
-import FLOAT from "../contracts/standard/FLOAT.cdc"
-import FindForge from "../contracts/FindForge.cdc"
-import FindVerifier from "../contracts/FindVerifier.cdc"
-import FINDNFTCatalog from "../contracts/FINDNFTCatalog.cdc"
+import "Clock"
+import "Debug"
+import "FindForge"
+import "FindVerifier"
+import "FINDNFTCatalog"
+import "ViewResolver"
 
-pub contract FindPack: NonFungibleToken {
+access(all) contract FindPack: NonFungibleToken{
     // Events
-    pub event ContractInitialized()
-    pub event Withdraw(id: UInt64, from: Address?)
-    pub event Deposit(id: UInt64, to: Address?)
-    pub event Minted(id: UInt64, typeId:UInt64)
+    access(all) event ContractInitialized()
+    access(all) event Withdraw(id: UInt64, from: Address?)
+    access(all) event Deposit(id: UInt64, to: Address?)
+    access(all) event Minted(id: UInt64, typeId:UInt64)
 
-    pub event Requeued(packId: UInt64, address:Address)
+    access(all) event Requeued(packId: UInt64, address:Address)
 
-    pub event Opened(packTypeName: String, packTypeId:UInt64, packId: UInt64, address:Address, packFields: {String : String}, packNFTTypes: [String])
-    pub event Fulfilled(packTypeName: String, packTypeId:UInt64, packId:UInt64, address:Address, packFields: {String : String}, packNFTTypes: [String])
-    pub event PackReveal(packTypeName: String, packTypeId:UInt64, packId:UInt64, address:Address, rewardId:UInt64, rewardType:String, rewardFields:{String:String}, packFields: {String : String}, packNFTTypes: [String])
+    access(all) event Opened(packTypeName: String, packTypeId:UInt64, packId: UInt64, address:Address, packFields: {String : String}, packNFTTypes: [String])
+    access(all) event Fulfilled(packTypeName: String, packTypeId:UInt64, packId:UInt64, address:Address, packFields: {String : String}, packNFTTypes: [String])
+    access(all) event PackReveal(packTypeName: String, packTypeId:UInt64, packId:UInt64, address:Address, rewardId:UInt64, rewardType:String, rewardFields:{String:String}, packFields: {String : String}, packNFTTypes: [String])
 
-    pub event Purchased(packTypeName: String, packTypeId: UInt64, packId: UInt64, address: Address, amount:UFix64, packFields: {String : String}, packNFTTypes: [String])
-    pub event MetadataRegistered(packTypeName: String, packTypeId: UInt64)
-    pub event FulfilledError(packTypeName: String, packTypeId: UInt64, packId:UInt64, address:Address?, reason:String)
+    access(all) event Purchased(packTypeName: String, packTypeId: UInt64, packId: UInt64, address: Address, amount:UFix64, packFields: {String : String}, packNFTTypes: [String])
+    access(all) event MetadataRegistered(packTypeName: String, packTypeId: UInt64)
+    access(all) event FulfilledError(packTypeName: String, packTypeId: UInt64, packId:UInt64, address:Address?, reason:String)
 
-    pub let PackMetadataStoragePath: StoragePath
+    access(all) let PackMetadataStoragePath: StoragePath
 
-    pub let CollectionStoragePath: StoragePath
-    pub let CollectionPublicPath: PublicPath
-    pub let CollectionPrivatePath: PrivatePath
+    access(all) let CollectionStoragePath: StoragePath
+    access(all) let CollectionPublicPath: PublicPath
 
-    pub let OpenedCollectionPublicPath: PublicPath
-    pub let OpenedCollectionStoragePath: StoragePath
+    access(all) let OpenedCollectionPublicPath: PublicPath
+    access(all) let OpenedCollectionStoragePath: StoragePath
 
+    access(all) let DLQCollectionPublicPath: PublicPath
+    access(all) let DLQCollectionStoragePath: StoragePath
 
-    pub let DLQCollectionPublicPath: PublicPath
-    pub let DLQCollectionStoragePath: StoragePath
-
-    pub var totalSupply: UInt64
+    access(all) var totalSupply: UInt64
 
     // Mapping of packTypeName (which is the find name) : {typeId : Metadata}
     access(contract) let packMetadata: {String : {UInt64: Metadata}}
 
     // this is a struct specific for airdropping packs
-    pub struct AirdropInfo {
-        pub let packTypeName: String
-        pub let packTypeId: UInt64
-        pub let users: [String]
-        pub let message: String
+    access(all) struct AirdropInfo {
+        access(all) let packTypeName: String
+        access(all) let packTypeId: UInt64
+        access(all) let users: [String]
+
+        access(all) let message: String
 
         init(packTypeName: String , packTypeId: UInt64 , users: [String],  message: String){
             self.packTypeName = packTypeName
@@ -60,26 +59,26 @@ pub contract FindPack: NonFungibleToken {
     }
 
     // this is a struct specific for registering pack metadata
-    pub struct PackRegisterInfo {
-        pub let forge: String
-        pub let name: String
-        pub let description: String
-        pub let typeId: UInt64
-        pub let externalURL: String
-        pub let squareImageHash: String
-        pub let bannerHash: String
-        pub let socials: {String : String}
-        pub let paymentAddress: Address
-        pub let paymentType: String
-        pub let openTime: UFix64
-        pub let packFields: {String : String}
-        pub let primaryRoyalty: [Royalty]
-        pub let secondaryRoyalty: [Royalty]
-        pub let requiresReservation: Bool
-        pub let nftTypes: [String]
-        pub let storageRequirement: UInt64
-        pub let saleInfo: [PackRegisterSaleInfo]
-        pub let extra: {String: AnyStruct}
+    access(all) struct PackRegisterInfo {
+        access(all) let forge: String
+        access(all) let name: String
+        access(all) let description: String
+        access(all) let typeId: UInt64
+        access(all) let externalURL: String
+        access(all) let squareImageHash: String
+        access(all) let bannerHash: String
+        access(all) let socials: {String : String}
+        access(all) let paymentAddress: Address
+        access(all) let paymentType: String
+        access(all) let openTime: UFix64
+        access(all) let packFields: {String : String}
+        access(all) let primaryRoyalty: [Royalty]
+        access(all) let secondaryRoyalty: [Royalty]
+        access(all) let requiresReservation: Bool
+        access(all) let nftTypes: [String]
+        access(all) let storageRequirement: UInt64
+        access(all) let saleInfo: [PackRegisterSaleInfo]
+        access(all) let extra: {String: AnyStruct}
 
         init(
             forge: String,
@@ -122,7 +121,7 @@ pub contract FindPack: NonFungibleToken {
             self.extra={}
         }
 
-        pub fun generateSaleInfo() : [SaleInfo] {
+        access(all) fun generateSaleInfo() : [SaleInfo] {
             let saleInfo : [SaleInfo] = []
             for s in self.saleInfo {
                 saleInfo.append(s.generateSaleInfo())
@@ -131,10 +130,10 @@ pub contract FindPack: NonFungibleToken {
         }
     }
 
-    pub struct Royalty {
-        pub let recipient: Address
-        pub let cut: UFix64
-        pub let description: String
+    access(all) struct Royalty {
+        access(all) let recipient: Address
+        access(all) let cut: UFix64
+        access(all) let description: String
         access(contract) let extra: {String: AnyStruct}
 
         init(
@@ -149,12 +148,13 @@ pub contract FindPack: NonFungibleToken {
         }
     }
 
-    pub struct PackRegisterSaleInfo {
-        pub let name : String
-        pub let startTime : UFix64
-        pub let price : UFix64
-        pub let verifiers : [{FindVerifier.Verifier}]
-        pub let verifyAll : Bool
+    access(all) struct PackRegisterSaleInfo {
+        access(all) let name : String
+        access(all) let startTime : UFix64
+        access(all) let price : UFix64
+        //TODO:potential breaking change?
+        access(all) let verifiers : [{FindVerifier.Verifier}]
+        access(all) let verifyAll : Bool
         access(contract) let extra: {String: AnyStruct}
 
         init(
@@ -173,7 +173,7 @@ pub contract FindPack: NonFungibleToken {
             self.extra=extra
         }
 
-        pub fun generateSaleInfo() : SaleInfo {
+        access(all) fun generateSaleInfo() : SaleInfo {
             var endTime : UFix64? = nil
             if let et = self.extra["endTime"] {
                 endTime = et as? UFix64
@@ -198,15 +198,15 @@ pub contract FindPack: NonFungibleToken {
 
     // Verifier container for packs
     // Each struct is one sale type. If they
-    pub struct SaleInfo {
-        pub let name : String
-        pub let startTime : UFix64
-        pub let endTime : UFix64?
-        pub let price : UFix64
-        pub let purchaseLimit : UInt64?
-        pub let purchaseRecord : {Address : UInt64}
-        pub let verifiers : [{FindVerifier.Verifier}]
-        pub let verifyAll : Bool
+    access(all) struct SaleInfo {
+        access(all) let name : String
+        access(all) let startTime : UFix64
+        access(all) let endTime : UFix64?
+        access(all) let price : UFix64
+        access(all) let purchaseLimit : UInt64?
+        access(all) let purchaseRecord : {Address : UInt64}
+        access(all) let verifiers : [{FindVerifier.Verifier}]
+        access(all) let verifyAll : Bool
 
         init(name : String, startTime : UFix64 , endTime : UFix64? , price : UFix64, purchaseLimit : UInt64?, verifiers: [{FindVerifier.Verifier}], verifyAll : Bool ) {
             self.name = name
@@ -219,7 +219,7 @@ pub contract FindPack: NonFungibleToken {
             self.verifyAll = verifyAll
         }
 
-        pub fun inTime(_ time: UFix64) : Bool {
+        access(all) fun inTime(_ time: UFix64) : Bool {
             let started = time >= self.startTime
             if self.endTime == nil {
                 return started
@@ -228,7 +228,7 @@ pub contract FindPack: NonFungibleToken {
             return started && time <= self.endTime!
         }
 
-        pub fun buy(_ addr: Address) {
+        access(all) fun buy(_ addr: Address) {
 
             // If verified false, then panic
 
@@ -243,11 +243,11 @@ pub contract FindPack: NonFungibleToken {
             self.purchaseRecord[addr] = purchased
         }
 
-        pub fun checkBought(_ addr: Address) : UInt64 {
+        access(all) fun checkBought(_ addr: Address) : UInt64 {
             return self.purchaseRecord[addr] ?? 0
         }
 
-        pub fun checkBuyable(addr: Address, time: UFix64) : Bool {
+        access(all) fun checkBuyable(addr: Address, time: UFix64) : Bool {
             // If not in time, return false
             if !self.inTime(time) {
                 return false
@@ -298,11 +298,11 @@ pub contract FindPack: NonFungibleToken {
     }
 
     // Input for minting packs from forge
-    pub struct MintPackData {
-        pub let packTypeName: String
-        pub let typeId: UInt64
-        pub let hash: String
-        pub let verifierRef: &FindForge.Verifier
+    access(all) struct MintPackData {
+        access(all) let packTypeName: String
+        access(all) let typeId: UInt64
+        access(all) let hash: String
+        access(all) let verifierRef: &FindForge.Verifier
 
         init(packTypeName: String, typeId: UInt64, hash: String, verifierRef: &FindForge.Verifier) {
             self.packTypeName = packTypeName
@@ -312,43 +312,42 @@ pub contract FindPack: NonFungibleToken {
         }
     }
 
-    pub struct PackRevealData {
-
-        pub let data: {String:String}
+    access(all) struct PackRevealData {
+        access(all) let data: {String:String}
 
         init(_ data: {String:String}) {
             self.data=data
         }
     }
 
-    pub struct Metadata {
-        pub let name: String
-        pub let description: String
+    access(all) struct Metadata {
+        access(all) let name: String
+        access(all) let description: String
 
-        pub let thumbnailHash: String?
-        pub let thumbnailUrl:String?
+        access(all) let thumbnailHash: String?
+        access(all) let thumbnailUrl:String?
 
-        pub let wallet: Capability<&{FungibleToken.Receiver}>
-        pub let walletType: Type
+        access(all) let wallet: Capability<&{FungibleToken.Receiver}>
+        access(all) let walletType: Type
 
-        pub let openTime: UFix64
-        pub let saleInfos: [SaleInfo]
+        access(all) let openTime: UFix64
+        access(all) let saleInfos: [SaleInfo]
 
-        pub let storageRequirement: UInt64
-        pub let collectionDisplay: MetadataViews.NFTCollectionDisplay
+        access(all) let storageRequirement: UInt64
+        access(all) let collectionDisplay: MetadataViews.NFTCollectionDisplay
 
-        pub let packFields: {String : String}
-        pub let extraData : {String : AnyStruct}
+        access(all) let packFields: {String : String}
+        access(all) let extraData : {String : AnyStruct}
 
-        pub let itemTypes: [Type]
-        access(contract) let providerCaps: {Type : Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>}
+        access(all) let itemTypes: [Type]
+        access(contract) let providerCaps: {Type : Capability<auth (NonFungibleToken.Withdraw) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>}
 
         access(contract) let primarySaleRoyalties : MetadataViews.Royalties
         access(contract) let royalties : MetadataViews.Royalties
 
-        pub let requiresReservation: Bool
+        access(all) let requiresReservation: Bool
 
-        init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, openTime:UFix64, walletType:Type, itemTypes: [Type],  providerCaps: {Type : Capability<&{NonFungibleToken.Provider, MetadataViews.ResolverCollection}>} , requiresReservation:Bool, storageRequirement: UInt64, saleInfos: [SaleInfo], primarySaleRoyalties : MetadataViews.Royalties, royalties : MetadataViews.Royalties, collectionDisplay: MetadataViews.NFTCollectionDisplay, packFields: {String : String} , extraData : {String : AnyStruct}) {
+        init(name: String, description: String, thumbnailUrl: String?,thumbnailHash: String?, wallet: Capability<&{FungibleToken.Receiver}>, openTime:UFix64, walletType:Type, itemTypes: [Type],  providerCaps: {Type : Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Provider, ViewResolver.ResolverCollection}>} , requiresReservation:Bool, storageRequirement: UInt64, saleInfos: [SaleInfo], primarySaleRoyalties : MetadataViews.Royalties, royalties : MetadataViews.Royalties, collectionDisplay: MetadataViews.NFTCollectionDisplay, packFields: {String : String} , extraData : {String : AnyStruct}) {
             self.name = name
             self.description = description
             self.thumbnailUrl = thumbnailUrl
@@ -373,14 +372,14 @@ pub contract FindPack: NonFungibleToken {
             self.extraData=extraData
         }
 
-        pub fun getThumbnail() : AnyStruct{MetadataViews.File} {
+        access(all) fun getThumbnail() : {MetadataViews.File} {
             if let hash = self.thumbnailHash {
                 return MetadataViews.IPFSFile(cid: hash, path: nil)
             }
             return MetadataViews.HTTPFile(url:self.thumbnailUrl!)
         }
 
-        pub fun getItemTypesAsStringArray() : [String] {
+        access(all) fun getItemTypesAsStringArray() : [String] {
             let types : [String] = []
             for t in self.itemTypes {
                 types.append(t.identifier)
@@ -388,36 +387,34 @@ pub contract FindPack: NonFungibleToken {
             return types
         }
 
-        pub fun canBeOpened() : Bool {
+        access(all) fun canBeOpened() : Bool {
             return self.openTime <= Clock.time()
         }
 
         access(contract) fun borrowSaleInfo(_ i: Int) : &SaleInfo {
-            return &self.saleInfos[i] as &FindPack.SaleInfo
+            return &self.saleInfos[i] 
         }
     }
 
     access(account) fun registerMetadata(packTypeName: String, typeId: UInt64, metadata: Metadata) {
         emit MetadataRegistered(packTypeName: packTypeName, packTypeId: typeId)
-        let mapping = self.packMetadata[packTypeName] ?? {} //<- if this is empty then setup the storage slot for this pack type
+        let mappingMetadata = self.packMetadata[packTypeName] ?? {} //<- if this is empty then setup the storage slot for this pack type
 
         // first time we create this type ID, if its not there then we create it.
-        if mapping[typeId] == nil {
+        if mappingMetadata[typeId] == nil {
             let pathIdentifier = self.getPacksCollectionPath(packTypeName: packTypeName, packTypeId: typeId)
             let storagePath = StoragePath(identifier: pathIdentifier) ?? panic("Cannot create path from identifier : ".concat(pathIdentifier))
             let publicPath = PublicPath(identifier: pathIdentifier) ?? panic("Cannot create path from identifier : ".concat(pathIdentifier))
-            FindPack.account.save<@NonFungibleToken.Collection>( <- FindPack.createEmptyCollection(), to: storagePath)
-            FindPack.account.link<&FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, FindPack.CollectionPublic, MetadataViews.ResolverCollection}>(
-                publicPath,
-                target: storagePath
-            )
+            FindPack.account.storage.save<@{NonFungibleToken.Collection}>( <- FindPack.createEmptyCollection(nftType: Type<@FindPack.NFT>()), to: storagePath)
+            let cap = FindPack.account.capabilities.storage.issue<&FindPack.Collection>(storagePath)
+            FindPack.account.capabilities.publish(cap, at: publicPath)
         }
 
-        mapping[typeId] = metadata
-        self.packMetadata[packTypeName] = mapping
+        mappingMetadata[typeId] = metadata
+        self.packMetadata[packTypeName] = mappingMetadata
     }
 
-    pub fun getMetadataById(packTypeName: String, typeId: UInt64): Metadata? {
+    access(all) fun getMetadataById(packTypeName: String, typeId: UInt64): Metadata? {
 
         if self.packMetadata[packTypeName] != nil {
             return self.packMetadata[packTypeName]![typeId]
@@ -426,7 +423,7 @@ pub contract FindPack: NonFungibleToken {
         return nil
     }
 
-    pub fun getMetadataByName(packTypeName: String): {UInt64 : Metadata} {
+    access(all) fun getMetadataByName(packTypeName: String): {UInt64 : Metadata} {
 
         if self.packMetadata[packTypeName] != nil {
             return self.packMetadata[packTypeName]!
@@ -435,10 +432,10 @@ pub contract FindPack: NonFungibleToken {
         return {}
     }
 
-    pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
+    access(all) resource NFT: NonFungibleToken.NFT, ViewResolver.Resolver {
         // The token's ID
-        pub let id: UInt64
-        pub let packTypeName: String
+        access(all) let id: UInt64
+        access(all) let packTypeName: String
 
         // The token's typeId
         access(self) var typeId: UInt64
@@ -461,14 +458,18 @@ pub contract FindPack: NonFungibleToken {
             self.packTypeName=packTypeName
         }
 
-        pub fun getOpenedBy() : {Type : Capability<&{NonFungibleToken.Receiver}>} {
+        access(all) view fun getID() : UInt64 {
+            return self.id
+        }
+
+        access(all) fun getOpenedBy() : {Type : Capability<&{NonFungibleToken.Receiver}>} {
             if self.openedBy== nil {
                 panic("Pack is not opened")
             }
-            return self.openedBy!
+            return self.openedBy
         }
 
-        pub fun getHash() : String{
+        access(all) fun getHash() : String{
             return self.hash
         }
 
@@ -480,7 +481,7 @@ pub contract FindPack: NonFungibleToken {
             if self.openedBy.length == 0 {
                 panic("Pack is not opened")
             }
-            let cap = self.openedBy!
+            let cap = self.openedBy
 
             self.openedBy={}
             return cap.values[0].address
@@ -493,15 +494,15 @@ pub contract FindPack: NonFungibleToken {
             self.openedBy=cap
         }
 
-        pub fun getTypeID() :UInt64 {
+        access(all) fun getTypeID() :UInt64 {
             return self.typeId
         }
 
-        pub fun getMetadata(): Metadata {
+        access(all) fun getMetadata(): Metadata {
             return FindPack.getMetadataById(packTypeName: self.packTypeName, typeId: self.typeId)!
         }
 
-        pub fun getViews(): [Type] {
+        access(all) view fun getViews(): [Type] {
             return [
             Type<MetadataViews.Display>(),
             Type<Metadata>(),
@@ -513,7 +514,7 @@ pub contract FindPack: NonFungibleToken {
             ]
         }
 
-        pub fun resolveView(_ view: Type): AnyStruct? {
+        access(all) fun resolveView(_ view: Type): AnyStruct? {
             let metadata = self.getMetadata()
             switch view {
             case Type<MetadataViews.Display>():
@@ -537,22 +538,10 @@ pub contract FindPack: NonFungibleToken {
                 return MetadataViews.Royalties(self.royalties)
 
             case Type<MetadataViews.NFTCollectionData>():
-                return MetadataViews.NFTCollectionData(
-                    storagePath: FindPack.CollectionStoragePath,
-                    publicPath: FindPack.CollectionPublicPath,
-                    providerPath: FindPack.CollectionPrivatePath,
-                    publicCollection: Type<&FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
-                    publicLinkedType: Type<&FindPack.Collection{NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
-                    providerLinkedType: Type<&FindPack.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, NonFungibleToken.Receiver, MetadataViews.ResolverCollection}>(),
-                    createEmptyCollectionFunction: fun () : @NonFungibleToken.Collection {
-                        return <- FindPack.createEmptyCollection()
-                    }
-                )
-
+                return FindPack.resolveContractView(resourceType: nil, viewType: Type<MetadataViews.NFTCollectionData>())
             case Type<MetadataViews.NFTCollectionDisplay>():
 
                 return self.getMetadata().collectionDisplay
-
                 /* to be determined
                 //let externalURL = MetadataViews.ExternalURL("https://find.xyz/mp/findPack")
                 let externalURL = MetadataViews.ExternalURL("https://find.xyz/")
@@ -572,40 +561,72 @@ pub contract FindPack: NonFungibleToken {
             return nil
         }
 
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <- create Collection() 
+        }
     }
 
-    pub resource interface CollectionPublic {
-        pub fun deposit(token: @NonFungibleToken.NFT)
-        pub fun getIDs(): [UInt64]
-        pub fun contains(_ id: UInt64): Bool
-        pub fun getPacksLeft() : Int   // returns the no of a type
-        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
-        pub fun borrowFindPack(id: UInt64): &FindPack.NFT?
-        pub fun buyWithSignature(packId: UInt64, signature:String, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>)
-        pub fun buy(packTypeName: String, typeId: UInt64, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>)
+    access(all) view fun getContractViews(resourceType: Type?): [Type] {
+        return [
+        Type<MetadataViews.NFTCollectionData>(),
+        Type<MetadataViews.NFTCollectionDisplay>()
+        ]
     }
+
+    access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
+        switch viewType {
+        case Type<MetadataViews.NFTCollectionData>():
+            let collectionRef = self.account.storage.borrow<&FindPack.Collection>(
+                from: FindPack.CollectionStoragePath
+            ) ?? panic("Could not borrow a reference to the stored collection")
+            let collectionData = MetadataViews.NFTCollectionData(
+                storagePath: FindPack.CollectionStoragePath,
+                publicPath: FindPack.CollectionPublicPath,
+                publicCollection: Type<&FindPack.Collection>(),
+                publicLinkedType: Type<&FindPack.Collection>(),
+                createEmptyCollectionFunction: (fun(): @{NonFungibleToken.Collection} {
+                    return <-FindPack.createEmptyCollection(nftType: Type<@FindPack.NFT>())
+                })
+            )
+            return collectionData
+        }
+        return nil
+    }
+
+    access(all) resource interface CollectionPublic {
+        access(all) fun deposit(token: @{NonFungibleToken.NFT})
+        access(all) view fun getIDs(): [UInt64]
+        access(all) fun contains(_ id: UInt64): Bool
+        access(all) fun getPacksLeft() : Int   // returns the no of a type
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}?
+        access(all) fun borrowFindPack(id: UInt64): &FindPack.NFT?
+        access(all) fun buyWithSignature(packId: UInt64, signature:String, vault: @{FungibleToken.Vault}, collectionCapability: Capability<&Collection>)
+        access(all) fun buy(packTypeName: String, typeId: UInt64, vault: @{FungibleToken.Vault}, collectionCapability: Capability<&Collection>)
+    }
+
+    access(all) entitlement Owner
 
     // Collection
     // A collection of FindPack NFTs owned by an account
     //
-    pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CollectionPublic, MetadataViews.ResolverCollection {
+    access(all) resource Collection: NonFungibleToken.Collection, CollectionPublic, ViewResolver.ResolverCollection {
         // dictionary of NFT conforming tokens
         // NFT is a resource type with an `UInt64` ID field
         //
-        pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+        access(all) var ownedNFTs: @{UInt64: {NonFungibleToken.NFT}}
 
         //this has to be called on the DLQ collection
-        pub fun requeue(packId:UInt64) {
+        access(Owner) fun requeue(packId:UInt64) {
             let token <- self.withdraw(withdrawID: packId) as! @NFT
 
             let address=token.resetOpenedBy()
-            let cap=getAccount(address).getCapability<&Collection{NonFungibleToken.Receiver}>(FindPack.CollectionPublicPath)
+            let cap=getAccount(address).capabilities.get<&Collection>(FindPack.CollectionPublicPath)
             let receiver = cap.borrow()!
             receiver.deposit(token: <- token)
             emit Requeued(packId:packId, address: cap.address)
         }
 
-        pub fun open(packId: UInt64, receiverCap: {Type : Capability<&{NonFungibleToken.Receiver}>}) {
+        access(Owner) fun open(packId: UInt64, receiverCap: {Type : Capability<&{NonFungibleToken.Receiver}>}) {
             for cap in receiverCap.values {
                 if !cap.check() {
                     panic("Receiver cap is not valid")
@@ -621,7 +642,7 @@ pub contract FindPack: NonFungibleToken {
             token.setOpenedBy(receiverCap)
 
             // establish the receiver for Redeeming FindPack
-            let receiver = FindPack.account.getCapability<&{NonFungibleToken.Receiver}>(FindPack.OpenedCollectionPublicPath).borrow()!
+            let receiver = FindPack.account.capabilities.get<&{NonFungibleToken.Receiver}>(FindPack.OpenedCollectionPublicPath).borrow()!
 
             let typeId=token.getTypeID()
             let packTypeName=token.packTypeName
@@ -635,7 +656,7 @@ pub contract FindPack: NonFungibleToken {
             emit Opened(packTypeName: packTypeName, packTypeId:typeId, packId: packId, address:self.owner!.address, packFields:packFields, packNFTTypes:packNFTTypes)
         }
 
-        pub fun buyWithSignature(packId: UInt64, signature:String, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) {
+        access(all) fun buyWithSignature(packId: UInt64, signature:String, vault: @{FungibleToken.Vault}, collectionCapability: Capability<&Collection>) {
             pre {
                 self.owner!.address == FindPack.account.address : "You can only buy pack directly from the FindPack account"
             }
@@ -698,7 +719,7 @@ pub contract FindPack: NonFungibleToken {
 
             // Verifies that the signature is valid and that it was generated from the
             // owner of the collection
-            if(!keyList.verify(signatureSet: signatureSet, signedData: nft.hash.utf8)){
+            if(!keyList.verify(signatureSet: signatureSet, signedData: nft.hash.utf8, domainSeparationTag: "FLOW-V0.0-user")){
                 panic("Unable to validate the signature for the pack!")
             }
 
@@ -713,7 +734,7 @@ pub contract FindPack: NonFungibleToken {
                 }
             }
 
-            let wallet = getAccount(FindPack.account.address).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+            let wallet = getAccount(FindPack.account.address).capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
             if wallet.check() {
                 let r = MetadataViews.Royalty(receiver: wallet, cut: 0.15, description: ".find")
                 r.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: saleInfo!.price * r.cut))
@@ -728,7 +749,7 @@ pub contract FindPack: NonFungibleToken {
             emit Purchased(packTypeName: packTypeName, packTypeId: packTypeId, packId: packId, address: collectionCapability.address, amount:saleInfo!.price, packFields:packFields, packNFTTypes:packNFTTypes)
         }
 
-        pub fun buy(packTypeName: String, typeId: UInt64, vault: @FungibleToken.Vault, collectionCapability: Capability<&Collection{NonFungibleToken.Receiver}>) {
+        access(all) fun buy(packTypeName: String, typeId: UInt64, vault: @{FungibleToken.Vault}, collectionCapability: Capability<&Collection>) {
             pre {
                 self.owner!.address == FindPack.account.address : "You can only buy pack directly from the FindPack account"
             }
@@ -755,8 +776,8 @@ pub contract FindPack: NonFungibleToken {
             for i, info in metadata.saleInfos {
                 // for later implement : if it requires all sale info checks
                 if info.checkBuyable(addr: collectionCapability.address, time:timestamp) {
-                    if lowestPrice == nil || lowestPrice! > info!.price {
-                        lowestPrice = info!.price
+                    if lowestPrice == nil || lowestPrice! > info.price {
+                        lowestPrice = info.price
                         saleInfo = info
                         saleInfoIndex = i
                     }
@@ -787,7 +808,7 @@ pub contract FindPack: NonFungibleToken {
 
             //TODO: REMOVE THIS
             if !royaltiesPaid {
-                let wallet = getAccount(FindPack.account.address).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+                let wallet = getAccount(FindPack.account.address).capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
                 if wallet.check() {
                     let r = MetadataViews.Royalty(receiver: wallet, cut: 0.10, description: ".find")
                     r.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: saleInfo!.price * r.cut))
@@ -809,7 +830,7 @@ pub contract FindPack: NonFungibleToken {
         // withdraw
         // Removes an NFT from the collection and moves it to the caller
         //
-        pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+        access(NonFungibleToken.Withdraw) fun withdraw(withdrawID: UInt64): @{NonFungibleToken.NFT} {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("Could not withdraw nft")
 
             let nft <- token as! @NFT
@@ -819,11 +840,32 @@ pub contract FindPack: NonFungibleToken {
             return <-nft
         }
 
+        access(all) view fun getIDsWithTypes(): {Type: [UInt64]} {
+            return {}
+        }
+
+        access(all) view fun getSupportedNFTTypes(): {Type: Bool} {
+            return {}
+        }
+
+
+        access(all) view fun isSupportedNFTType(type: Type) : Bool {
+            return type == Type<@FindPack.NFT>()
+        }
+
+        access(all) fun createEmptyCollection(): @{NonFungibleToken.Collection} {
+            return <- create Collection() 
+        }
+
+        access(all) view fun getLength() : Int {
+            return self.ownedNFTs.length
+        }
+
         // deposit
         // Takes a NFT and adds it to the collections dictionary
         // and adds the ID to the id array
         //
-        pub fun deposit(token: @NonFungibleToken.NFT) {
+        access(all) fun deposit(token: @{NonFungibleToken.NFT}) {
             let token <- token as! @FindPack.NFT
 
             let id: UInt64 = token.id
@@ -840,25 +882,24 @@ pub contract FindPack: NonFungibleToken {
         // getIDs
         // Returns an array of the IDs that are in the collection
         //
-        pub fun getIDs(): [UInt64] {
+        access(all) view fun getIDs(): [UInt64] {
             return self.ownedNFTs.keys
         }
 
-        pub fun contains(_ id: UInt64) : Bool {
+        access(all) fun contains(_ id: UInt64) : Bool {
             return self.ownedNFTs.containsKey(id)
         }
 
         //return the number of packs left of a type
-        pub fun getPacksLeft() : Int {
+        access(all) fun getPacksLeft() : Int {
             return self.ownedNFTs.length
         }
 
         // borrowNFT
         // Gets a reference to an NFT in the collection
         // so that the caller can read its metadata and call its methods
-        //
-        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
-            return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
+        access(all) view fun borrowNFT(_ id: UInt64): &{NonFungibleToken.NFT}? {
+            return &self.ownedNFTs[id]
         }
 
         // borrowFindPack
@@ -866,25 +907,30 @@ pub contract FindPack: NonFungibleToken {
         // exposing all of its fields.
         // This is safe as there are no functions that can be called on the FindPack.
         //
-        pub fun borrowFindPack(id: UInt64): &FindPack.NFT? {
+        access(all) fun borrowFindPack(id: UInt64): &FindPack.NFT? {
             if self.ownedNFTs[id] != nil {
-                let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+                let ref = (&self.ownedNFTs[id] as &{NonFungibleToken.NFT}?)!
                 return ref as! &FindPack.NFT
             } else {
                 return nil
             }
         }
 
-        pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
-            let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
-            let exampleNFT = nft as! &NFT
-            return exampleNFT
+
+        access(all) view fun borrowViewResolver(id: UInt64): &{ViewResolver.Resolver}? {
+            if let nft = &self.ownedNFTs[id] as &{NonFungibleToken.NFT}? {
+                return nft as &{ViewResolver.Resolver}
+            }
+            return nil
         }
 
-        // destructor
-        //
-        destroy() {
-            destroy self.ownedNFTs
+
+        access(all) view fun getDefaultStoragePath() : StoragePath {
+            return FindPack.CollectionStoragePath
+        }
+
+        access(all) view fun getDefaultPublicPath() : PublicPath {
+            return FindPack.CollectionPublicPath
         }
 
         // initializer
@@ -894,11 +940,7 @@ pub contract FindPack: NonFungibleToken {
         }
     }
 
-    pub fun createEmptyCollection(): @NonFungibleToken.Collection {
-        return <- create Collection()
-    }
-
-    access(account) fun mintNFT(packTypeName: String, typeId: UInt64, hash: String, royalties: [MetadataViews.Royalty]) : @NonFungibleToken.NFT {
+    access(account) fun mintNFT(packTypeName: String, typeId: UInt64, hash: String, royalties: [MetadataViews.Royalty]) : @{NonFungibleToken.NFT} {
 
         let nft <- create FindPack.NFT(packTypeName: packTypeName, typeId: typeId, hash:hash, royalties:royalties)
         emit Minted(id: nft.id, typeId:typeId)
@@ -909,7 +951,7 @@ pub contract FindPack: NonFungibleToken {
 
     access(account) fun fulfill(packId: UInt64, types:[Type], rewardIds: [UInt64], salt:String) {
 
-        let openedPacksCollection = FindPack.account.borrow<&FindPack.Collection>(from: FindPack.OpenedCollectionStoragePath)!
+        let openedPacksCollection = FindPack.account.storage.borrow<auth (NonFungibleToken.Withdraw) &FindPack.Collection>(from: FindPack.OpenedCollectionStoragePath)!
         let pack <- openedPacksCollection.withdraw(withdrawID: packId) as! @FindPack.NFT
         let packTypeName = pack.packTypeName
         let packTypeId = pack.getTypeID()
@@ -924,10 +966,10 @@ pub contract FindPack: NonFungibleToken {
         let rewards=pack.getMetadata().providerCaps
 
         let receiverAccount=getAccount(receivingAddress)
-        var freeStorage=UInt64(0)
+        var freeStorage=0 as UInt64
         // prevent underflow
-        if receiverAccount.storageCapacity >= receiverAccount.storageUsed {
-            freeStorage = receiverAccount.storageCapacity - receiverAccount.storageUsed
+        if receiverAccount.storage.capacity >= receiverAccount.storage.used {
+            freeStorage = receiverAccount.storage.capacity- receiverAccount.storage.used
         }
         Debug.log("Free capacity from account ".concat(freeStorage.toString()))
         if pack.getMetadata().storageRequirement > freeStorage {
@@ -948,6 +990,7 @@ pub contract FindPack: NonFungibleToken {
                 }
 
                 if !rewards[type]!.check() {
+                    Debug.log("type that is not present in rewards cap ".concat(type.identifier))
                     emit FulfilledError(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receiver[type]!.address, reason: "Cannot borrow provider capability to withdraw nfts")
                     self.transferToDLQ(<- pack)
                     return
@@ -975,7 +1018,7 @@ pub contract FindPack: NonFungibleToken {
             let source=rewards[type]!.borrow()!
 
             let viewType= Type<PackRevealData>()
-            let nft=source.borrowViewResolver(id: id)
+            let nft=source.borrowViewResolver(id: id)!
 
             var fields : {String: String}= {}
             if nft.getViews().contains(viewType) {
@@ -1006,13 +1049,13 @@ pub contract FindPack: NonFungibleToken {
             )
             target.deposit(token: <-token)
         }
-        emit Fulfilled(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receivingAddress!, packFields:packFields, packNFTTypes:packNFTTypes)
+        emit Fulfilled(packTypeName: packTypeName, packTypeId: packTypeId, packId:packId, address:receivingAddress, packFields:packFields, packNFTTypes:packNFTTypes)
 
         destroy pack
     }
 
     access(account) fun transferToDLQ(_ pack: @NFT) {
-        let dlq = FindPack.account.borrow<&FindPack.Collection>(from: FindPack.DLQCollectionStoragePath)!
+        let dlq = FindPack.account.storage.borrow<&FindPack.Collection>(from: FindPack.DLQCollectionStoragePath)!
         dlq.deposit(token: <- pack)
     }
 
@@ -1020,26 +1063,26 @@ pub contract FindPack: NonFungibleToken {
         return "FindPack_".concat(packTypeName).concat("_").concat(packTypeId.toString())
     }
 
-    pub fun getPacksCollection(packTypeName: String, packTypeId: UInt64) : &FindPack.Collection{CollectionPublic} {
+    access(all) fun getPacksCollection(packTypeName: String, packTypeId: UInt64) : &FindPack.Collection {
 
         let pathIdentifier = self.getPacksCollectionPath(packTypeName: packTypeName, packTypeId: packTypeId)
         let path = PublicPath(identifier: pathIdentifier) ?? panic("Cannot create path from identifier : ".concat(pathIdentifier))
-        return FindPack.account.getCapability<&FindPack.Collection{FindPack.CollectionPublic}>(path).borrow() ?? panic("Could not borow FindPack collection for path : ".concat(pathIdentifier))
+        return FindPack.account.capabilities.get<&FindPack.Collection>(path).borrow() ?? panic("Could not borow FindPack collection for path : ".concat(pathIdentifier))
     }
 
     // given a path, lookin to the NFT Collection and return a new empty collection
-    pub fun createEmptyCollectionFromPackData(packData: FindPack.Metadata, type: Type) : @NonFungibleToken.Collection {
+    access(all) fun createEmptyCollectionFromPackData(packData: FindPack.Metadata, type: Type) : @{NonFungibleToken.Collection} {
         let cap = packData.providerCaps[type] ?? panic("Type passed in does not exist in this pack ".concat(type.identifier))
         if !cap.check() {
             panic("Provider capability of pack is not valid Name and ID".concat(type.identifier))
         }
         let ref = cap.borrow()!
-        let resolver = ref.borrowViewResolver(id : ref.getIDs()[0])  // if the ID length is 0, there must be some problem
+        let resolver = ref.borrowViewResolver(id: ref.getIDs()[0])!  // if the ID length is 0, there must be some problem
         let collectionData = MetadataViews.getNFTCollectionData(resolver) ?? panic("Collection Data for this NFT Type is missing. Type : ".concat(resolver.getType().identifier))
         return <- collectionData.createEmptyCollection()
     }
 
-    pub fun canBuy(packTypeName: String, packTypeId:UInt64, user:Address) : Bool {
+    access(all) fun canBuy(packTypeName: String, packTypeId:UInt64, user:Address) : Bool {
 
         let packs=FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId:packTypeId)
 
@@ -1066,7 +1109,7 @@ pub contract FindPack: NonFungibleToken {
         return false
     }
 
-    pub fun getCurrentPrice(packTypeName: String, packTypeId:UInt64, user:Address) : UFix64? {
+    access(all) fun getCurrentPrice(packTypeName: String, packTypeId:UInt64, user:Address) : UFix64? {
 
         let packs=FindPack.getPacksCollection(packTypeName: packTypeName, packTypeId:packTypeId)
 
@@ -1087,8 +1130,8 @@ pub contract FindPack: NonFungibleToken {
         var lowestPrice : UFix64? = nil
         for info in metadata.saleInfos {
             if info.checkBuyable(addr: user, time:timestamp) {
-                if lowestPrice == nil || lowestPrice! > info!.price {
-                    lowestPrice = info!.price
+                if lowestPrice == nil || lowestPrice! > info.price {
+                    lowestPrice = info.price
                 }
             }
         }
@@ -1098,16 +1141,16 @@ pub contract FindPack: NonFungibleToken {
 
     access(contract) fun borrowSaleInfo(packTypeName: String, packTypeId: UInt64, index: Int) : &FindPack.SaleInfo {
         let mappingRef = (&FindPack.packMetadata[packTypeName] as &{UInt64: FindPack.Metadata}?)!
-        let ref = (&mappingRef[packTypeId] as &FindPack.Metadata?)!
+        let ref = mappingRef[packTypeId]!
         return ref.borrowSaleInfo(index)
     }
 
-    pub fun getOwnerCollection() : Capability<&FindPack.Collection{MetadataViews.ResolverCollection}> {
-        return FindPack.account.getCapability<&FindPack.Collection{MetadataViews.ResolverCollection}>(FindPack.CollectionPublicPath)
+    access(all) fun getOwnerCollection() : Capability<&FindPack.Collection> {
+        return FindPack.account.capabilities.get<&FindPack.Collection>(FindPack.CollectionPublicPath)
     }
 
-    pub resource Forge: FindForge.Forge {
-        pub fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @NonFungibleToken.NFT {
+    access(all) resource Forge: FindForge.Forge {
+        access(FindForge.ForgeOwner) fun mint(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) : @{NonFungibleToken.NFT} {
 
             let royalties : [MetadataViews.Royalty] = []
             // there should be no find cut for the pack.
@@ -1118,7 +1161,7 @@ pub contract FindPack: NonFungibleToken {
             return <- FindPack.mintNFT(packTypeName: platform.name, typeId: input.typeId , hash: input.hash, royalties: royalties)
         }
 
-        pub fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
+        access(FindForge.ForgeOwner) fun addContractData(platform: FindForge.MinterPlatform, data: AnyStruct, verifier: &FindForge.Verifier) {
             let type = data.getType()
 
             switch type {
@@ -1139,12 +1182,15 @@ pub contract FindPack: NonFungibleToken {
         return <- create Forge()
     }
 
+    access(all) fun createEmptyCollection(nftType: Type): @{NonFungibleToken.Collection} {
+
+        return <- create Collection()
+    }
     // initializer
     //
     init() {
         self.CollectionStoragePath = /storage/FindPackCollection
         self.CollectionPublicPath = /public/FindPackCollection
-        self.CollectionPrivatePath = /private/FindPackCollection
 
         self.OpenedCollectionStoragePath = /storage/FindPackOpenedCollection
         self.OpenedCollectionPublicPath = /public/FindPackOpenedCollection
@@ -1161,14 +1207,15 @@ pub contract FindPack: NonFungibleToken {
 
         // this contract will hold a Collection that FindPack can be deposited to and Admins can Consume them to transfer nfts to the depositing account
         let openedCollection <- create Collection()
-        self.account.save(<- openedCollection, to: self.OpenedCollectionStoragePath)
-        self.account.link<&FindPack.Collection{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, FindPack.CollectionPublic, MetadataViews.ResolverCollection}>(FindPack.OpenedCollectionPublicPath, target: FindPack.OpenedCollectionStoragePath)
-
+        self.account.storage.save(<- openedCollection, to: self.OpenedCollectionStoragePath)
+        let cap = self.account.capabilities.storage.issue<&Collection>(self.OpenedCollectionStoragePath)
+        self.account.capabilities.publish(cap, at: self.OpenedCollectionPublicPath)
 
         //a DLQ storage slot so that the opener can put items that cannot be opened/transferred here.
         let dlqCollection <- create Collection()
-        self.account.save(<- dlqCollection, to: self.DLQCollectionStoragePath)
-        self.account.link<&FindPack.Collection{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, FindPack.CollectionPublic, MetadataViews.ResolverCollection}>(FindPack.DLQCollectionPublicPath, target: FindPack.DLQCollectionStoragePath)
+        self.account.storage.save(<- dlqCollection, to: self.DLQCollectionStoragePath)
+        let dlqCap = self.account.capabilities.storage.issue<&Collection>(self.DLQCollectionStoragePath)
+        self.account.capabilities.publish(dlqCap, at: self.DLQCollectionPublicPath)
 
         FindForge.addForgeType(<- create Forge())
 
@@ -1176,7 +1223,6 @@ pub contract FindPack: NonFungibleToken {
         FindForge.addPublicForgeType(forgeType: Type<@Forge>())
 
         emit ContractInitialized()
-
     }
 }
 

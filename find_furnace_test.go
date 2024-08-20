@@ -4,32 +4,23 @@ import (
 	"fmt"
 	"testing"
 
-	. "github.com/bjartek/overflow"
+	. "github.com/bjartek/overflow/v2"
 )
 
 func TestFindFurnace(t *testing.T) {
-
-	otu := NewOverflowTest(t).
-		setupFIND().
-		setupDandy("user1")
-
+	otu := &OverflowTestUtils{T: t, O: ot.O}
 	dandyType := otu.identifier("Dandy", "NFT")
-	otu.mintThreeExampleDandies()
-	otu.registerDandyInNFTRegistry()
 
-	t.Run("Should be able to burn Dandy", func(t *testing.T) {
-
-		ids := otu.mintThreeExampleDandies()
-
+	ot.Run(t, "Should be able to burn Dandy", func(t *testing.T) {
 		res := otu.O.Tx("burnNFTs",
 			WithSigner("user1"),
 			WithArg("types", []string{dandyType, dandyType, dandyType}),
-			WithArg("ids", ids),
+			WithArg("ids", dandyIds),
 			WithArg("messages", []string{"Message 0", "Message 1", "Message 2"}),
 		).
 			AssertSuccess(t)
 
-		for i, id := range ids {
+		for i, id := range dandyIds {
 
 			events := res.GetEventsWithName("FindFurnace.Burned")
 			mockField := map[string]interface{}{}
@@ -57,5 +48,4 @@ func TestFindFurnace(t *testing.T) {
 			})
 		}
 	})
-
 }

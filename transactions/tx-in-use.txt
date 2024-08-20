@@ -1,0 +1,20 @@
+# Wearables Dependency
+
+initWearables
+redeemAllLostAndFoundNFTs
+redeemLostAndFoundNFTs
+sendWearables
+
+# SwapRouter Depenedency
+
+registerFlow
+
+# Missing from repo
+
+registerDapper, these have testnetergisterDapper, mainnetregisterDapper prefixes, can we modify thse
+renewNameDapper
+//mainnet
+fixAccount
+
+
+

@@ -1,19 +1,19 @@
-import FungibleToken from "../contracts/standard/FungibleToken.cdc"
-import NonFungibleToken from "../contracts/standard/NonFungibleToken.cdc"
-import FlowToken from "../contracts/standard/FlowToken.cdc"
-import Dandy from "../contracts/Dandy.cdc"
-import NFTStorefront from "../contracts/standard/NFTStorefront.cdc"
-import MetadataViews from "../contracts/standard/MetadataViews.cdc"
+import "FungibleToken"
+import "NonFungibleToken"
+import "FlowToken"
+import "Dandy"
+import "NFTStorefront"
+import "MetadataViews"
 
 
 
 //this has to be called after we have listed it somewhere else because of cap
 transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
     let flowReceiver: Capability<&FlowToken.Vault{FungibleToken.Receiver}>
-    let exampleNFTProvider: Capability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>
+    let exampleNFTProvider: Capability<&Dandy.Collection{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.Collection}>
     let storefront: &NFTStorefront.Storefront
 
-    prepare(acct: AuthAccount) {
+    prepare(acct: auth(BorrowValue) &Account) {
 
 			 // If the account doesn't already have a Storefront
         if acct.borrow<&NFTStorefront.Storefront>(from: NFTStorefront.StorefrontStoragePath) == nil {
@@ -35,7 +35,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64) {
         if self.flowReceiver.borrow() == nil {
             panic("Missing or mis-typed FlowToken receiver")
         }
-        self.exampleNFTProvider = acct.getCapability<&Dandy.Collection{NonFungibleToken.Provider, MetadataViews.ResolverCollection, NonFungibleToken.CollectionPublic}>(Dandy.CollectionPrivatePath)
+        self.exampleNFTProvider = acct.getCapability<&Dandy.Collection{NonFungibleToken.Provider, ViewResolver.ResolverCollection, NonFungibleToken.Collection}>(Dandy.CollectionPrivatePath)
         if self.exampleNFTProvider.borrow() == nil {
             panic("Missing or mis-typed ExampleNFT.Collection provider")
         }
