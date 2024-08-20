@@ -1,5 +1,6 @@
 import "NonFungibleToken"
 import "MetadataViews"
+import "ViewResolver"
 
 //                      ___  __
 //        __          /'___\/\ \__
@@ -14,108 +15,165 @@ import "MetadataViews"
 // Giefts - wrap NFT gifts in a box and send them to your friends.
 // The gifts can be claimed by passing the correct password.
 //
-pub contract Giefts {
-    
-    /**//////////////////////////////////////////////////////////////
-    //                            PATHS                            //
+access(all)
+contract Giefts{ 
+
+    access(all) entitlement Owner
+    /**/
+    ///////////////////////////////////////////////////////////// 
+
+    //							PATHS							//
     /////////////////////////////////////////////////////////////**/
+    access(all)
+    let GieftsStoragePath: StoragePath
 
-    pub let GieftsStoragePath: StoragePath
-    pub let GieftsPublicPath: PublicPath
-    pub let GieftsPrivatePath: PrivatePath
+    access(all)
+    let GieftsPublicPath: PublicPath
 
-    /**//////////////////////////////////////////////////////////////
-    //                            EVENTS                           //
+    //							EVENTS						   //
     /////////////////////////////////////////////////////////////**/
+    access(all)
+    event Packed(gieft: UInt64, nfts: [UInt64])
 
-    pub event Packed(gieft: UInt64, nfts: [UInt64])
-    pub event Added(gieft: UInt64, nft: UInt64, type: String, name: String, thumbnail: String)
-    pub event Removed(gieft: UInt64, nft: UInt64, type: String, name: String, thumbnail: String)
-    pub event Claimed(gieft: UInt64, nft: UInt64, type: String, name: String, thumbnail: String, gifter: Address?, giftee: Address?)
+    access(all)
+    event Added(gieft: UInt64, nft: UInt64, type: String, name: String, thumbnail: String)
 
-    /**//////////////////////////////////////////////////////////////
-    //                         INTERFACES                          //
+    access(all)
+    event Removed(gieft: UInt64, nft: UInt64, type: String, name: String, thumbnail: String)
+
+    access(all)
+    event Claimed(
+        gieft: UInt64,
+        nft: UInt64,
+        type: String,
+        name: String,
+        thumbnail: String,
+        gifter: Address?,
+        giftee: Address?
+    ) /**/
+    /////////////////////////////////////////////////////////////
+
+
+    //						 INTERFACES						  //
     /////////////////////////////////////////////////////////////**/
-
     /// Gieft
+    access(all)
+    resource interface GieftPublic{ 
+        access(all)
+        let password: [UInt8]
 
-    pub resource interface GieftPublic {
-        pub let password: [UInt8]
-        pub fun borrowClaimableNFT(): &NonFungibleToken.NFT?
-        pub fun claimNft(password: String, collection: &AnyResource{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection})
-        pub fun getNftIDs(): [UInt64]
+        access(all)
+        fun borrowClaimableNFT(): &{NonFungibleToken.NFT}?
+
+        access(all)
+        fun claimNft(
+            password: String,
+            collection: &{NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection}
+        )
+
+        access(all)
+        fun getNftIDs(): [UInt64]
     }
 
     /// GieftCollection
+    access(all)
+    resource interface GieftCollectionPublic{ 
+        access(all)
+        fun borrowGieft(_ gieft: UInt64): &Giefts.Gieft?
 
-    pub resource interface GieftCollectionPublic {
-        pub fun borrowGieft(_ gieft: UInt64): &Gieft{GieftPublic}?
-        pub fun getGieftIDs(): [UInt64]
+        access(all)
+        fun getGieftIDs(): [UInt64]
     }
 
-    pub resource interface GieftCollectionPrivate {
-        pub fun packGieft(name: String, password: [UInt8], nfts: @{UInt64: NonFungibleToken.NFT})
-        pub fun addNftToGieft(gieft: UInt64, nft: @NonFungibleToken.NFT)
-        pub fun unpackGieft(gieft: UInt64): @{UInt64: NonFungibleToken.NFT} 
-    }
+    access(all)
+    resource interface GieftCollectionPrivate{ 
+        access(Owner)
+        fun packGieft(
+            name: String,
+            password: [
+            UInt8
+            ],
+            nfts: @{
+                UInt64:{ NonFungibleToken.NFT}
+            }
+        ): Void
 
-    /**//////////////////////////////////////////////////////////////
-    //                         RESOURCES                           //
+        access(Owner)
+        fun addNftToGieft(gieft: UInt64, nft: @{NonFungibleToken.NFT})
+
+        access(Owner)
+        fun unpackGieft(gieft: UInt64): @{UInt64:{ NonFungibleToken.NFT}}
+    } /**/
+    /////////////////////////////////////////////////////////////
+
+
+    //						 RESOURCES						   //
     /////////////////////////////////////////////////////////////**/
-
     /// Gieft
     /// A collection of NFTs that can be claimed by passing the correct password
-
-    pub resource Gieft: GieftPublic {
+    access(all)
+    resource Gieft: GieftPublic{ 
         ///  The name of the gieft
-        pub let name: String
+        access(all)
+        let name: String
+
         /// A collection of NFTs
         /// nfts are stored as a map of uuids to NFTs
-        access(contract) var nfts: @{UInt64: NonFungibleToken.NFT}
+        access(contract)
+        var nfts: @{UInt64:{ NonFungibleToken.NFT}}
 
         /// The hashed password to claim an nft
-        pub let password: [UInt8]
+        access(all)
+        let password: [UInt8]
 
         /// add an NFT to the gieft
-        access(contract) fun addNft(nft: @NonFungibleToken.NFT) {
-            pre {
-                !self.nfts.keys.contains(nft.uuid) : "NFT uuid already added"
+        access(contract)
+        fun addNft(nft: @{NonFungibleToken.NFT}){ 
+            pre{ 
+                !self.nfts.keys.contains(nft.uuid):
+                "NFT uuid already added"
             }
             let display: MetadataViews.Display = nft.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
             emit Added(gieft: self.uuid, nft: nft.uuid, type: nft.getType().identifier, name: display.name, thumbnail: display.thumbnail.uri())
-            let oldNft <- self.nfts[nft.uuid] <-nft
+            let oldNft <- self.nfts[nft.uuid] <- nft
             destroy oldNft
         }
 
         /// borrwClaimableNFT
         /// get a reference to the first NFT that can be claimed
         /// @returns the first NFT that can be claimed
-        pub fun borrowClaimableNFT(): &NonFungibleToken.NFT? {
-            if self.nfts.length > 0 {
-                return &self.nfts[self.nfts.keys[0]] as &NonFungibleToken.NFT?
-            } else {
+        access(all)
+        fun borrowClaimableNFT(): &{NonFungibleToken.NFT}?{ 
+            if self.nfts.length > 0{ 
+                return &self.nfts[self.nfts.keys[0]]
+            } else{ 
                 return nil
             }
         }
 
         /// claim an NFT from the gieft
         /// @params password: the password to claim the NFT
-        pub fun claimNft(password: String, collection: &AnyResource{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}) {
-            pre {
-                self.password ==  HashAlgorithm.KECCAK_256.hash(password.utf8) : "Incorrect password"
-                self.nfts.length > 0 : "No NFTs to claim"
+        access(all)
+        fun claimNft(password: String, collection: &{NonFungibleToken.CollectionPublic, ViewResolver.ResolverCollection}){ 
+            pre{ 
+                self.password == HashAlgorithm.KECCAK_256.hash(password.utf8):
+                "Incorrect password"
+                self.nfts.length > 0:
+                "No NFTs to claim"
             }
             let nft <- self.nfts.remove(key: self.nfts.keys[0])!
             let display: MetadataViews.Display = nft.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
             emit Claimed(gieft: self.uuid, nft: nft.uuid, type: nft.getType().identifier, name: display.name, thumbnail: display.thumbnail.uri(), gifter: self.owner?.address, giftee: collection.owner?.address)
-            collection.deposit(token: <- nft)
+            collection.deposit(token: <-nft)
         }
 
         /// unpack, a function to unpack an NFT from the gieft, this function is only callable by the owner
         /// @params nft: the uuid of the NFT to claim
-        access(contract) fun unpack(nft: UInt64): @NonFungibleToken.NFT {
-            pre {
-                self.nfts.keys.contains(nft) : "NFT does not exist"
+        access(contract)
+        fun unpack(nft: UInt64): @{NonFungibleToken.NFT}{ 
+            pre{ 
+                self.nfts.keys.contains(nft):
+                "NFT does not exist"
             }
             let nft <- self.nfts.remove(key: nft)!
             let display: MetadataViews.Display = nft.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
@@ -124,37 +182,33 @@ pub contract Giefts {
         }
 
         /// get all NFT ids
-        pub fun getNftIDs(): [UInt64] {
+        access(all)
+        fun getNftIDs(): [UInt64]{ 
             return self.nfts.keys
         }
 
-        init (name: String, password: [UInt8], nfts: @{UInt64: NonFungibleToken.NFT}) {
+        init(name: String, password: [UInt8], nfts: @{UInt64:{ NonFungibleToken.NFT}}){ 
             self.name = name
             self.nfts <- nfts
             self.password = password
             emit Packed(gieft: self.uuid, nfts: self.nfts.keys)
         }
-
-        destroy () {
-            pre {
-                self.nfts.length == 0 : "All NFTs must be claimed before destroying the gieft"
-            }
-            destroy self.nfts
-        }
     }
 
     /// GieftCollection
     /// A collection of giefts
-
-    pub resource GieftCollection: GieftCollectionPublic, GieftCollectionPrivate  {
+    access(all)
+    resource GieftCollection: GieftCollectionPublic, GieftCollectionPrivate{ 
         /// a collection of giefts
-        pub var giefts: @{UInt64: Gieft}
+        access(all)
+        var giefts: @{UInt64: Gieft}
 
         /// create a new gieft
         /// @params password: the hashed password to claim an NFT from the Gieft
         /// @params nfts: the NFTs to add to the gieft
-        pub fun packGieft(name: String, password: [UInt8], nfts: @{UInt64: NonFungibleToken.NFT}) {
-            let gieft <- create Gieft(name: name, password: password, nfts: <- nfts)
+        access(Owner)
+        fun packGieft(name: String, password: [UInt8], nfts: @{UInt64:{ NonFungibleToken.NFT}}){ 
+            let gieft <- create Gieft(name: name, password: password, nfts: <-nfts)
             let oldGieft <- self.giefts[gieft.uuid] <- gieft
             destroy oldGieft
         }
@@ -162,24 +216,27 @@ pub contract Giefts {
         /// add an NFT to a gieft
         /// @params gieft: the uuid of the gieft to add the NFT to
         /// @params nft: the NFT to add to the gieft
-        pub fun addNftToGieft(gieft: UInt64, nft: @NonFungibleToken.NFT) {
-            pre {
-                self.giefts.keys.contains(gieft) : "Gieft does not exist"
+        access(Owner)
+        fun addNftToGieft(gieft: UInt64, nft: @{NonFungibleToken.NFT}){ 
+            pre{ 
+                self.giefts.keys.contains(gieft):
+                "Gieft does not exist"
             }
-            self.borrowGieft(gieft)!.addNft(nft: <-nft)
+            (self.borrowGieft(gieft)!).addNft(nft: <-nft)
         }
 
         /// unpack a gieft
         /// @params gieft: the uuid of the gieft to unpack
-        pub fun unpackGieft(gieft: UInt64): @{UInt64: NonFungibleToken.NFT} {
-            pre {
-                self.giefts.keys.contains(gieft) : "Gieft does not exist"
+        access(Owner)
+        fun unpackGieft(gieft: UInt64): @{UInt64:{ NonFungibleToken.NFT}}{ 
+            pre{ 
+                self.giefts.keys.contains(gieft):
+                "Gieft does not exist"
             }
-            var nfts: @{UInt64: NonFungibleToken.NFT} <- {}
-
+            var nfts: @{UInt64:{ NonFungibleToken.NFT}} <-{} 
             let gieft = self.borrowGieft(gieft)!
             let nftIDs = gieft.getNftIDs()
-            for nftID in nftIDs {
+            for nftID in nftIDs{ 
                 let nft <- gieft.unpack(nft: nftID)
                 let oldNft <- nfts[nftID] <- nft
                 destroy oldNft
@@ -189,37 +246,35 @@ pub contract Giefts {
 
         /// borrow a gieft reference
         /// @params gieft: the uuid of the gieft to borrow
-        pub fun borrowGieft(_ gieft: UInt64): &Gieft? {
-            return &self.giefts[gieft] as &Gieft?
+        access(all)
+        fun borrowGieft(_ gieft: UInt64): &Gieft?{ 
+            return &self.giefts[gieft] 
         }
 
         /// get all gieft ids
-        pub fun getGieftIDs(): [UInt64] {
+        access(all)
+        fun getGieftIDs(): [UInt64]{ 
             return self.giefts.keys
         }
 
-        init () {
-            self.giefts <- {}
+        init(){ 
+            self.giefts <-{} 
         }
+    } /**/
+    /////////////////////////////////////////////////////////////
 
-        destroy () {
-            destroy self.giefts
-        }
-    }
 
-    /**//////////////////////////////////////////////////////////////
-    //                         FUNCTIONS                           //
+    //						 FUNCTIONS						   //
     /////////////////////////////////////////////////////////////**/
-
     /// create a new gieft collection resource
-    pub fun createGieftCollection (): @GieftCollection {
+    access(all)
+    fun createGieftCollection(): @GieftCollection{ 
         return <-create GieftCollection()
     }
 
-    init () {
+    init(){ 
         /// paths
         self.GieftsStoragePath = /storage/Giefts
         self.GieftsPublicPath = /public/Giefts
-        self.GieftsPrivatePath = /private/Giefts
     }
 }

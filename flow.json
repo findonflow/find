@@ -20,7 +20,8 @@
         "testnet": "9a0766d93b6608b7",
         "migrationnet": "9a0766d93b6608b7",
         "previewnet": "0xa0225e7000ac82a9",
-        "emulator": "ee82856bf20e2aa6"
+        "emulator": "ee82856bf20e2aa6",
+        "mainnet": "0xf233dcee88fe0abe"
       }
     },
     "EmeraldIdentity": {
@@ -619,7 +620,6 @@
         "FindAirdropper",
         "FindFurnace",
         "FindUtils",
-        "FindUserStatus",
         "FindThoughts",
         "FindMarketCut",
         "FindMarketCutStruct",

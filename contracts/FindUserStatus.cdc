@@ -307,7 +307,7 @@ access(all) contract FindUserStatus {
     access(all) fun getFlowtyListing(user: Address, id: UInt64, type: Type) : FlowtyListing? {
         var flowty : FlowtyListing? = nil
         let account = getAccount(user)
-        let flowtyCap = account.capabilities.get<&Flowty.FlowtyStorefront{Flowty.FlowtyStorefrontPublic}>(Flowty.FlowtyStorefrontPublicPath)
+        let flowtyCap = account.capabilities.get<&Flowty.FlowtyStorefront>(Flowty.FlowtyStorefrontPublicPath)!
 
         if flowtyCap.check() {
             let storefrontRef=flowtyCap.borrow()!
@@ -340,7 +340,7 @@ access(all) contract FindUserStatus {
 
         var flowtyRental : FlowtyRental? = nil
         let account = getAccount(user)
-        let flowtyRentalCap = account.getCapability<&FlowtyRentals.FlowtyRentalsStorefront{FlowtyRentals.FlowtyRentalsStorefrontPublic}>(FlowtyRentals.FlowtyRentalsStorefrontPublicPath)
+        let flowtyRentalCap = account.capabilities.get<&FlowtyRentals.FlowtyRentalsStorefront>(FlowtyRentals.FlowtyRentalsStorefrontPublicPath)!
 
         if flowtyRentalCap.check() {
             let storefrontRef=flowtyRentalCap.borrow()!
