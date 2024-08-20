@@ -21,7 +21,6 @@ func TestFindForge(t *testing.T) {
 		buyForge("user1")
 
 	t.Run("Should be able to mint Example NFT and then get it by script", func(t *testing.T) {
-
 		exampleNFTIdentifier := exampleNFTType(otu)
 
 		otu.O.Tx("adminAddNFTCatalog",
@@ -70,12 +69,10 @@ func TestFindForge(t *testing.T) {
 				"shard":              "NFTCatalog",
 			}}),
 		)
-
 	})
 
 	exampleNFTForge := otu.identifier("ExampleNFT", "Forge")
 	t.Run("Should be able to add allowed names to private forges", func(t *testing.T) {
-
 		otu.O.Tx("adminRemoveForge",
 			WithSigner("find-admin"),
 			WithArg("type", exampleNFTForge),
@@ -152,11 +149,9 @@ func TestFindForge(t *testing.T) {
 			WithArg("collectionSquareImage", "Example NFT square image"),
 			WithArg("collectionBannerImage", "Example NFT banner image"),
 		).AssertSuccess(t)
-
 	})
 
 	t.Run("Should be able to add allowed names to private forges", func(t *testing.T) {
-
 		otu.O.Tx("adminRemoveForge",
 			WithSigner("find-admin"),
 			WithArg("type", exampleNFTForge),
@@ -168,11 +163,12 @@ func TestFindForge(t *testing.T) {
 			WithArg("name", "user1"),
 		).AssertSuccess(t)
 
+		price := 1000.0 / 0.42
 		otu.O.Tx("buyAddon",
 			WithSigner("user1"),
 			WithArg("name", "user1"),
 			WithArg("addon", "premiumForge"),
-			WithArg("amount", 1000.0),
+			WithArg("maxAmount", price),
 		).AssertSuccess(t).
 			AssertEvent(t, otu.identifier("FIND", "AddonActivated"),
 				map[string]interface{}{
@@ -195,7 +191,6 @@ func TestFindForge(t *testing.T) {
 			WithArg("collectionBannerImage", "Example NFT banner image"),
 		).AssertSuccess(t).
 			GetIdFromEvent("FindForge.Minted", "id")
-
 		if err != nil {
 			panic(err)
 		}
@@ -208,11 +203,9 @@ func TestFindForge(t *testing.T) {
 		).AssertWant(t,
 			autogold.Want("royalty", map[string]interface{}{"cutInfos": []interface{}{map[string]interface{}{"cut": 0.05, "description": "creator", "receiver": fmt.Sprintf("Capability<&AnyResource{%s}>(address: %s, path: /public/findProfileReceiver)", otu.identifier("FungibleToken", "Receiver"), otu.O.Address("user1"))}}}),
 		)
-
 	})
 
 	t.Run("Should not be able to mint Example NFTs with non-exist traits", func(t *testing.T) {
-
 		otu.O.Tx("devMintExampleNFT",
 			WithSigner("user1"),
 			WithArg("name", "user1"),
@@ -226,12 +219,11 @@ func TestFindForge(t *testing.T) {
 			WithArg("collectionSquareImage", "Example NFT square image"),
 			WithArg("collectionBannerImage", "Example NFT banner image"),
 		).
-		Print().
+			Print().
 			AssertFailure(t, "This trait does not exist ID :4")
 	})
 
 	t.Run("Should be able register traits to Example NFT and then mint", func(t *testing.T) {
-
 		otu.O.Tx("devAddTraitsExampleNFT",
 			WithSigner("find-admin"),
 			WithArg("lease", "user1"),
@@ -255,7 +247,6 @@ func TestFindForge(t *testing.T) {
 	})
 
 	t.Run("Should be able to add addon and mint for users as admin", func(t *testing.T) {
-
 		otu.registerUserWithName("user1", "testingname")
 
 		otu.O.Tx("adminAddAddon",
@@ -292,12 +283,12 @@ func TestFindForge(t *testing.T) {
 	})
 
 	type MetadataViews_NFTCollectionDisplay struct {
+		Socials     map[string]MetadataViews_ExternalURL
+		SquareImage MetadataViews_Media_IPFS `cadence:"squareImage"`
+		BannerImage MetadataViews_Media_IPFS `cadence:"bannerImage"`
 		Name        string
 		Description string
 		ExternalURL MetadataViews_ExternalURL `cadence:"externalURL"`
-		SquareImage MetadataViews_Media_IPFS  `cadence:"squareImage"`
-		BannerImage MetadataViews_Media_IPFS  `cadence:"bannerImage"`
-		Socials     map[string]MetadataViews_ExternalURL
 	}
 
 	collectionDisplay := MetadataViews_NFTCollectionDisplay{
@@ -323,20 +314,19 @@ func TestFindForge(t *testing.T) {
 	}
 
 	t.Run("Should be able to order Forges for contract", func(t *testing.T) {
-
 		testingName := "foo"
 		mintType := "DIM"
 		otu.O.Tx("register",
 			WithSigner("user1"),
 			WithArg("name", testingName),
-			WithArg("amount", 500.0),
+			WithArg("maxAmount", 500.0/0.42),
 		).AssertSuccess(t)
 
 		otu.O.Tx("buyAddon",
 			WithSigner("user1"),
 			WithArg("name", testingName),
 			WithArg("addon", "forge"),
-			WithArg("amount", 50.0),
+			WithArg("maxAmount", 50.0/0.42),
 		).
 			AssertSuccess(t).
 			AssertEvent(t, "AddonActivated", map[string]interface{}{
@@ -368,7 +358,6 @@ func TestFindForge(t *testing.T) {
 	})
 
 	t.Run("Should be able to remove order as Admin", func(t *testing.T) {
-
 		testingName := "foo"
 		mintType := "DIM"
 
@@ -388,7 +377,6 @@ func TestFindForge(t *testing.T) {
 	})
 
 	t.Run("Should be able to order as Admin", func(t *testing.T) {
-
 		testingName := "foo"
 		mintType := "DIM"
 
@@ -413,7 +401,7 @@ func TestFindForge(t *testing.T) {
 	otu.O.Tx("setup_fin_1_create_client", WithSigner("find-forge")).
 		AssertSuccess(otu.T).AssertNoEvents(otu.T)
 
-	//link in the server in the versus client
+	// link in the server in the versus client
 	otu.O.Tx("setup_fin_2_register_client",
 		findSigner,
 		WithArg("ownerAddress", "find-forge"),
@@ -428,7 +416,6 @@ func TestFindForge(t *testing.T) {
 	})
 
 	t.Run("Should be able to mint Foo NFT as user 1", func(t *testing.T) {
-
 		type FindForgeStruct_FindDIM struct {
 			Name          string                 `cadence:"name"`
 			Description   string                 `cadence:"description"`

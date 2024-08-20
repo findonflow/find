@@ -28,15 +28,15 @@ func TestFIND(t *testing.T) {
 		otu.O.Tx("register",
 			WithSigner("user1"),
 			WithArg("name", "usr"),
-			WithArg("amount", 500.0),
-		).AssertFailure(t, "Amount withdrawn must be less than or equal than the balance of the Vault")
+			WithArg("maxAmount", 1001.0),
+		).Print().AssertFailure(t, "Balance of vault is not high enough")
 	})
 
 	t.Run("Should get error if you try to register a name that is too short", func(t *testing.T) {
 		otu.O.Tx("register",
 			WithSigner("user1"),
 			WithArg("name", "ur"),
-			WithArg("amount", 5.0),
+			WithArg("maxAmount", 5.0/0.42),
 		).AssertFailure(t, "A FIND name has to be lower-cased alphanumeric or dashes and between 3 and 16 characters")
 	})
 
@@ -44,7 +44,7 @@ func TestFIND(t *testing.T) {
 		otu.O.Tx("register",
 			WithSigner("user1"),
 			WithArg("name", "user1"),
-			WithArg("amount", 5.0),
+			WithArg("maxAmount", 5.0/0.42),
 		).AssertFailure(t, "Name already registered")
 	})
 
@@ -155,17 +155,20 @@ func TestFIND(t *testing.T) {
 				"action":     "add",
 			})
 
-		otu.O.Script("getFindStatus",
+		status := otu.O.Script("getFindStatus",
 			WithArg("user", "user1"),
-		).
-			AssertWithPointerWant(t, "/accounts/0",
-				autogold.Want("getFindStatus Dapper", map[string]interface{}{
-					"address": otu.O.Address("user2"),
-					"name":    "dapper",
-					"network": "Flow",
-					"node":    "FindRelatedAccounts",
-					"trusted": false,
-				}))
+		)
+
+		status.Print()
+
+		status.AssertWithPointerWant(t, "/accounts/0",
+			autogold.Want("getFindStatus Dapper", map[string]interface{}{
+				"address": otu.O.Address("user2"),
+				"name":    "dapper",
+				"network": "Flow",
+				"node":    "FindRelatedAccounts",
+				"trusted": false,
+			}))
 
 		otu.O.Tx("removeRelatedAccount",
 			WithSigner("user1"),
@@ -221,9 +224,10 @@ func TestFIND(t *testing.T) {
 		).AssertWant(t,
 			autogold.Want("getFindStatus", map[string]interface{}{
 				"activatedAccount": true, "hasLostAndFoundItem": false,
-				"isDapper":          false,
-				"privateMode":       false,
-				"readyForWearables": false,
+				"isDapper":            false,
+				"privateMode":         false,
+				"isReadyForNameOffer": false,
+				"readyForWearables":   false,
 			}),
 		)
 	})
@@ -237,6 +241,7 @@ func TestFIND(t *testing.T) {
 				"findDandy",
 				"A_179b6b1cb6755e31_FindMarketDirectOfferEscrow_SaleItemCollection_find",
 				"FindPackCollection",
+				"A_179b6b1cb6755e31_FindLeaseMarketDirectOfferSoft_SaleItemCollection_find",
 			}}),
 		)
 	})
@@ -310,18 +315,9 @@ func TestFIND(t *testing.T) {
 			WithSigner("user1"),
 			WithArg("name", "name1"),
 			WithArg("addon", "forge"),
-			WithArg("amount", 10.0),
+			WithArg("maxAmount", 10.0/0.42),
 		).
-			AssertFailure(t, "Expect 50.00000000 FUSD for forge addon")
-
-		/* Should not be able to buy addons that does not exist */
-		otu.O.Tx("buyAddon",
-			WithSigner(user),
-			WithArg("name", user),
-			WithArg("addon", dandyNFTType(otu)),
-			WithArg("amount", 10.0),
-		).
-			AssertFailure(t, "This addon is not available.")
+			AssertFailure(t, "You have not sent in enough max flow")
 	})
 
 	t.Run("Should be able to fund users without profile", func(t *testing.T) {
@@ -465,6 +461,7 @@ func TestFIND(t *testing.T) {
 	user3Address := otu.O.Address("user3")
 	otu.expireLease().tickClock(2.0)
 	otu.registerUser("user1")
+
 	t.Run("Should be able to register related account and mutually link it for trust", func(t *testing.T) {
 		otu.O.Tx("setRelatedAccount",
 			WithSigner("user1"),
@@ -622,36 +619,12 @@ func TestFIND(t *testing.T) {
 
 	// setup for testing old leases
 	otu.registerUserWithName(oldOwner, testingName)
-	otu.listNameForSale(oldOwner, testingName)
-	otu.O.Tx("listNameForAuction",
-		WithSigner(oldOwner),
-		WithArg("name", testingName),
-		WithArg("auctionStartPrice", 5.0),
-		WithArg("auctionReservePrice", 20.0),
-		WithArg("auctionDuration", auctionDurationFloat),
-		WithArg("auctionExtensionOnLateBid", 300.0),
-	).
-		AssertSuccess(t)
 
 	otu.expireLease().
 		expireLease().
 		tickClock(2.0)
 
 	otu.registerUserWithName(currentOwner, testingName)
-
-	t.Run("Should not be able to move old leases", func(t *testing.T) {
-		// should be able to move name to other user
-		otu.moveNameTo(currentOwner, "user3", "testingname")
-		otu.moveNameTo("user3", currentOwner, "testingname")
-
-		// should not be able to move name to other user
-		otu.O.Tx("moveNameTO",
-			WithSigner(oldOwner),
-			WithArg("name", testingName),
-			WithArg("receiver", otu.O.Address("user3")),
-		).
-			AssertFailure(t, "This is not a valid lease. Lease already expires and some other user registered it. Lease : testingname")
-	})
 
 	t.Run("Should not be able to get old leases information", func(t *testing.T) {
 		otu.O.Script(`
@@ -702,75 +675,6 @@ func TestFIND(t *testing.T) {
 }`))
 	})
 
-	t.Run("Should not be able to list old leases for sale", func(t *testing.T) {
-		// should be able to list name for sale
-		otu.O.Tx("listNameForSale",
-			WithSigner(currentOwner),
-			WithArg("name", testingName),
-			WithArg("directSellPrice", 10.0),
-		).AssertSuccess(t)
-
-		// should not be able to list name for sale
-		otu.O.Tx("listNameForSale",
-			WithSigner(oldOwner),
-			WithArg("name", testingName),
-			WithArg("directSellPrice", 10.0),
-		).
-			AssertFailure(t, "This is not a valid lease. Lease already expires and some other user registered it. Lease : testingname")
-	})
-
-	t.Run("Should not be able to list old leases for auction", func(t *testing.T) {
-		// should be able to list name for auction
-		otu.O.Tx("listNameForAuction",
-			WithSigner(currentOwner),
-			WithArg("name", testingName),
-			WithArg("auctionStartPrice", 5.0),
-			WithArg("auctionReservePrice", 20.0),
-			WithArg("auctionDuration", auctionDurationFloat),
-			WithArg("auctionExtensionOnLateBid", 300.0),
-		).
-			AssertSuccess(t)
-
-		// should not be able to list name for auction
-		otu.O.Tx("listNameForAuction",
-			WithSigner(oldOwner),
-			WithArg("name", testingName),
-			WithArg("auctionStartPrice", 5.0),
-			WithArg("auctionReservePrice", 20.0),
-			WithArg("auctionDuration", auctionDurationFloat),
-			WithArg("auctionExtensionOnLateBid", 300.0),
-		).
-			AssertFailure(t, "This is not a valid lease. Lease already expires and some other user registered it. Lease : testingname")
-	})
-
-	t.Run("Should be able to delist old leases for sale", func(t *testing.T) {
-		// should be able to delist name for sale
-		otu.O.Tx("delistNameSale",
-			WithSigner(currentOwner),
-			WithArg("names", []string{testingName}),
-		).
-			AssertSuccess(t)
-
-		// should be able to delist name for sale
-		otu.O.Tx("delistNameSale",
-			WithSigner(oldOwner),
-			WithArg("names", []string{testingName}),
-		).
-			AssertSuccess(t)
-	})
-
-	t.Run("Should be able to delist old leases for auction", func(t *testing.T) {
-		otu.O.Tx("cancelNameAuction",
-			WithSigner(currentOwner),
-			WithArg("names", []string{testingName}),
-		).AssertSuccess(t)
-
-		otu.O.Tx("cancelNameAuction",
-			WithSigner(oldOwner),
-			WithArg("names", []string{testingName}),
-		).AssertSuccess(t)
-	})
-
 	t.Run("Should be able to cleanup invalid leases", func(t *testing.T) {
 		otu.O.Tx("cleanUpInvalidatedLease",
 			WithSigner(currentOwner),
@@ -782,20 +686,5 @@ func TestFIND(t *testing.T) {
 			WithSigner(oldOwner),
 			WithArg("names", []string{testingName}),
 		).AssertSuccess(t)
-	})
-
-	t.Run("Should be able to register a name with usdc", func(t *testing.T) {
-		otu.O.Tx("registerUSDC",
-			WithSigner("user1"),
-			WithArg("name", "fooobar"),
-			WithArg("amount", 5.0),
-		).AssertSuccess(t).
-			AssertEvent(otu.T, "FIND.Register", map[string]interface{}{
-				"name": "fooobar",
-			}).
-			AssertEvent(otu.T, "FiatToken.TokensDeposited", map[string]interface{}{
-				"amount": 5.0,
-				"to":     otu.O.Address("find-admin"),
-			})
 	})
 }

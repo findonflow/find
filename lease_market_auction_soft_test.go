@@ -7,13 +7,12 @@ import (
 )
 
 func TestLeaseMarketAuctionSoft(t *testing.T) {
-
 	otu := NewOverflowTest(t)
 
 	price := 10.0
 	preIncrement := 5.0
 	otu.setupMarketAndDandyDapper()
-	otu.setFlowLeaseMarketOption().
+	otu.setFlowLeaseMarketOptionDapper().
 		registerDUCInRegistry().
 		setProfile("user1").
 		setProfile("user2").
@@ -30,7 +29,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	royaltyIdentifier := otu.identifier("FindLeaseMarket", "RoyaltyPaid")
 
 	t.Run("Should not be able to list an item for auction twice, and will give error message.", func(t *testing.T) {
-
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			saleLeaseListed("user1", "active_listed", price)
 
@@ -51,7 +49,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	})
 
 	t.Run("Should be able to sell at auction", func(t *testing.T) {
-
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			saleLeaseListed("user1", "active_listed", price).
 			auctionBidLeaseMarketSoft("user2", "name1", price+5.0).
@@ -63,7 +60,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	})
 
 	t.Run("Should be able to cancel listing if the pointer is no longer valid", func(t *testing.T) {
-
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			saleLeaseListed("user1", "active_listed", price).
 			auctionBidLeaseMarketSoft("user2", "name1", price+5.0).
@@ -86,7 +82,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	})
 
 	t.Run("Should not be able to list with price 0", func(t *testing.T) {
-
 		otu.O.Tx(
 			"listLeaseForAuctionSoftDapper",
 			WithSigner("user1"),
@@ -100,11 +95,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Auction start price should be greater than 0")
-
 	})
 
 	t.Run("Should not be able to list with invalid reserve price", func(t *testing.T) {
-
 		otu.O.Tx(
 			"listLeaseForAuctionSoftDapper",
 			WithSigner("user1"),
@@ -118,11 +111,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			WithArg("auctionValidUntil", otu.currentTime()+10.0),
 		).
 			AssertFailure(t, "Auction reserve price should be greater than Auction start price")
-
 	})
 
 	t.Run("Should not be able to list with invalid time", func(t *testing.T) {
-
 		otu.O.Tx(
 			"listLeaseForAuctionSoftDapper",
 			WithSigner("user1"),
@@ -136,11 +127,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			WithArg("auctionValidUntil", 0.0),
 		).
 			AssertFailure(t, "Valid until is before current time")
-
 	})
 
 	t.Run("Should be able to add bid at auction", func(t *testing.T) {
-
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			saleLeaseListed("user1", "active_listed", price).
 			auctionBidLeaseMarketSoft("user2", "name1", price+5.0).
@@ -153,7 +142,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	})
 
 	t.Run("Should not be able to bid expired auction listing", func(t *testing.T) {
-
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			saleLeaseListed("user1", "active_listed", price).
 			tickClock(1000.0)
@@ -169,7 +157,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	})
 
 	t.Run("Should not be able to bid your own listing", func(t *testing.T) {
-
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			saleLeaseListed("user1", "active_listed", price)
 
@@ -184,7 +171,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	})
 
 	t.Run("Should be able to cancel an auction", func(t *testing.T) {
-
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			saleLeaseListed("user1", "active_listed", price)
 
@@ -203,7 +189,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	})
 
 	t.Run("Should not be able to cancel an ended auction", func(t *testing.T) {
-
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			saleLeaseListed("user1", "active_listed", price).
 			auctionBidLeaseMarketSoft("user2", "name1", price+5.0).
@@ -220,7 +205,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.fulfillLeaseMarketAuctionSoft("user2", "name1", price+5.0).
 			moveNameTo("user2", "user1", "name1")
-
 	})
 
 	t.Run("Cannot fulfill a not yet ended auction", func(t *testing.T) {
@@ -243,7 +227,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	})
 
 	t.Run("Should allow seller to cancel auction if it failed to meet reserve price", func(t *testing.T) {
-
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			saleLeaseListed("user1", "active_listed", price).
 			auctionBidLeaseMarketSoft("user2", "name1", price+1.0).
@@ -266,7 +249,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	})
 
 	t.Run("Should be able to bid and increase bid by same user", func(t *testing.T) {
-
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			saleLeaseListed("user1", "active_listed", price).
 			auctionBidLeaseMarketSoft("user2", "name1", price+preIncrement).
@@ -284,7 +266,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 	/* Tests on Rules */
 	t.Run("Should not be able to list after deprecated", func(t *testing.T) {
-
 		otu.alterLeaseMarketOption("deprecate")
 
 		otu.O.Tx("listLeaseForAuctionSoftDapper",
@@ -355,11 +336,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.alterLeaseMarketOption("enable").
 			moveNameTo("user2", "user1", "name1")
-
 	})
 
 	t.Run("Should no be able to list, bid, add bid , fulfill auction and delist after stopped", func(t *testing.T) {
-
 		otu.alterLeaseMarketOption("stop")
 
 		otu.O.Tx("listLeaseForAuctionSoftDapper",
@@ -441,7 +420,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 			AssertFailure(t, "You need to bid more then the starting price of 10.00000000")
 
 		otu.delistAllLeaseForSoftAuction("user1")
-
 	})
 
 	t.Run("Should not be able to bid less the previous bidder", func(t *testing.T) {
@@ -466,7 +444,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	// find 0.025
 	// tenant nil
 	t.Run("Royalties should be sent to correspondence upon fulfill action", func(t *testing.T) {
-
 		price = 5.0
 
 		otu.listLeaseForSoftAuction("user1", "name1", price).
@@ -492,7 +469,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	})
 
 	t.Run("Should be able to ban user, user is only allowed to cancel listing.", func(t *testing.T) {
-
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			listLeaseForSoftAuction("user1", "name2", price).
 			auctionBidLeaseMarketSoft("user2", "name1", price+5.0).
@@ -545,11 +521,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.delistAllLeaseForSoftAuction("user1").
 			moveNameTo("user2", "user1", "name1")
-
 	})
 
 	t.Run("Should be able to ban user, user cannot bid NFT.", func(t *testing.T) {
-
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			listLeaseForSoftAuction("user1", "name2", price).
 			auctionBidLeaseMarketSoft("user2", "name1", price+5.0).
@@ -584,11 +558,9 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.delistAllLeaseForSoftAuction("user1").
 			moveNameTo("user2", "user1", "name1")
-
 	})
 
 	t.Run("Should emit previous bidder if outbid", func(t *testing.T) {
-
 		otu.listLeaseForSoftAuction("user1", "name1", price).
 			saleLeaseListed("user1", "active_listed", price).
 			auctionBidLeaseMarketSoft("user2", "name1", price+5.0).
@@ -611,7 +583,6 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 	})
 
 	t.Run("Should be able to list an NFT for auction and bid it with DUC", func(t *testing.T) {
-
 		otu.createDapperUser("user1").
 			createDapperUser("user2")
 
@@ -633,5 +604,4 @@ func TestLeaseMarketAuctionSoft(t *testing.T) {
 
 		otu.moveNameTo("user2", "user1", "name1")
 	})
-
 }

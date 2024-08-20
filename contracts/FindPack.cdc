@@ -780,12 +780,9 @@ pub contract FindPack: NonFungibleToken {
                 if royalty.receiver.check(){
                     royalty.receiver.borrow()!.deposit(from: <- vault.withdraw(amount: saleInfo!.price * royalty.cut))
                     royaltiesPaid=true
-                } else {
-                    //to-do :  emit events here ?
                 }
             }
 
-            //TODO: REMOVE THIS
             if !royaltiesPaid {
                 let wallet = getAccount(FindPack.account.address).getCapability<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
                 if wallet.check() {
@@ -1172,7 +1169,6 @@ pub contract FindPack: NonFungibleToken {
 
         FindForge.addForgeType(<- create Forge())
 
-        //TODO: Add the Forge resource aswell
         FindForge.addPublicForgeType(forgeType: Type<@Forge>())
 
         emit ContractInitialized()
