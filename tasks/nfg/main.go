@@ -5,7 +5,6 @@ import (
 )
 
 func main() {
-
 	o := Overflow(WithGlobalPrintOptions())
 
 	name := "nonfungerbils"
@@ -14,7 +13,7 @@ func main() {
 	nameArg := WithArg("name", name)
 	saSigner := WithSignerServiceAccount()
 
-	//setup find
+	// setup find
 	o.Tx("setup_fin_1_create_client", findSigner)
 	o.Tx("setup_fin_2_register_client", saSigner, WithArg("ownerAddress", "find"))
 	o.Tx("setup_fin_3_create_network", findSigner)
@@ -23,10 +22,10 @@ func main() {
 	o.Tx("setup_find_market_1", WithSigner("user4"))
 	o.Tx("setup_find_lease_market_2", WithSigner("find"), WithArg("tenantAddress", "user4"))
 
-	//setnup NFG
+	// setnup NFG
 	o.Tx("createProfile", nameSigner, nameArg)
 	o.Tx("devMintFusd", WithSignerServiceAccount(), WithArg("recipient", "user1"), WithArg("amount", 1000.0))
-	o.Tx("register", nameSigner, nameArg, WithArg("amount", 5.0))
+	o.Tx("register", nameSigner, nameArg, WithArg("maxAmount", 10.0))
 
 	o.Tx("adminAddForge",
 		findSigner,

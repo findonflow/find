@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 	var err error
 	ot, err = SetupTest([]OverflowOption{
 		WithCoverageReport(),
-		WithFlowForNewUsers(100.0),
+		WithFlowForNewUsers(500.0),
 	}, SetupFIND)
 	if err != nil {
 		panic(err)
@@ -113,7 +113,7 @@ func SetupFIND(o *OverflowState) error {
 	stx("register",
 		WithSigner("find"),
 		WithArg("name", "find"),
-		WithArg("amount", 100.0),
+		WithArg("maxAmount", 200.1),
 	)
 
 	createUser(stx, 100.0, "find-admin")
@@ -121,7 +121,7 @@ func SetupFIND(o *OverflowState) error {
 	stx("register",
 		WithSigner("find-admin"),
 		WithArg("name", "find-admin"),
-		WithArg("amount", 5.0),
+		WithArg("maxAmount", 10.1),
 	)
 	// setup find forge
 	stx("setup_find_forge_1", WithSigner("find-forge"))
@@ -142,14 +142,14 @@ func SetupFIND(o *OverflowState) error {
 	stx("register",
 		WithSigner("user1"),
 		WithArg("name", "user1"),
-		WithArg("amount", 5.0),
+		WithArg("maxAmount", 10.0),
 	)
 
 	stx("buyAddon",
 		WithSigner("user1"),
 		WithArg("name", "user1"),
 		WithArg("addon", "forge"),
-		WithArg("amount", 50.0),
+		WithArg("maxAmount", 100.0),
 	)
 
 	createUser(stx, 100.0, "user2")
@@ -157,7 +157,7 @@ func SetupFIND(o *OverflowState) error {
 	stx("register",
 		WithSigner("user2"),
 		WithArg("name", "user2"),
-		WithArg("amount", 5.0),
+		WithArg("maxAmount", 10.0),
 	)
 
 	createUser(stx, 100.0, "user3")
@@ -418,6 +418,13 @@ func SetupFIND(o *OverflowState) error {
 
 	findleaseQI, _ := o.QualifiedIdentifier("FIND", "Lease")
 	stx("tenantsetLeaseOptionDapper",
+		WithSigner("find"),
+		WithArg("nftName", "Lease"),
+		WithArg("nftType", findleaseQI),
+		WithArg("cut", 0.0),
+	)
+
+	stx("tenantsetLeaseOptionMarket",
 		WithSigner("find"),
 		WithArg("nftName", "Lease"),
 		WithArg("nftType", findleaseQI),

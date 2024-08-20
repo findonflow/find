@@ -3,6 +3,7 @@ import "FindMarket"
 import "FungibleToken"
 import "DapperUtilityCoin"
 import "FlowUtilityToken"
+import "FlowToken"
 import "MetadataViews"
 
 transaction(tenantAddress: Address) {
@@ -10,7 +11,7 @@ transaction(tenantAddress: Address) {
         let adminClient=account.storage.borrow<auth(FindMarketAdmin.Owner) &FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath)!
 
         let cut = [
-        FindMarket.TenantRule( name:"standard ft", types:[Type<@DapperUtilityCoin.Vault>(), Type<@FlowUtilityToken.Vault>()], ruleType:"ft", allow:true)
+        FindMarket.TenantRule( name:"standard ft", types:[Type<@DapperUtilityCoin.Vault>(), Type<@FlowUtilityToken.Vault>(), Type<@FlowToken.Vault>()], ruleType:"ft", allow:true)
         ]
 
         let royalty = MetadataViews.Royalty(

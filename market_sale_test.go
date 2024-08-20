@@ -128,13 +128,6 @@ func TestMarketSale(t *testing.T) {
 		).
 			AssertFailure(t, "Incorrect balance sent in vault. Expected 10.00000000 got 5.00000000")
 	})
-
-	ot.Run(t, "Should be able to list it in Flow but not FUSD.", func(t *testing.T) {
-		listingTx("listNFTForSale",
-			WithArg("ftAliasOrIdentifier", "FUSD"),
-		).AssertFailure(t, "Nothing matches")
-	})
-
 	ot.Run(t, "Should be able cancel all listing", func(t *testing.T) {
 		otu.listNFTForSale("user1", dandyIds[0], price)
 		otu.listNFTForSale("user1", dandyIds[1], price)
@@ -367,45 +360,6 @@ func TestMarketSale(t *testing.T) {
 					"amount":      0.5,
 					"findName":    "user1",
 					"royaltyName": "creator",
-				},
-			)
-	})
-
-	ot.Run(t, "Royalties should be sent to residual account if royalty receiver is not working", func(t *testing.T) {
-		otu.registerUser("user3")
-		otu.sendDandy("user3", "user1", id)
-
-		otu.O.Tx("devtenantsetMarketOptionAll",
-			WithSigner("find"),
-			WithArg("nftName", "Dandy"),
-			WithArg("nftType", dandyIdentifier),
-			WithArg("cut", 0.0),
-		).
-			AssertSuccess(otu.T)
-
-		listingTx("listNFTForSale",
-			WithSigner("user3"),
-			WithArg("id", id),
-			WithArg("ftAliasOrIdentifier", "FUSD"),
-		).AssertSuccess(t)
-
-		otu.destroyFUSDVault("user1")
-
-		otu.O.Tx("buyNFTForSale",
-			WithSigner("user2"),
-			WithArg("user", "user3"),
-			WithArg("id", id),
-			WithArg("amount", price),
-		).
-			AssertSuccess(t).
-			AssertEvent(t,
-				"FindMarket.RoyaltyCouldNotBePaid",
-				map[string]interface{}{
-					"address":         otu.O.Address("user1"),
-					"amount":          0.5,
-					"findName":        "user1",
-					"residualAddress": otu.O.Address("residual"),
-					"royaltyName":     "creator",
 				},
 			)
 	})

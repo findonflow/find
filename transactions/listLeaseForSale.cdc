@@ -29,12 +29,15 @@ transaction(leaseName: String, ftAliasOrIdentifier: String, directSellPrice:UFix
             account.capabilities.publish(leaseSaleItemCap, at: leasePublicPath)
         }
 
+
         self.saleItems= account.storage.borrow<auth(FindLeaseMarketSale.Seller) &FindLeaseMarketSale.SaleItemCollection>(from: leaseStoragePath)!
+
+        // Get supported NFT and FT Information from Registries from input alias
         let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic("This FT is not supported by the Find Market yet. Type : ".concat(ftAliasOrIdentifier))
         self.vaultType= ft.type
 
         let storagePathIdentifer = FIND.LeaseStoragePath.toString().split(separator:"/")[1]
-        let providerIdentifier = storagePathIdentifer.concat("Provider")
+        let providerIdentifier = storagePathIdentifer.concat("ProviderFlow")
         let providerStoragePath = StoragePath(identifier: providerIdentifier)!
 
         var existingProvider= account.storage.copy<Capability<auth(FIND.LeaseOwner) &FIND.LeaseCollection>>(from: providerStoragePath) 

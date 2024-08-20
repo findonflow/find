@@ -196,4 +196,23 @@ func TestLeaseMarketSale(t *testing.T) {
 		).
 			AssertFailure(t, "Seller banned by Tenant")
 	})
+
+
+	ot.Run(t, "Should be able to list two leases for sale", func(t *testing.T) {
+
+	otu.O.Tx("devRegisterDapper",
+		WithSigner("user5"),
+		WithPayloadSigner("dapper"),
+		WithArg("merchAccount", "dapper"),
+		WithArg("name", "name5"),
+		WithArg("amount", 5.0),
+	).AssertSuccess(otu.T)
+
+		otu.listLeaseForSaleDUC("user5", "user5", price)
+		otu.listLeaseForSaleDUC("user5", "name5", price)
+
+		itemsForSale := otu.getLeasesForSale("user5")
+		require.Equal(t, 2 , len(itemsForSale))
+
+	})
 }

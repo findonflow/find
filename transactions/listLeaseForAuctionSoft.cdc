@@ -34,7 +34,7 @@ transaction(leaseName: String, ftAliasOrIdentifier:String, price:UFix64, auction
 
 
         let storagePathIdentifer = FIND.LeaseStoragePath.toString().split(separator:"/")[1]
-        let providerIdentifier = storagePathIdentifer.concat("Provider")
+        let providerIdentifier = storagePathIdentifer.concat("ProviderFlow")
         let providerStoragePath = StoragePath(identifier: providerIdentifier)!
 
         var existingProvider= account.storage.copy<Capability<auth(FIND.LeaseOwner) &FIND.LeaseCollection>>(from: providerStoragePath) 
