@@ -560,6 +560,60 @@
         "Flomies",
         "GeneratedExperiences"
       ]
+    },
+    "mainnet": {
+      "mainnet-find": [
+        "FIND",
+        "Clock",
+        "Profile",
+        "Debug",
+        "Admin",
+        "FindMarketAdmin",
+        "CharityNFT",
+        "FindViews",
+        "Dandy",
+        "FindMarket",
+        "FindMarketSale",
+        "FindMarketDirectOfferEscrow",
+        "FindMarketDirectOfferSoft",
+        "FindMarketAuctionEscrow",
+        "FindMarketAuctionSoft",
+        "FindLeaseMarket",
+        "FindLeaseMarketSale",
+        "FindLeaseMarketAuctionSoft",
+        "FindLeaseMarketDirectOfferSoft",
+        "Sender",
+        "FindRelatedAccounts",
+        "FTRegistry",
+        "FindForge",
+        "FindForgeOrder",
+        "FindForgeStruct",
+        "ProfileCache",
+        "FindRulesCache",
+        "FINDNFTCatalog",
+        "FINDNFTCatalogAdmin",
+        "FindLostAndFoundWrapper",
+        "FindPack",
+        "FindVerifier",
+        "FindAirdropper",
+        "FindFurnace",
+        "FindUtils",
+        "FindUserStatus",
+        "FindThoughts",
+        "FindMarketCut",
+        "FindMarketCutStruct",
+        "FindMarketCutInterface",
+        "FindMarketInfrastructureCut",
+        "NameVoucher",
+        "Giefts"
+      ],
+      "mainnet-find-forge": [
+        "NFGv3",
+        "PartyFavorz",
+        "PartyFavorzExtraData",
+        "Flomies",
+        "GeneratedExperiences"
+      ]
     }
   }
 }
