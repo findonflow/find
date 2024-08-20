@@ -367,6 +367,26 @@
     "migrationnet-find-forge": {
       "address": "3e5b4c627064625d",
       "key": "${TESTNET_ACCOUNT}"
+    },
+    "mainnet-find": {
+      "address": "0x097bafa4e0b48eef",
+      "key": "${MAINNET_FIND}"
+    },
+    "mainnet-find-forge": {
+      "address": "0x123cb666996b8432",
+      "key": "${MAINNET_FIND}"
+    },
+    "mainnet-find-admin": {
+      "address": "0x09a86f2493ce2e9d",
+      "key": "${MAINNET_FIND_ADMIN}"
+    },
+    "mainnet-find-lease": {
+      "address": "0x8f8767d488332ac7",
+      "key": "${MAINNET_FIND_ADMIN}"
+    },
+    "mainnet-find-dapper": {
+      "address": "0x46b99041da7235e9",
+      "key": "${MAINNET_FIND_ADMIN}"
     }
   },
   "deployments": {
