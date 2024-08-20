@@ -274,6 +274,7 @@
     "Flomies": "./contracts/Flomies.cdc",
     "NFGv3": "./contracts/NFGv3.cdc",
     "PartyFavorz": "./contracts/PartyFavorz.cdc",
+    "Giefts": "./contracts/Giefts.cdc",
     "PartyFavorzExtraData": "./contracts/PartyFavorzExtraData.cdc"
   },
   "networks": {
