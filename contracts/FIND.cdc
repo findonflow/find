@@ -1,5 +1,4 @@
 import "FungibleToken"
-import "FUSD"
 import "FlowToken"
 import "DapperUtilityCoin"
 import "Profile"
@@ -1315,40 +1314,8 @@ access(all) contract FIND {
         self.LeasePublicPath=/public/findLeases
         self.LeaseStoragePath=/storage/findLeases
 
-        self.BidPublicPath=/public/findBids
-        self.BidStoragePath=/storage/findBids
-
-        // Check if wallet is already initialized
-        if self.account.storage.borrow<&FUSD.Vault>(from: /storage/fusdVault) == nil {
-
-            // Unpublished the capabilites
-            self.account.capabilities.unpublish(/public/fusdBalance)
-            self.account.capabilities.unpublish(/public/fusdReceiver)
-
-            // Initialize Wallet
-            let vault <- FUSD.createEmptyVault(vaultType: Type<@FUSD.Vault>())
-
-            // Save the vault to storage
-            self.account.storage.save(<-vault, to: /storage/fusdVault)
-
-            // Create a public capability for the vault
-            let vaultCap = self.account.capabilities.storage.issue<&FUSD.Vault>(
-                /storage/fusdVault
-            )
-
-            let capb = self.account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/fusdVault)
-            self.account.capabilities.publish(capb, at: /public/fusdBalance)
-
-
-            // Create a public Capability to the Vault's Receiver functionality
-            let receiverCap = self.account.capabilities.storage.issue<&{FungibleToken.Receiver}>(
-                /storage/fusdVault
-            )
-            self.account.capabilities.publish(receiverCap, at: /public/fusdReceiver)
-        }
-
         // Get
-        let wallet=self.account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
+        let wallet=self.account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
 
         // these values are hardcoded here for a reason. Then plan is to throw away the key and not have setters for them so that people can trust the contract to be the same
         let network <-  create Network(
@@ -1363,124 +1330,11 @@ access(all) contract FIND {
         self.account.storage.save(<-network, to: FIND.NetworkStoragePath)
     }
 
-
-    //////////////////////////////////////////////////////////////////////
-    // DEPRECATED
-    //////////////////////////////////////////////////////////////////////
-
-
-    /* This code is dead, it still needs to be here, but it is not in use anymore */
-    access(all) event Sold()
-    access(all) event SoldAuction()
-    access(all) event DirectOfferRejected()
-    access(all) event DirectOfferCanceled()
-    access(all) event AuctionStarted()
-    access(all) event AuctionCanceled()
-    access(all) event AuctionBid()
-    access(all) event AuctionCanceledReservePrice()
-    access(all) event ForSale() 
-    access(all) event ForAuction()
-
-    // Deprecated in testnet
-    access(all) event TokensRewarded()
-    access(all) event TokensCanNotBeRewarded()
-
-    /// Emitted when a name is explicistly put up for sale
-    access(all) event Sale(name: String, uuid:UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, buyer:Address?, buyerName:String?, buyerAvatar: String?, validUntil: UFix64, lockedUntil: UFix64)
-
-    /// Emitted when an name is put up for on-demand auction
-    access(all) event EnglishAuction(name: String, uuid:UInt64, seller: Address, sellerName:String?, amount: UFix64, auctionReservePrice: UFix64, status: String, vaultType:String, buyer:Address?, buyerName:String?, buyerAvatar: String?, endsAt: UFix64?, validUntil: UFix64, lockedUntil: UFix64, previousBuyer:Address?, previousBuyerName:String?)
-
-    /// Emitted if a bid occurs at a name that is too low or not for sale
-    access(all) event DirectOffer(name: String, uuid:UInt64, seller: Address, sellerName: String?, amount: UFix64, status: String, vaultType:String, buyer:Address?, buyerName:String?, buyerAvatar: String?, validUntil: UFix64, lockedUntil: UFix64, previousBuyer:Address?, previousBuyerName:String?)
-
-    access(all) event RoyaltyPaid(name: String, uuid: UInt64, address: Address, findName:String?, royaltyName:String, amount: UFix64, vaultType:String, saleType: String)
-
-    //store bids made by a bidder to somebody elses leases
-    access(all) let BidPublicPath: PublicPath
-    access(all) let BidStoragePath: StoragePath
-
-    /* An Auction for a lease */
-    access(all) resource Auction {
-        access(contract) var endsAt: UFix64
-        access(contract) var startedAt: UFix64
-        access(contract) let extendOnLateBid: UFix64
-        access(contract) var latestBidCallback: Capability<&BidCollection>
-        access(contract) let name: String
-
-        init(endsAt: UFix64, startedAt: UFix64, extendOnLateBid: UFix64, latestBidCallback: Capability<&BidCollection>, name: String) {
-
-            if startedAt >= endsAt {
-                panic("Cannot start before it will end")
-            }
-            if extendOnLateBid == 0.0 {
-                panic("Extends on late bid must be a non zero value")
-            }
-            self.endsAt=endsAt
-            self.startedAt=startedAt
-            self.extendOnLateBid=extendOnLateBid
-            self.latestBidCallback=latestBidCallback
-            self.name=name
-        }
-
-    }
-
-
-    /*
-    ==========================================================================
-    Bids are a collection/resource for storing the bids bidder made on leases
-    ==========================================================================
-    */
-
-    //Struct that is used to return information about bids
-    access(all) struct BidInfo{
-        access(all) let name: String
-        access(all) let type: String
-        access(all) let amount: UFix64
-        access(all) let timestamp: UFix64
-        access(all) let lease: LeaseInformation?
-
-        init(name: String, amount: UFix64, timestamp: UFix64, type: String, lease: LeaseInformation?) {
-            self.name=name
-            self.amount=amount
-            self.timestamp=timestamp
-            self.type=type
-            self.lease=lease
-        }
-    }
-
-    access(all) resource Bid {
-        access(contract) let from: Capability<&LeaseCollection>
-        access(contract) let name: String
-        access(contract) var type: String
-        access(contract) let vault: @FUSD.Vault
-        access(contract) var bidAt: UFix64
-
-        init(from: Capability<&LeaseCollection>, name: String, vault: @FUSD.Vault){
-            self.vault <- vault
-            self.name=name
-            self.from=from
-            self.type="blind"
-            self.bidAt=Clock.time()
-        }
-    }
-
-    access(all) resource interface BidCollectionPublic {
-    }
-
-    //A collection stored for bidders/buyers
-    access(all) resource BidCollection: BidCollectionPublic {
-
-        access(contract) var bids : @{String: Bid}
-        access(contract) let receiver: Capability<&{FungibleToken.Receiver}>
-        access(contract) let leases: Capability<&LeaseCollection>
-
-        init(receiver: Capability<&{FungibleToken.Receiver}>, leases: Capability<&LeaseCollection>) {
-            self.bids <- {}
-            self.receiver=receiver
-            self.leases=leases
-        }
-
-    }
+    //These are deprecated resources that we cannot have remove 
+    access(all) struct BidInfo{}
+    access(all) resource Auction { }
+    access(all) resource Bid { }
+    access(all) resource interface BidCollectionPublic { }
+    access(all) resource BidCollection: BidCollectionPublic { }
 
 }
