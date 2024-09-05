@@ -542,21 +542,6 @@ access(all) contract FindPack: NonFungibleToken{
             case Type<MetadataViews.NFTCollectionDisplay>():
 
                 return self.getMetadata().collectionDisplay
-                /* to be determined
-                //let externalURL = MetadataViews.ExternalURL("https://find.xyz/mp/findPack")
-                let externalURL = MetadataViews.ExternalURL("https://find.xyz/")
-                let squareImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: "https://pbs.twimg.com/profile_images/1467546091780550658/R1uc6dcq_400x400.jpg"), mediaType: "image")
-                let bannerImage = MetadataViews.Media(file: MetadataViews.HTTPFile(url: "https://pbs.twimg.com/profile_banners/1448245049666510848/1652452073/1500x500"), mediaType: "image")
-                return MetadataViews.NFTCollectionDisplay(name: "find Pack",
-                description: "Find pack",
-                externalURL: externalURL,
-                squareImage: squareImage,
-                bannerImage: bannerImage,
-                socials: {
-                    "discord": MetadataViews.ExternalURL("https://discord.gg/ejdVgzWmYN"),
-                    "twitter" : MetadataViews.ExternalURL("https://twitter.com/findonflow")
-                })
-                */
             }
             return nil
         }
@@ -573,12 +558,24 @@ access(all) contract FindPack: NonFungibleToken{
         ]
     }
 
+
     access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
         switch viewType {
+        case Type<MetadataViews.NFTCollectionDisplay>():
+            return MetadataViews.NFTCollectionDisplay(
+                name: "Find Pack",
+                description: "A generic find pack that can contain lots of stuff",
+                externalURL: MetadataViews.ExternalURL("http://find.xyz"),
+                squareImage: MetadataViews.Media(file: MetadataViews.HTTPFile(url: "https://pbs.twimg.com/profile_images/1467546091780550658/R1uc6dcq_400x400.jpg") , mediaType: "image"),
+                bannerImage: MetadataViews.Media(file: MetadataViews.HTTPFile(url: "https://pbs.twimg.com/profile_banners/1448245049666510848/1652452073/1500x500") , mediaType: "image"),
+                socials: { 
+                    "Twitter" : MetadataViews.ExternalURL("https://twitter.com/findonflow") , 
+                    "Discord" : MetadataViews.ExternalURL("https://discord.gg/95P274mayM") 
+                }
+            )
+
+
         case Type<MetadataViews.NFTCollectionData>():
-            let collectionRef = self.account.storage.borrow<&FindPack.Collection>(
-                from: FindPack.CollectionStoragePath
-            ) ?? panic("Could not borrow a reference to the stored collection")
             let collectionData = MetadataViews.NFTCollectionData(
                 storagePath: FindPack.CollectionStoragePath,
                 publicPath: FindPack.CollectionPublicPath,

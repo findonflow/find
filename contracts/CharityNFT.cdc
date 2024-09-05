@@ -138,16 +138,28 @@ access(all) contract CharityNFT: NonFungibleToken {
 
     access(all) view fun getContractViews(resourceType: Type?): [Type] {
         return [
-        Type<MetadataViews.NFTCollectionData>()
+        Type<MetadataViews.NFTCollectionData>(),
+        Type<MetadataViews.NFTCollectionDisplay>() 
         ]
     }
 
     access(all) fun resolveContractView(resourceType: Type?, viewType: Type): AnyStruct? {
         switch viewType {
+
+            case Type<MetadataViews.NFTCollectionDisplay>() : 
+            return MetadataViews.NFTCollectionDisplay(
+                name: "Neo Charity 2021",
+                description: "This collection is to show participation in the Neo Collectibles x Flowverse Charity Auction in 2021.",
+                externalURL: MetadataViews.ExternalURL("http://find.xyz/neoCharity"),
+                squareImage: MetadataViews.Media(file: MetadataViews.HTTPFile(url: "https://pbs.twimg.com/profile_images/1467546091780550658/R1uc6dcq_400x400.jpg") , mediaType: "image"),
+                bannerImage: MetadataViews.Media(file: MetadataViews.HTTPFile(url: "https://pbs.twimg.com/profile_banners/1448245049666510848/1652452073/1500x500") , mediaType: "image"),
+                socials: { 
+                    "Twitter" : MetadataViews.ExternalURL("https://twitter.com/findonflow") , 
+                    "Discord" : MetadataViews.ExternalURL("https://discord.gg/95P274mayM") 
+                }
+            )
+
         case Type<MetadataViews.NFTCollectionData>():
-            let collectionRef = self.account.storage.borrow<&CharityNFT.Collection>(
-                from: CharityNFT.CollectionStoragePath
-            ) ?? panic("Could not borrow a reference to the stored collection")
             let collectionData = MetadataViews.NFTCollectionData(
                 storagePath: CharityNFT.CollectionStoragePath,
                 publicPath: CharityNFT.CollectionPublicPath,
