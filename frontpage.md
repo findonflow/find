@@ -35,7 +35,7 @@ pub fun main(name: String) :  Address? {
 }
 ```
 
-## Tehnical 2
+## Technical 2
 Lookup a profile from a .find name
 ```
 //testnet
@@ -52,7 +52,7 @@ import FIND, Profile from 0x37a05b1ecacc80f7
 ## FAQ
 
 
-### what happends when i register a lease
+### what happems when I register a lease
 FIND integrates with the profile contract from the Versus project. If you do not have a profile already it will create a new one for you that uses the name you just registered. 
 
 
@@ -78,17 +78,17 @@ This is to ensure that it can be used in urls and to keep things simple.
 ### how much does it cost
 Find is charged in the FUSD stable coin for a 365 day lease. This is done to keep prices stable and avoid a high increase if the flow token increases. 
 
-Currently the price structuer is as follows:
+Currently the price structure is as follows:
  - 5+ characters: 5 FUSD
  - 4 characters: 100 FUSD
- - 3 charactesrs: 500 FUSD
+ - 3 characters: 500 FUSD
  
  
-### What happends when a lease expires
+### What happens when a lease expires
 When a lease expires the name is locked for 90 days. 
 During the lock period the owner can reactivate it but nobody else can register it. 
 This is done to ensure that bots do not snatch up just freed names that some poor user has forgotten to extend the lease for.
-During the lock period you can sell a lease, however note that if an aucion goes over the 90 day limit the sale will not go through.
+During the lock period you can sell a lease, however note that if an auction goes over the 90 day limit the sale will not go through.
 
 ## how long do i own a lease?
 You own a name for 365 days when you pay for it. You can pay for as many years as you like.
@@ -96,19 +96,19 @@ You own a name for 365 days when you pay for it. You can pay for as many years a
 ## why is my lease locked?
 Your lease is locked because it is over a year since you last paid for it. You can reactivate it. The lease will be freed for anybody else after 90 days
 
-## how can i sell my lease
-A lease in FIND is not a NFT, bauce the current NFT standard makes it impossible for the FIND network to be correct whene moving/selling leases. 
+## how can I sell my lease
+A lease in FIND is not a NFT, because the current NFT standard makes it impossible for the FIND network to be correct when moving/selling leases. 
 
-FIND has built in suport for a sophistiated market. 
+FIND has built in support for a sophisticated market. 
  - a user can bid on any lease in what we call a blind bid
- - a owner can accept a blind bid and directly sell or use that to start an auction.
- - a owner can list a lease for direct sale, any bid at that price will sell it instantly
- - a owner cal list a leaes for auction specifying: 
+ - an owner can accept a blind bid and directly sell or use that to start an auction.
+ - an owner can list a lease for direct sale, any bid at that price will sell it instantly
+ - an owner can list a lease for auction specifying: 
    - the minimum bid to start the auction
    - the reserve price that must be met to fulfill the sale
    - the duration of the auction
- - an late bid on a auction in FIND will automatically extend the auction to 5 minutes remaining
- - a user can mamage his bids in his profile
+ - a late bid on an auction in FIND will automatically extend the auction to 5 minutes remaining
+ - a user can manage his bids in his profile
   - a bid can be cancelled if it is a blind bid or if the bid is on a lease that is now free 
   - a bid can be increased
  - anybody both a user and a owner can fulfill an ended auction. 
@@ -116,7 +116,7 @@ FIND has built in suport for a sophistiated market.
 ## other similar solutions
 While i created FIND in the spring/summer of 2021 Mynft was also developing flowns.org. I had no idea about this and they did not know abou me. 
 
-I hope that find and flowns can coexisting as different TLD's and help each other build tools to make it possible for users of the flow blockchain to find people and things they love. 
+I hope that find and flowns can coexist as different TLD's and help each other build tools to make it possible for users of the flow blockchain to find people and things they love. 
 
 ## why is lease not an NFT
 A lease in FIND is not an NFT because the current NFT spec makes it very hard to update the FIND network global state when resources change owners. 
