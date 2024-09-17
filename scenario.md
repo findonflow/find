@@ -14,7 +14,7 @@
 
 ## For backend
  - all 'register' code from buy tx can be removed
- - we can have seperate tx to 'fix' getStatus problems.
+ - we can have separate tx to 'fix' getStatus problems.
 
 ## For frontend
  - we cannot have an active buy button since we do not know if wallet can do this action

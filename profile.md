@@ -1,12 +1,12 @@
 # Profile
 
-Thea idea with the profile is that a user can register lots of relevant information about himself directly on the flow blockchian. 
+The idea with the profile is that a user can register lots of relevant information about himself directly on the flow blockchain. 
 
 The base profile fields include
  - name: max length 16
  - avatar
  - description: max 255 length
- - tags: max 3 short descriptione
+ - tags: max 3 short description
  - collections: point to a capability for things like versus art of find bids
  - wallets: register wallets that support different types.
  - friends: you can add other users as friends
@@ -15,8 +15,8 @@ The base profile fields include
    
 What types of links do i envision
  - if the type is a valid fa-icon then use it as that and only use the title as a hover over the image. 
- - if type is img then show it in a img tag
- - if type is audtio/video then show viewer for that. 
+ - if type is img then show it in an img tag
+ - if type is audio/video then show viewer for that. 
  - if type is collection and title is same as a collection this is a weblink to that collection.
  - if type is generic then just show a simple a href. 
 
