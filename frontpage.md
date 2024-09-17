@@ -52,7 +52,7 @@ import FIND, Profile from 0x37a05b1ecacc80f7
 ## FAQ
 
 
-### what happems when I register a lease
+### what happens when I register a lease
 FIND integrates with the profile contract from the Versus project. If you do not have a profile already it will create a new one for you that uses the name you just registered. 
 
 
