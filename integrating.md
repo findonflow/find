@@ -1,6 +1,6 @@
 # How to integrate with .find
 
-We advice anybody that is integrating to contact us in [discord in the technical channel](https://discord.gg/8a27XMx8Zp) 
+We advice anybody who is integrating to contact us in [discord in the technical channel](https://discord.gg/8a27XMx8Zp) 
 
 
 ## Resolving names <> addresses
@@ -61,7 +61,7 @@ pub fun main(address: Address) :  String? {
 
 If you want to create Profiles in .find in your solution that is possible. 
 
-Contract us in discord if you want this so that we can discuss it further:
+Contact us in discord if you want this so that we can discuss it further:
 
 
 Please do not use any of these raw but as inspiration :)
