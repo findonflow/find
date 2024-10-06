@@ -1,6 +1,6 @@
 # .find
 
-.find is a solution that aims to make it easier to .find people and their things on the flow blockchain. It is live on mainnet since Dec 13th 2021 at https://find.xyz
+.find is a solution that aims to make it easier to .find people and their things on the flow blockchain. It has been live on mainnet since Dec 13th 2021 at https://find.xyz
 
 
 ## Developing .find
