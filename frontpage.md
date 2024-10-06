@@ -90,7 +90,7 @@ During the lock period the owner can reactivate it but nobody else can register 
 This is done to ensure that bots do not snatch up just freed names that some poor user has forgotten to extend the lease for.
 During the lock period you can sell a lease, however note that if an auction goes over the 90 day limit the sale will not go through.
 
-## how long do i own a lease?
+## how long do I own a lease?
 You own a name for 365 days when you pay for it. You can pay for as many years as you like.
 
 ## why is my lease locked?
@@ -114,7 +114,7 @@ FIND has built in support for a sophisticated market.
  - anybody both a user and a owner can fulfill an ended auction. 
 
 ## other similar solutions
-While i created FIND in the spring/summer of 2021 Mynft was also developing flowns.org. I had no idea about this and they did not know abou me. 
+While I created FIND in the spring/summer of 2021 Mynft was also developing flowns.org. I had no idea about this and they did not know about me. 
 
 I hope that find and flowns can coexist as different TLD's and help each other build tools to make it possible for users of the flow blockchain to find people and things they love. 
 
