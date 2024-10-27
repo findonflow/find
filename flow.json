@@ -227,7 +227,9 @@
       "source": "./contracts/community/BandOracle.cdc",
       "aliases": {
         "mainnet": "0x6801a6222ebf784a",
-        "testnet": "0x2c71de7af78d1adf"
+        "testnet": "0x2c71de7af78d1adf",
+        "migrationnet": "0x8232ce4a3aff4e94",
+        "emulator": "0x8232ce4a3aff4e94"
       }
     },
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",

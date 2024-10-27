@@ -281,6 +281,17 @@
                },
                "code": "import FIND from 0xf3fcd2c1a78f5eee\n\naccess(all)\nfun main(address: Address) : String?{\n    return FIND.reverseLookup(address)\n}"
             },
+            "getNamePriceInFlow": {
+               "spec": {
+                  "parameters": {
+                     "name": "String"
+                  },
+                  "order": [
+                     "name"
+                  ]
+               },
+               "code": "import FIND from 0xf3fcd2c1a78f5eee\n\naccess(all) fun main(_ name:String):UFix64 {\n    return FIND.calculateCostInFlow(name)\n}"
+            },
             "getNameSearchbar": {
                "spec": {
                   "parameters": {
@@ -3038,6 +3049,17 @@
                },
                "code": "import FIND from 0x097bafa4e0b48eef\n\naccess(all)\nfun main(address: Address) : String?{\n    return FIND.reverseLookup(address)\n}"
             },
+            "getNamePriceInFlow": {
+               "spec": {
+                  "parameters": {
+                     "name": "String"
+                  },
+                  "order": [
+                     "name"
+                  ]
+               },
+               "code": "import FIND from 0x097bafa4e0b48eef\n\naccess(all) fun main(_ name:String):UFix64 {\n    return FIND.calculateCostInFlow(name)\n}"
+            },
             "getNameSearchbar": {
                "spec": {
                   "parameters": {
@@ -5715,6 +5737,17 @@
                   ]
                },
                "code": "import FIND from 0x35717efbbce11c74\n\naccess(all)\nfun main(address: Address) : String?{\n    return FIND.reverseLookup(address)\n}"
+            },
+            "getNamePriceInFlow": {
+               "spec": {
+                  "parameters": {
+                     "name": "String"
+                  },
+                  "order": [
+                     "name"
+                  ]
+               },
+               "code": "import FIND from 0x35717efbbce11c74\n\naccess(all) fun main(_ name:String):UFix64 {\n    return FIND.calculateCostInFlow(name)\n}"
             },
             "getNameSearchbar": {
                "spec": {
@@ -8541,6 +8574,17 @@
                   ]
                },
                "code": "import FIND from 0x35717efbbce11c74\n\naccess(all)\nfun main(address: Address) : String?{\n    return FIND.reverseLookup(address)\n}"
+            },
+            "getNamePriceInFlow": {
+               "spec": {
+                  "parameters": {
+                     "name": "String"
+                  },
+                  "order": [
+                     "name"
+                  ]
+               },
+               "code": "import FIND from 0x35717efbbce11c74\n\naccess(all) fun main(_ name:String):UFix64 {\n    return FIND.calculateCostInFlow(name)\n}"
             },
             "getNameSearchbar": {
                "spec": {
