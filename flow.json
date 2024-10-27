@@ -223,6 +223,13 @@
         "migrationnet": "0x8232ce4a3aff4e94"
       }
     },
+    "BandOracle": {
+      "source": "./contracts/community/BandOracle.cdc",
+      "aliases": {
+        "mainnet": "0x6801a6222ebf784a",
+        "testnet": "0x2c71de7af78d1adf"
+      }
+    },
     "ExampleNFT": "./contracts/standard/ExampleNFT.cdc",
     "ProfileCache": "./contracts/ProfileCache.cdc",
     "FIND": "./contracts/FIND.cdc",
