@@ -1,7 +1,5 @@
 import "FindMarket"
 import "FlowToken"
-import "FUSD"
-import "FiatToken"
 import "FindMarketSale"
 import "DapperUtilityCoin"
 import "FlowUtilityToken"

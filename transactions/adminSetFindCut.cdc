@@ -1,8 +1,6 @@
 import "FindMarketAdmin"
 import "FindMarket"
 import "FlowToken"
-import "FUSD"
-import "FiatToken"
 import "DapperUtilityCoin"
 import "FlowUtilityToken"
 import "MetadataViews"
@@ -15,7 +13,7 @@ transaction(tenant: Address, cut: UFix64){
         let defaultRules : [FindMarket.TenantRule] = [
         FindMarket.TenantRule(
             name: "standardFT",
-            types:[Type<@FlowToken.Vault>(), Type<@FUSD.Vault>(), Type<@FiatToken.Vault>(), Type<@DapperUtilityCoin.Vault>(), Type<@FlowUtilityToken.Vault>()],
+            types:[Type<@FlowToken.Vault>(), Type<@DapperUtilityCoin.Vault>(), Type<@FlowUtilityToken.Vault>()],
             ruleType: "ft",
             allow:true
         )

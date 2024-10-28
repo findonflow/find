@@ -61,24 +61,6 @@
         "previewnet": "0xcbc6dbbfcc60e595"
       }
     },
-    "FUSD": {
-      "source": "./contracts/standard/FUSD.cdc",
-      "aliases": {
-        "testnet": "0xe223d8a629e49c68",
-        "migrationnet": "0xe223d8a629e49c68",
-        "mainnet": "0x3c5959b568896393",
-        "previewnet": "0x7e3499582a06616f"
-      }
-    },
-    "FiatToken": {
-      "source": "./contracts/standard/FiatToken.cdc",
-      "aliases": {
-        "testnet": "0xa983fecbed621163",
-        "migrationnet": "0xa983fecbed621163",
-        "mainnet": "0xb19436aae4d94622",
-        "previewnet": "0x7e3499582a06616f"
-      }
-    },
     "DapperStorageRent": {
       "source": "./contracts/standard/DapperStorageRent.cdc",
       "aliases": {
@@ -220,6 +202,14 @@
       "aliases": {
         "mainnet": "0xec67451f8a58216a",
         "testnet": "0x8232ce4a3aff4e94",
+        "migrationnet": "0x8232ce4a3aff4e94"
+      }
+    },
+    "BandOracle": {
+      "source": "./contracts/community/BandOracle.cdc",
+      "aliases": {
+        "mainnet": "0x6801a6222ebf784a",
+        "testnet": "0x2c71de7af78d1adf",
         "migrationnet": "0x8232ce4a3aff4e94"
       }
     },
@@ -394,8 +384,6 @@
   "deployments": {
     "emulator": {
       "emulator-account": [
-        "FUSD",
-        "FiatToken",
         "TokenForwarding",
         "FLOAT",
         "FLOATVerifiers",
@@ -407,7 +395,8 @@
         "LostAndFound",
         "LostAndFoundHelper",
         "FeeEstimator",
-        "PublicPriceOracle"
+        "PublicPriceOracle",
+        "BandOracle"
       ],
       "emulator-dapper": [
         "DapperUtilityCoin",

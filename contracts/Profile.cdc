@@ -524,10 +524,6 @@ access(all) contract Profile {
             var ref : &{FungibleToken.Receiver}? = nil
             if FindUtils.contains(identifier, element: "FlowToken.Vault") {
                 ref = self.owner!.capabilities.borrow<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
-            } else if FindUtils.contains(identifier, element: "FiatToken.Vault") {
-                ref = self.owner!.capabilities.borrow<&{FungibleToken.Receiver}>(/public/USDCVaultReceiver)
-            } else if FindUtils.contains(identifier, element: "FUSD.Vault") {
-                ref = self.owner!.capabilities.borrow<&{FungibleToken.Receiver}>(/public/fusdReceiver)
             } else if FindUtils.contains(identifier, element: "FlowUtilityToken.Vault") {
                 ref = self.owner!.capabilities.borrow<&{FungibleToken.Receiver}>(/public/flowUtilityTokenReceiver)
             } else if FindUtils.contains(identifier, element: "DapperUtilityCoin.Vault") {

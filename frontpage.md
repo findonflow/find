@@ -58,7 +58,7 @@ FIND integrates with the profile contract from the Versus project. If you do not
 
 ###  what does the money go to?
 (do we need this?)
-The income from flow will go to its creator (bjartek) so that he can continue to dedicate his time to the flow ecosystem and help it thrive.
+The income from flow will go to its creator so that he can continue to dedicate his time to the flow ecosystem and help it thrive.
 
 ### sites that integrate with find 
 Find will be integrated into the following sites at launch
@@ -76,12 +76,12 @@ A valid find name is 0-9a-z, minimum 3 tokens. Also it cannot be a Flow address,
 This is to ensure that it can be used in urls and to keep things simple.
 
 ### how much does it cost
-Find is charged in the FUSD stable coin for a 365 day lease. This is done to keep prices stable and avoid a high increase if the flow token increases. 
+Find is charged in the Flow coin a 365 day lease. This is done to keep prices stable and avoid a high increase if the flow token increases. 
 
 Currently the price structuer is as follows:
- - 5+ characters: 5 FUSD
- - 4 characters: 100 FUSD
- - 3 charactesrs: 500 FUSD
+ - 5+ characters: 5 USD worth of flow
+ - 4 characters: 100 USD worth of flow
+ - 3 characters: 500 USD worth of flow
  
  
 ### What happends when a lease expires

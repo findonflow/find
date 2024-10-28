@@ -1,7 +1,6 @@
 import "FindMarket"
 import "FindMarketAdmin"
 import "FlowToken"
-import "FUSD"
 import "ExampleNFT"
 
 transaction(tenant: Address) {
@@ -9,13 +8,13 @@ transaction(tenant: Address) {
         let adminRef = account.storage.borrow<auth(FindMarketAdmin.Owner) &FindMarketAdmin.AdminProxy>(from: FindMarketAdmin.AdminProxyStoragePath) ?? panic("Cannot borrow Admin Reference.")
 
         let flowExample = FindMarket.TenantSaleItem(name:"FlowExampleNFT", cut: nil, rules:[
-            FindMarket.TenantRule(name:"Flow", types:[Type<@FlowToken.Vault>()], ruleType: "ft", allow: true),
-            FindMarket.TenantRule(name:"ExampleNFT", types:[ Type<@ExampleNFT.NFT>()], ruleType: "nft", allow: true)
-            ],
-            status: "active"
-        )
+        FindMarket.TenantRule(name:"Flow", types:[Type<@FlowToken.Vault>()], ruleType: "ft", allow: true),
+        FindMarket.TenantRule(name:"ExampleNFT", types:[ Type<@ExampleNFT.NFT>()], ruleType: "nft", allow: true)
+        ],
+        status: "active"
+    )
 
-        adminRef.setMarketOption(tenant: tenant, saleItem: flowExample)
+    adminRef.setMarketOption(tenant: tenant, saleItem: flowExample)
 
-    }
+}
 }

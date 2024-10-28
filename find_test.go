@@ -89,7 +89,7 @@ access(all) fun main(name: String) :  Address? {
 		).AssertWant(t, autogold.Want("getNameStatus", nil))
 	})
 
-	ot.Run(t, "Admin should be able to register without paying FUSD", func(t *testing.T) {
+	ot.Run(t, "Admin should be able to register without paying", func(t *testing.T) {
 		otu.O.Tx("adminRegisterName",
 			WithSigner("find-admin"),
 			WithArg("names", `["find-admin2"]`),
@@ -585,5 +585,4 @@ access(all) fun main(name: String) :  Address? {
 			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
 	})
-
 }

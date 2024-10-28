@@ -1,7 +1,5 @@
 import "Admin"
-import "FUSD"
 import "FungibleToken"
-import "FiatToken"
 
 transaction() {
     prepare(account: auth (BorrowValue, SaveValue, StorageCapabilities, IssueStorageCapabilityController, PublishCapability) &Account) {

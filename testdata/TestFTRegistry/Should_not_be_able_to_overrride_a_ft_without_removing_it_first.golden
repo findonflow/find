@@ -45,35 +45,5 @@
         "typeIdentifier": "A.179b6b1cb6755e31.FlowUtilityToken.Vault",
         "vaultPath": "/storage/flowUtilityTokenVault",
         "vaultPathIdentifier": "flowUtilityTokenVault"
-    },
-    "A.f8d6e0586b0a20c7.FUSD.Vault": {
-        "alias": "FUSD",
-        "balancePath": "/public/fusdBalance",
-        "balancePathIdentifier": "fusdBalance",
-        "icon": "https://static.flowscan.org/mainnet/icons/A.3c5959b568896393.FUSD.png",
-        "receiverPath": "/public/fusdReceiver",
-        "receiverPathIdentifier": "fusdReceiver",
-        "tag": [
-            "stablecoin"
-        ],
-        "type": "A.f8d6e0586b0a20c7.FUSD.Vault",
-        "typeIdentifier": "A.f8d6e0586b0a20c7.FUSD.Vault",
-        "vaultPath": "/storage/fusdVault",
-        "vaultPathIdentifier": "fusdVault"
-    },
-    "A.f8d6e0586b0a20c7.FiatToken.Vault": {
-        "alias": "USDC",
-        "balancePath": "/public/USDCVaultBalance",
-        "balancePathIdentifier": "USDCVaultBalance",
-        "icon": "https://static.flowscan.org/mainnet/icons/A.b19436aae4d94622.FiatToken.png",
-        "receiverPath": "/public/USDCVaultReceiver",
-        "receiverPathIdentifier": "USDCVaultReceiver",
-        "tag": [
-            "stablecoin"
-        ],
-        "type": "A.f8d6e0586b0a20c7.FiatToken.Vault",
-        "typeIdentifier": "A.f8d6e0586b0a20c7.FiatToken.Vault",
-        "vaultPath": "/storage/USDCVault",
-        "vaultPathIdentifier": "USDCVault"
     }
 }`

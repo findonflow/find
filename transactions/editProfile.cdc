@@ -1,5 +1,4 @@
 import "FungibleToken"
-import "FUSD"
 import "FlowToken"
 import "FIND"
 import "Profile"
@@ -14,24 +13,9 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
 
         self.profile =account.storage.borrow<auth(Profile.Admin) &Profile.User>(from:Profile.storagePath) ?? panic("Cannot borrow reference to profile")
 
-        let fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-        if !fusdReceiver.check() {
-            let fusd <- FUSD.createEmptyVault(vaultType: Type<@FUSD.Vault>())
-            account.storage.save(<- fusd, to: /storage/fusdVault)
-            var cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/fusdVault)
-            account.capabilities.publish(cap, at: /public/fusdReceiver)
-            let capb = account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/fusdVault)
-            account.capabilities.publish(capb, at: /public/fusdBalance)
-        }
-
-        var hasFusdWallet=false
         var hasFlowWallet=false
         let wallets=self.profile.getWallets()
         for wallet in wallets {
-            if wallet.name=="FUSD" {
-                hasFusdWallet=true
-            }
-
             if wallet.name =="Flow" {
                 hasFlowWallet=true
             }
@@ -46,17 +30,6 @@ transaction(name:String, description: String, avatar: String, tags:[String], all
                 tags: ["flow"]
             )
             self.profile.addWallet(flowWallet)
-        }
-
-        if !hasFusdWallet {
-            let fusdWallet=Profile.Wallet(
-                name:"FUSD", 
-                receiver:account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver),
-                balance:account.capabilities.get<&{FungibleToken.Vault}>(/public/fusdBalance),
-                accept: Type<@FUSD.Vault>(),
-                tags: ["fusd", "stablecoin"]
-            )
-            self.profile.addWallet(fusdWallet)
         }
 
         let leaseCollection = account.capabilities.get<&{FIND.LeaseCollectionPublic}>(FIND.LeasePublicPath)

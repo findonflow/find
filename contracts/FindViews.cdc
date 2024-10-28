@@ -277,7 +277,14 @@ access(all) contract FindViews {
                 return false
             }
 
-            let nft= self.cap.borrow()!.borrowNFT(self.id)
+            let collection = self.cap.borrow()! 
+
+            let collectionType=collection.getType()
+            if collectionType.isRecovered {
+                return false
+            }
+
+            let nft= collection.borrowNFT(self.id)
 
             if nft ==nil {
                 return false

@@ -1,7 +1,5 @@
 import "FungibleToken"
 import "FlowToken"
-import "FUSD"
-import "FiatToken"
 import "TokenForwarding"
 import "FungibleTokenSwitchboard"
 import "DapperUtilityCoin"
@@ -11,30 +9,6 @@ transaction(dapperAddress: Address) {
     prepare(account: auth (StorageCapabilities, SaveValue,PublishCapability, BorrowValue) &Account) {
 
         let dapper = getAccount(dapperAddress)
-
-        //FUSD
-        var fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-        if !fusdReceiver.check() {
-            let fusd <- FUSD.createEmptyVault(vaultType: Type<@FUSD.Vault>())
-
-            account.storage.save(<- fusd, to: /storage/fusdVault)
-            var cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/fusdVault)
-            account.capabilities.publish(cap, at: /public/fusdReceiver)
-            let capb = account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/fusdVault)
-            account.capabilities.publish(capb, at: /public/fusdBalance)
-            fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-        }
-
-
-        var usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
-        if !usdcCap.check() {
-            account.storage.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
-            let cap = account.capabilities.storage.issue<&FiatToken.Vault>(FiatToken.VaultStoragePath)
-            account.capabilities.publish(cap, at: FiatToken.VaultUUIDPubPath)
-            account.capabilities.publish(cap, at: FiatToken.VaultReceiverPubPath)
-            account.capabilities.publish(cap, at: FiatToken.VaultBalancePubPath)
-            usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
-        }
 
         //Dapper utility token
         var DUCReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
@@ -75,12 +49,6 @@ transaction(dapperAddress: Address) {
         }
         if !switchboard.isSupportedVaultType(type: Type<@FlowUtilityToken.Vault>()) {
             switchboard.addNewVaultWrapper(capability: FUTReceiver, type: Type<@FlowUtilityToken.Vault>())
-        }
-        if !switchboard.isSupportedVaultType(type: usdcCap.borrow()!.getType()) {
-            switchboard.addNewVault(capability: usdcCap)
-        }
-        if !switchboard.isSupportedVaultType(type: fusdReceiver.borrow()!.getType()) {
-            switchboard.addNewVault(capability: fusdReceiver)
         }
         let flowTokenCap = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
         if !switchboard.isSupportedVaultType(type: flowTokenCap.borrow()!.getType()) {
