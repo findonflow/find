@@ -1,6 +1,5 @@
 import "FungibleToken"
 import "NonFungibleToken"
-import "FiatToken"
 import "FlowToken"
 import "MetadataViews"
 import "FIND"
@@ -22,15 +21,6 @@ transaction(name: String) {
 
         //the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
         //SYNC with register
-        let usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
-        if !usdcCap.check() {
-            account.storage.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
-            let cap = account.capabilities.storage.issue<&FiatToken.Vault>(FiatToken.VaultStoragePath)
-            account.capabilities.publish(cap, at: FiatToken.VaultUUIDPubPath)
-            account.capabilities.publish(cap, at: FiatToken.VaultReceiverPubPath)
-            account.capabilities.publish(cap, at: FiatToken.VaultBalancePubPath)
-        }
-
         let leaseCollection = account.capabilities.get<&FIND.LeaseCollection>(FIND.LeasePublicPath)
         if !leaseCollection.check() {
             account.storage.save(<- FIND.createEmptyLeaseCollection(), to: FIND.LeaseStoragePath)
@@ -74,14 +64,6 @@ transaction(name: String) {
             profile.addWallet(flowWallet)
             updated=true
         }
-        if !profile.hasWallet("USDC") {
-
-            let fr = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
-            let fb =account.capabilities.get<&{FungibleToken.Vault}>(FiatToken.VaultBalancePubPath) 
-            profile.addWallet(Profile.Wallet( name:"USDC", receiver:fr, balance:fb, accept: Type<@FiatToken.Vault>(), tags: ["usdc", "stablecoin"]))
-            updated=true
-        }
-
         /*
         //If find name not set and we have a profile set it.
         if profile.getFindName() == "" {

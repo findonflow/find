@@ -164,7 +164,6 @@ func SetupFIND(o *OverflowState) error {
 
 	tokens := []string{
 		"Flow",
-		"FUSD",
 		"USDC",
 		"DUC",
 		"FUT",

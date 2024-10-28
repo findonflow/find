@@ -1101,15 +1101,6 @@ func (otu *OverflowTestUtils) removeProfileWallet(user string) *OverflowTestUtil
 	return otu
 }
 
-func (otu *OverflowTestUtils) destroyFUSDVault(user string) *OverflowTestUtils {
-	otu.O.Tx("devDestroyFUSDVault",
-		WithSigner(user),
-	).
-		AssertSuccess(otu.T)
-
-	return otu
-}
-
 func (otu *OverflowTestUtils) unlinkDandyProvider(user string) *OverflowTestUtils {
 	otu.O.Tx("devUnlinkDandyProvider",
 		WithSigner(user),

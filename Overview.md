@@ -74,7 +74,7 @@ addons - .find leases can support add ons to the name itself.
 
 	// depositWithTagAndMessage sends fund from sender to user with / without profile and emit very good events
 	// for users with profile, it supports as much FT as they've set up wallets in profile
-	// for users without profile, we support flow and FUSD at the moment but it can be extended pretty easily
+	// for users without profile, we support flow  at the moment but it can be extended pretty easily
 	access(all) fun depositWithTagAndMessage(to:String, message:String, tag: String, vault: @FungibleToken.Vault, from: &Sender.Token)
 ```
 
@@ -179,9 +179,9 @@ transaction(
 	// This is the find name to be purchased
 	name: String,
 	// Amount needed :
-	// 3 characters : 500 FUSD,
-	// 4 characters : 100 FUSD,
-	// 5 characters or above : 5 FUSD
+	// 3 characters : 500 USD,
+	// 4 characters : 100 USD,
+	// 5 characters or above : 5 USD
 	amount: UFix64
 	)
 
@@ -376,7 +376,7 @@ access(all) struct AccountInformation {
 ## FungibleToken
 
 FungibleTokens are exposed under Find Profile contracts.
-As soon as a user adds his/her wallet to Profile, it can be viewable in Profile report. By default we always add FUSD / USDC / Flow token for non-Dapper Users if they initiate their account on .find page.
+As soon as a user adds his/her wallet to Profile, it can be viewable in Profile report. 
 
 ## NonFungibleToken
 

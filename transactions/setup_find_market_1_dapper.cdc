@@ -1,7 +1,6 @@
 import "FindMarket"
 import "FungibleToken"
 import "FlowToken"
-import "FiatToken"
 import "TokenForwarding"
 import "FungibleTokenSwitchboard"
 import "DapperUtilityCoin"
@@ -20,16 +19,6 @@ transaction(dapperAddress: Address) {
         // Get a Receiver reference for the Dapper account that will be the recipient of the forwarded DUC and FUT
         let dapper = getAccount(dapperAddress)
 
-
-        var usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
-        if !usdcCap.check() {
-            account.storage.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
-            let cap = account.capabilities.storage.issue<&FiatToken.Vault>(FiatToken.VaultStoragePath)
-            account.capabilities.publish(cap, at: FiatToken.VaultUUIDPubPath)
-            account.capabilities.publish(cap, at: FiatToken.VaultReceiverPubPath)
-            account.capabilities.publish(cap, at: FiatToken.VaultBalancePubPath)
-            usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
-        }
 
 
         //Dapper utility token
@@ -71,9 +60,6 @@ transaction(dapperAddress: Address) {
         }
         if !switchboard.isSupportedVaultType(type: Type<@FlowUtilityToken.Vault>()) {
             switchboard.addNewVaultWrapper(capability: FUTReceiver, type: Type<@FlowUtilityToken.Vault>())
-        }
-        if !switchboard.isSupportedVaultType(type: usdcCap.borrow()!.getType()) {
-            switchboard.addNewVault(capability: usdcCap)
         }
         let flowTokenCap = account.capabilities.get<&{FungibleToken.Receiver}>(/public/flowTokenReceiver)
         if !switchboard.isSupportedVaultType(type: flowTokenCap.borrow()!.getType()) {
