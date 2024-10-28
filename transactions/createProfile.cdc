@@ -1,6 +1,5 @@
 import "FungibleToken"
 import "NonFungibleToken"
-import "FUSD"
 import "FiatToken"
 import "FlowToken"
 import "MetadataViews"
@@ -23,17 +22,6 @@ transaction(name: String) {
 
         //the code below has some dead code for this specific transaction, but it is hard to maintain otherwise
         //SYNC with register
-        //Add exising FUSD or create a new one and add it
-        let fusdReceiver = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-        if !fusdReceiver.check() {
-            let fusd <- FUSD.createEmptyVault(vaultType: Type<@FUSD.Vault>())
-            account.storage.save(<- fusd, to: /storage/fusdVault)
-            var cap = account.capabilities.storage.issue<&{FungibleToken.Receiver}>(/storage/fusdVault)
-            account.capabilities.publish(cap, at: /public/fusdReceiver)
-            let capb = account.capabilities.storage.issue<&{FungibleToken.Vault}>(/storage/fusdVault)
-            account.capabilities.publish(capb, at: /public/fusdBalance)
-        }
-
         let usdcCap = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)
         if !usdcCap.check() {
             account.storage.save( <-FiatToken.createEmptyVault(), to: FiatToken.VaultStoragePath)
@@ -86,13 +74,6 @@ transaction(name: String) {
             profile.addWallet(flowWallet)
             updated=true
         }
-        if !profile.hasWallet("FUSD") {
-            let fr = account.capabilities.get<&{FungibleToken.Receiver}>(/public/fusdReceiver)
-            let fb =account.capabilities.get<&{FungibleToken.Vault}>(/public/fusdBalance)
-            profile.addWallet(Profile.Wallet( name:"FUSD", receiver:fr, balance:fb, accept: Type<@FUSD.Vault>(), tags: ["fusd", "stablecoin"]))
-            updated=true
-        }
-
         if !profile.hasWallet("USDC") {
 
             let fr = account.capabilities.get<&{FungibleToken.Receiver}>(FiatToken.VaultReceiverPubPath)

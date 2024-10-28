@@ -28,7 +28,6 @@
 					Name:        "user1",
 					AcceptTypes: []string{
 						"A.0ae53cb6e3f42a79.FlowToken.Vault",
-						"A.f8d6e0586b0a20c7.FUSD.Vault",
 						"A.f8d6e0586b0a20c7.FiatToken.Vault",
 					},
 					Cut: 0.05,
@@ -40,7 +39,6 @@
 					Name:        "find",
 					AcceptTypes: []string{
 						"A.0ae53cb6e3f42a79.FlowToken.Vault",
-						"A.f8d6e0586b0a20c7.FUSD.Vault",
 						"A.f8d6e0586b0a20c7.FiatToken.Vault",
 					},
 					Cut: 0.025,
@@ -82,7 +80,6 @@
 					Name:        "user1",
 					AcceptTypes: []string{
 						"A.0ae53cb6e3f42a79.FlowToken.Vault",
-						"A.f8d6e0586b0a20c7.FUSD.Vault",
 						"A.f8d6e0586b0a20c7.FiatToken.Vault",
 					},
 					Cut: 0.05,
@@ -94,7 +91,6 @@
 					Name:        "find",
 					AcceptTypes: []string{
 						"A.0ae53cb6e3f42a79.FlowToken.Vault",
-						"A.f8d6e0586b0a20c7.FUSD.Vault",
 						"A.f8d6e0586b0a20c7.FiatToken.Vault",
 					},
 					Cut: 0.025,
@@ -136,7 +132,6 @@
 					Name:        "user1",
 					AcceptTypes: []string{
 						"A.0ae53cb6e3f42a79.FlowToken.Vault",
-						"A.f8d6e0586b0a20c7.FUSD.Vault",
 						"A.f8d6e0586b0a20c7.FiatToken.Vault",
 					},
 					Cut: 0.05,
@@ -148,7 +143,6 @@
 					Name:        "find",
 					AcceptTypes: []string{
 						"A.0ae53cb6e3f42a79.FlowToken.Vault",
-						"A.f8d6e0586b0a20c7.FUSD.Vault",
 						"A.f8d6e0586b0a20c7.FiatToken.Vault",
 					},
 					Cut: 0.025,

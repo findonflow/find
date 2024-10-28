@@ -1,8 +1,6 @@
 import "FindMarketAdmin"
 import "FindMarket"
 import "FlowToken"
-import "FUSD"
-import "FiatToken"
 import "DapperUtilityCoin"
 import "FlowUtilityToken"
 import "MetadataViews"
@@ -16,9 +14,7 @@ transaction(tenant: String, tenantAddress: Address, findCut: UFix64) {
         // pass in the default cut rules here
         let rules = [
         FindMarket.TenantRule( name:"standard ft", types:[
-        Type<@FUSD.Vault>(), 
         Type<@FlowToken.Vault>(), 
-        Type<@FiatToken.Vault>(), 
         Type<@DapperUtilityCoin.Vault>() , 
         Type<@FlowUtilityToken.Vault>()], ruleType:"ft", allow:true)
         ]

@@ -452,7 +452,6 @@ func createUser(stx OverflowTransactionFunction, fusd float64, name string) {
 	)
 
 	for _, mintName := range []string{
-		"devMintFusd",
 		"devMintUsdc",
 	} {
 		stx(mintName, WithSigner("account"),
