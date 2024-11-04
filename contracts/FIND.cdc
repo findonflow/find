@@ -59,20 +59,20 @@ access(all) contract FIND {
     //////////////////////////////////////////
     // Get the latest FLOW/USD price
     //This uses the FLOW/USD increment.fi oracle
-    access(all) fun getLatestPriceOld(): UFix64 {
+    access(all) fun getLatestPrice(): UFix64 {
         let lastResult = PublicPriceOracle.getLatestPrice(oracleAddr: self.getFlowUSDOracleAddress())
         let lastBlockNum = PublicPriceOracle.getLatestBlockHeight(oracleAddr: self.getFlowUSDOracleAddress())
 
         // Make sure the price is not expired
         if getCurrentBlock().height - lastBlockNum > 2000 {
-            panic("Price is expired")
+            return FIND.getLatestPriceBand()
         }
 
         return lastResult
     }
 
-    //this uses band oracle
-    access(all) fun getLatestPrice(): UFix64 {
+    //this uses band oracle, we use this as backup
+    access(all) fun getLatestPriceBand(): UFix64 {
 
         let acct = FIND.account
         let vaultRef = acct.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(from: /storage/flowTokenVault) ?? panic("Cannot borrow reference to signer's FLOW vault")
