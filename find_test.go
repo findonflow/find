@@ -24,12 +24,27 @@ func TestFIND(t *testing.T) {
 	// this use does not have a profile at all
 	user4Address := otu.O.Address("user4")
 
-	ot.Run(t, "Should get error if you try to register a name and dont have enough money", func(t *testing.T) {
-		otu.O.Tx("register",
+	ot.Run(t, "Should be able to renew lease", func(t *testing.T) {
+		otu.O.Tx("cleanUpInvalidatedLease",
 			WithSigner("user1"),
-			WithArg("name", "usr"),
-			WithArg("maxAmount", 1000.0),
-		).AssertFailure(t, "Balance of vault is not high enough")
+			WithArg("names", []string{"user1"}),
+		).
+			AssertFailure(t, "This is a valid lease. You cannot clean this up")
+
+		otu.expireLease().expireLease().tickClock(2.0)
+		otu.O.Tx("cleanUpInvalidatedLease",
+
+			WithSigner("user1"),
+			WithArg("names", []string{"user1"}),
+		).AssertSuccess(t)
+	})
+
+	ot.Run(t, "Should be able to renew nam", func(t *testing.T) {
+		otu.O.Tx("renewName",
+			WithSigner("user1"),
+			WithArg("name", "user1"),
+			WithArg("maxAmount", 10.5),
+		).AssertSuccess(t)
 	})
 
 	ot.Run(t, "Should get error if you try to register a name that is too short", func(t *testing.T) {

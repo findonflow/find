@@ -24,7 +24,7 @@ transaction(name: String, maxAmount: UFix64) {
 
     execute{
         let payVault <- self.vaultRef!.withdraw(amount: self.cost) as! @FlowToken.Vault
-        let finToken= self.finLeases!.borrow(name)
+        let finToken= self.finLeases!.borrowAuth(name)
         finToken.extendLease(<- payVault)
     }
 }
