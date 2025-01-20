@@ -171,7 +171,7 @@ pub contract FungibleTokenSwitchboard {
                 ?? panic ("The deposited vault is not available on this switchboard")
             // Borrow the reference to the desired vault
             let vaultRef = depositedVaultCapability.borrow()
-                ?? panic ("Can not borrow a reference to the the vault")
+                ?? panic ("Can not borrow a reference to the vault")
             vaultRef.deposit(from: <-from)
         }
 

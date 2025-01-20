@@ -110,7 +110,7 @@ pub contract FlovatarMarketplace {
             // store the price in the price array
             self.flovatarPrices[id] = price
 
-            // put the NFT into the the forSale dictionary
+            // put the NFT into the forSale dictionary
             let oldToken <- self.flovatarForSale[id] <- token
             destroy oldToken
 
@@ -126,7 +126,7 @@ pub contract FlovatarMarketplace {
             // store the price in the price array
             self.flovatarComponentPrices[id] = price
 
-            // put the NFT into the the forSale dictionary
+            // put the NFT into the forSale dictionary
             let oldToken <- self.flovatarComponentForSale[id] <- token
             destroy oldToken
 

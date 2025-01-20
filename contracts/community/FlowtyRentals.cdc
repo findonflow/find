@@ -288,7 +288,7 @@ pub contract FlowtyRentals {
         // rent
         // Rent the listing. Distributing fees to all parties and taking a deposit to be held
         // until the nft is either returned or the rental defaults. A rental can be automatically returned
-        // if renterNFTProvider is provided, giving us a way obtain the the rented nft automatically
+        // if renterNFTProvider is provided, giving us a way obtain the rented nft automatically
         // to be returned.
         pub fun rent(
             payment: @FungibleToken.Vault,
@@ -361,7 +361,7 @@ pub contract FlowtyRentals {
         // rent
         // Rent the listing. Distributing fees to all parties and taking a deposit to be held
         // until the nft is either returned or the rental defaults. A rental can be automatically returned
-        // if renterNFTProvider is provided, giving us a way obtain the the rented nft automatically
+        // if renterNFTProvider is provided, giving us a way obtain the rented nft automatically
         // to be returned.
         pub fun rent(
             payment: @FungibleToken.Vault,

@@ -46,7 +46,7 @@ func main() {
 			WithArg("collectionBannerImage", "https://find.mypinata.cloud/ipfs/QmWmDRnSrv8HK5QsiHwUNR4akK95WC8veydq6dnnFbMja1"),
 			WithArg("socials", `{ "Twitter" : "https://twitter.com/NonFunGerbils" }`),
 		)
-		description := `#PEPEgerbil is besotted, obsessed by their precious, They cradle it, love it, perhaps it's devine.\n\nThis NFT pairs with a physical painting of mixed technique on canvas, size 24x30cm by Pepelangelo.\n\n Only the the owner of the physical can see what is uniquely precious.`
+		description := `#PEPEgerbil is besotted, obsessed by their precious, They cradle it, love it, perhaps it's devine.\n\nThis NFT pairs with a physical painting of mixed technique on canvas, size 24x30cm by Pepelangelo.\n\n Only the owner of the physical can see what is uniquely precious.`
 
 		desc, err := cadence.NewString(description)
 		if err != nil {
