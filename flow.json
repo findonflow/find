@@ -201,7 +201,6 @@
       "source": "./contracts/community/PublicPriceOracle.cdc",
       "aliases": {
         "mainnet": "0xec67451f8a58216a",
-        "testnet": "0x8232ce4a3aff4e94",
         "migrationnet": "0x8232ce4a3aff4e94"
       }
     },
@@ -470,6 +469,7 @@
     },
     "testnet": {
       "testnet-find": [
+        "PublicPriceOracle",
         "FIND",
         "Clock",
         "Profile",

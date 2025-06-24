@@ -8104,7 +8104,7 @@
                   "parameters": {},
                   "order": []
                },
-               "code": "import PublicPriceOracle from 0x8232ce4a3aff4e94\n\naccess(all) fun main():UFix64? {\n\n    let feeds = PublicPriceOracle.getAllSupportedOracles()\n    for address in feeds.keys {\n\n        let name= feeds[address]\n        if name==\"FLOW/USD\" {\n            return PublicPriceOracle.getLatestPrice(oracleAddr: address)\n        }\n\n    }\n    return nil\n}"
+               "code": "import PublicPriceOracle from 0x35717efbbce11c74\n\naccess(all) fun main():UFix64? {\n\n    let feeds = PublicPriceOracle.getAllSupportedOracles()\n    for address in feeds.keys {\n\n        let name= feeds[address]\n        if name==\"FLOW/USD\" {\n            return PublicPriceOracle.getLatestPrice(oracleAddr: address)\n        }\n\n    }\n    return nil\n}"
             },
             "getLostAndFoundNFTs": {
                "spec": {
@@ -8429,7 +8429,7 @@
                   "parameters": {},
                   "order": []
                },
-               "code": "import PublicPriceOracle from 0x8232ce4a3aff4e94 \n\n// oracleAddress =\u003e oracleTag\naccess(all) fun main(): {Address: String} {\n    return PublicPriceOracle.getAllSupportedOracles()\n}"
+               "code": "import PublicPriceOracle from 0x35717efbbce11c74 \n\n// oracleAddress =\u003e oracleTag\naccess(all) fun main(): {Address: String} {\n    return PublicPriceOracle.getAllSupportedOracles()\n}"
             },
             "getProfile": {
                "spec": {

@@ -99,7 +99,6 @@ access(all) contract FIND {
     //////////////////////////////////////////
 
     //These methods are basically just here for convenience
-    //
 
     access(all) fun calculateCostInFlow(_ name:String) : UFix64 {
         if !FIND.validateFindName(name) {
