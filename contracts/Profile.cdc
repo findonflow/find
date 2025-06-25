@@ -598,7 +598,11 @@ access(all) contract Profile {
             ProfileCache.resetLeaseCache(address: self.owner!.address, leaseName: self.findName)
             self.findName = val
         }
-
+        access(Admin) fun setMainName(_ val: String) {
+            emit Updated(account:self.owner!.address, userName:self.name, findName:val, thumbnail:self.avatar)
+            ProfileCache.resetLeaseCache(address: self.owner!.address, leaseName: self.findName)
+            self.findName = val
+        }
         access(Admin) fun setGender(_ val: String) { self.gender = val }
         access(Admin) fun setAvatar(_ val: String) { self.avatar = val }
         access(Admin) fun setDescription(_ val: String) { self.description=val}
