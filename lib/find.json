@@ -2359,7 +2359,7 @@
                      "name"
                   ]
                },
-               "code": "import Profile from 0xf3fcd2c1a78f5eee\nimport FIND from 0xf3fcd2c1a78f5eee\n\n\ntransaction(name: String) {\n\n    let leaseCollectionOwner : Capability\u003c\u0026FIND.LeaseCollection\u003e\n    let profile : \u0026Profile.User\n\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.leaseCollectionOwner = acct.capabilities.get\u003c\u0026FIND.LeaseCollection\u003e(FIND.LeasePublicPath)!\n        if (self.leaseCollectionOwner.borrow()!.getLease(name) == nil) {\n            panic(\"You do not own this lease so you cannot set it as main name\")\n        }\n        self.profile =acct.storage.borrow\u003c\u0026Profile.User\u003e(from:Profile.storagePath)!\n    }\n\n    pre{\n        self.leaseCollectionOwner.check() : \"Not a find user\"\n    }\n\n    execute{\n        self.profile.setFindName(name)\n    }\n}"
+               "code": "import Profile from 0xf3fcd2c1a78f5eee\nimport FIND from 0xf3fcd2c1a78f5eee\n\n\ntransaction(name: String) {\n\n    let profile : auth(Profile.Admin) \u0026Profile.User\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.profile =acct.storage.borrow\u003cauth(Profile.Admin) \u0026Profile.User\u003e(from:Profile.storagePath) ?? panic(\"Cannot borrow reference to profile\")\n    }\n\n    execute{\n        self.profile.setMainName(name)\n    }\n}"
             },
             "setMarketOptionFlowDandy": {
                "spec": {
@@ -5101,7 +5101,7 @@
                      "name"
                   ]
                },
-               "code": "import Profile from 0x097bafa4e0b48eef\nimport FIND from 0x097bafa4e0b48eef\n\n\ntransaction(name: String) {\n\n    let leaseCollectionOwner : Capability\u003c\u0026FIND.LeaseCollection\u003e\n    let profile : \u0026Profile.User\n\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.leaseCollectionOwner = acct.capabilities.get\u003c\u0026FIND.LeaseCollection\u003e(FIND.LeasePublicPath)!\n        if (self.leaseCollectionOwner.borrow()!.getLease(name) == nil) {\n            panic(\"You do not own this lease so you cannot set it as main name\")\n        }\n        self.profile =acct.storage.borrow\u003c\u0026Profile.User\u003e(from:Profile.storagePath)!\n    }\n\n    pre{\n        self.leaseCollectionOwner.check() : \"Not a find user\"\n    }\n\n    execute{\n        self.profile.setFindName(name)\n    }\n}"
+               "code": "import Profile from 0x097bafa4e0b48eef\nimport FIND from 0x097bafa4e0b48eef\n\n\ntransaction(name: String) {\n\n    let profile : auth(Profile.Admin) \u0026Profile.User\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.profile =acct.storage.borrow\u003cauth(Profile.Admin) \u0026Profile.User\u003e(from:Profile.storagePath) ?? panic(\"Cannot borrow reference to profile\")\n    }\n\n    execute{\n        self.profile.setMainName(name)\n    }\n}"
             },
             "setMarketOptionFlowDandy": {
                "spec": {
@@ -7686,7 +7686,7 @@
                      "name"
                   ]
                },
-               "code": "import Profile from 0x35717efbbce11c74\nimport FIND from 0x35717efbbce11c74\n\n\ntransaction(name: String) {\n\n    let leaseCollectionOwner : Capability\u003c\u0026FIND.LeaseCollection\u003e\n    let profile : \u0026Profile.User\n\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.leaseCollectionOwner = acct.capabilities.get\u003c\u0026FIND.LeaseCollection\u003e(FIND.LeasePublicPath)!\n        if (self.leaseCollectionOwner.borrow()!.getLease(name) == nil) {\n            panic(\"You do not own this lease so you cannot set it as main name\")\n        }\n        self.profile =acct.storage.borrow\u003c\u0026Profile.User\u003e(from:Profile.storagePath)!\n    }\n\n    pre{\n        self.leaseCollectionOwner.check() : \"Not a find user\"\n    }\n\n    execute{\n        self.profile.setFindName(name)\n    }\n}"
+               "code": "import Profile from 0x35717efbbce11c74\nimport FIND from 0x35717efbbce11c74\n\n\ntransaction(name: String) {\n\n    let profile : auth(Profile.Admin) \u0026Profile.User\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.profile =acct.storage.borrow\u003cauth(Profile.Admin) \u0026Profile.User\u003e(from:Profile.storagePath) ?? panic(\"Cannot borrow reference to profile\")\n    }\n\n    execute{\n        self.profile.setMainName(name)\n    }\n}"
             },
             "setMarketOptionFlowDandy": {
                "spec": {
@@ -10482,7 +10482,7 @@
                      "name"
                   ]
                },
-               "code": "import Profile from 0x35717efbbce11c74\nimport FIND from 0x35717efbbce11c74\n\n\ntransaction(name: String) {\n\n    let leaseCollectionOwner : Capability\u003c\u0026FIND.LeaseCollection\u003e\n    let profile : \u0026Profile.User\n\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.leaseCollectionOwner = acct.capabilities.get\u003c\u0026FIND.LeaseCollection\u003e(FIND.LeasePublicPath)!\n        if (self.leaseCollectionOwner.borrow()!.getLease(name) == nil) {\n            panic(\"You do not own this lease so you cannot set it as main name\")\n        }\n        self.profile =acct.storage.borrow\u003c\u0026Profile.User\u003e(from:Profile.storagePath)!\n    }\n\n    pre{\n        self.leaseCollectionOwner.check() : \"Not a find user\"\n    }\n\n    execute{\n        self.profile.setFindName(name)\n    }\n}"
+               "code": "import Profile from 0x35717efbbce11c74\nimport FIND from 0x35717efbbce11c74\n\n\ntransaction(name: String) {\n\n    let profile : auth(Profile.Admin) \u0026Profile.User\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.profile =acct.storage.borrow\u003cauth(Profile.Admin) \u0026Profile.User\u003e(from:Profile.storagePath) ?? panic(\"Cannot borrow reference to profile\")\n    }\n\n    execute{\n        self.profile.setMainName(name)\n    }\n}"
             },
             "setMarketOptionFlowDandy": {
                "spec": {
