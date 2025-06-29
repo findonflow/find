@@ -895,7 +895,7 @@
                      "amount"
                   ]
                },
-               "code": "import FindMarket from 0xf3fcd2c1a78f5eee\nimport FTRegistry from 0xf3fcd2c1a78f5eee\nimport FungibleToken from 0xee82856bf20e2aa6\nimport FIND from 0xf3fcd2c1a78f5eee\nimport Profile from 0xf3fcd2c1a78f5eee\nimport FindLeaseMarketSale from 0xf3fcd2c1a78f5eee\nimport FindLeaseMarket from 0xf3fcd2c1a78f5eee\n\ntransaction(leaseName: String, amount: UFix64) {\n\n    let buyer : Address\n    let walletReference : auth(FungibleToken.Withdraw) \u0026{FungibleToken.Vault}\n\n    let saleItemCollection: \u0026{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}\n\n    prepare(account: auth(BorrowValue, SaveValue, IssueStorageCapabilityController) \u0026Account) {\n\n        let profile=account.storage.borrow\u003c\u0026Profile.User\u003e(from: Profile.storagePath) ?? panic(\"You do not have a profile set up, initialize the user first\")\n\n        let address = FIND.resolve(leaseName) ?? panic(\"The address input is not a valid name nor address. Input : \".concat(leaseName))\n\n        if address == nil {\n            panic(\"The address input is not a valid name nor address. Input : \".concat(leaseName))\n        }\n\n        let leaseMarketplace = FindMarket.getTenantAddress(\"find\") ?? panic(\"Cannot find find tenant\")\n        let saleItemsCap= FindLeaseMarketSale.getSaleItemCapability(marketplace: leaseMarketplace, user:address) ?? panic(\"cannot find sale item cap for find\")\n\n        let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!\n        let leaseTenant = leaseTenantCapability.borrow()!\n\n        let leaseSaleItemType= Type\u003c@FindLeaseMarketSale.SaleItemCollection\u003e()\n        let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: \"find\")\n        let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:\"find\")\n        var leaseSaleItemCap= account.capabilities.get\u003c\u0026{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}\u003e(leasePublicPath)\n        if !leaseSaleItemCap.check(){\n            //The link here has to be a capability not a tenant, because it can change.\n            account.storage.save\u003c@FindLeaseMarketSale.SaleItemCollection\u003e(\u003c- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)\n            leaseSaleItemCap= account.capabilities.storage.issue\u003c\u0026{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}\u003e(leaseStoragePath)\n        }\n\n        self.saleItemCollection = saleItemsCap.borrow()!\n        let item = self.saleItemCollection.borrowSaleItem(leaseName)\n\n        let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(item.getFtType().identifier))\n\n\n        self.walletReference = account.storage.borrow\u003cauth(FungibleToken.Withdraw) \u0026{FungibleToken.Vault}\u003e(from: ft.vaultPath) ?? panic(\"No suitable wallet linked for this account\")\n        self.buyer = account.address\n    }\n\n    pre {\n        self.walletReference.balance \u003e amount : \"Your wallet does not have enough funds to pay for this item\"\n    }\n\n    execute {\n        let vault \u003c- self.walletReference.withdraw(amount: amount)\n        self.saleItemCollection.buy(name:leaseName, vault: \u003c- vault, to: self.buyer)\n    }\n}"
+               "code": "import FindMarket from 0xf3fcd2c1a78f5eee\nimport FTRegistry from 0xf3fcd2c1a78f5eee\nimport FungibleToken from 0xee82856bf20e2aa6\nimport FIND from 0xf3fcd2c1a78f5eee\nimport Profile from 0xf3fcd2c1a78f5eee\nimport FindLeaseMarketSale from 0xf3fcd2c1a78f5eee\nimport FindLeaseMarket from 0xf3fcd2c1a78f5eee\n\ntransaction(leaseName: String, amount: UFix64) {\n\n    let buyer : Address\n    let walletReference : auth(FungibleToken.Withdraw) \u0026{FungibleToken.Vault}\n\n    let saleItemCollection: \u0026{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}\n\n    prepare(account: auth(BorrowValue, SaveValue, IssueStorageCapabilityController) \u0026Account) {\n\n        let profile=account.storage.borrow\u003c\u0026Profile.User\u003e(from: Profile.storagePath) ?? panic(\"You do not have a profile set up, initialize the user first\")\n\n        let address = FIND.resolve(leaseName) ?? panic(\"The address input is not a valid name nor address. Input : \".concat(leaseName))\n\n        if address == nil {\n            panic(\"The address input is not a valid name nor address. Input : \".concat(leaseName))\n        }\n\n        let leaseMarketplace = FindMarket.getTenantAddress(\"find\") ?? panic(\"Cannot find find tenant\")\n        let saleItemsCap= FindLeaseMarketSale.getSaleItemCapability(marketplace: leaseMarketplace, user:address) ?? panic(\"cannot find sale item cap for find\")\n\n        let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!\n        let leaseTenant = leaseTenantCapability.borrow()!\n\n        let leaseSaleItemType= Type\u003c@FindLeaseMarketSale.SaleItemCollection\u003e()\n        let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: \"find\")\n        let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:\"find\")\n        var leaseSaleItemCap= account.capabilities.get\u003c\u0026{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}\u003e(leasePublicPath)\n        if !leaseSaleItemCap.check(){\n            //The link here has to be a capability not a tenant, because it can change.\n            account.storage.save\u003c@FindLeaseMarketSale.SaleItemCollection\u003e(\u003c- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)\n            leaseSaleItemCap= account.capabilities.storage.issue\u003c\u0026{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}\u003e(leaseStoragePath)\n            account.capabilities.publish(leaseSaleItemCap, at: leasePublicPath)\n        }\n\n        self.saleItemCollection = saleItemsCap.borrow()!\n        let item = self.saleItemCollection.borrowSaleItem(leaseName)\n\n        let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(item.getFtType().identifier))\n\n\n        self.walletReference = account.storage.borrow\u003cauth(FungibleToken.Withdraw) \u0026{FungibleToken.Vault}\u003e(from: ft.vaultPath) ?? panic(\"No suitable wallet linked for this account\")\n        self.buyer = account.address\n    }\n\n    pre {\n        self.walletReference.balance \u003e amount : \"Your wallet does not have enough funds to pay for this item\"\n    }\n\n    execute {\n        let vault \u003c- self.walletReference.withdraw(amount: amount)\n        self.saleItemCollection.buy(name:leaseName, vault: \u003c- vault, to: self.buyer)\n    }\n}"
             },
             "buyLeaseForSaleDapper": {
                "spec": {
@@ -1068,28 +1068,6 @@
                },
                "code": "import FindMarket from 0xf3fcd2c1a78f5eee\nimport FindMarketDirectOfferEscrow from 0xf3fcd2c1a78f5eee\nimport FindMarketAuctionEscrow from 0xf3fcd2c1a78f5eee\nimport FindMarketAuctionSoft from 0xf3fcd2c1a78f5eee\nimport FindMarketDirectOfferSoft from 0xf3fcd2c1a78f5eee\nimport FindMarketSale from 0xf3fcd2c1a78f5eee\n\ntransaction(ids: {String : [UInt64]}) {\n    prepare(account: auth(BorrowValue) \u0026Account) {\n\n        let marketplace = FindMarket.getFindTenantAddress()\n        let tenant=FindMarket.getTenant(marketplace)\n\n        var saleType = Type\u003c@FindMarketDirectOfferEscrow.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketDirectOfferEscrow.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.cancel(id)\n            }\n        }\n\n        saleType = Type\u003c@FindMarketAuctionEscrow.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketAuctionEscrow.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.cancel(id)\n            }\n        }\n\n        saleType = Type\u003c@FindMarketAuctionSoft.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketAuctionSoft.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.cancel(id)\n            }\n        }\n\n        saleType = Type\u003c@FindMarketDirectOfferSoft.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketDirectOfferSoft.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.cancel(id)\n            }\n        }\n\n        saleType = Type\u003c@FindMarketSale.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.delist(id)\n            }\n        }\n\n    }\n}"
             },
-            "cancelNameAuction": {
-               "spec": {
-                  "parameters": {
-                     "names": "[String]"
-                  },
-                  "order": [
-                     "names"
-                  ]
-               },
-               "code": "import FIND from 0xf3fcd2c1a78f5eee\n\ntransaction(names: [String]) {\n\n    let finLeases : auth(FIND.AuctionOwner, FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        self.finLeases= account.storage.borrow\u003cauth(FIND.AuctionOwner, FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find leases collection\"\n    }\n\n    execute {\n        for name in names {\n            self.finLeases!.cancel(name)\n            self.finLeases!.delistAuction(name)\n        }\n    }\n}"
-            },
-            "cancelNameBid": {
-               "spec": {
-                  "parameters": {
-                     "names": "[String]"
-                  },
-                  "order": [
-                     "names"
-                  ]
-               },
-               "code": "import FIND from 0xf3fcd2c1a78f5eee\n\ntransaction(names: [String]) {\n\n    let bids : \u0026FIND.BidCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        self.bids = account.storage.borrow\u003c\u0026FIND.BidCollection\u003e(from: FIND.BidStoragePath)\n    }\n\n    pre{\n        self.bids != nil : \"Cannot borrow reference to find bid collection\"\n    }\n\n    execute {\n        for name in names {\n            self.bids!.cancelBid(name)\n        }\n    }\n\n}"
-            },
             "cleanUpInvalidatedLease": {
                "spec": {
                   "parameters": {
@@ -1183,17 +1161,6 @@
                   ]
                },
                "code": "import FindMarket from 0xf3fcd2c1a78f5eee\nimport FindMarketSale from 0xf3fcd2c1a78f5eee\n\n//Remove one or more listings from a marketplace\ntransaction(ids: [UInt64]) {\n\n    let saleItems : auth(FindMarketSale.Seller) \u0026FindMarketSale.SaleItemCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        let marketplace = FindMarket.getFindTenantAddress()\n        let tenant=FindMarket.getTenant(marketplace)\n        self.saleItems= account.storage.borrow\u003cauth(FindMarketSale.Seller) \u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(Type\u003c@FindMarketSale.SaleItemCollection\u003e()))\n    }\n\n    pre{\n        self.saleItems != nil : \"Cannot borrow reference to saleItem\"\n    }\n\n    execute{\n        for id in ids {\n            self.saleItems!.delist(id)\n        }\n    }\n}"
-            },
-            "delistNameSale": {
-               "spec": {
-                  "parameters": {
-                     "names": "[String]"
-                  },
-                  "order": [
-                     "names"
-                  ]
-               },
-               "code": "import FIND from 0xf3fcd2c1a78f5eee\n\ntransaction(names: [String]) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.finLeases= acct.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        for name in names {\n            self.finLeases!.delistSale(name)\n        }\n    }\n}"
             },
             "editFindThought": {
                "spec": {
@@ -1463,30 +1430,6 @@
                   ]
                },
                "code": "import FindMarketDirectOfferSoft from 0xf3fcd2c1a78f5eee\nimport FungibleToken from 0xee82856bf20e2aa6\nimport FTRegistry from 0xf3fcd2c1a78f5eee\nimport FindMarket from 0xf3fcd2c1a78f5eee\n\ntransaction(ids: [UInt64], amounts:[UFix64]) {\n\n    let walletReference : [\u0026FungibleToken.Vault]\n    let bidsReference: \u0026FindMarketDirectOfferSoft.MarketBidCollection\n    let requiredAmount: [UFix64]\n    let balanceBeforeTransfer: {Type : UFix64}\n\n    prepare(dapper: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) \u0026Account, account: auth(BorrowValue) \u0026Account) {\n        let marketplace = FindMarket.getFindTenantAddress()\n        let tenant=FindMarket.getTenant(marketplace)\n        let storagePath=tenant.getStoragePath(Type\u003c@FindMarketDirectOfferSoft.MarketBidCollection\u003e())\n        self.bidsReference= account.storage.borrow\u003c\u0026FindMarketDirectOfferSoft.MarketBidCollection\u003e(from: storagePath) ?? panic(\"Cannot borrow direct offer soft bid collection\")\n        let marketOption = FindMarket.getMarketOptionFromType(Type\u003c@FindMarketDirectOfferSoft.MarketBidCollection\u003e())\n\n        var counter = 0\n        self.requiredAmount = []\n        self.walletReference = []\n        self.balanceBeforeTransfer = {}\n        let fts : {String : FTRegistry.FTInfo} = {}\n        let vaultRefs : {StoragePath : \u0026FungibleToken.Vault} = {}\n\n\n        while counter \u003c ids.length {\n            let item = FindMarket.assertBidOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, id: ids[counter])\n\n            var ft : FTRegistry.FTInfo? = nil\n            let ftIdentifier = item.getFtType().identifier\n            if fts[ftIdentifier] != nil {\n                ft = fts[ftIdentifier]\n            } else {\n                ft = FTRegistry.getFTInfoByTypeIdentifier(ftIdentifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(ftIdentifier))\n                fts[ftIdentifier] = ft\n            }\n\n            if vaultRefs[ft!.vaultPath] != nil {\n                let vaultRef = vaultRefs[ft!.vaultPath]!\n                self.walletReference.append(vaultRef)\n            } else {\n                let walletReference = dapper.storage.borrow\u003c\u0026{FungibleToken.Vault}\u003e(from: ft!.vaultPath) ?? panic(\"Cannot borrow Dapper Coin Vault. Type : \".concat(ft!.type.identifier))\n                vaultRefs[ft!.vaultPath] = walletReference\n                self.walletReference.append(walletReference)\n                self.balanceBeforeTransfer[walletReference.getType()] = walletReference.balance\n            }\n            let requiredAmount = self.bidsReference.getBalance(ids[counter])\n            self.requiredAmount.append(requiredAmount)\n            counter = counter + 1\n        }\n    }\n\n    execute {\n        var counter = 0\n        while counter \u003c ids.length {\n            if self.walletReference[counter].balance \u003c self.requiredAmount[counter] {\n                panic(\"Your wallet does not have enough funds to pay for this item. Item ID: \".concat(ids[counter].toString()))\n            }\n            if self.requiredAmount[counter] != amounts[counter] {\n                panic(\"Amount needed to fulfill is \".concat(amounts[counter].toString()))\n            }\n            let vault \u003c- self.walletReference[counter].withdraw(amount: amounts[counter])\n            self.bidsReference.fulfillDirectOffer(id: ids[counter], vault: \u003c- vault)\n            counter = counter + 1\n        }\n        // Check that all dapper Coin was routed back to Dapper\n        for vault in self.walletReference {\n            if self.balanceBeforeTransfer[vault.getType()]! != vault.balance {\n                panic(\"Dapper Coin leakage. Type : \".concat(vault.getType().identifier))\n            }\n        }\n    }\n\n}"
-            },
-            "fulfillName": {
-               "spec": {
-                  "parameters": {
-                     "name": "String"
-                  },
-                  "order": [
-                     "name"
-                  ]
-               },
-               "code": "import FIND from 0xf3fcd2c1a78f5eee\nimport Profile from 0xf3fcd2c1a78f5eee\n\ntransaction(name: String) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        self.finLeases= account.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath) \n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        self.finLeases!.fulfill(name)\n    }\n}"
-            },
-            "fulfillNameAuction": {
-               "spec": {
-                  "parameters": {
-                     "name": "String",
-                     "owner": "Address"
-                  },
-                  "order": [
-                     "owner",
-                     "name"
-                  ]
-               },
-               "code": "import FIND from 0xf3fcd2c1a78f5eee\nimport Profile from 0xf3fcd2c1a78f5eee\n\ntransaction(owner: Address, name: String) {\n\n    let leases : \u0026FIND.LeaseCollection?\n\n    prepare(account: \u0026Account) {\n        self.leases = getAccount(owner).capabilities.get\u003c\u0026FIND.LeaseCollection\u003e(FIND.LeasePublicPath)!.borrow()\n    }\n\n    pre{\n        self.leases != nil : \"Cannot borrow reference to lease collection reference. Account address: \".concat(owner.toString())\n    }\n\n    execute{\n        self.leases!.fulfillAuction(name)\n    }\n}"
             },
             "hideFindThoughts": {
                "spec": {
@@ -1826,38 +1769,6 @@
                   ]
                },
                "code": "import FindMarket from 0xf3fcd2c1a78f5eee\nimport FindMarketSale from 0xf3fcd2c1a78f5eee\nimport FINDNFTCatalog from 0xf3fcd2c1a78f5eee\nimport FTRegistry from 0xf3fcd2c1a78f5eee\nimport FindViews from 0xf3fcd2c1a78f5eee\nimport NonFungibleToken from 0xf8d6e0586b0a20c7\nimport MetadataViews from 0xf8d6e0586b0a20c7\nimport FlowUtilityToken from 0x179b6b1cb6755e31\nimport TokenForwarding from 0xf8d6e0586b0a20c7\nimport FungibleToken from 0xee82856bf20e2aa6\n\ntransaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {\n\n    let saleItems : auth(FindMarketSale.Seller) \u0026FindMarketSale.SaleItemCollection?\n    let pointer : FindViews.AuthNFTPointer\n    let vaultType : Type\n\n    prepare(account: auth (StorageCapabilities, PublishCapability, Storage, IssueStorageCapabilityController) \u0026Account) {\n\n        let marketplace = FindMarket.getFindTenantAddress()\n        let saleItemType= Type\u003c@FindMarketSale.SaleItemCollection\u003e()\n        let tenantCapability= FindMarket.getTenantCapability(marketplace)!\n\n        let tenant = tenantCapability.borrow()!\n\n        //TODO:how do we fix this on testnet/mainnet\n        let dapper=getAccount(FindViews.getDapperAddress())\n\n        let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)\n        let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)\n\n        let saleItemCap= account.capabilities.get\u003c\u0026FindMarketSale.SaleItemCollection\u003e(publicPath)\n        if !saleItemCap.check() {\n            account.storage.save(\u003c- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)\n            let cap = account.capabilities.storage.issue\u003c\u0026FindMarketSale.SaleItemCollection\u003e(storagePath)\n            account.capabilities.publish(cap, at: publicPath)\n        }\n        // Get supported NFT and FT Information from Registries from input alias\n        let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftAliasOrIdentifier)?.keys ?? panic(\"This NFT is not supported by the NFT Catalog yet. Type : \".concat(nftAliasOrIdentifier))\n        let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!\n        let nft = collection.collectionData\n\n        let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(ftAliasOrIdentifier))\n\n        let futReceiver = account.capabilities.get\u003c\u0026{FungibleToken.Receiver}\u003e(/public/flowUtilityTokenReceiver)\n        if ft.type == Type\u003c@FlowUtilityToken.Vault\u003e() \u0026\u0026 !futReceiver.check() {\n            // Create a new Forwarder resource for FUT and store it in the new account's storage\n            let futForwarder \u003c- TokenForwarding.createNewForwarder(recipient: dapper.capabilities.get\u003c\u0026{FungibleToken.Receiver}\u003e(/public/flowUtilityTokenReceiver))\n            account.storage.save(\u003c-futForwarder, to: /storage/flowUtilityTokenReceiver)\n            let receiverCap = account.capabilities.storage.issue\u003c\u0026{FungibleToken.Receiver}\u003e(/storage/flowUtilityTokenReceiver)\n            account.capabilities.publish(receiverCap, at: /public/flowUtilityTokenReceiver)\n\n            let vaultCap = account.capabilities.storage.issue\u003c\u0026{FungibleToken.Vault}\u003e(/storage/flowUtilityTokenReceiver)\n            account.capabilities.publish(vaultCap, at: /public/flowUtilityTokenVault)\n        }\n\n        let storagePathIdentifer = nft.storagePath.toString().split(separator:\"/\")[1]\n        let providerIdentifier = storagePathIdentifer.concat(\"Provider\")\n        let providerStoragePath = StoragePath(identifier: providerIdentifier)!\n\n        //if this stores anything but this it will panic, why does it not return nil?\n        var existingProvider= account.storage.copy\u003cCapability\u003cauth(NonFungibleToken.Withdraw) \u0026{NonFungibleToken.Collection}\u003e\u003e(from: providerStoragePath) \n        if existingProvider==nil {\n            existingProvider=account.capabilities.storage.issue\u003cauth(NonFungibleToken.Withdraw) \u0026{NonFungibleToken.Collection}\u003e(nft.storagePath)\n            //we save it to storage to memoize it\n            account.storage.save(existingProvider!, to: providerStoragePath)\n            log(\"create new cap\")\n        }\n        var providerCap = existingProvider!\n\n        // Get the salesItemRef from tenant\n        self.saleItems= account.storage.borrow\u003cauth(FindMarketSale.Seller) \u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(Type\u003c@FindMarketSale.SaleItemCollection\u003e()))\n        self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)\n        self.vaultType= ft.type\n    }\n\n    pre{\n        self.saleItems != nil : \"Cannot borrow reference to saleItem\"\n    }\n\n    execute{\n        self.saleItems!.listForSale(pointer: self.pointer, vaultType: self.vaultType, directSellPrice: directSellPrice, validUntil: validUntil, extraField: {})\n\n    }\n}"
-            },
-            "listNameForAuction": {
-               "spec": {
-                  "parameters": {
-                     "auctionDuration": "UFix64",
-                     "auctionExtensionOnLateBid": "UFix64",
-                     "auctionReservePrice": "UFix64",
-                     "auctionStartPrice": "UFix64",
-                     "name": "String"
-                  },
-                  "order": [
-                     "name",
-                     "auctionStartPrice",
-                     "auctionReservePrice",
-                     "auctionDuration",
-                     "auctionExtensionOnLateBid"
-                  ]
-               },
-               "code": "import FIND from 0xf3fcd2c1a78f5eee\n\ntransaction(name: String, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.finLeases= acct.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        self.finLeases!.listForAuction(name: name, auctionStartPrice: auctionStartPrice, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration,  auctionExtensionOnLateBid: auctionExtensionOnLateBid)\n    }\n}"
-            },
-            "listNameForSale": {
-               "spec": {
-                  "parameters": {
-                     "directSellPrice": "UFix64",
-                     "name": "String"
-                  },
-                  "order": [
-                     "name",
-                     "directSellPrice"
-                  ]
-               },
-               "code": "import FIND from 0xf3fcd2c1a78f5eee\n\ntransaction(name: String, directSellPrice:UFix64) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.finLeases= acct.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        self.finLeases!.listForSale(name: name,  directSellPrice:directSellPrice)\n    }\n}"
             },
             "moveNameTO": {
                "spec": {
@@ -2420,17 +2331,6 @@
                   "order": []
                },
                "code": "import FindMarket from 0xf3fcd2c1a78f5eee\nimport FlowToken from 0x0ae53cb6e3f42a79\nimport Dandy from 0xf3fcd2c1a78f5eee\n\ntransaction(){\n    prepare(account: auth(BorrowValue) \u0026Account){\n        let path = FindMarket.TenantClientStoragePath\n        let tenantRef = account.storage.borrow\u003cauth(FindMarket.TenantClientOwner) \u0026FindMarket.TenantClient\u003e(from: path) ?? panic(\"Cannot borrow Reference.\")\n\n        tenantRef.setMarketOption(name:\"FlowDandy\", cut: nil, rules:[\n        FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n        FindMarket.TenantRule(name:\"Dandy\", types:[ Type\u003c@Dandy.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n    )\n\n}\n}"
-            },
-            "startNameAuction": {
-               "spec": {
-                  "parameters": {
-                     "name": "String"
-                  },
-                  "order": [
-                     "name"
-                  ]
-               },
-               "code": "import FIND from 0xf3fcd2c1a78f5eee\n\ntransaction(name: String) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        self.finLeases= account.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        self.finLeases!.startAuction(name)\n    }\n}"
             },
             "storeCuratedCollections": {
                "spec": {
@@ -3626,7 +3526,7 @@
                      "amount"
                   ]
                },
-               "code": "import FindMarket from 0x097bafa4e0b48eef\nimport FTRegistry from 0x097bafa4e0b48eef\nimport FungibleToken from 0xf233dcee88fe0abe\nimport FIND from 0x097bafa4e0b48eef\nimport Profile from 0x097bafa4e0b48eef\nimport FindLeaseMarketSale from 0x097bafa4e0b48eef\nimport FindLeaseMarket from 0x097bafa4e0b48eef\n\ntransaction(leaseName: String, amount: UFix64) {\n\n    let buyer : Address\n    let walletReference : auth(FungibleToken.Withdraw) \u0026{FungibleToken.Vault}\n\n    let saleItemCollection: \u0026{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}\n\n    prepare(account: auth(BorrowValue, SaveValue, IssueStorageCapabilityController) \u0026Account) {\n\n        let profile=account.storage.borrow\u003c\u0026Profile.User\u003e(from: Profile.storagePath) ?? panic(\"You do not have a profile set up, initialize the user first\")\n\n        let address = FIND.resolve(leaseName) ?? panic(\"The address input is not a valid name nor address. Input : \".concat(leaseName))\n\n        if address == nil {\n            panic(\"The address input is not a valid name nor address. Input : \".concat(leaseName))\n        }\n\n        let leaseMarketplace = FindMarket.getTenantAddress(\"find\") ?? panic(\"Cannot find find tenant\")\n        let saleItemsCap= FindLeaseMarketSale.getSaleItemCapability(marketplace: leaseMarketplace, user:address) ?? panic(\"cannot find sale item cap for find\")\n\n        let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!\n        let leaseTenant = leaseTenantCapability.borrow()!\n\n        let leaseSaleItemType= Type\u003c@FindLeaseMarketSale.SaleItemCollection\u003e()\n        let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: \"find\")\n        let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:\"find\")\n        var leaseSaleItemCap= account.capabilities.get\u003c\u0026{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}\u003e(leasePublicPath)\n        if !leaseSaleItemCap.check(){\n            //The link here has to be a capability not a tenant, because it can change.\n            account.storage.save\u003c@FindLeaseMarketSale.SaleItemCollection\u003e(\u003c- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)\n            leaseSaleItemCap= account.capabilities.storage.issue\u003c\u0026{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}\u003e(leaseStoragePath)\n        }\n\n        self.saleItemCollection = saleItemsCap.borrow()!\n        let item = self.saleItemCollection.borrowSaleItem(leaseName)\n\n        let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(item.getFtType().identifier))\n\n\n        self.walletReference = account.storage.borrow\u003cauth(FungibleToken.Withdraw) \u0026{FungibleToken.Vault}\u003e(from: ft.vaultPath) ?? panic(\"No suitable wallet linked for this account\")\n        self.buyer = account.address\n    }\n\n    pre {\n        self.walletReference.balance \u003e amount : \"Your wallet does not have enough funds to pay for this item\"\n    }\n\n    execute {\n        let vault \u003c- self.walletReference.withdraw(amount: amount)\n        self.saleItemCollection.buy(name:leaseName, vault: \u003c- vault, to: self.buyer)\n    }\n}"
+               "code": "import FindMarket from 0x097bafa4e0b48eef\nimport FTRegistry from 0x097bafa4e0b48eef\nimport FungibleToken from 0xf233dcee88fe0abe\nimport FIND from 0x097bafa4e0b48eef\nimport Profile from 0x097bafa4e0b48eef\nimport FindLeaseMarketSale from 0x097bafa4e0b48eef\nimport FindLeaseMarket from 0x097bafa4e0b48eef\n\ntransaction(leaseName: String, amount: UFix64) {\n\n    let buyer : Address\n    let walletReference : auth(FungibleToken.Withdraw) \u0026{FungibleToken.Vault}\n\n    let saleItemCollection: \u0026{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}\n\n    prepare(account: auth(BorrowValue, SaveValue, IssueStorageCapabilityController) \u0026Account) {\n\n        let profile=account.storage.borrow\u003c\u0026Profile.User\u003e(from: Profile.storagePath) ?? panic(\"You do not have a profile set up, initialize the user first\")\n\n        let address = FIND.resolve(leaseName) ?? panic(\"The address input is not a valid name nor address. Input : \".concat(leaseName))\n\n        if address == nil {\n            panic(\"The address input is not a valid name nor address. Input : \".concat(leaseName))\n        }\n\n        let leaseMarketplace = FindMarket.getTenantAddress(\"find\") ?? panic(\"Cannot find find tenant\")\n        let saleItemsCap= FindLeaseMarketSale.getSaleItemCapability(marketplace: leaseMarketplace, user:address) ?? panic(\"cannot find sale item cap for find\")\n\n        let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!\n        let leaseTenant = leaseTenantCapability.borrow()!\n\n        let leaseSaleItemType= Type\u003c@FindLeaseMarketSale.SaleItemCollection\u003e()\n        let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: \"find\")\n        let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:\"find\")\n        var leaseSaleItemCap= account.capabilities.get\u003c\u0026{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}\u003e(leasePublicPath)\n        if !leaseSaleItemCap.check(){\n            //The link here has to be a capability not a tenant, because it can change.\n            account.storage.save\u003c@FindLeaseMarketSale.SaleItemCollection\u003e(\u003c- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)\n            leaseSaleItemCap= account.capabilities.storage.issue\u003c\u0026{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}\u003e(leaseStoragePath)\n            account.capabilities.publish(leaseSaleItemCap, at: leasePublicPath)\n        }\n\n        self.saleItemCollection = saleItemsCap.borrow()!\n        let item = self.saleItemCollection.borrowSaleItem(leaseName)\n\n        let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(item.getFtType().identifier))\n\n\n        self.walletReference = account.storage.borrow\u003cauth(FungibleToken.Withdraw) \u0026{FungibleToken.Vault}\u003e(from: ft.vaultPath) ?? panic(\"No suitable wallet linked for this account\")\n        self.buyer = account.address\n    }\n\n    pre {\n        self.walletReference.balance \u003e amount : \"Your wallet does not have enough funds to pay for this item\"\n    }\n\n    execute {\n        let vault \u003c- self.walletReference.withdraw(amount: amount)\n        self.saleItemCollection.buy(name:leaseName, vault: \u003c- vault, to: self.buyer)\n    }\n}"
             },
             "buyLeaseForSaleDapper": {
                "spec": {
@@ -3799,28 +3699,6 @@
                },
                "code": "import FindMarket from 0x097bafa4e0b48eef\nimport FindMarketDirectOfferEscrow from 0x097bafa4e0b48eef\nimport FindMarketAuctionEscrow from 0x097bafa4e0b48eef\nimport FindMarketAuctionSoft from 0x097bafa4e0b48eef\nimport FindMarketDirectOfferSoft from 0x097bafa4e0b48eef\nimport FindMarketSale from 0x097bafa4e0b48eef\n\ntransaction(ids: {String : [UInt64]}) {\n    prepare(account: auth(BorrowValue) \u0026Account) {\n\n        let marketplace = FindMarket.getFindTenantAddress()\n        let tenant=FindMarket.getTenant(marketplace)\n\n        var saleType = Type\u003c@FindMarketDirectOfferEscrow.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketDirectOfferEscrow.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.cancel(id)\n            }\n        }\n\n        saleType = Type\u003c@FindMarketAuctionEscrow.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketAuctionEscrow.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.cancel(id)\n            }\n        }\n\n        saleType = Type\u003c@FindMarketAuctionSoft.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketAuctionSoft.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.cancel(id)\n            }\n        }\n\n        saleType = Type\u003c@FindMarketDirectOfferSoft.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketDirectOfferSoft.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.cancel(id)\n            }\n        }\n\n        saleType = Type\u003c@FindMarketSale.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.delist(id)\n            }\n        }\n\n    }\n}"
             },
-            "cancelNameAuction": {
-               "spec": {
-                  "parameters": {
-                     "names": "[String]"
-                  },
-                  "order": [
-                     "names"
-                  ]
-               },
-               "code": "import FIND from 0x097bafa4e0b48eef\n\ntransaction(names: [String]) {\n\n    let finLeases : auth(FIND.AuctionOwner, FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        self.finLeases= account.storage.borrow\u003cauth(FIND.AuctionOwner, FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find leases collection\"\n    }\n\n    execute {\n        for name in names {\n            self.finLeases!.cancel(name)\n            self.finLeases!.delistAuction(name)\n        }\n    }\n}"
-            },
-            "cancelNameBid": {
-               "spec": {
-                  "parameters": {
-                     "names": "[String]"
-                  },
-                  "order": [
-                     "names"
-                  ]
-               },
-               "code": "import FIND from 0x097bafa4e0b48eef\n\ntransaction(names: [String]) {\n\n    let bids : \u0026FIND.BidCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        self.bids = account.storage.borrow\u003c\u0026FIND.BidCollection\u003e(from: FIND.BidStoragePath)\n    }\n\n    pre{\n        self.bids != nil : \"Cannot borrow reference to find bid collection\"\n    }\n\n    execute {\n        for name in names {\n            self.bids!.cancelBid(name)\n        }\n    }\n\n}"
-            },
             "cleanUpInvalidatedLease": {
                "spec": {
                   "parameters": {
@@ -3914,17 +3792,6 @@
                   ]
                },
                "code": "import FindMarket from 0x097bafa4e0b48eef\nimport FindMarketSale from 0x097bafa4e0b48eef\n\n//Remove one or more listings from a marketplace\ntransaction(ids: [UInt64]) {\n\n    let saleItems : auth(FindMarketSale.Seller) \u0026FindMarketSale.SaleItemCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        let marketplace = FindMarket.getFindTenantAddress()\n        let tenant=FindMarket.getTenant(marketplace)\n        self.saleItems= account.storage.borrow\u003cauth(FindMarketSale.Seller) \u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(Type\u003c@FindMarketSale.SaleItemCollection\u003e()))\n    }\n\n    pre{\n        self.saleItems != nil : \"Cannot borrow reference to saleItem\"\n    }\n\n    execute{\n        for id in ids {\n            self.saleItems!.delist(id)\n        }\n    }\n}"
-            },
-            "delistNameSale": {
-               "spec": {
-                  "parameters": {
-                     "names": "[String]"
-                  },
-                  "order": [
-                     "names"
-                  ]
-               },
-               "code": "import FIND from 0x097bafa4e0b48eef\n\ntransaction(names: [String]) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.finLeases= acct.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        for name in names {\n            self.finLeases!.delistSale(name)\n        }\n    }\n}"
             },
             "editFindThought": {
                "spec": {
@@ -4194,30 +4061,6 @@
                   ]
                },
                "code": "import FindMarketDirectOfferSoft from 0x097bafa4e0b48eef\nimport FungibleToken from 0xf233dcee88fe0abe\nimport FTRegistry from 0x097bafa4e0b48eef\nimport FindMarket from 0x097bafa4e0b48eef\n\ntransaction(ids: [UInt64], amounts:[UFix64]) {\n\n    let walletReference : [\u0026FungibleToken.Vault]\n    let bidsReference: \u0026FindMarketDirectOfferSoft.MarketBidCollection\n    let requiredAmount: [UFix64]\n    let balanceBeforeTransfer: {Type : UFix64}\n\n    prepare(dapper: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) \u0026Account, account: auth(BorrowValue) \u0026Account) {\n        let marketplace = FindMarket.getFindTenantAddress()\n        let tenant=FindMarket.getTenant(marketplace)\n        let storagePath=tenant.getStoragePath(Type\u003c@FindMarketDirectOfferSoft.MarketBidCollection\u003e())\n        self.bidsReference= account.storage.borrow\u003c\u0026FindMarketDirectOfferSoft.MarketBidCollection\u003e(from: storagePath) ?? panic(\"Cannot borrow direct offer soft bid collection\")\n        let marketOption = FindMarket.getMarketOptionFromType(Type\u003c@FindMarketDirectOfferSoft.MarketBidCollection\u003e())\n\n        var counter = 0\n        self.requiredAmount = []\n        self.walletReference = []\n        self.balanceBeforeTransfer = {}\n        let fts : {String : FTRegistry.FTInfo} = {}\n        let vaultRefs : {StoragePath : \u0026FungibleToken.Vault} = {}\n\n\n        while counter \u003c ids.length {\n            let item = FindMarket.assertBidOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, id: ids[counter])\n\n            var ft : FTRegistry.FTInfo? = nil\n            let ftIdentifier = item.getFtType().identifier\n            if fts[ftIdentifier] != nil {\n                ft = fts[ftIdentifier]\n            } else {\n                ft = FTRegistry.getFTInfoByTypeIdentifier(ftIdentifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(ftIdentifier))\n                fts[ftIdentifier] = ft\n            }\n\n            if vaultRefs[ft!.vaultPath] != nil {\n                let vaultRef = vaultRefs[ft!.vaultPath]!\n                self.walletReference.append(vaultRef)\n            } else {\n                let walletReference = dapper.storage.borrow\u003c\u0026{FungibleToken.Vault}\u003e(from: ft!.vaultPath) ?? panic(\"Cannot borrow Dapper Coin Vault. Type : \".concat(ft!.type.identifier))\n                vaultRefs[ft!.vaultPath] = walletReference\n                self.walletReference.append(walletReference)\n                self.balanceBeforeTransfer[walletReference.getType()] = walletReference.balance\n            }\n            let requiredAmount = self.bidsReference.getBalance(ids[counter])\n            self.requiredAmount.append(requiredAmount)\n            counter = counter + 1\n        }\n    }\n\n    execute {\n        var counter = 0\n        while counter \u003c ids.length {\n            if self.walletReference[counter].balance \u003c self.requiredAmount[counter] {\n                panic(\"Your wallet does not have enough funds to pay for this item. Item ID: \".concat(ids[counter].toString()))\n            }\n            if self.requiredAmount[counter] != amounts[counter] {\n                panic(\"Amount needed to fulfill is \".concat(amounts[counter].toString()))\n            }\n            let vault \u003c- self.walletReference[counter].withdraw(amount: amounts[counter])\n            self.bidsReference.fulfillDirectOffer(id: ids[counter], vault: \u003c- vault)\n            counter = counter + 1\n        }\n        // Check that all dapper Coin was routed back to Dapper\n        for vault in self.walletReference {\n            if self.balanceBeforeTransfer[vault.getType()]! != vault.balance {\n                panic(\"Dapper Coin leakage. Type : \".concat(vault.getType().identifier))\n            }\n        }\n    }\n\n}"
-            },
-            "fulfillName": {
-               "spec": {
-                  "parameters": {
-                     "name": "String"
-                  },
-                  "order": [
-                     "name"
-                  ]
-               },
-               "code": "import FIND from 0x097bafa4e0b48eef\nimport Profile from 0x097bafa4e0b48eef\n\ntransaction(name: String) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        self.finLeases= account.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath) \n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        self.finLeases!.fulfill(name)\n    }\n}"
-            },
-            "fulfillNameAuction": {
-               "spec": {
-                  "parameters": {
-                     "name": "String",
-                     "owner": "Address"
-                  },
-                  "order": [
-                     "owner",
-                     "name"
-                  ]
-               },
-               "code": "import FIND from 0x097bafa4e0b48eef\nimport Profile from 0x097bafa4e0b48eef\n\ntransaction(owner: Address, name: String) {\n\n    let leases : \u0026FIND.LeaseCollection?\n\n    prepare(account: \u0026Account) {\n        self.leases = getAccount(owner).capabilities.get\u003c\u0026FIND.LeaseCollection\u003e(FIND.LeasePublicPath)!.borrow()\n    }\n\n    pre{\n        self.leases != nil : \"Cannot borrow reference to lease collection reference. Account address: \".concat(owner.toString())\n    }\n\n    execute{\n        self.leases!.fulfillAuction(name)\n    }\n}"
             },
             "hideFindThoughts": {
                "spec": {
@@ -4538,38 +4381,6 @@
                   ]
                },
                "code": "import FindMarket from 0x097bafa4e0b48eef\nimport FindMarketSale from 0x097bafa4e0b48eef\nimport NonFungibleToken from 0x1d7e57aa55817448\nimport MetadataViews from 0x1d7e57aa55817448\nimport FindViews from 0x097bafa4e0b48eef\nimport FINDNFTCatalog from 0x097bafa4e0b48eef\nimport FTRegistry from 0x097bafa4e0b48eef\n\ntransaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {\n\n    let saleItems : auth(FindMarketSale.Seller) \u0026FindMarketSale.SaleItemCollection?\n    let pointer : FindViews.AuthNFTPointer\n    let vaultType : Type\n\n    prepare(account: auth (StorageCapabilities, IssueStorageCapabilityController,PublishCapability, Storage) \u0026Account) {\n\n        let marketplace = FindMarket.getFindTenantAddress()\n        let tenantCapability= FindMarket.getTenantCapability(marketplace)!\n        let saleItemType= Type\u003c@FindMarketSale.SaleItemCollection\u003e()\n\n        let tenant = tenantCapability.borrow()!\n        let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)\n        let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)\n        let saleItemCap= account.capabilities.get\u003c\u0026FindMarketSale.SaleItemCollection\u003e(publicPath)\n        if !saleItemCap.check(){\n            account.storage.save(\u003c- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)\n            let cap = account.capabilities.storage.issue\u003c\u0026FindMarketSale.SaleItemCollection\u003e(storagePath)\n            account.capabilities.publish(cap, at: publicPath)\n        }\n\n        // Get supported NFT and FT Information from Registries from input alias\n        let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier:nftAliasOrIdentifier)?.keys ?? panic(\"This NFT is not supported by the NFT Catalog yet. Type : \".concat(nftAliasOrIdentifier))\n        let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!\n        let nft = collection.collectionData\n\n        let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(ftAliasOrIdentifier))\n\n        let storagePathIdentifer = nft.storagePath.toString().split(separator:\"/\")[1]\n        let providerIdentifier = storagePathIdentifer.concat(\"Provider\")\n        let providerStoragePath = StoragePath(identifier: providerIdentifier)!\n\n        //if this stores anything but this it will panic, why does it not return nil?\n        var existingProvider= account.storage.copy\u003cCapability\u003cauth(NonFungibleToken.Withdraw) \u0026{NonFungibleToken.Collection}\u003e\u003e(from: providerStoragePath) \n        if existingProvider==nil {\n            existingProvider=account.capabilities.storage.issue\u003cauth(NonFungibleToken.Withdraw) \u0026{NonFungibleToken.Collection}\u003e(nft.storagePath)\n            //we save it to storage to memoize it\n            account.storage.save(existingProvider!, to: providerStoragePath)\n            log(\"create new cap\")\n        }\n        var providerCap = existingProvider!\n\n        // Get the salesItemRef from tenant\n        self.saleItems= account.storage.borrow\u003cauth(FindMarketSale.Seller) \u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(Type\u003c@FindMarketSale.SaleItemCollection\u003e()))\n        self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)\n        self.vaultType= ft.type\n    }\n\n    pre{\n        self.saleItems != nil : \"Cannot borrow reference to saleItem\"\n    }\n\n    execute{\n        self.saleItems!.listForSale(pointer: self.pointer, vaultType: self.vaultType, directSellPrice: directSellPrice, validUntil: validUntil, extraField: {})\n    }\n}"
-            },
-            "listNameForAuction": {
-               "spec": {
-                  "parameters": {
-                     "auctionDuration": "UFix64",
-                     "auctionExtensionOnLateBid": "UFix64",
-                     "auctionReservePrice": "UFix64",
-                     "auctionStartPrice": "UFix64",
-                     "name": "String"
-                  },
-                  "order": [
-                     "name",
-                     "auctionStartPrice",
-                     "auctionReservePrice",
-                     "auctionDuration",
-                     "auctionExtensionOnLateBid"
-                  ]
-               },
-               "code": "import FIND from 0x097bafa4e0b48eef\n\ntransaction(name: String, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.finLeases= acct.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        self.finLeases!.listForAuction(name: name, auctionStartPrice: auctionStartPrice, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration,  auctionExtensionOnLateBid: auctionExtensionOnLateBid)\n    }\n}"
-            },
-            "listNameForSale": {
-               "spec": {
-                  "parameters": {
-                     "directSellPrice": "UFix64",
-                     "name": "String"
-                  },
-                  "order": [
-                     "name",
-                     "directSellPrice"
-                  ]
-               },
-               "code": "import FIND from 0x097bafa4e0b48eef\n\ntransaction(name: String, directSellPrice:UFix64) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.finLeases= acct.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        self.finLeases!.listForSale(name: name,  directSellPrice:directSellPrice)\n    }\n}"
             },
             "moveNameTO": {
                "spec": {
@@ -5162,17 +4973,6 @@
                   "order": []
                },
                "code": "import FindMarket from 0x097bafa4e0b48eef\nimport FlowToken from 0x1654653399040a61\nimport Dandy from 0x097bafa4e0b48eef\n\ntransaction(){\n    prepare(account: auth(BorrowValue) \u0026Account){\n        let path = FindMarket.TenantClientStoragePath\n        let tenantRef = account.storage.borrow\u003cauth(FindMarket.TenantClientOwner) \u0026FindMarket.TenantClient\u003e(from: path) ?? panic(\"Cannot borrow Reference.\")\n\n        tenantRef.setMarketOption(name:\"FlowDandy\", cut: nil, rules:[\n        FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n        FindMarket.TenantRule(name:\"Dandy\", types:[ Type\u003c@Dandy.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n    )\n\n}\n}"
-            },
-            "startNameAuction": {
-               "spec": {
-                  "parameters": {
-                     "name": "String"
-                  },
-                  "order": [
-                     "name"
-                  ]
-               },
-               "code": "import FIND from 0x097bafa4e0b48eef\n\ntransaction(name: String) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        self.finLeases= account.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        self.finLeases!.startAuction(name)\n    }\n}"
             },
             "storeCuratedCollections": {
                "spec": {
@@ -6222,7 +6022,7 @@
                      "amount"
                   ]
                },
-               "code": "import FindMarket from 0x35717efbbce11c74\nimport FTRegistry from 0x35717efbbce11c74\nimport FungibleToken from 0x9a0766d93b6608b7\nimport FIND from 0x35717efbbce11c74\nimport Profile from 0x35717efbbce11c74\nimport FindLeaseMarketSale from 0x35717efbbce11c74\nimport FindLeaseMarket from 0x35717efbbce11c74\n\ntransaction(leaseName: String, amount: UFix64) {\n\n    let buyer : Address\n    let walletReference : auth(FungibleToken.Withdraw) \u0026{FungibleToken.Vault}\n\n    let saleItemCollection: \u0026{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}\n\n    prepare(account: auth(BorrowValue, SaveValue, IssueStorageCapabilityController) \u0026Account) {\n\n        let profile=account.storage.borrow\u003c\u0026Profile.User\u003e(from: Profile.storagePath) ?? panic(\"You do not have a profile set up, initialize the user first\")\n\n        let address = FIND.resolve(leaseName) ?? panic(\"The address input is not a valid name nor address. Input : \".concat(leaseName))\n\n        if address == nil {\n            panic(\"The address input is not a valid name nor address. Input : \".concat(leaseName))\n        }\n\n        let leaseMarketplace = FindMarket.getTenantAddress(\"find\") ?? panic(\"Cannot find find tenant\")\n        let saleItemsCap= FindLeaseMarketSale.getSaleItemCapability(marketplace: leaseMarketplace, user:address) ?? panic(\"cannot find sale item cap for find\")\n\n        let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!\n        let leaseTenant = leaseTenantCapability.borrow()!\n\n        let leaseSaleItemType= Type\u003c@FindLeaseMarketSale.SaleItemCollection\u003e()\n        let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: \"find\")\n        let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:\"find\")\n        var leaseSaleItemCap= account.capabilities.get\u003c\u0026{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}\u003e(leasePublicPath)\n        if !leaseSaleItemCap.check(){\n            //The link here has to be a capability not a tenant, because it can change.\n            account.storage.save\u003c@FindLeaseMarketSale.SaleItemCollection\u003e(\u003c- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)\n            leaseSaleItemCap= account.capabilities.storage.issue\u003c\u0026{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}\u003e(leaseStoragePath)\n        }\n\n        self.saleItemCollection = saleItemsCap.borrow()!\n        let item = self.saleItemCollection.borrowSaleItem(leaseName)\n\n        let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(item.getFtType().identifier))\n\n\n        self.walletReference = account.storage.borrow\u003cauth(FungibleToken.Withdraw) \u0026{FungibleToken.Vault}\u003e(from: ft.vaultPath) ?? panic(\"No suitable wallet linked for this account\")\n        self.buyer = account.address\n    }\n\n    pre {\n        self.walletReference.balance \u003e amount : \"Your wallet does not have enough funds to pay for this item\"\n    }\n\n    execute {\n        let vault \u003c- self.walletReference.withdraw(amount: amount)\n        self.saleItemCollection.buy(name:leaseName, vault: \u003c- vault, to: self.buyer)\n    }\n}"
+               "code": "import FindMarket from 0x35717efbbce11c74\nimport FTRegistry from 0x35717efbbce11c74\nimport FungibleToken from 0x9a0766d93b6608b7\nimport FIND from 0x35717efbbce11c74\nimport Profile from 0x35717efbbce11c74\nimport FindLeaseMarketSale from 0x35717efbbce11c74\nimport FindLeaseMarket from 0x35717efbbce11c74\n\ntransaction(leaseName: String, amount: UFix64) {\n\n    let buyer : Address\n    let walletReference : auth(FungibleToken.Withdraw) \u0026{FungibleToken.Vault}\n\n    let saleItemCollection: \u0026{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}\n\n    prepare(account: auth(BorrowValue, SaveValue, IssueStorageCapabilityController) \u0026Account) {\n\n        let profile=account.storage.borrow\u003c\u0026Profile.User\u003e(from: Profile.storagePath) ?? panic(\"You do not have a profile set up, initialize the user first\")\n\n        let address = FIND.resolve(leaseName) ?? panic(\"The address input is not a valid name nor address. Input : \".concat(leaseName))\n\n        if address == nil {\n            panic(\"The address input is not a valid name nor address. Input : \".concat(leaseName))\n        }\n\n        let leaseMarketplace = FindMarket.getTenantAddress(\"find\") ?? panic(\"Cannot find find tenant\")\n        let saleItemsCap= FindLeaseMarketSale.getSaleItemCapability(marketplace: leaseMarketplace, user:address) ?? panic(\"cannot find sale item cap for find\")\n\n        let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!\n        let leaseTenant = leaseTenantCapability.borrow()!\n\n        let leaseSaleItemType= Type\u003c@FindLeaseMarketSale.SaleItemCollection\u003e()\n        let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: \"find\")\n        let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:\"find\")\n        var leaseSaleItemCap= account.capabilities.get\u003c\u0026{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}\u003e(leasePublicPath)\n        if !leaseSaleItemCap.check(){\n            //The link here has to be a capability not a tenant, because it can change.\n            account.storage.save\u003c@FindLeaseMarketSale.SaleItemCollection\u003e(\u003c- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)\n            leaseSaleItemCap= account.capabilities.storage.issue\u003c\u0026{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}\u003e(leaseStoragePath)\n            account.capabilities.publish(leaseSaleItemCap, at: leasePublicPath)\n        }\n\n        self.saleItemCollection = saleItemsCap.borrow()!\n        let item = self.saleItemCollection.borrowSaleItem(leaseName)\n\n        let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(item.getFtType().identifier))\n\n\n        self.walletReference = account.storage.borrow\u003cauth(FungibleToken.Withdraw) \u0026{FungibleToken.Vault}\u003e(from: ft.vaultPath) ?? panic(\"No suitable wallet linked for this account\")\n        self.buyer = account.address\n    }\n\n    pre {\n        self.walletReference.balance \u003e amount : \"Your wallet does not have enough funds to pay for this item\"\n    }\n\n    execute {\n        let vault \u003c- self.walletReference.withdraw(amount: amount)\n        self.saleItemCollection.buy(name:leaseName, vault: \u003c- vault, to: self.buyer)\n    }\n}"
             },
             "buyLeaseForSaleDapper": {
                "spec": {
@@ -6395,28 +6195,6 @@
                },
                "code": "import FindMarket from 0x35717efbbce11c74\nimport FindMarketDirectOfferEscrow from 0x35717efbbce11c74\nimport FindMarketAuctionEscrow from 0x35717efbbce11c74\nimport FindMarketAuctionSoft from 0x35717efbbce11c74\nimport FindMarketDirectOfferSoft from 0x35717efbbce11c74\nimport FindMarketSale from 0x35717efbbce11c74\n\ntransaction(ids: {String : [UInt64]}) {\n    prepare(account: auth(BorrowValue) \u0026Account) {\n\n        let marketplace = FindMarket.getFindTenantAddress()\n        let tenant=FindMarket.getTenant(marketplace)\n\n        var saleType = Type\u003c@FindMarketDirectOfferEscrow.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketDirectOfferEscrow.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.cancel(id)\n            }\n        }\n\n        saleType = Type\u003c@FindMarketAuctionEscrow.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketAuctionEscrow.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.cancel(id)\n            }\n        }\n\n        saleType = Type\u003c@FindMarketAuctionSoft.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketAuctionSoft.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.cancel(id)\n            }\n        }\n\n        saleType = Type\u003c@FindMarketDirectOfferSoft.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketDirectOfferSoft.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.cancel(id)\n            }\n        }\n\n        saleType = Type\u003c@FindMarketSale.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.delist(id)\n            }\n        }\n\n    }\n}"
             },
-            "cancelNameAuction": {
-               "spec": {
-                  "parameters": {
-                     "names": "[String]"
-                  },
-                  "order": [
-                     "names"
-                  ]
-               },
-               "code": "import FIND from 0x35717efbbce11c74\n\ntransaction(names: [String]) {\n\n    let finLeases : auth(FIND.AuctionOwner, FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        self.finLeases= account.storage.borrow\u003cauth(FIND.AuctionOwner, FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find leases collection\"\n    }\n\n    execute {\n        for name in names {\n            self.finLeases!.cancel(name)\n            self.finLeases!.delistAuction(name)\n        }\n    }\n}"
-            },
-            "cancelNameBid": {
-               "spec": {
-                  "parameters": {
-                     "names": "[String]"
-                  },
-                  "order": [
-                     "names"
-                  ]
-               },
-               "code": "import FIND from 0x35717efbbce11c74\n\ntransaction(names: [String]) {\n\n    let bids : \u0026FIND.BidCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        self.bids = account.storage.borrow\u003c\u0026FIND.BidCollection\u003e(from: FIND.BidStoragePath)\n    }\n\n    pre{\n        self.bids != nil : \"Cannot borrow reference to find bid collection\"\n    }\n\n    execute {\n        for name in names {\n            self.bids!.cancelBid(name)\n        }\n    }\n\n}"
-            },
             "cleanUpInvalidatedLease": {
                "spec": {
                   "parameters": {
@@ -6510,17 +6288,6 @@
                   ]
                },
                "code": "import FindMarket from 0x35717efbbce11c74\nimport FindMarketSale from 0x35717efbbce11c74\n\n//Remove one or more listings from a marketplace\ntransaction(ids: [UInt64]) {\n\n    let saleItems : auth(FindMarketSale.Seller) \u0026FindMarketSale.SaleItemCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        let marketplace = FindMarket.getFindTenantAddress()\n        let tenant=FindMarket.getTenant(marketplace)\n        self.saleItems= account.storage.borrow\u003cauth(FindMarketSale.Seller) \u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(Type\u003c@FindMarketSale.SaleItemCollection\u003e()))\n    }\n\n    pre{\n        self.saleItems != nil : \"Cannot borrow reference to saleItem\"\n    }\n\n    execute{\n        for id in ids {\n            self.saleItems!.delist(id)\n        }\n    }\n}"
-            },
-            "delistNameSale": {
-               "spec": {
-                  "parameters": {
-                     "names": "[String]"
-                  },
-                  "order": [
-                     "names"
-                  ]
-               },
-               "code": "import FIND from 0x35717efbbce11c74\n\ntransaction(names: [String]) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.finLeases= acct.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        for name in names {\n            self.finLeases!.delistSale(name)\n        }\n    }\n}"
             },
             "editFindThought": {
                "spec": {
@@ -6790,30 +6557,6 @@
                   ]
                },
                "code": "import FindMarketDirectOfferSoft from 0x35717efbbce11c74\nimport FungibleToken from 0x9a0766d93b6608b7\nimport FTRegistry from 0x35717efbbce11c74\nimport FindMarket from 0x35717efbbce11c74\n\ntransaction(ids: [UInt64], amounts:[UFix64]) {\n\n    let walletReference : [\u0026FungibleToken.Vault]\n    let bidsReference: \u0026FindMarketDirectOfferSoft.MarketBidCollection\n    let requiredAmount: [UFix64]\n    let balanceBeforeTransfer: {Type : UFix64}\n\n    prepare(dapper: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) \u0026Account, account: auth(BorrowValue) \u0026Account) {\n        let marketplace = FindMarket.getFindTenantAddress()\n        let tenant=FindMarket.getTenant(marketplace)\n        let storagePath=tenant.getStoragePath(Type\u003c@FindMarketDirectOfferSoft.MarketBidCollection\u003e())\n        self.bidsReference= account.storage.borrow\u003c\u0026FindMarketDirectOfferSoft.MarketBidCollection\u003e(from: storagePath) ?? panic(\"Cannot borrow direct offer soft bid collection\")\n        let marketOption = FindMarket.getMarketOptionFromType(Type\u003c@FindMarketDirectOfferSoft.MarketBidCollection\u003e())\n\n        var counter = 0\n        self.requiredAmount = []\n        self.walletReference = []\n        self.balanceBeforeTransfer = {}\n        let fts : {String : FTRegistry.FTInfo} = {}\n        let vaultRefs : {StoragePath : \u0026FungibleToken.Vault} = {}\n\n\n        while counter \u003c ids.length {\n            let item = FindMarket.assertBidOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, id: ids[counter])\n\n            var ft : FTRegistry.FTInfo? = nil\n            let ftIdentifier = item.getFtType().identifier\n            if fts[ftIdentifier] != nil {\n                ft = fts[ftIdentifier]\n            } else {\n                ft = FTRegistry.getFTInfoByTypeIdentifier(ftIdentifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(ftIdentifier))\n                fts[ftIdentifier] = ft\n            }\n\n            if vaultRefs[ft!.vaultPath] != nil {\n                let vaultRef = vaultRefs[ft!.vaultPath]!\n                self.walletReference.append(vaultRef)\n            } else {\n                let walletReference = dapper.storage.borrow\u003c\u0026{FungibleToken.Vault}\u003e(from: ft!.vaultPath) ?? panic(\"Cannot borrow Dapper Coin Vault. Type : \".concat(ft!.type.identifier))\n                vaultRefs[ft!.vaultPath] = walletReference\n                self.walletReference.append(walletReference)\n                self.balanceBeforeTransfer[walletReference.getType()] = walletReference.balance\n            }\n            let requiredAmount = self.bidsReference.getBalance(ids[counter])\n            self.requiredAmount.append(requiredAmount)\n            counter = counter + 1\n        }\n    }\n\n    execute {\n        var counter = 0\n        while counter \u003c ids.length {\n            if self.walletReference[counter].balance \u003c self.requiredAmount[counter] {\n                panic(\"Your wallet does not have enough funds to pay for this item. Item ID: \".concat(ids[counter].toString()))\n            }\n            if self.requiredAmount[counter] != amounts[counter] {\n                panic(\"Amount needed to fulfill is \".concat(amounts[counter].toString()))\n            }\n            let vault \u003c- self.walletReference[counter].withdraw(amount: amounts[counter])\n            self.bidsReference.fulfillDirectOffer(id: ids[counter], vault: \u003c- vault)\n            counter = counter + 1\n        }\n        // Check that all dapper Coin was routed back to Dapper\n        for vault in self.walletReference {\n            if self.balanceBeforeTransfer[vault.getType()]! != vault.balance {\n                panic(\"Dapper Coin leakage. Type : \".concat(vault.getType().identifier))\n            }\n        }\n    }\n\n}"
-            },
-            "fulfillName": {
-               "spec": {
-                  "parameters": {
-                     "name": "String"
-                  },
-                  "order": [
-                     "name"
-                  ]
-               },
-               "code": "import FIND from 0x35717efbbce11c74\nimport Profile from 0x35717efbbce11c74\n\ntransaction(name: String) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        self.finLeases= account.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath) \n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        self.finLeases!.fulfill(name)\n    }\n}"
-            },
-            "fulfillNameAuction": {
-               "spec": {
-                  "parameters": {
-                     "name": "String",
-                     "owner": "Address"
-                  },
-                  "order": [
-                     "owner",
-                     "name"
-                  ]
-               },
-               "code": "import FIND from 0x35717efbbce11c74\nimport Profile from 0x35717efbbce11c74\n\ntransaction(owner: Address, name: String) {\n\n    let leases : \u0026FIND.LeaseCollection?\n\n    prepare(account: \u0026Account) {\n        self.leases = getAccount(owner).capabilities.get\u003c\u0026FIND.LeaseCollection\u003e(FIND.LeasePublicPath)!.borrow()\n    }\n\n    pre{\n        self.leases != nil : \"Cannot borrow reference to lease collection reference. Account address: \".concat(owner.toString())\n    }\n\n    execute{\n        self.leases!.fulfillAuction(name)\n    }\n}"
             },
             "hideFindThoughts": {
                "spec": {
@@ -7153,38 +6896,6 @@
                   ]
                },
                "code": "import FindMarket from 0x35717efbbce11c74\nimport FindMarketSale from 0x35717efbbce11c74\nimport FINDNFTCatalog from 0x35717efbbce11c74\nimport FTRegistry from 0x35717efbbce11c74\nimport FindViews from 0x35717efbbce11c74\nimport NonFungibleToken from 0x631e88ae7f1d7c20\nimport MetadataViews from 0x631e88ae7f1d7c20\nimport FlowUtilityToken from 0x82ec283f88a62e65\nimport TokenForwarding from 0x51ea0e37c27a1f1a\nimport FungibleToken from 0x9a0766d93b6608b7\n\ntransaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {\n\n    let saleItems : auth(FindMarketSale.Seller) \u0026FindMarketSale.SaleItemCollection?\n    let pointer : FindViews.AuthNFTPointer\n    let vaultType : Type\n\n    prepare(account: auth (StorageCapabilities, PublishCapability, Storage, IssueStorageCapabilityController) \u0026Account) {\n\n        let marketplace = FindMarket.getFindTenantAddress()\n        let saleItemType= Type\u003c@FindMarketSale.SaleItemCollection\u003e()\n        let tenantCapability= FindMarket.getTenantCapability(marketplace)!\n\n        let tenant = tenantCapability.borrow()!\n\n        //TODO:how do we fix this on testnet/mainnet\n        let dapper=getAccount(FindViews.getDapperAddress())\n\n        let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)\n        let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)\n\n        let saleItemCap= account.capabilities.get\u003c\u0026FindMarketSale.SaleItemCollection\u003e(publicPath)\n        if !saleItemCap.check() {\n            account.storage.save(\u003c- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)\n            let cap = account.capabilities.storage.issue\u003c\u0026FindMarketSale.SaleItemCollection\u003e(storagePath)\n            account.capabilities.publish(cap, at: publicPath)\n        }\n        // Get supported NFT and FT Information from Registries from input alias\n        let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier: nftAliasOrIdentifier)?.keys ?? panic(\"This NFT is not supported by the NFT Catalog yet. Type : \".concat(nftAliasOrIdentifier))\n        let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!\n        let nft = collection.collectionData\n\n        let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(ftAliasOrIdentifier))\n\n        let futReceiver = account.capabilities.get\u003c\u0026{FungibleToken.Receiver}\u003e(/public/flowUtilityTokenReceiver)\n        if ft.type == Type\u003c@FlowUtilityToken.Vault\u003e() \u0026\u0026 !futReceiver.check() {\n            // Create a new Forwarder resource for FUT and store it in the new account's storage\n            let futForwarder \u003c- TokenForwarding.createNewForwarder(recipient: dapper.capabilities.get\u003c\u0026{FungibleToken.Receiver}\u003e(/public/flowUtilityTokenReceiver))\n            account.storage.save(\u003c-futForwarder, to: /storage/flowUtilityTokenReceiver)\n            let receiverCap = account.capabilities.storage.issue\u003c\u0026{FungibleToken.Receiver}\u003e(/storage/flowUtilityTokenReceiver)\n            account.capabilities.publish(receiverCap, at: /public/flowUtilityTokenReceiver)\n\n            let vaultCap = account.capabilities.storage.issue\u003c\u0026{FungibleToken.Vault}\u003e(/storage/flowUtilityTokenReceiver)\n            account.capabilities.publish(vaultCap, at: /public/flowUtilityTokenVault)\n        }\n\n        let storagePathIdentifer = nft.storagePath.toString().split(separator:\"/\")[1]\n        let providerIdentifier = storagePathIdentifer.concat(\"Provider\")\n        let providerStoragePath = StoragePath(identifier: providerIdentifier)!\n\n        //if this stores anything but this it will panic, why does it not return nil?\n        var existingProvider= account.storage.copy\u003cCapability\u003cauth(NonFungibleToken.Withdraw) \u0026{NonFungibleToken.Collection}\u003e\u003e(from: providerStoragePath) \n        if existingProvider==nil {\n            existingProvider=account.capabilities.storage.issue\u003cauth(NonFungibleToken.Withdraw) \u0026{NonFungibleToken.Collection}\u003e(nft.storagePath)\n            //we save it to storage to memoize it\n            account.storage.save(existingProvider!, to: providerStoragePath)\n            log(\"create new cap\")\n        }\n        var providerCap = existingProvider!\n\n        // Get the salesItemRef from tenant\n        self.saleItems= account.storage.borrow\u003cauth(FindMarketSale.Seller) \u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(Type\u003c@FindMarketSale.SaleItemCollection\u003e()))\n        self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)\n        self.vaultType= ft.type\n    }\n\n    pre{\n        self.saleItems != nil : \"Cannot borrow reference to saleItem\"\n    }\n\n    execute{\n        self.saleItems!.listForSale(pointer: self.pointer, vaultType: self.vaultType, directSellPrice: directSellPrice, validUntil: validUntil, extraField: {})\n\n    }\n}"
-            },
-            "listNameForAuction": {
-               "spec": {
-                  "parameters": {
-                     "auctionDuration": "UFix64",
-                     "auctionExtensionOnLateBid": "UFix64",
-                     "auctionReservePrice": "UFix64",
-                     "auctionStartPrice": "UFix64",
-                     "name": "String"
-                  },
-                  "order": [
-                     "name",
-                     "auctionStartPrice",
-                     "auctionReservePrice",
-                     "auctionDuration",
-                     "auctionExtensionOnLateBid"
-                  ]
-               },
-               "code": "import FIND from 0x35717efbbce11c74\n\ntransaction(name: String, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.finLeases= acct.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        self.finLeases!.listForAuction(name: name, auctionStartPrice: auctionStartPrice, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration,  auctionExtensionOnLateBid: auctionExtensionOnLateBid)\n    }\n}"
-            },
-            "listNameForSale": {
-               "spec": {
-                  "parameters": {
-                     "directSellPrice": "UFix64",
-                     "name": "String"
-                  },
-                  "order": [
-                     "name",
-                     "directSellPrice"
-                  ]
-               },
-               "code": "import FIND from 0x35717efbbce11c74\n\ntransaction(name: String, directSellPrice:UFix64) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.finLeases= acct.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        self.finLeases!.listForSale(name: name,  directSellPrice:directSellPrice)\n    }\n}"
             },
             "moveNameTO": {
                "spec": {
@@ -7747,17 +7458,6 @@
                   "order": []
                },
                "code": "import FindMarket from 0x35717efbbce11c74\nimport FlowToken from 0x7e60df042a9c0868\nimport Dandy from 0x35717efbbce11c74\n\ntransaction(){\n    prepare(account: auth(BorrowValue) \u0026Account){\n        let path = FindMarket.TenantClientStoragePath\n        let tenantRef = account.storage.borrow\u003cauth(FindMarket.TenantClientOwner) \u0026FindMarket.TenantClient\u003e(from: path) ?? panic(\"Cannot borrow Reference.\")\n\n        tenantRef.setMarketOption(name:\"FlowDandy\", cut: nil, rules:[\n        FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n        FindMarket.TenantRule(name:\"Dandy\", types:[ Type\u003c@Dandy.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n    )\n\n}\n}"
-            },
-            "startNameAuction": {
-               "spec": {
-                  "parameters": {
-                     "name": "String"
-                  },
-                  "order": [
-                     "name"
-                  ]
-               },
-               "code": "import FIND from 0x35717efbbce11c74\n\ntransaction(name: String) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        self.finLeases= account.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        self.finLeases!.startAuction(name)\n    }\n}"
             },
             "storeCuratedCollections": {
                "spec": {
@@ -9007,7 +8707,7 @@
                      "amount"
                   ]
                },
-               "code": "import FindMarket from 0x35717efbbce11c74\nimport FTRegistry from 0x35717efbbce11c74\nimport FungibleToken from 0x9a0766d93b6608b7\nimport FIND from 0x35717efbbce11c74\nimport Profile from 0x35717efbbce11c74\nimport FindLeaseMarketSale from 0x35717efbbce11c74\nimport FindLeaseMarket from 0x35717efbbce11c74\n\ntransaction(leaseName: String, amount: UFix64) {\n\n    let buyer : Address\n    let walletReference : auth(FungibleToken.Withdraw) \u0026{FungibleToken.Vault}\n\n    let saleItemCollection: \u0026{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}\n\n    prepare(account: auth(BorrowValue, SaveValue, IssueStorageCapabilityController) \u0026Account) {\n\n        let profile=account.storage.borrow\u003c\u0026Profile.User\u003e(from: Profile.storagePath) ?? panic(\"You do not have a profile set up, initialize the user first\")\n\n        let address = FIND.resolve(leaseName) ?? panic(\"The address input is not a valid name nor address. Input : \".concat(leaseName))\n\n        if address == nil {\n            panic(\"The address input is not a valid name nor address. Input : \".concat(leaseName))\n        }\n\n        let leaseMarketplace = FindMarket.getTenantAddress(\"find\") ?? panic(\"Cannot find find tenant\")\n        let saleItemsCap= FindLeaseMarketSale.getSaleItemCapability(marketplace: leaseMarketplace, user:address) ?? panic(\"cannot find sale item cap for find\")\n\n        let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!\n        let leaseTenant = leaseTenantCapability.borrow()!\n\n        let leaseSaleItemType= Type\u003c@FindLeaseMarketSale.SaleItemCollection\u003e()\n        let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: \"find\")\n        let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:\"find\")\n        var leaseSaleItemCap= account.capabilities.get\u003c\u0026{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}\u003e(leasePublicPath)\n        if !leaseSaleItemCap.check(){\n            //The link here has to be a capability not a tenant, because it can change.\n            account.storage.save\u003c@FindLeaseMarketSale.SaleItemCollection\u003e(\u003c- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)\n            leaseSaleItemCap= account.capabilities.storage.issue\u003c\u0026{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}\u003e(leaseStoragePath)\n        }\n\n        self.saleItemCollection = saleItemsCap.borrow()!\n        let item = self.saleItemCollection.borrowSaleItem(leaseName)\n\n        let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(item.getFtType().identifier))\n\n\n        self.walletReference = account.storage.borrow\u003cauth(FungibleToken.Withdraw) \u0026{FungibleToken.Vault}\u003e(from: ft.vaultPath) ?? panic(\"No suitable wallet linked for this account\")\n        self.buyer = account.address\n    }\n\n    pre {\n        self.walletReference.balance \u003e amount : \"Your wallet does not have enough funds to pay for this item\"\n    }\n\n    execute {\n        let vault \u003c- self.walletReference.withdraw(amount: amount)\n        self.saleItemCollection.buy(name:leaseName, vault: \u003c- vault, to: self.buyer)\n    }\n}"
+               "code": "import FindMarket from 0x35717efbbce11c74\nimport FTRegistry from 0x35717efbbce11c74\nimport FungibleToken from 0x9a0766d93b6608b7\nimport FIND from 0x35717efbbce11c74\nimport Profile from 0x35717efbbce11c74\nimport FindLeaseMarketSale from 0x35717efbbce11c74\nimport FindLeaseMarket from 0x35717efbbce11c74\n\ntransaction(leaseName: String, amount: UFix64) {\n\n    let buyer : Address\n    let walletReference : auth(FungibleToken.Withdraw) \u0026{FungibleToken.Vault}\n\n    let saleItemCollection: \u0026{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}\n\n    prepare(account: auth(BorrowValue, SaveValue, IssueStorageCapabilityController) \u0026Account) {\n\n        let profile=account.storage.borrow\u003c\u0026Profile.User\u003e(from: Profile.storagePath) ?? panic(\"You do not have a profile set up, initialize the user first\")\n\n        let address = FIND.resolve(leaseName) ?? panic(\"The address input is not a valid name nor address. Input : \".concat(leaseName))\n\n        if address == nil {\n            panic(\"The address input is not a valid name nor address. Input : \".concat(leaseName))\n        }\n\n        let leaseMarketplace = FindMarket.getTenantAddress(\"find\") ?? panic(\"Cannot find find tenant\")\n        let saleItemsCap= FindLeaseMarketSale.getSaleItemCapability(marketplace: leaseMarketplace, user:address) ?? panic(\"cannot find sale item cap for find\")\n\n        let leaseTenantCapability= FindMarket.getTenantCapability(leaseMarketplace)!\n        let leaseTenant = leaseTenantCapability.borrow()!\n\n        let leaseSaleItemType= Type\u003c@FindLeaseMarketSale.SaleItemCollection\u003e()\n        let leasePublicPath=FindMarket.getPublicPath(leaseSaleItemType, name: \"find\")\n        let leaseStoragePath= FindMarket.getStoragePath(leaseSaleItemType, name:\"find\")\n        var leaseSaleItemCap= account.capabilities.get\u003c\u0026{FindLeaseMarketSale.SaleItemCollectionPublic, FindLeaseMarket.SaleItemCollectionPublic}\u003e(leasePublicPath)\n        if !leaseSaleItemCap.check(){\n            //The link here has to be a capability not a tenant, because it can change.\n            account.storage.save\u003c@FindLeaseMarketSale.SaleItemCollection\u003e(\u003c- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)\n            leaseSaleItemCap= account.capabilities.storage.issue\u003c\u0026{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}\u003e(leaseStoragePath)\n            account.capabilities.publish(leaseSaleItemCap, at: leasePublicPath)\n        }\n\n        self.saleItemCollection = saleItemsCap.borrow()!\n        let item = self.saleItemCollection.borrowSaleItem(leaseName)\n\n        let ft = FTRegistry.getFTInfoByTypeIdentifier(item.getFtType().identifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(item.getFtType().identifier))\n\n\n        self.walletReference = account.storage.borrow\u003cauth(FungibleToken.Withdraw) \u0026{FungibleToken.Vault}\u003e(from: ft.vaultPath) ?? panic(\"No suitable wallet linked for this account\")\n        self.buyer = account.address\n    }\n\n    pre {\n        self.walletReference.balance \u003e amount : \"Your wallet does not have enough funds to pay for this item\"\n    }\n\n    execute {\n        let vault \u003c- self.walletReference.withdraw(amount: amount)\n        self.saleItemCollection.buy(name:leaseName, vault: \u003c- vault, to: self.buyer)\n    }\n}"
             },
             "buyLeaseForSaleDapper": {
                "spec": {
@@ -9180,28 +8880,6 @@
                },
                "code": "import FindMarket from 0x35717efbbce11c74\nimport FindMarketDirectOfferEscrow from 0x35717efbbce11c74\nimport FindMarketAuctionEscrow from 0x35717efbbce11c74\nimport FindMarketAuctionSoft from 0x35717efbbce11c74\nimport FindMarketDirectOfferSoft from 0x35717efbbce11c74\nimport FindMarketSale from 0x35717efbbce11c74\n\ntransaction(ids: {String : [UInt64]}) {\n    prepare(account: auth(BorrowValue) \u0026Account) {\n\n        let marketplace = FindMarket.getFindTenantAddress()\n        let tenant=FindMarket.getTenant(marketplace)\n\n        var saleType = Type\u003c@FindMarketDirectOfferEscrow.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketDirectOfferEscrow.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.cancel(id)\n            }\n        }\n\n        saleType = Type\u003c@FindMarketAuctionEscrow.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketAuctionEscrow.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.cancel(id)\n            }\n        }\n\n        saleType = Type\u003c@FindMarketAuctionSoft.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketAuctionSoft.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.cancel(id)\n            }\n        }\n\n        saleType = Type\u003c@FindMarketDirectOfferSoft.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketDirectOfferSoft.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.cancel(id)\n            }\n        }\n\n        saleType = Type\u003c@FindMarketSale.SaleItemCollection\u003e()\n        if let ids = ids[FindMarket.getMarketOptionFromType(saleType)] {\n            let saleItems= account.storage.borrow\u003c\u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(saleType))!\n            for id in ids {\n                saleItems.delist(id)\n            }\n        }\n\n    }\n}"
             },
-            "cancelNameAuction": {
-               "spec": {
-                  "parameters": {
-                     "names": "[String]"
-                  },
-                  "order": [
-                     "names"
-                  ]
-               },
-               "code": "import FIND from 0x35717efbbce11c74\n\ntransaction(names: [String]) {\n\n    let finLeases : auth(FIND.AuctionOwner, FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        self.finLeases= account.storage.borrow\u003cauth(FIND.AuctionOwner, FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find leases collection\"\n    }\n\n    execute {\n        for name in names {\n            self.finLeases!.cancel(name)\n            self.finLeases!.delistAuction(name)\n        }\n    }\n}"
-            },
-            "cancelNameBid": {
-               "spec": {
-                  "parameters": {
-                     "names": "[String]"
-                  },
-                  "order": [
-                     "names"
-                  ]
-               },
-               "code": "import FIND from 0x35717efbbce11c74\n\ntransaction(names: [String]) {\n\n    let bids : \u0026FIND.BidCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        self.bids = account.storage.borrow\u003c\u0026FIND.BidCollection\u003e(from: FIND.BidStoragePath)\n    }\n\n    pre{\n        self.bids != nil : \"Cannot borrow reference to find bid collection\"\n    }\n\n    execute {\n        for name in names {\n            self.bids!.cancelBid(name)\n        }\n    }\n\n}"
-            },
             "cleanUpInvalidatedLease": {
                "spec": {
                   "parameters": {
@@ -9295,17 +8973,6 @@
                   ]
                },
                "code": "import FindMarket from 0x35717efbbce11c74\nimport FindMarketSale from 0x35717efbbce11c74\n\n//Remove one or more listings from a marketplace\ntransaction(ids: [UInt64]) {\n\n    let saleItems : auth(FindMarketSale.Seller) \u0026FindMarketSale.SaleItemCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        let marketplace = FindMarket.getFindTenantAddress()\n        let tenant=FindMarket.getTenant(marketplace)\n        self.saleItems= account.storage.borrow\u003cauth(FindMarketSale.Seller) \u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(Type\u003c@FindMarketSale.SaleItemCollection\u003e()))\n    }\n\n    pre{\n        self.saleItems != nil : \"Cannot borrow reference to saleItem\"\n    }\n\n    execute{\n        for id in ids {\n            self.saleItems!.delist(id)\n        }\n    }\n}"
-            },
-            "delistNameSale": {
-               "spec": {
-                  "parameters": {
-                     "names": "[String]"
-                  },
-                  "order": [
-                     "names"
-                  ]
-               },
-               "code": "import FIND from 0x35717efbbce11c74\n\ntransaction(names: [String]) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.finLeases= acct.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        for name in names {\n            self.finLeases!.delistSale(name)\n        }\n    }\n}"
             },
             "editFindThought": {
                "spec": {
@@ -9575,30 +9242,6 @@
                   ]
                },
                "code": "import FindMarketDirectOfferSoft from 0x35717efbbce11c74\nimport FungibleToken from 0x9a0766d93b6608b7\nimport FTRegistry from 0x35717efbbce11c74\nimport FindMarket from 0x35717efbbce11c74\n\ntransaction(ids: [UInt64], amounts:[UFix64]) {\n\n    let walletReference : [\u0026FungibleToken.Vault]\n    let bidsReference: \u0026FindMarketDirectOfferSoft.MarketBidCollection\n    let requiredAmount: [UFix64]\n    let balanceBeforeTransfer: {Type : UFix64}\n\n    prepare(dapper: auth(StorageCapabilities, SaveValue,PublishCapability, BorrowValue) \u0026Account, account: auth(BorrowValue) \u0026Account) {\n        let marketplace = FindMarket.getFindTenantAddress()\n        let tenant=FindMarket.getTenant(marketplace)\n        let storagePath=tenant.getStoragePath(Type\u003c@FindMarketDirectOfferSoft.MarketBidCollection\u003e())\n        self.bidsReference= account.storage.borrow\u003c\u0026FindMarketDirectOfferSoft.MarketBidCollection\u003e(from: storagePath) ?? panic(\"Cannot borrow direct offer soft bid collection\")\n        let marketOption = FindMarket.getMarketOptionFromType(Type\u003c@FindMarketDirectOfferSoft.MarketBidCollection\u003e())\n\n        var counter = 0\n        self.requiredAmount = []\n        self.walletReference = []\n        self.balanceBeforeTransfer = {}\n        let fts : {String : FTRegistry.FTInfo} = {}\n        let vaultRefs : {StoragePath : \u0026FungibleToken.Vault} = {}\n\n\n        while counter \u003c ids.length {\n            let item = FindMarket.assertBidOperationValid(tenant: marketplace, address: account.address, marketOption: marketOption, id: ids[counter])\n\n            var ft : FTRegistry.FTInfo? = nil\n            let ftIdentifier = item.getFtType().identifier\n            if fts[ftIdentifier] != nil {\n                ft = fts[ftIdentifier]\n            } else {\n                ft = FTRegistry.getFTInfoByTypeIdentifier(ftIdentifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(ftIdentifier))\n                fts[ftIdentifier] = ft\n            }\n\n            if vaultRefs[ft!.vaultPath] != nil {\n                let vaultRef = vaultRefs[ft!.vaultPath]!\n                self.walletReference.append(vaultRef)\n            } else {\n                let walletReference = dapper.storage.borrow\u003c\u0026{FungibleToken.Vault}\u003e(from: ft!.vaultPath) ?? panic(\"Cannot borrow Dapper Coin Vault. Type : \".concat(ft!.type.identifier))\n                vaultRefs[ft!.vaultPath] = walletReference\n                self.walletReference.append(walletReference)\n                self.balanceBeforeTransfer[walletReference.getType()] = walletReference.balance\n            }\n            let requiredAmount = self.bidsReference.getBalance(ids[counter])\n            self.requiredAmount.append(requiredAmount)\n            counter = counter + 1\n        }\n    }\n\n    execute {\n        var counter = 0\n        while counter \u003c ids.length {\n            if self.walletReference[counter].balance \u003c self.requiredAmount[counter] {\n                panic(\"Your wallet does not have enough funds to pay for this item. Item ID: \".concat(ids[counter].toString()))\n            }\n            if self.requiredAmount[counter] != amounts[counter] {\n                panic(\"Amount needed to fulfill is \".concat(amounts[counter].toString()))\n            }\n            let vault \u003c- self.walletReference[counter].withdraw(amount: amounts[counter])\n            self.bidsReference.fulfillDirectOffer(id: ids[counter], vault: \u003c- vault)\n            counter = counter + 1\n        }\n        // Check that all dapper Coin was routed back to Dapper\n        for vault in self.walletReference {\n            if self.balanceBeforeTransfer[vault.getType()]! != vault.balance {\n                panic(\"Dapper Coin leakage. Type : \".concat(vault.getType().identifier))\n            }\n        }\n    }\n\n}"
-            },
-            "fulfillName": {
-               "spec": {
-                  "parameters": {
-                     "name": "String"
-                  },
-                  "order": [
-                     "name"
-                  ]
-               },
-               "code": "import FIND from 0x35717efbbce11c74\nimport Profile from 0x35717efbbce11c74\n\ntransaction(name: String) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        self.finLeases= account.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath) \n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        self.finLeases!.fulfill(name)\n    }\n}"
-            },
-            "fulfillNameAuction": {
-               "spec": {
-                  "parameters": {
-                     "name": "String",
-                     "owner": "Address"
-                  },
-                  "order": [
-                     "owner",
-                     "name"
-                  ]
-               },
-               "code": "import FIND from 0x35717efbbce11c74\nimport Profile from 0x35717efbbce11c74\n\ntransaction(owner: Address, name: String) {\n\n    let leases : \u0026FIND.LeaseCollection?\n\n    prepare(account: \u0026Account) {\n        self.leases = getAccount(owner).capabilities.get\u003c\u0026FIND.LeaseCollection\u003e(FIND.LeasePublicPath)!.borrow()\n    }\n\n    pre{\n        self.leases != nil : \"Cannot borrow reference to lease collection reference. Account address: \".concat(owner.toString())\n    }\n\n    execute{\n        self.leases!.fulfillAuction(name)\n    }\n}"
             },
             "hideFindThoughts": {
                "spec": {
@@ -9919,38 +9562,6 @@
                   ]
                },
                "code": "import FindMarket from 0x35717efbbce11c74\nimport FindMarketSale from 0x35717efbbce11c74\nimport NonFungibleToken from 0x631e88ae7f1d7c20\nimport MetadataViews from 0x631e88ae7f1d7c20\nimport FindViews from 0x35717efbbce11c74\nimport FINDNFTCatalog from 0x35717efbbce11c74\nimport FTRegistry from 0x35717efbbce11c74\n\ntransaction(nftAliasOrIdentifier: String, id: UInt64, ftAliasOrIdentifier: String, directSellPrice:UFix64, validUntil: UFix64?) {\n\n    let saleItems : auth(FindMarketSale.Seller) \u0026FindMarketSale.SaleItemCollection?\n    let pointer : FindViews.AuthNFTPointer\n    let vaultType : Type\n\n    prepare(account: auth (StorageCapabilities, IssueStorageCapabilityController,PublishCapability, Storage) \u0026Account) {\n\n        let marketplace = FindMarket.getFindTenantAddress()\n        let tenantCapability= FindMarket.getTenantCapability(marketplace)!\n        let saleItemType= Type\u003c@FindMarketSale.SaleItemCollection\u003e()\n\n        let tenant = tenantCapability.borrow()!\n        let publicPath=FindMarket.getPublicPath(saleItemType, name: tenant.name)\n        let storagePath= FindMarket.getStoragePath(saleItemType, name:tenant.name)\n        let saleItemCap= account.capabilities.get\u003c\u0026FindMarketSale.SaleItemCollection\u003e(publicPath)\n        if !saleItemCap.check(){\n            account.storage.save(\u003c- FindMarketSale.createEmptySaleItemCollection(tenantCapability), to: storagePath)\n            let cap = account.capabilities.storage.issue\u003c\u0026FindMarketSale.SaleItemCollection\u003e(storagePath)\n            account.capabilities.publish(cap, at: publicPath)\n        }\n\n        // Get supported NFT and FT Information from Registries from input alias\n        let collectionIdentifier = FINDNFTCatalog.getCollectionsForType(nftTypeIdentifier:nftAliasOrIdentifier)?.keys ?? panic(\"This NFT is not supported by the NFT Catalog yet. Type : \".concat(nftAliasOrIdentifier))\n        let collection = FINDNFTCatalog.getCatalogEntry(collectionIdentifier : collectionIdentifier[0])!\n        let nft = collection.collectionData\n\n        let ft = FTRegistry.getFTInfo(ftAliasOrIdentifier) ?? panic(\"This FT is not supported by the Find Market yet. Type : \".concat(ftAliasOrIdentifier))\n\n        let storagePathIdentifer = nft.storagePath.toString().split(separator:\"/\")[1]\n        let providerIdentifier = storagePathIdentifer.concat(\"Provider\")\n        let providerStoragePath = StoragePath(identifier: providerIdentifier)!\n\n        //if this stores anything but this it will panic, why does it not return nil?\n        var existingProvider= account.storage.copy\u003cCapability\u003cauth(NonFungibleToken.Withdraw) \u0026{NonFungibleToken.Collection}\u003e\u003e(from: providerStoragePath) \n        if existingProvider==nil {\n            existingProvider=account.capabilities.storage.issue\u003cauth(NonFungibleToken.Withdraw) \u0026{NonFungibleToken.Collection}\u003e(nft.storagePath)\n            //we save it to storage to memoize it\n            account.storage.save(existingProvider!, to: providerStoragePath)\n            log(\"create new cap\")\n        }\n        var providerCap = existingProvider!\n\n        // Get the salesItemRef from tenant\n        self.saleItems= account.storage.borrow\u003cauth(FindMarketSale.Seller) \u0026FindMarketSale.SaleItemCollection\u003e(from: tenant.getStoragePath(Type\u003c@FindMarketSale.SaleItemCollection\u003e()))\n        self.pointer= FindViews.AuthNFTPointer(cap: providerCap, id: id)\n        self.vaultType= ft.type\n    }\n\n    pre{\n        self.saleItems != nil : \"Cannot borrow reference to saleItem\"\n    }\n\n    execute{\n        self.saleItems!.listForSale(pointer: self.pointer, vaultType: self.vaultType, directSellPrice: directSellPrice, validUntil: validUntil, extraField: {})\n    }\n}"
-            },
-            "listNameForAuction": {
-               "spec": {
-                  "parameters": {
-                     "auctionDuration": "UFix64",
-                     "auctionExtensionOnLateBid": "UFix64",
-                     "auctionReservePrice": "UFix64",
-                     "auctionStartPrice": "UFix64",
-                     "name": "String"
-                  },
-                  "order": [
-                     "name",
-                     "auctionStartPrice",
-                     "auctionReservePrice",
-                     "auctionDuration",
-                     "auctionExtensionOnLateBid"
-                  ]
-               },
-               "code": "import FIND from 0x35717efbbce11c74\n\ntransaction(name: String, auctionStartPrice: UFix64, auctionReservePrice: UFix64, auctionDuration: UFix64, auctionExtensionOnLateBid: UFix64) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.finLeases= acct.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        self.finLeases!.listForAuction(name: name, auctionStartPrice: auctionStartPrice, auctionReservePrice: auctionReservePrice, auctionDuration: auctionDuration,  auctionExtensionOnLateBid: auctionExtensionOnLateBid)\n    }\n}"
-            },
-            "listNameForSale": {
-               "spec": {
-                  "parameters": {
-                     "directSellPrice": "UFix64",
-                     "name": "String"
-                  },
-                  "order": [
-                     "name",
-                     "directSellPrice"
-                  ]
-               },
-               "code": "import FIND from 0x35717efbbce11c74\n\ntransaction(name: String, directSellPrice:UFix64) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(acct: auth(BorrowValue) \u0026Account) {\n        self.finLeases= acct.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        self.finLeases!.listForSale(name: name,  directSellPrice:directSellPrice)\n    }\n}"
             },
             "moveNameTO": {
                "spec": {
@@ -10543,17 +10154,6 @@
                   "order": []
                },
                "code": "import FindMarket from 0x35717efbbce11c74\nimport FlowToken from 0x7e60df042a9c0868\nimport Dandy from 0x35717efbbce11c74\n\ntransaction(){\n    prepare(account: auth(BorrowValue) \u0026Account){\n        let path = FindMarket.TenantClientStoragePath\n        let tenantRef = account.storage.borrow\u003cauth(FindMarket.TenantClientOwner) \u0026FindMarket.TenantClient\u003e(from: path) ?? panic(\"Cannot borrow Reference.\")\n\n        tenantRef.setMarketOption(name:\"FlowDandy\", cut: nil, rules:[\n        FindMarket.TenantRule(name:\"Flow\", types:[Type\u003c@FlowToken.Vault\u003e()], ruleType: \"ft\", allow: true),\n        FindMarket.TenantRule(name:\"Dandy\", types:[ Type\u003c@Dandy.NFT\u003e()], ruleType: \"nft\", allow: true)\n        ]\n    )\n\n}\n}"
-            },
-            "startNameAuction": {
-               "spec": {
-                  "parameters": {
-                     "name": "String"
-                  },
-                  "order": [
-                     "name"
-                  ]
-               },
-               "code": "import FIND from 0x35717efbbce11c74\n\ntransaction(name: String) {\n\n    let finLeases : auth(FIND.LeaseOwner) \u0026FIND.LeaseCollection?\n\n    prepare(account: auth(BorrowValue) \u0026Account) {\n        self.finLeases= account.storage.borrow\u003cauth(FIND.LeaseOwner) \u0026FIND.LeaseCollection\u003e(from:FIND.LeaseStoragePath)\n    }\n\n    pre{\n        self.finLeases != nil : \"Cannot borrow reference to find lease collection\"\n    }\n\n    execute{\n        self.finLeases!.startAuction(name)\n    }\n}"
             },
             "storeCuratedCollections": {
                "spec": {

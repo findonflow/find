@@ -37,6 +37,7 @@ transaction(leaseName: String, amount: UFix64) {
             //The link here has to be a capability not a tenant, because it can change.
             account.storage.save<@FindLeaseMarketSale.SaleItemCollection>(<- FindLeaseMarketSale.createEmptySaleItemCollection(leaseTenantCapability), to: leaseStoragePath)
             leaseSaleItemCap= account.capabilities.storage.issue<&{FindLeaseMarket.SaleItemCollectionPublic, FindLeaseMarketSale.SaleItemCollectionPublic}>(leaseStoragePath)
+            account.capabilities.publish(leaseSaleItemCap, at: leasePublicPath)
         }
 
         self.saleItemCollection = saleItemsCap.borrow()!
