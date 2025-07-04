@@ -67,7 +67,7 @@ Contact us in discord if you want this so that we can discuss it further:
 Please do not use any of these raw but as inspiration :)
 
  - [createProfile](transactions/createProfile.cdc) : create a profile with just a name. NB! this hard codes the  'createdAt' on line 22 to .find 
- - [setPFP](transactions/setProfile) : sets the PFP profile picture
+ - [setPFP](transactions/setProfile.cdc) : sets the PFP profile picture
  - [editProfile](transactions/editProfile) : edit the profile
  - [getProfile from address](scripts/profile.cdc) : to get from name, if you have .find name ise lookup as explained above
  
