@@ -600,4 +600,12 @@ access(all) fun main(name: String) :  Address? {
 			WithArg("names", []string{"user1"}),
 		).AssertSuccess(t)
 	})
+
+	ot.Run(t, "Should be able to resgister name without profile", func(t *testing.T) {
+		otu.O.Tx("register",
+			WithSigner("user4"),
+			WithArg("name", "user4"),
+			WithArg("maxAmount", 10.0),
+		).AssertSuccess(t)
+	})
 }

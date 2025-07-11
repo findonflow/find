@@ -21,5 +21,14 @@ func TestLeaseMarketSaleFlow(t *testing.T) {
 
 		otu.buyLeaseForMarketSale("user2", "user1", "user1", price)
 	})
- 
+
+	ot.Run(t, "Should be able to list a lease for sale and buy it with new user", func(t *testing.T) {
+		otu.listLeaseForSale("user1", "user1", price)
+
+		itemsForSale := otu.getLeasesForSale("user1")
+		require.Equal(t, 1, len(itemsForSale))
+		assert.Equal(t, "active_listed", itemsForSale[0].SaleType)
+
+		otu.buyLeaseForMarketSale("user4", "user1", "user1", price)
+	})
 }
