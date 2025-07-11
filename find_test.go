@@ -607,5 +607,7 @@ access(all) fun main(name: String) :  Address? {
 			WithArg("name", "user4"),
 			WithArg("maxAmount", 10.0),
 		).AssertSuccess(t)
+
+		otu.O.Script("isFindUser", WithArg("user", "user4")).AssertWant(t, autogold.Want("should be valid", true))
 	})
 }
