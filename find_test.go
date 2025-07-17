@@ -608,6 +608,6 @@ access(all) fun main(name: String) :  Address? {
 			WithArg("maxAmount", 10.0),
 		).AssertSuccess(t)
 
-		otu.O.Script("valid_user", WithArg("user", "user4")).AssertWant(t, autogold.Want("should be valid", true))
+		otu.O.Script("validUser", WithArg("user", "user4")).AssertWant(t, autogold.Want("should be valid", true))
 	})
 }

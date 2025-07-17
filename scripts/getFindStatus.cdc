@@ -122,14 +122,12 @@ fun main(user: String) : FINDReport? {
                 continue
             }
 
-            accounts.append(
-                AccountInformation(
-                    name: wallet,
-                    address: w.toString(),
-                    network: "Flow",
-                    trusted: true,
-                    node: "EmeraldID")
-                )
+            accounts.append(AccountInformation(
+                name: wallet,
+                address: w.toString(),
+                network: "Flow",
+                trusted: true,
+                node: "EmeraldID"))
             }
         }
 
